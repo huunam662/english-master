@@ -1,17 +1,17 @@
 package com.example.englishmaster_be.Controller;
 
-import com.example.englishmaster_be.Model.ResponseExam;
+import com.example.englishmaster_be.Model.ResponseModel;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class ExamController {
 
-    private ResponseExam response =new ResponseExam();
+    private ResponseModel response =new ResponseModel();
     
     @RequestMapping(value = "/test", method = RequestMethod.GET)
-    public ResponseExam test() {
+    public ResponseModel test() {
 
-        response.setResult("success");
+        response.setStatus("success");
         return response;
     }
 }
