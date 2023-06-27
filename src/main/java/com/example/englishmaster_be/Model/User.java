@@ -14,7 +14,7 @@ import java.util.UUID;
 public class User implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "user_id", columnDefinition = "BINARY(16)")
+    @Column(name = "id", columnDefinition = "BINARY(16)")
     private UUID userId;
     private String email;
     private String password;
@@ -36,7 +36,7 @@ public class User implements Serializable {
     private boolean isEnabled;
 
     @ManyToOne
-    @JoinColumn(name = "role", referencedColumnName = "role_id")
+    @JoinColumn(name = "role", referencedColumnName = "id")
     private Role role;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)

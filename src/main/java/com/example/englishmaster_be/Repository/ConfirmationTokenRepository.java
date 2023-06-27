@@ -10,4 +10,6 @@ import java.util.UUID;
 public interface ConfirmationTokenRepository extends JpaRepository<ConfirmationToken, UUID> {
     ConfirmationToken findByUserConfirmTokenId(UUID confirmToken);
 
+    ConfirmationToken findByCodeAndType(String code, String type);
+
 }

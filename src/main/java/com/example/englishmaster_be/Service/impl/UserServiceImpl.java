@@ -37,6 +37,8 @@ public class UserServiceImpl implements UserService{
     @Autowired
     private RoleRepository roleRepository;
 
+    private RefreshTokenService refreshTokenService;
+
     @Autowired
     private JavaMailSender mailSender;
 
@@ -68,10 +70,10 @@ public class UserServiceImpl implements UserService{
         userRepository.save(user);
 
         ConfirmationToken confirmationToken = new ConfirmationToken(user);
-
+        confirmationToken.setType("ACTIVE");
+        confirmationToken.setCode(UUID.randomUUID().toString());
 
         confirmationTokenRepository.save(confirmationToken);
-
 
         sendConfirmationEmail(user.getEmail(), confirmationToken.getUserConfirmTokenId().toString());
 
@@ -87,7 +89,7 @@ public class UserServiceImpl implements UserService{
 
         ResponseModel responseModel = new ResponseModel();
 
-        ConfirmationToken confirmationToken = confirmationTokenRepository.findByUserConfirmTokenId(UUID.fromString(confirmToken));
+        ConfirmationToken confirmationToken = confirmationTokenRepository.findByCodeAndType(confirmToken, "ACTIVE");
         if (confirmationToken == null){
             responseModel.setMessage("Invalid verification code!");
             responseModel.setStatus("fail");
@@ -100,7 +102,7 @@ public class UserServiceImpl implements UserService{
             return responseModel;
         }
 
-        if (confirmationToken.getConfirmExpiry().isBefore(LocalDateTime.now())){
+        if ((confirmationToken.getCreateAt().plusMinutes(5)).isBefore(LocalDateTime.now())){
             responseModel.setMessage("Verification code has expired!");
             responseModel.setStatus("fail");
             return responseModel;
@@ -123,11 +125,13 @@ public class UserServiceImpl implements UserService{
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLoginDTO.getEmail(), userLoginDTO.getPassword()));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            String jwt = jwtUtils.generateJwtToken(authentication);
 
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-            AuthResponse authResponse = new AuthResponse(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities(), jwt);
+            String jwt = jwtUtils.generateJwtToken(userDetails);
+
+            ConfirmationToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUsername());
+            AuthResponse authResponse = new AuthResponse(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities(), jwt, refreshToken.getCode());
 
             responseModel.setMessage("login successful");
             responseModel.setStatus("success");

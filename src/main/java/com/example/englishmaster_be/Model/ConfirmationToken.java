@@ -12,19 +12,21 @@ public class ConfirmationToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "user_confirm_token_id", columnDefinition = "BINARY(16)")
+    @Column(name = "id", columnDefinition = "BINARY(16)")
     private UUID userConfirmTokenId;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_at")
     private LocalDateTime createAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "confirm_expiry")
-    private LocalDateTime confirmExpiry;
+    @Column(name = "type")
+    private String type;
+
+    @Column(name = "code")
+    private String code;
 
     @OneToOne()
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     public ConfirmationToken() {
@@ -33,7 +35,6 @@ public class ConfirmationToken {
     public ConfirmationToken(User user){
         this.user = user;
         createAt = LocalDateTime.now();
-        confirmExpiry = LocalDateTime.now().plusMinutes(5);
     }
 
     public UUID getUserConfirmTokenId() {
@@ -52,12 +53,20 @@ public class ConfirmationToken {
         this.createAt = createAt;
     }
 
-    public LocalDateTime getConfirmExpiry() {
-        return confirmExpiry;
+    public String getType() {
+        return type;
     }
 
-    public void setConfirmExpiry(LocalDateTime confirmExpiry) {
-        this.confirmExpiry = confirmExpiry;
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
     }
 
     public User getUser() {
