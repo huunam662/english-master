@@ -47,14 +47,15 @@ public class JwtUtils {
                 .compact();
     }
 
+
+
+    private Key key() {
+//        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
+        return Keys.secretKeyFor(SignatureAlgorithm.HS512);
+    }
     public String getUserNameFromJwtToken(String token) {
         return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
     }
-
-//    private Key key() {
-////        return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
-//        return Keys.secretKeyFor(SignatureAlgorithm.HS256);
-//    }
 //
 //    public String getUserNameFromJwtToken(String token) {
 //        return Jwts.parserBuilder().setSigningKey(key()).build()

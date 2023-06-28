@@ -7,6 +7,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.io.Serializable;
 import java.security.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.UUID;
 
 @Entity
@@ -39,8 +40,8 @@ public class User implements Serializable {
     @JoinColumn(name = "role", referencedColumnName = "id")
     private Role role;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private ConfirmationToken confirmToken;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private Collection<ConfirmationToken> confirmToken;
 
     public User() {
         createAt = LocalDateTime.now();
@@ -128,11 +129,11 @@ public class User implements Serializable {
         isEnabled = enabled;
     }
 
-    public ConfirmationToken getConfirmToken() {
+    public Collection<ConfirmationToken> getConfirmToken() {
         return confirmToken;
     }
 
-    public void setConfirmToken(ConfirmationToken confirmToken) {
+    public void setConfirmToken(Collection<ConfirmationToken> confirmToken) {
         this.confirmToken = confirmToken;
     }
 

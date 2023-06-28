@@ -14,6 +14,14 @@ public class ResponseModel {
         timeStamp = Timestamp.valueOf(LocalDateTime.now());
     }
 
+    public ResponseModel(String message, Object responseData, String status, String violations) {
+        this.message = message;
+        this.responseData = responseData;
+        this.status = status;
+        this.violations = violations;
+        timeStamp = Timestamp.valueOf(LocalDateTime.now());
+    }
+
     public String getMessage() {
         return message;
     }

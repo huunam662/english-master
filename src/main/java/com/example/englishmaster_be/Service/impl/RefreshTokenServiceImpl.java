@@ -2,17 +2,20 @@ package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Exception.RefreshTokenException;
 import com.example.englishmaster_be.Model.ConfirmationToken;
+import com.example.englishmaster_be.Model.ResponseModel;
 import com.example.englishmaster_be.Model.User;
 import com.example.englishmaster_be.Repository.ConfirmationTokenRepository;
 import com.example.englishmaster_be.Repository.UserRepository;
 import com.example.englishmaster_be.Service.RefreshTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Service
 public class RefreshTokenServiceImpl implements RefreshTokenService {
 
     @Value("${masterE.jwtRefreshExpirationMs}")
@@ -41,12 +44,14 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     }
 
     @Override
-    public ConfirmationToken verifyExpiration(ConfirmationToken token) {
-        if(token.getCreateAt().plusSeconds(refreshTokenDurationMs).isBefore(LocalDateTime.now())){
+    public ResponseModel verifyExpiration(ResponseModel responseModel, ConfirmationToken token) {
+        System.out.println(token.getCreateAt().plusNanos(refreshTokenDurationMs));
+        if(token.getCreateAt().plusNanos(refreshTokenDurationMs).isBefore(LocalDateTime.now())){
             confirmationTokenRepository.delete(token);
-            throw new RefreshTokenException(token.getCode(), "Refresh token was expired. Please make a new signin request");
+            responseModel.setStatus("fail");
+            responseModel.setMessage("Refresh token was expired. Please make a new signin request");
         }
-        return token;
+        return responseModel;
     }
 
     @Override
