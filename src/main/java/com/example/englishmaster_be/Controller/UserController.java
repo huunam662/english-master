@@ -63,11 +63,19 @@ public class UserController {
         User user = userService.createUser(registerDTO);
 
         boolean existingUser = userRepository.existsByEmail(user.getEmail());
+
+        if (registerDTO.getPassword().equals(registerDTO.getConfirmPassword())){
+            responseModel.setMessage("Password and confirm password don't match");
+            responseModel.setStatus("fail");
+            return responseModel;
+        }
+
         if (existingUser){
             responseModel.setMessage("This email already exists!");
             responseModel.setStatus("fail");
             return responseModel;
         }
+
 
         userRepository.save(user);
 
