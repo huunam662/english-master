@@ -1,9 +1,7 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.Exception.RefreshTokenException;
 import com.example.englishmaster_be.Model.ConfirmationToken;
 import com.example.englishmaster_be.Model.ResponseModel;
-import com.example.englishmaster_be.Model.User;
 import com.example.englishmaster_be.Repository.ConfirmationTokenRepository;
 import com.example.englishmaster_be.Repository.UserRepository;
 import com.example.englishmaster_be.Service.RefreshTokenService;
@@ -11,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.UUID;
 

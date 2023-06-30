@@ -64,7 +64,7 @@ public class UserController {
 
         boolean existingUser = userRepository.existsByEmail(user.getEmail());
 
-        if (registerDTO.getPassword().equals(registerDTO.getConfirmPassword())){
+        if (!registerDTO.getPassword().equals(registerDTO.getConfirmPassword())){
             responseModel.setMessage("Password and confirm password don't match");
             responseModel.setStatus("fail");
             return responseModel;

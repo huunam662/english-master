@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Configuration.jwt;
 
+import com.example.englishmaster_be.Model.ResponseModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +13,9 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,13 +31,26 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
-        final Map<String, Object> body = new HashMap<>();
-        body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-        body.put("error", "Unauthorized");
-        body.put("message", authException.getMessage());
-        body.put("path", request.getServletPath());
+
+        ResponseModel responseModel = new ResponseModel();
+        System.out.println(responseModel.getTimeStamp());
+
+        responseModel.setMessage(authException.getMessage());
+        responseModel.setStatus("fail");
+        responseModel.setViolations(String.valueOf(HttpServletResponse.SC_UNAUTHORIZED));
+
+//        final Map<String, Object> body = new HashMap<>();
+//        body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
+//        body.put("error", "Unauthorized");
+//        body.put("message", authException.getMessage());
+//        body.put("path", request.getServletPath());
 
         final ObjectMapper mapper = new ObjectMapper();
-        mapper.writeValue(response.getOutputStream(), body);
+//        mapper.writeValue(response.getOutputStream(), body);
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        mapper.setDateFormat(sdf);
+        mapper.writeValue(response.getOutputStream(), responseModel);
+
     }
 }
