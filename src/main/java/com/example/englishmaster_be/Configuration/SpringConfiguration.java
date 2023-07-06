@@ -1,5 +1,9 @@
 package com.example.englishmaster_be.Configuration;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.*;
+import io.swagger.v3.oas.models.security.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.mail.javamail.*;
 
@@ -20,4 +24,6 @@ public class SpringConfiguration {
 
         return mailSender;
     }
+
+
 }

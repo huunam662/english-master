@@ -8,54 +8,51 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
-@Table(name = "users")
-public class User implements Serializable {
+@Table(name = "answer")
+public class Answer implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", columnDefinition = "BINARY(16)")
-    private UUID userId;
-    private String email;
-    private String password;
-    private String name;
-    private String phone;
-    private String address;
-    private String avatar;
+    private UUID answerId;
+
+    @Column(name = "content")
+    private String answerContent;
+
+    @ManyToOne
+    @JoinColumn(name = "question_id", referencedColumnName = "id")
+    private Question question;
+
+    @Column(name = "correct_answer")
+    private boolean correctAnswer;
+
+    @Column(name = "explain_details")
+    private String explainDetails;
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
     @Column(name = "create_at")
     private LocalDateTime createAt;
+
+    @ManyToOne
+    @JoinColumn(name = "create_by", referencedColumnName = "id")
+    private User userCreate;
+
     @Temporal(TemporalType.TIMESTAMP)
     @UpdateTimestamp
     @Column(name = "update_at")
     private LocalDateTime updateAt;
 
-    @Column(name = "is_enabled")
-    private boolean isEnabled;
-
     @ManyToOne
-    @JoinColumn(name = "role", referencedColumnName = "id")
-    private Role role;
+    @JoinColumn(name = "update_by", referencedColumnName = "id")
+    private User userUpdate;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private Collection<ConfirmationToken> confirmToken;
-
-//    @OneToMany(mappedBy = "userCreate", cascade = CascadeType.ALL)
-//    private Collection<Topic> topicCreate;
-//
-//    @OneToMany(mappedBy = "userUpdate", cascade = CascadeType.ALL)
-//    private Collection<Topic> topicUpdate;
-
-    public User() {
+    public Answer() {
         createAt = LocalDateTime.now();
         updateAt= LocalDateTime.now();
-
     }
-
 }

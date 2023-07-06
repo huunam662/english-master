@@ -10,15 +10,10 @@ import jakarta.mail.internet.MimeMessage;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
+import org.springframework.core.io.*;
+import org.springframework.mail.javamail.*;
+import org.springframework.security.authentication.*;
+import org.springframework.security.core.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.FileCopyUtils;
@@ -138,8 +133,13 @@ public class UserController {
 
             String jwt = jwtUtils.generateJwtToken(userDetails);
 
+            User user = userService.findUser(userDetails);
+
+            refreshTokenService.deleteAllTokenExpired(user);
+
             ConfirmationToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUsername());
-            AuthResponse authResponse = new AuthResponse(userDetails.getUsername(), userDetails.getPassword(), userDetails.getAuthorities(), jwt, refreshToken.getCode());
+
+            AuthResponse authResponse = new AuthResponse(jwt, refreshToken.getCode());
 
             responseModel.setMessage("login successful");
             responseModel.setStatus("success");
@@ -156,9 +156,8 @@ public class UserController {
     public ResponseModel forgetPassword(@RequestParam("email")String email) throws MessagingException, IOException {
         ResponseModel responseModel = new ResponseModel();
 
-        System.out.println(email);
         boolean existingUser = userRepository.existsByEmail(email);
-        System.out.println(existingUser);
+
         if (!existingUser){
             responseModel.setMessage("This email don't exists!");
             responseModel.setStatus("fail");
@@ -260,7 +259,6 @@ public class UserController {
         }
 
         responseModel = refreshTokenService.verifyExpiration(responseModel, token);
-        System.out.println(responseModel.getMessage());
 
         if (responseModel.getStatus() != null){
             return responseModel;
@@ -275,6 +273,22 @@ public class UserController {
         responseModel.setStatus("success");
         responseModel.setMessage("Created new access token");
         responseModel.setResponseData(obj);
+
+        return responseModel;
+    }
+
+    @GetMapping("/logout")
+    public ResponseModel logoutUser(@RequestParam String access_token){
+        ResponseModel responseModel = new ResponseModel();
+
+        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        User user = userRepository.findByEmail(userDetails.getUsername());
+        ConfirmationToken confirmationToken = confirmationTokenRepository.findByUserAndType(user, "REFRESH_TOKEN");
+        confirmationTokenRepository.delete(confirmationToken);
+
+        responseModel.setStatus("success");
+        responseModel.setMessage("Log out successful");
 
         return responseModel;
     }

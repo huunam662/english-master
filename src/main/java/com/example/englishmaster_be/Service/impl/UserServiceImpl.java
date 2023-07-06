@@ -7,6 +7,7 @@ import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,8 @@ public class UserServiceImpl implements UserService{
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private UserRepository userRepository;
 
 
     @Override
@@ -41,6 +44,11 @@ public class UserServiceImpl implements UserService{
     @Override
     public void changePassword(User user, String newpass) {
         user.setPassword(passwordEncoder.encode((newpass)));
+    }
+
+    @Override
+    public User findUser(UserDetails userDetails) {
+        return userRepository.findByEmail(userDetails.getUsername());
     }
 
 }
