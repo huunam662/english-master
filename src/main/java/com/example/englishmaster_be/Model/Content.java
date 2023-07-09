@@ -1,8 +1,7 @@
 package com.example.englishmaster_be.Model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -13,25 +12,18 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-@Table(name = "question_group")
-public class QuestionGroup implements Serializable {
+@Table(name = "content")
+public class Content implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "id", columnDefinition = "BINARY(16)")
-    private UUID questionGroupId;
-
-    @Column(name = "question_content")
-    private String questionContent;
+    private UUID contentId;
 
     @Column(name = "content_type")
     private String contentType;
 
     @Column(name = "content_data")
     private String contentData;
-
-    @ManyToOne
-    @JoinColumn(name = "part_id", referencedColumnName = "id")
-    private Part part;
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
@@ -51,8 +43,23 @@ public class QuestionGroup implements Serializable {
     @JoinColumn(name = "update_by", referencedColumnName = "id")
     private User userUpdate;
 
-    public QuestionGroup() {
+    @ManyToOne
+    @JoinTable(name = "question_content",
+            joinColumns = @JoinColumn(name = "content_id"),
+            inverseJoinColumns = @JoinColumn(name = "question_id"))
+    private Question question;
+
+
+    public Content(Question question, String contentType, String contentData) {
+        this.question = question;
+        this.contentType = contentType;
+        this.contentData = contentData;
+
         createAt = LocalDateTime.now();
-        updateAt= LocalDateTime.now();
+        updateAt = LocalDateTime.now();
+    }
+
+    public Content() {
+
     }
 }

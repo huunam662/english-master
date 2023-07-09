@@ -1,12 +1,12 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.Configuration.jwt.JwtUtils;
 import com.example.englishmaster_be.DTO.UserRegisterDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,9 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-
 @Service
-public class UserServiceImpl implements UserService{
+public class UserServiceImpl implements IUserService {
 
 
     @Autowired
@@ -49,6 +48,14 @@ public class UserServiceImpl implements UserService{
     @Override
     public User findUser(UserDetails userDetails) {
         return userRepository.findByEmail(userDetails.getUsername());
+    }
+
+    @Override
+    public User currentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+        User user = findUser(userDetails);
+        return user;
     }
 
 }

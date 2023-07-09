@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Model;
 
+import com.example.englishmaster_be.DTO.Question.*;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -25,17 +26,14 @@ public class Question implements Serializable {
     private String questionContent;
 
     @Column(name = "question_score")
-    private String questionScore;
-
-    @Column(name = "content_type")
-    private String contentType;
-
-    @Column(name = "content_data")
-    private String contentData;
+    private int questionScore;
 
     @ManyToOne
-    @JoinColumn(name = "question_group_id", referencedColumnName = "id")
-    private QuestionGroup questionGroup;
+    @JoinColumn(name = "question_group", referencedColumnName = "id")
+    private Question questionGroup;
+
+    @Column(name = "question_numberical")
+    private int questionNumberical;
 
     @ManyToOne
     @JoinColumn(name = "part_id", referencedColumnName = "id")
@@ -66,7 +64,28 @@ public class Question implements Serializable {
     @OneToMany(mappedBy = "question")
     private Collection<Answer> answers;
 
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
+    private Collection<Content> contentCollection;
+
+
+
     public Question() {
+        createAt = LocalDateTime.now();
+        updateAt= LocalDateTime.now();
+    }
+
+    public Question(CreateQuestionDTO createQuestionDTO){
+        this.questionContent = createQuestionDTO.getQuestionContent();
+        this.questionScore = createQuestionDTO.getQuestionScore();
+
+        createAt = LocalDateTime.now();
+        updateAt= LocalDateTime.now();
+    }
+
+    public Question(String questionContent, int questionScore){
+        this.questionContent = questionContent;
+        this.questionScore = questionScore;
+
         createAt = LocalDateTime.now();
         updateAt= LocalDateTime.now();
     }

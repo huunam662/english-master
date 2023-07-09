@@ -29,7 +29,7 @@ import java.util.UUID;
 @RequestMapping("/api")
 public class UserController {
     @Autowired
-    private UserService userService;
+    private IUserService IUserService;
     @Autowired
     private UserRepository userRepository;
 
@@ -40,7 +40,7 @@ public class UserController {
     private JavaMailSender mailSender;
 
     @Autowired
-    private RefreshTokenService refreshTokenService;
+    private IRefreshTokenService IRefreshTokenService;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -55,7 +55,7 @@ public class UserController {
     public ResponseModel register(@RequestBody UserRegisterDTO registerDTO) throws IOException, MessagingException {
         ResponseModel responseModel = new ResponseModel();
 
-        User user = userService.createUser(registerDTO);
+        User user = IUserService.createUser(registerDTO);
 
         boolean existingUser = userRepository.existsByEmail(user.getEmail());
 
@@ -133,11 +133,11 @@ public class UserController {
 
             String jwt = jwtUtils.generateJwtToken(userDetails);
 
-            User user = userService.findUser(userDetails);
+            User user = IUserService.findUser(userDetails);
 
-            refreshTokenService.deleteAllTokenExpired(user);
+            IRefreshTokenService.deleteAllTokenExpired(user);
 
-            ConfirmationToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUsername());
+            ConfirmationToken refreshToken = IRefreshTokenService.createRefreshToken(userDetails.getUsername());
 
             AuthResponse authResponse = new AuthResponse(jwt, refreshToken.getCode());
 
@@ -234,7 +234,7 @@ public class UserController {
         }
 
         User user = confirmToken.getUser();
-        userService.changePassword(user, changePasswordDTO.getNewPass());
+        IUserService.changePassword(user, changePasswordDTO.getNewPass());
 
         userRepository.save(user);
         confirmationTokenRepository.delete(confirmToken);
@@ -250,7 +250,7 @@ public class UserController {
         String refresh = refreshTokenDTO.getRequestRefresh();
         ResponseModel responseModel = new ResponseModel();
 
-        ConfirmationToken token = refreshTokenService.findByToken(refresh);
+        ConfirmationToken token = IRefreshTokenService.findByToken(refresh);
 
         if(token == null){
             responseModel.setMessage("Refresh token isn't in database!");
@@ -258,7 +258,7 @@ public class UserController {
             return responseModel;
         }
 
-        responseModel = refreshTokenService.verifyExpiration(responseModel, token);
+        responseModel = IRefreshTokenService.verifyExpiration(responseModel, token);
 
         if (responseModel.getStatus() != null){
             return responseModel;

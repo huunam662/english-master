@@ -1,8 +1,7 @@
 package com.example.englishmaster_be.Service.impl;
 
 
-import com.example.englishmaster_be.Service.FileStorageService;
-import org.springframework.beans.factory.annotation.Value;
+import com.example.englishmaster_be.Service.IFileStorageService;
 import org.springframework.core.io.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.stream.Stream;
 
 @Service
-public class FileStorageServiceImpl implements FileStorageService {
+public class FileStorageServiceImpl implements IFileStorageService {
 
 //    @Value("${masterE.fileSave}")
 //    private String fileSave;
@@ -47,10 +46,9 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 
     @Override
-    public String save(MultipartFile file) {
+    public void save(MultipartFile file, String fileName) {
         try {
-            Files.copy(file.getInputStream(), this.root.resolve(nameFile(file)));
-            return nameFile(file);
+            Files.copy(file.getInputStream(), this.root.resolve(fileName));
         } catch (Exception e) {
             if (e instanceof FileAlreadyExistsException) {
                 throw new RuntimeException("A file of that name already exists.");
@@ -59,6 +57,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         }
 
     }
+
 
     @Override
     public Stream<Path> loadAll() {
@@ -69,7 +68,18 @@ public class FileStorageServiceImpl implements FileStorageService {
         }
     }
 
-    private String nameFile(MultipartFile file){
+    @Override
+    public boolean delete(String filename) {
+        try {
+            Path file = root.resolve(filename);
+            return Files.deleteIfExists(file);
+        } catch (IOException e) {
+            throw new RuntimeException("Error: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public String nameFile(MultipartFile file){
         String originalFilename = file.getOriginalFilename();
         String extension = getExtension(originalFilename);
         String fileNameDelete = deleteExtension(originalFilename);

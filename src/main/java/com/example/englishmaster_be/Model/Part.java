@@ -63,12 +63,10 @@ public class Part implements Serializable {
         updateAt= LocalDateTime.now();
     }
 
-    public Part(String partName, String partDescription, String partType, String contentType, String contentData) {
+    public Part(String partName, String partDescription, String partType) {
         this.partName = partName;
         this.partDescription = partDescription;
         this.partType = partType;
-        this.contentType = contentType;
-        this.contentData = contentData;
 
         createAt = LocalDateTime.now();
         updateAt= LocalDateTime.now();

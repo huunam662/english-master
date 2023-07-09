@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Model.Response;
 
+import com.example.englishmaster_be.Component.GetExtension;
 import com.example.englishmaster_be.Component.PublicLink;
 import com.example.englishmaster_be.Model.Topic;
 import lombok.Getter;
@@ -40,30 +41,13 @@ public class TopicResponse {
 
     public TopicResponse(Topic topic) {
 
-        String link = PublicLink.getLink();
-        String extension = getExtension(topic.getTopicImage());
-        String linkFile = link;
+        String link = GetExtension.linkName(topic.getTopicImage());
+        System.out.println(link);
 
         this.topicId = topic.getTopicId();
         this.topicName = topic.getTopicName();
 
-        switch (extension){
-            case ".jpg":
-            case ".JPG":
-            case ".jpeg":
-            case ".JPEG":
-            case ".png":
-            case ".PNG":
-            case ".gif":
-            case ".GIF":
-                linkFile = link + "file/showImage/";
-                break;
-            default:
-                linkFile = link + "file/";
-                break;
-        }
-
-        this.topicImage =  linkFile + topic.getTopicImage();
+        this.topicImage =  link + topic.getTopicImage();
         this.topicDescription = topic.getTopicDescription();
         this.topicType = topic.getTopicType();
         this.workTime = topic.getWorkTime();
@@ -82,11 +66,4 @@ public class TopicResponse {
         userUpdate.put("User Name", topic.getUserUpdate().getName());
     }
 
-    private String getExtension(String filename) {
-        int dotIndex = filename.lastIndexOf(".");
-        if (dotIndex > -1 && dotIndex < filename.length() - 1) {
-            return filename.substring(dotIndex);
-        }
-        return "";
-    }
 }

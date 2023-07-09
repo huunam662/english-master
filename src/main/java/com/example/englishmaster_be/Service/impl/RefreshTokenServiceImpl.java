@@ -2,17 +2,16 @@ package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Repository.*;
-import com.example.englishmaster_be.Service.RefreshTokenService;
+import com.example.englishmaster_be.Service.IRefreshTokenService;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Service
-public class RefreshTokenServiceImpl implements RefreshTokenService {
+public class RefreshTokenServiceImpl implements IRefreshTokenService {
 
     @Value("${masterE.jwtRefreshExpirationMs}")
     private Long refreshTokenDurationMs;

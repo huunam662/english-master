@@ -9,8 +9,6 @@ public class CreatePartDTO {
     private String partName;
     private String partDiscription;
     private String partType;
-    private String contentType;
-    private MultipartFile contentData;
 
     public CreatePartDTO() {
     }
