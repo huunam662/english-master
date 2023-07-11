@@ -2,8 +2,6 @@ package com.example.englishmaster_be.Model;
 
 import com.example.englishmaster_be.DTO.Question.*;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -13,8 +11,6 @@ import java.util.Collection;
 import java.util.UUID;
 
 @Entity
-@Getter
-@Setter
 @Table(name = "question")
 public class Question implements Serializable {
     @Id
@@ -88,4 +84,109 @@ public class Question implements Serializable {
         createAt = LocalDateTime.now();
         updateAt= LocalDateTime.now();
     }
+
+	public UUID getQuestionId() {
+		return questionId;
+	}
+
+	public void setQuestionId(UUID questionId) {
+		this.questionId = questionId;
+	}
+
+	public String getQuestionContent() {
+		return questionContent;
+	}
+
+	public void setQuestionContent(String questionContent) {
+		this.questionContent = questionContent;
+	}
+
+	public int getQuestionScore() {
+		return questionScore;
+	}
+
+	public void setQuestionScore(int questionScore) {
+		this.questionScore = questionScore;
+	}
+
+	public Question getQuestionGroup() {
+		return questionGroup;
+	}
+
+	public void setQuestionGroup(Question questionGroup) {
+		this.questionGroup = questionGroup;
+	}
+
+	public int getQuestionNumberical() {
+		return questionNumberical;
+	}
+
+	public void setQuestionNumberical(int questionNumberical) {
+		this.questionNumberical = questionNumberical;
+	}
+
+	public Part getPart() {
+		return part;
+	}
+
+	public void setPart(Part part) {
+		this.part = part;
+	}
+
+	public LocalDateTime getCreateAt() {
+		return createAt;
+	}
+
+	public void setCreateAt(LocalDateTime createAt) {
+		this.createAt = createAt;
+	}
+
+	public User getUserCreate() {
+		return userCreate;
+	}
+
+	public void setUserCreate(User userCreate) {
+		this.userCreate = userCreate;
+	}
+
+	public LocalDateTime getUpdateAt() {
+		return updateAt;
+	}
+
+	public void setUpdateAt(LocalDateTime updateAt) {
+		this.updateAt = updateAt;
+	}
+
+	public User getUserUpdate() {
+		return userUpdate;
+	}
+
+	public void setUserUpdate(User userUpdate) {
+		this.userUpdate = userUpdate;
+	}
+
+	public Collection<Topic> getTopics() {
+		return topics;
+	}
+
+	public void setTopics(Collection<Topic> topics) {
+		this.topics = topics;
+	}
+
+	public Collection<Answer> getAnswers() {
+		return answers;
+	}
+
+	public void setAnswers(Collection<Answer> answers) {
+		this.answers = answers;
+	}
+
+	public Collection<Content> getContentCollection() {
+		return contentCollection;
+	}
+
+	public void setContentCollection(Collection<Content> contentCollection) {
+		this.contentCollection = contentCollection;
+	}
+    
 }

@@ -1,14 +1,10 @@
 package com.example.englishmaster_be.Model;
 
-import lombok.Getter;
-import lombok.Setter;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
 public class ResponseModel {
     private String message;
     private Object responseData;
@@ -29,5 +25,46 @@ public class ResponseModel {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
         timeStamp = sdf.format(Timestamp.valueOf(LocalDateTime.now()));
     }
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public Object getResponseData() {
+		return responseData;
+	}
+
+	public void setResponseData(Object responseData) {
+		this.responseData = responseData;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public String getTimeStamp() {
+		return timeStamp;
+	}
+
+	public void setTimeStamp(String timeStamp) {
+		this.timeStamp = timeStamp;
+	}
+
+	public String getViolations() {
+		return violations;
+	}
+
+	public void setViolations(String violations) {
+		this.violations = violations;
+	}
+    
 
 }

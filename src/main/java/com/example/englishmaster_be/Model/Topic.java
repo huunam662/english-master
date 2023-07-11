@@ -1,20 +1,15 @@
 package com.example.englishmaster_be.Model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.io.Serializable;
-import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.UUID;
 
 @Entity
-@Getter
-@Setter
 @Table(name = "topics")
 public class Topic implements Serializable {
     @Id
@@ -99,5 +94,135 @@ public class Topic implements Serializable {
         createAt = LocalDateTime.now();
         updateAt= LocalDateTime.now();
     }
+
+	public UUID getTopicId() {
+		return topicId;
+	}
+
+	public void setTopicId(UUID topicId) {
+		this.topicId = topicId;
+	}
+
+	public String getTopicName() {
+		return topicName;
+	}
+
+	public void setTopicName(String topicName) {
+		this.topicName = topicName;
+	}
+
+	public String getTopicImage() {
+		return topicImage;
+	}
+
+	public void setTopicImage(String topicImage) {
+		this.topicImage = topicImage;
+	}
+
+	public String getTopicDescription() {
+		return topicDescription;
+	}
+
+	public void setTopicDescription(String topicDescription) {
+		this.topicDescription = topicDescription;
+	}
+
+	public String getTopicType() {
+		return topicType;
+	}
+
+	public void setTopicType(String topicType) {
+		this.topicType = topicType;
+	}
+
+	public String getWorkTime() {
+		return workTime;
+	}
+
+	public void setWorkTime(String workTime) {
+		this.workTime = workTime;
+	}
+
+	public LocalDateTime getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(LocalDateTime startTime) {
+		this.startTime = startTime;
+	}
+
+	public LocalDateTime getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(LocalDateTime endTime) {
+		this.endTime = endTime;
+	}
+
+	public Collection<Question> getQuestions() {
+		return questions;
+	}
+
+	public void setQuestions(Collection<Question> questions) {
+		this.questions = questions;
+	}
+
+	public Collection<Part> getParts() {
+		return parts;
+	}
+
+	public void setParts(Collection<Part> parts) {
+		this.parts = parts;
+	}
+
+	public boolean isEnable() {
+		return enable;
+	}
+
+	public void setEnable(boolean enable) {
+		this.enable = enable;
+	}
+
+	public LocalDateTime getCreateAt() {
+		return createAt;
+	}
+
+	public void setCreateAt(LocalDateTime createAt) {
+		this.createAt = createAt;
+	}
+
+	public User getUserCreate() {
+		return userCreate;
+	}
+
+	public void setUserCreate(User userCreate) {
+		this.userCreate = userCreate;
+	}
+
+	public LocalDateTime getUpdateAt() {
+		return updateAt;
+	}
+
+	public void setUpdateAt(LocalDateTime updateAt) {
+		this.updateAt = updateAt;
+	}
+
+	public User getUserUpdate() {
+		return userUpdate;
+	}
+
+	public void setUserUpdate(User userUpdate) {
+		this.userUpdate = userUpdate;
+	}
+
+	public Collection<MockTest> getMockTests() {
+		return mockTests;
+	}
+
+	public void setMockTests(Collection<MockTest> mockTests) {
+		this.mockTests = mockTests;
+	}
+    
+    
 
 }
