@@ -2,6 +2,7 @@ package com.example.englishmaster_be.Service.impl;
 
 
 import com.example.englishmaster_be.Service.IFileStorageService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,10 +17,10 @@ import java.util.stream.Stream;
 @Service
 public class FileStorageServiceImpl implements IFileStorageService {
 
-//    @Value("${masterE.fileSave}")
-//    private String fileSave;
+    @Value("${masterE.fileSave}")
+    private String fileSave;
+//    private final Path root = Paths.get("D:\\Workplace\\FileEnglishMaster");
     private final Path root = Paths.get("D:\\Workplace\\FileEnglishMaster");
-
     @Override
     public void init() {
         try {

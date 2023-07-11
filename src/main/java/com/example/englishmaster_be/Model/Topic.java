@@ -99,4 +99,5 @@ public class Topic implements Serializable {
         createAt = LocalDateTime.now();
         updateAt= LocalDateTime.now();
     }
+
 }

@@ -7,7 +7,6 @@ import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Service.*;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -268,7 +267,6 @@ public class QuestionController {
                 AnswerResponse answerResponse = new AnswerResponse(answer);
                 answerArray.add(answerResponse);
 
-                System.out.println(answerResponse.getCreateAt());
             }
 
             responseModel.setMessage("List answer to question successfully");

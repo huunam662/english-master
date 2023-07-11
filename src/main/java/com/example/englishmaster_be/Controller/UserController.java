@@ -281,11 +281,10 @@ public class UserController {
     public ResponseModel logoutUser(@RequestParam String access_token){
         ResponseModel responseModel = new ResponseModel();
 
-        CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        User user = IUserService.currentUser();
 
-        User user = userRepository.findByEmail(userDetails.getUsername());
-        ConfirmationToken confirmationToken = confirmationTokenRepository.findByUserAndType(user, "REFRESH_TOKEN");
-        confirmationTokenRepository.delete(confirmationToken);
+//        ConfirmationToken confirmationToken = confirmationTokenRepository.findByUserAndType(user, "REFRESH_TOKEN");
+//        confirmationTokenRepository.delete(confirmationToken);
 
         responseModel.setStatus("success");
         responseModel.setMessage("Log out successful");
