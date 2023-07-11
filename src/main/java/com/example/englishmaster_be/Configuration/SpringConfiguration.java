@@ -1,10 +1,17 @@
 package com.example.englishmaster_be.Configuration;
 
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.*;
+import io.swagger.v3.oas.models.security.*;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.*;
 
 import java.util.Properties;
 
+@Configuration
 public class SpringConfiguration {
     @Bean
     public JavaMailSender javaMailSender() {
@@ -20,4 +27,6 @@ public class SpringConfiguration {
 
         return mailSender;
     }
+
+
 }

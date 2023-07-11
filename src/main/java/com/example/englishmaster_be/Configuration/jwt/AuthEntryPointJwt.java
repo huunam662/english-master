@@ -13,11 +13,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.Map;
 
 @Configuration(proxyBeanMethods = true)
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
@@ -39,14 +35,8 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
         responseModel.setStatus("fail");
         responseModel.setViolations(String.valueOf(HttpServletResponse.SC_UNAUTHORIZED));
 
-//        final Map<String, Object> body = new HashMap<>();
-//        body.put("status", HttpServletResponse.SC_UNAUTHORIZED);
-//        body.put("error", "Unauthorized");
-//        body.put("message", authException.getMessage());
-//        body.put("path", request.getServletPath());
 
         final ObjectMapper mapper = new ObjectMapper();
-//        mapper.writeValue(response.getOutputStream(), body);
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
         mapper.setDateFormat(sdf);
