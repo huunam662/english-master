@@ -9,6 +9,8 @@ import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -27,13 +29,13 @@ public class TopicResponse {
 
     private String workTime;
 
-    private LocalDateTime startTime;
+    private String startTime;
 
-    private LocalDateTime endTime;
+    private String endTime;
 
-    private LocalDateTime createAt;
+    private String createAt;
 
-    private LocalDateTime updateAt;
+    private String updateAt;
 
     private JSONObject userCreate;
 
@@ -51,10 +53,13 @@ public class TopicResponse {
         this.topicDescription = topic.getTopicDescription();
         this.topicType = topic.getTopicType();
         this.workTime = topic.getWorkTime();
-        this.startTime = topic.getStartTime();
-        this.endTime = topic.getEndTime();
-        this.createAt = topic.getCreateAt();
-        this.updateAt = topic.getUpdateAt();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+
+        this.startTime = sdf.format(Timestamp.valueOf(topic.getStartTime()));
+        this.endTime = sdf.format(Timestamp.valueOf(topic.getEndTime()));
+        this.createAt = sdf.format(Timestamp.valueOf(topic.getCreateAt()));
+        this.updateAt = sdf.format(Timestamp.valueOf(topic.getUpdateAt()));
 
         userCreate = new JSONObject();
         userUpdate = new JSONObject();

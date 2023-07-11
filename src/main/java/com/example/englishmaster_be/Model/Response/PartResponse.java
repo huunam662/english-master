@@ -8,6 +8,8 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.json.simple.JSONObject;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -20,8 +22,8 @@ public class PartResponse {
     private String partType;
     private String contentType;
     private String contentData;
-    private LocalDateTime createAt;
-    private LocalDateTime updateAt;
+    private String createAt;
+    private String updateAt;
 
     private JSONObject userCreate;
 
@@ -43,8 +45,10 @@ public class PartResponse {
         this.partDescription = part.getPartDescription();
         this.partType = part.getPartType();
         this.contentType = part.getContentType();
-        this.createAt = part.getCreateAt();
-        this.updateAt = part.getUpdateAt();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        this.createAt = sdf.format(Timestamp.valueOf(part.getCreateAt()));
+        this.updateAt = sdf.format(Timestamp.valueOf(part.getUpdateAt()));
 
         userCreate = new JSONObject();
         userUpdate = new JSONObject();

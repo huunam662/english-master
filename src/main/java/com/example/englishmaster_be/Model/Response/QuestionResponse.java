@@ -8,6 +8,8 @@ import lombok.Setter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -20,8 +22,8 @@ public class QuestionResponse {
     private JSONArray contentList;
     private UUID questionGroup;
     private UUID partId;
-    private LocalDateTime createAt;
-    private LocalDateTime updateAt;
+    private String createAt;
+    private String updateAt;
 
     private JSONObject userCreate;
 
@@ -43,9 +45,9 @@ public class QuestionResponse {
 
         this.partId = question.getPart().getPartId();
 
-        this.createAt = question.getCreateAt();
-        this.updateAt = question.getUpdateAt();
-
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        this.createAt = sdf.format(Timestamp.valueOf(question.getCreateAt()));
+        this.updateAt = sdf.format(Timestamp.valueOf(question.getUpdateAt()));
 
         contentList = new JSONArray();
         userCreate = new JSONObject();

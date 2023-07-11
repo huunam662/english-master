@@ -267,6 +267,8 @@ public class QuestionController {
             for(Answer answer : answerCollection){
                 AnswerResponse answerResponse = new AnswerResponse(answer);
                 answerArray.add(answerResponse);
+
+                System.out.println(answerResponse.getCreateAt());
             }
 
             responseModel.setMessage("List answer to question successfully");

@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.json.simple.JSONObject;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -16,8 +18,8 @@ public class AnswerResponse {
     private String answerContent;
     private boolean correctAnswer;
     private String explainDetails;
-    private LocalDateTime createAt;
-    private LocalDateTime updateAt;
+    private String createAt;
+    private String updateAt;
 
     private JSONObject userCreate;
 
@@ -29,8 +31,10 @@ public class AnswerResponse {
         answerContent = answer.getAnswerContent();
         correctAnswer = answer.isCorrectAnswer();
         explainDetails =answer.getExplainDetails();
-        createAt = answer.getCreateAt();
-        updateAt = answer.getUpdateAt();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        createAt = sdf.format(Timestamp.valueOf(answer.getCreateAt()));
+        updateAt = sdf.format(Timestamp.valueOf(answer.getUpdateAt()));
 
         userCreate = new JSONObject();
         userUpdate = new JSONObject();

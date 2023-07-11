@@ -6,6 +6,8 @@ import lombok.Setter;
 import org.json.simple.JSONObject;
 
 import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -17,8 +19,8 @@ public class MockTestResponse {
     private Time time;
     private UUID topicId;
 
-    private LocalDateTime createAt;
-    private LocalDateTime updateAt;
+    private String createAt;
+    private String updateAt;
 
     private JSONObject userCreate;
 
@@ -30,8 +32,9 @@ public class MockTestResponse {
         this.time = mockTest.getTime();
         this.topicId = mockTest.getTopic().getTopicId();
 
-        this.createAt = mockTest.getCreateAt();
-        this.updateAt = mockTest.getUpdateAt();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        this.createAt = sdf.format(Timestamp.valueOf(mockTest.getCreateAt()));
+        this.updateAt = sdf.format(Timestamp.valueOf(mockTest.getUpdateAt()));
 
         userCreate = new JSONObject();
         userUpdate = new JSONObject();

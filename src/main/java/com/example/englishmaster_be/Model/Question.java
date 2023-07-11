@@ -68,7 +68,6 @@ public class Question implements Serializable {
     private Collection<Content> contentCollection;
 
 
-
     public Question() {
         createAt = LocalDateTime.now();
         updateAt= LocalDateTime.now();
