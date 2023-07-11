@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Model;
 
+import com.example.englishmaster_be.DTO.MockTest.CreateMockTestDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -57,6 +58,14 @@ public class MockTest implements Serializable {
 
 
     public MockTest() {
+        createAt = LocalDateTime.now();
+        updateAt= LocalDateTime.now();
+    }
+
+    public  MockTest(CreateMockTestDTO createMockTestDTO){
+        this.score = createMockTestDTO.getScore();
+        this.time = createMockTestDTO.getTime();
+
         createAt = LocalDateTime.now();
         updateAt= LocalDateTime.now();
     }

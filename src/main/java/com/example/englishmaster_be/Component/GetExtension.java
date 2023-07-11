@@ -30,7 +30,7 @@ public class GetExtension {
                 fileLink = link + "file/showImage/";
                 break;
             case ".mp3":
-                fileLink = link + "file/";
+                fileLink = link + "file/showAudio/";
                 break;
             default:
                 fileLink = "";

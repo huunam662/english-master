@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Model;
 
+import com.example.englishmaster_be.DTO.Answer.CreateAnswerDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -52,6 +53,15 @@ public class Answer implements Serializable {
     private User userUpdate;
 
     public Answer() {
+        createAt = LocalDateTime.now();
+        updateAt= LocalDateTime.now();
+    }
+
+    public Answer(CreateAnswerDTO createAnswerDTO){
+        this.answerContent = createAnswerDTO.getAnswerContent();
+        this.correctAnswer = createAnswerDTO.isCorrectAnswer();
+        this.explainDetails = createAnswerDTO.getExplainDetails();
+
         createAt = LocalDateTime.now();
         updateAt= LocalDateTime.now();
     }

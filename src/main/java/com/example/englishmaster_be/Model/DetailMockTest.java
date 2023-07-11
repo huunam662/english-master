@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Model;
 
+import com.example.englishmaster_be.Model.Response.AnswerResponse;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -50,4 +51,12 @@ public class DetailMockTest implements Serializable {
         createAt = LocalDateTime.now();
         updateAt= LocalDateTime.now();
     }
+
+    public  DetailMockTest(MockTest mockTest, Answer answer){
+        this.mockTest = mockTest;
+        this.answer = answer;
+
+        createAt = LocalDateTime.now();
+        updateAt= LocalDateTime.now();
+    };
 }

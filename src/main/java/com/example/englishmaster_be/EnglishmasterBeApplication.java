@@ -2,12 +2,18 @@ package com.example.englishmaster_be;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.StandardEnvironment;
 
 @SpringBootApplication
 public class EnglishmasterBeApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(EnglishmasterBeApplication.class, args);
+        SpringApplication application = new SpringApplication(EnglishmasterBeApplication.class);
+        ConfigurableEnvironment environment = new StandardEnvironment();
+        environment.setActiveProfiles("local");
+        application.setEnvironment(environment);
+        application.run(args);
     }
 
 }

@@ -6,16 +6,15 @@ import com.example.englishmaster_be.DTO.*;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Service.*;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/question")
@@ -30,6 +29,8 @@ public class QuestionController {
     private IQuestionService IQuestionService;
     @Autowired
     private IContentService IContentService;
+    @Autowired
+    private IAnswerService IAnswerService;
 
 
     @PostMapping(value = "/create")
@@ -253,5 +254,31 @@ public class QuestionController {
         }
     }
 
+    @GetMapping(value = "/listAnswer")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> getAnswerToQuestion(@RequestParam UUID questionId) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
 
+            Question question = IQuestionService.findQuestionById(questionId);
+            Collection<Answer> answerCollection = question.getAnswers();
+
+            JSONArray answerArray = new JSONArray();
+            for(Answer answer : answerCollection){
+                AnswerResponse answerResponse = new AnswerResponse(answer);
+                answerArray.add(answerResponse);
+            }
+
+            responseModel.setMessage("List answer to question successfully");
+            responseModel.setResponseData(answerArray);
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("List answer to question fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
 }

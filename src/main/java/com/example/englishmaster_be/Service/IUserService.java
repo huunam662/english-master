@@ -5,6 +5,8 @@ import com.example.englishmaster_be.Model.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
+import java.util.UUID;
+
 
 public interface IUserService {
 
@@ -15,4 +17,6 @@ public interface IUserService {
     User findUser(UserDetails userDetails);
 
     User currentUser();
+
+    User findUserById(UUID userId);
 }
