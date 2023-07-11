@@ -4,7 +4,6 @@ package com.example.englishmaster_be.DTO.MockTest;
 import java.sql.Time;
 import java.util.UUID;
 
-
 public class CreateMockTestDTO {
     private int score;
     private Time time;

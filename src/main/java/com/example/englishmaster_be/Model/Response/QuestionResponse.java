@@ -3,18 +3,14 @@ package com.example.englishmaster_be.Model.Response;
 import com.example.englishmaster_be.Component.GetExtension;
 import com.example.englishmaster_be.Model.Question;
 import com.example.englishmaster_be.Model.Content;
-import lombok.Getter;
-import lombok.Setter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Getter
-@Setter
+
 public class QuestionResponse {
     private UUID questionId;
     private String questionContent;
@@ -77,4 +73,86 @@ public class QuestionResponse {
         userUpdate.put("User Id", question.getUserUpdate().getUserId());
         userUpdate.put("User Name", question.getUserUpdate().getName());
     }
+
+	public UUID getQuestionId() {
+		return questionId;
+	}
+
+	public void setQuestionId(UUID questionId) {
+		this.questionId = questionId;
+	}
+
+	public String getQuestionContent() {
+		return questionContent;
+	}
+
+	public void setQuestionContent(String questionContent) {
+		this.questionContent = questionContent;
+	}
+
+	public int getQuestionScore() {
+		return questionScore;
+	}
+
+	public void setQuestionScore(int questionScore) {
+		this.questionScore = questionScore;
+	}
+
+	public JSONArray getContentList() {
+		return contentList;
+	}
+
+	public void setContentList(JSONArray contentList) {
+		this.contentList = contentList;
+	}
+
+	public UUID getQuestionGroup() {
+		return questionGroup;
+	}
+
+	public void setQuestionGroup(UUID questionGroup) {
+		this.questionGroup = questionGroup;
+	}
+
+	public UUID getPartId() {
+		return partId;
+	}
+
+	public void setPartId(UUID partId) {
+		this.partId = partId;
+	}
+
+	public String getCreateAt() {
+		return createAt;
+	}
+
+	public void setCreateAt(String createAt) {
+		this.createAt = createAt;
+	}
+
+	public String getUpdateAt() {
+		return updateAt;
+	}
+
+	public void setUpdateAt(String updateAt) {
+		this.updateAt = updateAt;
+	}
+
+	public JSONObject getUserCreate() {
+		return userCreate;
+	}
+
+	public void setUserCreate(JSONObject userCreate) {
+		this.userCreate = userCreate;
+	}
+
+	public JSONObject getUserUpdate() {
+		return userUpdate;
+	}
+
+	public void setUserUpdate(JSONObject userUpdate) {
+		this.userUpdate = userUpdate;
+	}
+    
+    
 }
