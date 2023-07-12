@@ -281,4 +281,27 @@ public class QuestionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
     }
+
+    @PostMapping(value = "/deleteQuestion")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> deleteQuestion(@RequestParam UUID questionId) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            Question question = IQuestionService.findQuestionById(questionId);
+            IQuestionService.deleteQuestion(question);
+            for(Content content : question.getContentCollection()){
+                IFileStorageService.delete(content.getContentData());
+            }
+
+            responseModel.setMessage("Delete question successfully");
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Delete question fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
 }

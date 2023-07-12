@@ -57,4 +57,9 @@ public class PartSeviceImpl implements IPartService {
             return false;
         return true;
     }
+
+    @Override
+    public void deletePart(Part part) {
+        partRepository.delete(part);
+    }
 }

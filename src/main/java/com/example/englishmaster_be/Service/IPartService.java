@@ -18,4 +18,6 @@ public interface IPartService {
     boolean checkPart(Part part);
 
     boolean checkFilePart(Part part);
+    void deletePart(Part part);
+
 }
