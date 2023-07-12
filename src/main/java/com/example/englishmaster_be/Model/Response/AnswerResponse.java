@@ -1,17 +1,12 @@
 package com.example.englishmaster_be.Model.Response;
 
 import com.example.englishmaster_be.Model.Answer;
-import lombok.Getter;
-import lombok.Setter;
 import org.json.simple.JSONObject;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Getter
-@Setter
 public class AnswerResponse {
     private UUID questionId;
     private UUID answerId;
@@ -45,4 +40,78 @@ public class AnswerResponse {
         userUpdate.put("User Id", answer.getUserUpdate().getUserId());
         userUpdate.put("User Name", answer.getUserUpdate().getName());
     }
+
+	public UUID getQuestionId() {
+		return questionId;
+	}
+
+	public void setQuestionId(UUID questionId) {
+		this.questionId = questionId;
+	}
+
+	public UUID getAnswerId() {
+		return answerId;
+	}
+
+	public void setAnswerId(UUID answerId) {
+		this.answerId = answerId;
+	}
+
+	public String getAnswerContent() {
+		return answerContent;
+	}
+
+	public void setAnswerContent(String answerContent) {
+		this.answerContent = answerContent;
+	}
+
+	public boolean isCorrectAnswer() {
+		return correctAnswer;
+	}
+
+	public void setCorrectAnswer(boolean correctAnswer) {
+		this.correctAnswer = correctAnswer;
+	}
+
+	public String getExplainDetails() {
+		return explainDetails;
+	}
+
+	public void setExplainDetails(String explainDetails) {
+		this.explainDetails = explainDetails;
+	}
+
+	public String getCreateAt() {
+		return createAt;
+	}
+
+	public void setCreateAt(String createAt) {
+		this.createAt = createAt;
+	}
+
+	public String getUpdateAt() {
+		return updateAt;
+	}
+
+	public void setUpdateAt(String updateAt) {
+		this.updateAt = updateAt;
+	}
+
+	public JSONObject getUserCreate() {
+		return userCreate;
+	}
+
+	public void setUserCreate(JSONObject userCreate) {
+		this.userCreate = userCreate;
+	}
+
+	public JSONObject getUserUpdate() {
+		return userUpdate;
+	}
+
+	public void setUserUpdate(JSONObject userUpdate) {
+		this.userUpdate = userUpdate;
+	}
+    
+    
 }

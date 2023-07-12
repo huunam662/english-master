@@ -1,12 +1,8 @@
 package com.example.englishmaster_be.DTO.Question;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.UUID;
 
-@Setter
-@Getter
+
 public class CreateGroupQuestionDTO {
     private String questionContent;
 
@@ -15,4 +11,37 @@ public class CreateGroupQuestionDTO {
     private int questionNumberical;
 
     private UUID questionGroupId;
+
+	public String getQuestionContent() {
+		return questionContent;
+	}
+
+	public void setQuestionContent(String questionContent) {
+		this.questionContent = questionContent;
+	}
+
+	public int getQuestionScore() {
+		return questionScore;
+	}
+
+	public void setQuestionScore(int questionScore) {
+		this.questionScore = questionScore;
+	}
+
+	public int getQuestionNumberical() {
+		return questionNumberical;
+	}
+
+	public void setQuestionNumberical(int questionNumberical) {
+		this.questionNumberical = questionNumberical;
+	}
+
+	public UUID getQuestionGroupId() {
+		return questionGroupId;
+	}
+
+	public void setQuestionGroupId(UUID questionGroupId) {
+		this.questionGroupId = questionGroupId;
+	}
+    
 }

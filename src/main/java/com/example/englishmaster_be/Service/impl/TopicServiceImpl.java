@@ -1,12 +1,15 @@
 package com.example.englishmaster_be.Service.impl;
 
+import com.example.englishmaster_be.DTO.Topic.UpdateTopicDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.ITopicService;
+import com.example.englishmaster_be.Service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 @Service
 public class TopicServiceImpl implements ITopicService {
@@ -14,6 +17,9 @@ public class TopicServiceImpl implements ITopicService {
     private TopicRepository topicRepository;
     @Autowired
     private PartRepository partRepository;
+    @Autowired
+    private IUserService IUserService;
+
     @Override
     public void createTopic(Topic topic) {
         topicRepository.save(topic);
@@ -90,5 +96,27 @@ public class TopicServiceImpl implements ITopicService {
             }
         }
         return false;
+    }
+
+    @Override
+    public void updateTopic(Topic topic, UpdateTopicDTO updateTopicDTO) {
+        topic.setTopicName(updateTopicDTO.getTopicName());
+        topic.setTopicDescription(updateTopicDTO.getTopicDiscription());
+        topic.setTopicType(updateTopicDTO.getTopicType());
+        topic.setWorkTime(updateTopicDTO.getWorkTime());
+        topic.setStartTime(updateTopicDTO.getStartTime());
+        topic.setEndTime(updateTopicDTO.getEndTime());
+        topic.setEnable(updateTopicDTO.isEnable());
+        topic.setUpdateAt(LocalDateTime.now());
+
+        User user = IUserService.currentUser();
+        topic.setUserUpdate(user);
+
+        topicRepository.save(topic);
+    }
+
+    @Override
+    public void deleteTopic(Topic topic) {
+        topicRepository.delete(topic);
     }
 }

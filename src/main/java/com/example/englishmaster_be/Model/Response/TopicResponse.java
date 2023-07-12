@@ -1,17 +1,13 @@
 package com.example.englishmaster_be.Model.Response;
 
 import com.example.englishmaster_be.Component.GetExtension;
-import com.example.englishmaster_be.Component.PublicLink;
 import com.example.englishmaster_be.Model.Topic;
 import lombok.Getter;
 import lombok.Setter;
 import org.json.simple.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -70,5 +66,103 @@ public class TopicResponse {
         userUpdate.put("User Id", topic.getUserUpdate().getUserId());
         userUpdate.put("User Name", topic.getUserUpdate().getName());
     }
+
+	public UUID getTopicId() {
+		return topicId;
+	}
+
+	public void setTopicId(UUID topicId) {
+		this.topicId = topicId;
+	}
+
+	public String getTopicName() {
+		return topicName;
+	}
+
+	public void setTopicName(String topicName) {
+		this.topicName = topicName;
+	}
+
+	public String getTopicImage() {
+		return topicImage;
+	}
+
+	public void setTopicImage(String topicImage) {
+		this.topicImage = topicImage;
+	}
+
+	public String getTopicDescription() {
+		return topicDescription;
+	}
+
+	public void setTopicDescription(String topicDescription) {
+		this.topicDescription = topicDescription;
+	}
+
+	public String getTopicType() {
+		return topicType;
+	}
+
+	public void setTopicType(String topicType) {
+		this.topicType = topicType;
+	}
+
+	public String getWorkTime() {
+		return workTime;
+	}
+
+	public void setWorkTime(String workTime) {
+		this.workTime = workTime;
+	}
+
+	public String getStartTime() {
+		return startTime;
+	}
+
+	public void setStartTime(String startTime) {
+		this.startTime = startTime;
+	}
+
+	public String getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(String endTime) {
+		this.endTime = endTime;
+	}
+
+	public String getCreateAt() {
+		return createAt;
+	}
+
+	public void setCreateAt(String createAt) {
+		this.createAt = createAt;
+	}
+
+	public String getUpdateAt() {
+		return updateAt;
+	}
+
+	public void setUpdateAt(String updateAt) {
+		this.updateAt = updateAt;
+	}
+
+	public JSONObject getUserCreate() {
+		return userCreate;
+	}
+
+	public void setUserCreate(JSONObject userCreate) {
+		this.userCreate = userCreate;
+	}
+
+	public JSONObject getUserUpdate() {
+		return userUpdate;
+	}
+
+	public void setUserUpdate(JSONObject userUpdate) {
+		this.userUpdate = userUpdate;
+	}
+    
+    
 
 }

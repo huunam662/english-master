@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Service;
 
+import com.example.englishmaster_be.DTO.Topic.UpdateTopicDTO;
 import com.example.englishmaster_be.Model.*;
 import org.springframework.stereotype.Service;
 
@@ -22,4 +23,7 @@ public interface ITopicService {
     boolean existQuestionInTopic(Topic topic, Question question);
     boolean existPartInTopic(Topic topic, Part part);
 
+    void updateTopic(Topic topic, UpdateTopicDTO updateTopicDTO);
+
+    void deleteTopic(Topic topic);
 }

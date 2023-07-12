@@ -1,8 +1,6 @@
 package com.example.englishmaster_be.Model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -10,8 +8,6 @@ import java.util.UUID;
 
 
 @Entity
-@Getter
-@Setter
 @Table(name = "roles")
 public class Role implements Serializable {
     @Id
@@ -30,5 +26,38 @@ public class Role implements Serializable {
 
     public Role() {
     }
+
+	public UUID getRoleId() {
+		return roleId;
+	}
+
+	public void setRoleId(UUID roleId) {
+		this.roleId = roleId;
+	}
+
+	public String getRoleName() {
+		return roleName;
+	}
+
+	public void setRoleName(String roleName) {
+		this.roleName = roleName;
+	}
+
+	public String getRoleDiscription() {
+		return roleDiscription;
+	}
+
+	public void setRoleDiscription(String roleDiscription) {
+		this.roleDiscription = roleDiscription;
+	}
+
+	public Collection<User> getUsers() {
+		return users;
+	}
+
+	public void setUsers(Collection<User> users) {
+		this.users = users;
+	}
+    
 
 }

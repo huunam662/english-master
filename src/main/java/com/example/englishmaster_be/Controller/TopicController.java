@@ -1,8 +1,10 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.DTO.Topic.*;
+import com.example.englishmaster_be.DTO.UploadFileDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.TopicResponse;
+import com.example.englishmaster_be.Repository.TopicRepository;
 import com.example.englishmaster_be.Service.*;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +61,87 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             responseModel.setMessage("Create topic fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @PostMapping(value = "/update")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> updateTopic(@RequestBody UpdateTopicDTO updateTopicDTO){
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            Topic topic = ITopicService.findTopicById(updateTopicDTO.getTopicId());
+
+            ITopicService.updateTopic(topic, updateTopicDTO);
+
+            TopicResponse topicResponse = new TopicResponse(topic);
+
+            responseModel.setMessage("Update topic successfully");
+            responseModel.setResponseData(topicResponse);
+            responseModel.setStatus("success");
+
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Update topic fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @PostMapping(value = "/uploadImage", consumes = {"multipart/form-data"})
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> uploadFileImage(@ModelAttribute UploadFileDTO uploadFileDTO){
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            User user = IUserService.currentUser();
+            Topic topic = ITopicService.findTopicById(uploadFileDTO.getId());
+
+            String filename = IFileStorageService.nameFile(uploadFileDTO.getContentData());
+            IFileStorageService.delete(topic.getTopicImage());
+
+            topic.setTopicImage(filename);
+            topic.setUserUpdate(user);
+            topic.setUpdateAt(LocalDateTime.now());
+
+            TopicResponse topicResponse = new TopicResponse(topic);
+
+            responseModel.setMessage("Update topic successfully");
+            responseModel.setResponseData(topicResponse);
+            responseModel.setStatus("success");
+
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Update topic fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @PostMapping(value = "/deleteTopic")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> deleteTopic(@RequestParam UUID topicId){
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            User user = IUserService.currentUser();
+            Topic topic = ITopicService.findTopicById(topicId);
+
+            IFileStorageService.delete(topic.getTopicImage());
+
+            ITopicService.deleteTopic(topic);
+
+            responseModel.setMessage("Delete topic successfully");
+            responseModel.setStatus("success");
+
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Delete topic fail: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
