@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @RestController
@@ -29,22 +30,31 @@ public class AnswerController {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
-
+            boolean check = true;
             Question question = IQuestionService.findQuestionById(createAnswerDTO.getQuestionId());
-            Answer answer = new Answer(createAnswerDTO);
-            answer.setQuestion(question);
-            answer.setUserCreate(user);
-            answer.setUserUpdate(user);
 
-            IAnswerService.createAnswer(answer);
+            for (Answer answerCheck : question.getAnswers()) {
+                if (answerCheck.isCorrectAnswer() && createAnswerDTO.isCorrectAnswer()) {
+                    check = false;
+                }
+            }
+            if (check) {
+                Answer answer = new Answer(createAnswerDTO);
+                answer.setQuestion(question);
+                answer.setUserCreate(user);
+                answer.setUserUpdate(user);
 
-            AnswerResponse answerResponse = new AnswerResponse(answer);
+                IAnswerService.createAnswer(answer);
 
-            responseModel.setMessage("Create answer successfully");
+                AnswerResponse answerResponse = new AnswerResponse(answer);
 
-            responseModel.setResponseData(answerResponse);
-            responseModel.setStatus("success");
-
+                responseModel.setMessage("Create answer successfully");
+                responseModel.setResponseData(answerResponse);
+                responseModel.setStatus("success");
+            } else {
+                responseModel.setMessage("Had correct answer");
+                responseModel.setStatus("success");
+            }
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
@@ -54,5 +64,94 @@ public class AnswerController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
     }
+
+    @PostMapping(value = "/update")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> updateAnswer(@RequestBody UpdateAnswerDTO updateAnswerDTO) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            User user = IUserService.currentUser();
+            boolean check = true;
+            Question question = IQuestionService.findQuestionById(updateAnswerDTO.getQuestionId());
+
+            for (Answer answerCheck : question.getAnswers()) {
+                if (answerCheck.isCorrectAnswer() && updateAnswerDTO.isCorrectAnswer() && !answerCheck.getAnswerId().equals(updateAnswerDTO.getAnswerId())) {
+                    check = false;
+                }
+            }
+            if (check) {
+                Answer answer = IAnswerService.findAnswerToId(updateAnswerDTO.getAnswerId());
+                answer.setAnswerContent(updateAnswerDTO.getAnswerContent());
+                answer.setCorrectAnswer(updateAnswerDTO.isCorrectAnswer());
+                answer.setExplainDetails(updateAnswerDTO.getExplainDetails());
+                answer.setQuestion(question);
+                answer.setUpdateAt(LocalDateTime.now());
+                answer.setUserUpdate(user);
+
+                IAnswerService.createAnswer(answer);
+
+                AnswerResponse answerResponse = new AnswerResponse(answer);
+
+                responseModel.setMessage("Update answer successfully");
+                responseModel.setResponseData(answerResponse);
+                responseModel.setStatus("success");
+            } else {
+                responseModel.setMessage("Had correct answer");
+                responseModel.setStatus("success");
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Update answer fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @PostMapping(value = "/delete")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> deleteAnswer(@RequestParam UUID answerId) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            Answer answer = IAnswerService.findAnswerToId(answerId);
+            IAnswerService.deleteAnswer(answer);
+
+            responseModel.setMessage("Delete answer successfully");
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Delete answer fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @GetMapping(value = "getDetailAnswer")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> getDetailAnswer(@RequestParam UUID answerId) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+
+            Answer answer = IAnswerService.findAnswerToId(answerId);
+
+            AnswerResponse answerResponse = new AnswerResponse(answer);
+
+            responseModel.setMessage("Detail answer successfully");
+            responseModel.setResponseData(answerResponse);
+            responseModel.setStatus("success");
+
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Detail answer fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
 
 }

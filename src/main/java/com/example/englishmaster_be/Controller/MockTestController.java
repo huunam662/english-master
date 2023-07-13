@@ -119,10 +119,11 @@ public class MockTestController {
 
     @PostMapping(value = "/addAnswerToMockTest")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> addAnswerToMockTest(@RequestParam UUID mockTestId, UUID answerId  ){
+    public ResponseEntity<ResponseModel> addAnswerToMockTest(@RequestParam UUID mockTestId, @RequestParam UUID answerId  ){
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
+
             MockTest mockTest = IMockTestService.findMockTestToId(mockTestId);
             Answer answer = IAnswerService.findAnswerToId(answerId);
 
@@ -150,17 +151,21 @@ public class MockTestController {
 
     @GetMapping(value = "/listCorrectAnswer")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> listCorrectAnswer(@RequestParam int index, boolean isCorrect ,UUID mockTestId){
+    public ResponseEntity<ResponseModel> listCorrectAnswer(@RequestParam int index, @RequestParam boolean isCorrect, @RequestParam UUID mockTestId){
         ResponseModel responseModel = new ResponseModel();
         try {
             MockTest mockTest = IMockTestService.findMockTestToId(mockTestId);
 
             List<DetailMockTest> detailMockTestList = IMockTestService.getTop10DetailToCorrect(index, isCorrect, mockTest);
+            System.out.println(detailMockTestList);
 
-            List<DetailMockTestResponse> detailMockTestResponseList = new ArrayList<>();
-            for(DetailMockTest detailMockTest : detailMockTestList){
-                DetailMockTestResponse detailMockTestResponse = new DetailMockTestResponse(detailMockTest);
-                detailMockTestResponseList.add(detailMockTestResponse);
+            if(detailMockTestList != null){
+                List<DetailMockTestResponse> detailMockTestResponseList = new ArrayList<>();
+                for(DetailMockTest detailMockTest : detailMockTestList){
+                    DetailMockTestResponse detailMockTestResponse = new DetailMockTestResponse(detailMockTest);
+                    detailMockTestResponseList.add(detailMockTestResponse);
+                }
+                responseModel.setResponseData(detailMockTestResponseList);
             }
 
             if(isCorrect){
@@ -169,7 +174,7 @@ public class MockTestController {
                 responseModel.setMessage("Get top 10 answer wrong successfully");
             }
 
-            responseModel.setResponseData(detailMockTestResponseList);
+
             responseModel.setStatus("success");
 
 

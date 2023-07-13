@@ -20,9 +20,11 @@ public class FileStorageServiceImpl implements IFileStorageService {
     @Value("${masterE.fileSave}")
     private String fileSave;
 //    private final Path root = Paths.get("D:\\Workplace\\FileEnglishMaster");
-    private final Path root = Paths.get("D:\\Workplace\\FileEnglishMaster");
+//    private final Path root = Paths.get(fileSave);
+    
     @Override
     public void init() {
+        Path root = Paths.get(fileSave);
         try {
             Files.createDirectories(root);
         } catch (IOException e) {
@@ -32,6 +34,7 @@ public class FileStorageServiceImpl implements IFileStorageService {
 
     @Override
     public Resource load(String filename) {
+        Path root = Paths.get(fileSave);
         try {
             Path file = root.resolve(filename);
             Resource resource = new UrlResource(file.toUri());
@@ -48,8 +51,9 @@ public class FileStorageServiceImpl implements IFileStorageService {
 
     @Override
     public void save(MultipartFile file, String fileName) {
+        Path root = Paths.get(fileSave);
         try {
-            Files.copy(file.getInputStream(), this.root.resolve(fileName));
+            Files.copy(file.getInputStream(), root.resolve(fileName));
         } catch (Exception e) {
             if (e instanceof FileAlreadyExistsException) {
                 throw new RuntimeException("A file of that name already exists.");
@@ -62,8 +66,9 @@ public class FileStorageServiceImpl implements IFileStorageService {
 
     @Override
     public Stream<Path> loadAll() {
+        Path root = Paths.get(fileSave);
         try {
-            return Files.walk(this.root, 1).filter(path -> !path.equals(this.root)).map(this.root::relativize);
+            return Files.walk(root, 1).filter(path -> !path.equals(root)).map(root::relativize);
         } catch (IOException e) {
             throw new RuntimeException("Could not load the files!");
         }
@@ -71,6 +76,7 @@ public class FileStorageServiceImpl implements IFileStorageService {
 
     @Override
     public boolean delete(String filename) {
+        Path root = Paths.get(fileSave);
         try {
             Path file = root.resolve(filename);
             return Files.deleteIfExists(file);

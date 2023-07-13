@@ -32,4 +32,10 @@ public class AnswerServiceImpl implements IAnswerService {
     public Answer findAnswerToId(UUID answerID) {
         return answerRepository.findByAnswerId(answerID);
     }
+
+    @Override
+    public void deleteAnswer(Answer answer) {
+        answerRepository.delete(answer);
+    }
+
 }

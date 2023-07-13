@@ -123,17 +123,15 @@ public class TopicController {
         }
     }
 
-    @PostMapping(value = "/deleteTopic")
+    @PostMapping(value = "/delete")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ResponseModel> deleteTopic(@RequestParam UUID topicId){
         ResponseModel responseModel = new ResponseModel();
         try {
-            User user = IUserService.currentUser();
             Topic topic = ITopicService.findTopicById(topicId);
 
-            IFileStorageService.delete(topic.getTopicImage());
-
             ITopicService.deleteTopic(topic);
+            IFileStorageService.delete(topic.getTopicImage());
 
             responseModel.setMessage("Delete topic successfully");
             responseModel.setStatus("success");
