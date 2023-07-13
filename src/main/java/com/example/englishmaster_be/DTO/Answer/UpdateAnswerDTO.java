@@ -3,7 +3,6 @@ package com.example.englishmaster_be.DTO.Answer;
 import java.util.UUID;
 
 public class UpdateAnswerDTO {
-    private UUID answerId;
     private String answerContent;
     private UUID questionId;
     private boolean correctAnswer;
@@ -12,13 +11,6 @@ public class UpdateAnswerDTO {
     public UpdateAnswerDTO() {
     }
 
-    public UUID getAnswerId() {
-        return answerId;
-    }
-
-    public void setAnswerId(UUID answerId) {
-        this.answerId = answerId;
-    }
 
     public String getAnswerContent() {
         return answerContent;

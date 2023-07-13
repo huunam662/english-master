@@ -5,7 +5,6 @@ import java.util.UUID;
 
 public class CreateGroupQuestionDTO {
     private String questionContent;
-
     private int questionScore;
 
     private int questionNumberical;

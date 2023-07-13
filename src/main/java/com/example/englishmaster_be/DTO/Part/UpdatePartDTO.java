@@ -3,20 +3,11 @@ package com.example.englishmaster_be.DTO.Part;
 import java.util.UUID;
 
 public class UpdatePartDTO {
-    private UUID partId;
     private String partName;
     private String partDiscription;
     private String partType;
 
     public UpdatePartDTO() {
-    }
-
-    public UUID getPartId() {
-        return partId;
-    }
-
-    public void setPartId(UUID partId) {
-        this.partId = partId;
     }
 
     public String getPartName() {
