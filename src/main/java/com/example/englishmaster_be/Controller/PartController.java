@@ -166,9 +166,12 @@ public class PartController {
         ResponseModel responseModel = new ResponseModel();
 
         try {
+
             Part part = IPartService.getPartToId(partId);
 
-            IFileStorageService.delete(part.getContentData());
+            if(part.getContentData() != null){
+                IFileStorageService.delete(part.getContentData());
+            }
 
             IPartService.deletePart(part);
 
