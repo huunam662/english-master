@@ -65,9 +65,9 @@ public class AnswerController {
         }
     }
 
-    @PostMapping(value = "/update")
+    @PutMapping(value = "/{answerId:.+}/update")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> updateAnswer(@RequestBody UpdateAnswerDTO updateAnswerDTO) {
+    public ResponseEntity<ResponseModel> updateAnswer(@PathVariable UUID answerId, @RequestBody UpdateAnswerDTO updateAnswerDTO) {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
@@ -75,12 +75,12 @@ public class AnswerController {
             Question question = IQuestionService.findQuestionById(updateAnswerDTO.getQuestionId());
 
             for (Answer answerCheck : question.getAnswers()) {
-                if (answerCheck.isCorrectAnswer() && updateAnswerDTO.isCorrectAnswer() && !answerCheck.getAnswerId().equals(updateAnswerDTO.getAnswerId())) {
+                if (answerCheck.isCorrectAnswer() && updateAnswerDTO.isCorrectAnswer() && !answerCheck.getAnswerId().equals(answerId)) {
                     check = false;
                 }
             }
             if (check) {
-                Answer answer = IAnswerService.findAnswerToId(updateAnswerDTO.getAnswerId());
+                Answer answer = IAnswerService.findAnswerToId(answerId);
                 answer.setAnswerContent(updateAnswerDTO.getAnswerContent());
                 answer.setCorrectAnswer(updateAnswerDTO.isCorrectAnswer());
                 answer.setExplainDetails(updateAnswerDTO.getExplainDetails());
@@ -109,9 +109,9 @@ public class AnswerController {
         }
     }
 
-    @PostMapping(value = "/delete")
+    @DeleteMapping(value = "/{answerId:.+}/delete")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> deleteAnswer(@RequestParam UUID answerId) {
+    public ResponseEntity<ResponseModel> deleteAnswer(@PathVariable UUID answerId) {
         ResponseModel responseModel = new ResponseModel();
         try {
             Answer answer = IAnswerService.findAnswerToId(answerId);
@@ -129,9 +129,9 @@ public class AnswerController {
         }
     }
 
-    @GetMapping(value = "getDetailAnswer")
+    @GetMapping(value = "/{answerId:.+}/getDetailAnswer")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> getDetailAnswer(@RequestParam UUID answerId) {
+    public ResponseEntity<ResponseModel> getDetailAnswer(@PathVariable UUID answerId) {
         ResponseModel responseModel = new ResponseModel();
         try {
 

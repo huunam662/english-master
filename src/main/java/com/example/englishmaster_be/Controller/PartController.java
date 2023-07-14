@@ -64,15 +64,15 @@ public class PartController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
     }
 
-    @PostMapping(value = "/uploadfile", consumes = {"multipart/form-data"} )
+    @PutMapping(value = "/{partId:.+}/uploadfile", consumes = {"multipart/form-data"} )
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> uploadFilePart(@ModelAttribute UploadMultiFileDTO uploadMultiFileDTO){
+    public ResponseEntity<ResponseModel> uploadFilePart(@PathVariable UUID partId, @ModelAttribute UploadMultiFileDTO uploadMultiFileDTO){
         ResponseModel responseModel = new ResponseModel();
 
         try {
             User user = IUserService.currentUser();
 
-            Part part = IPartService.getPartToId(uploadMultiFileDTO.getId());
+            Part part = IPartService.getPartToId(partId);
             Arrays.asList(uploadMultiFileDTO.getContentData()).stream().forEach(file ->{
                 String filename = IFileStorageService.nameFile(file);
                 if(IPartService.checkFilePart(part)){
@@ -102,14 +102,13 @@ public class PartController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
     }
 
-    @PostMapping(value = "/uploadText")
+    @PutMapping(value = "/{partId:.+}/uploadText")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> uploadTextPart(@RequestBody UploadTextDTO uploadTextDTO){
+    public ResponseEntity<ResponseModel> uploadTextPart(@PathVariable UUID partId, @RequestBody UploadTextDTO uploadTextDTO){
         ResponseModel responseModel = new ResponseModel();
-
         try {
 
-            Part part = IPartService.getPartToId(uploadTextDTO.getId());
+            Part part = IPartService.getPartToId(partId);
             part.setContentData(uploadTextDTO.getContentData());
             part.setContentType(uploadTextDTO.getContentType());
 
@@ -161,15 +160,18 @@ public class PartController {
         }
     }
 
-    @PostMapping(value = "/delete")
+    @DeleteMapping(value = "/{partId:.+}/delete")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> deletePart(@RequestParam UUID partId){
+    public ResponseEntity<ResponseModel> deletePart(@PathVariable UUID partId){
         ResponseModel responseModel = new ResponseModel();
 
         try {
+
             Part part = IPartService.getPartToId(partId);
 
-            IFileStorageService.delete(part.getContentData());
+            if(part.getContentData() != null){
+                IFileStorageService.delete(part.getContentData());
+            }
 
             IPartService.deletePart(part);
 
@@ -185,15 +187,15 @@ public class PartController {
         }
     }
 
-    @PostMapping(value = "/update")
+    @PutMapping(value = "/{partId:.+}/update")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> updatePart(@RequestBody UpdatePartDTO updatePartDTO){
+    public ResponseEntity<ResponseModel> updatePart(@PathVariable UUID partId, @RequestBody UpdatePartDTO updatePartDTO){
         ResponseModel responseModel = new ResponseModel();
 
         try {
             User user = IUserService.currentUser();
 
-            Part part = IPartService.getPartToId(updatePartDTO.getPartId());
+            Part part = IPartService.getPartToId(partId);
 
             String partNameOld = part.getPartName();
 
