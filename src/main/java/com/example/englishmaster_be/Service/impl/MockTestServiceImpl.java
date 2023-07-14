@@ -50,7 +50,10 @@ public class MockTestServiceImpl implements IMockTestService {
     public List<DetailMockTest> getTop10DetailToCorrect(int index, boolean isCorrect ,MockTest mockTest) {
         Page<DetailMockTest> detailMockTestPage = detailMockTestRepository.findAllByMockTest(mockTest, PageRequest.of(index, 10, Sort.by(Sort.Order.desc("updateAt"))));
         for(DetailMockTest detailMockTest : detailMockTestPage.getContent()){
-            if(!detailMockTest.getAnswer().isCorrectAnswer()){
+            if(detailMockTest.getAnswer().isCorrectAnswer() != isCorrect){
+                if(detailMockTestPage.getContent().size() == 1){
+                    return null;
+                }
                 detailMockTestPage.getContent().remove(detailMockTest);
             }
         }

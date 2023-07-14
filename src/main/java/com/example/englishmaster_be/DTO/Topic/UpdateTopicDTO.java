@@ -6,7 +6,6 @@ import java.util.UUID;
 
 
 public class UpdateTopicDTO {
-    private UUID topicId;
     private String topicName;
     private String topicDiscription;
     private String topicType;
@@ -17,14 +16,6 @@ public class UpdateTopicDTO {
 
     public UpdateTopicDTO() {
     }
-
-	public UUID getTopicId() {
-		return topicId;
-	}
-
-	public void setTopicId(UUID topicId) {
-		this.topicId = topicId;
-	}
 
 	public String getTopicName() {
 		return topicName;

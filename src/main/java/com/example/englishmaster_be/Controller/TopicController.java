@@ -67,12 +67,12 @@ public class TopicController {
         }
     }
 
-    @PostMapping(value = "/update")
+    @PutMapping(value = "/{topicId:.+}/update")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> updateTopic(@RequestBody UpdateTopicDTO updateTopicDTO){
+    public ResponseEntity<ResponseModel> updateTopic(@PathVariable UUID topicId, @RequestBody UpdateTopicDTO updateTopicDTO){
         ResponseModel responseModel = new ResponseModel();
         try {
-            Topic topic = ITopicService.findTopicById(updateTopicDTO.getTopicId());
+            Topic topic = ITopicService.findTopicById(topicId);
 
             ITopicService.updateTopic(topic, updateTopicDTO);
 
@@ -92,13 +92,13 @@ public class TopicController {
         }
     }
 
-    @PostMapping(value = "/uploadImage", consumes = {"multipart/form-data"})
+    @PutMapping(value = "/{topicId:.+}/uploadImage", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> uploadFileImage(@ModelAttribute UploadFileDTO uploadFileDTO){
+    public ResponseEntity<ResponseModel> uploadFileImage(@PathVariable UUID topicId, @ModelAttribute UploadFileDTO uploadFileDTO){
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
-            Topic topic = ITopicService.findTopicById(uploadFileDTO.getId());
+            Topic topic = ITopicService.findTopicById(topicId);
 
             String filename = IFileStorageService.nameFile(uploadFileDTO.getContentData());
             IFileStorageService.delete(topic.getTopicImage());
@@ -123,17 +123,15 @@ public class TopicController {
         }
     }
 
-    @PostMapping(value = "/deleteTopic")
+    @DeleteMapping(value = "/{topicId:.+}/delete")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> deleteTopic(@RequestParam UUID topicId){
+    public ResponseEntity<ResponseModel> deleteTopic(@PathVariable UUID topicId){
         ResponseModel responseModel = new ResponseModel();
         try {
-            User user = IUserService.currentUser();
             Topic topic = ITopicService.findTopicById(topicId);
 
-            IFileStorageService.delete(topic.getTopicImage());
-
             ITopicService.deleteTopic(topic);
+            IFileStorageService.delete(topic.getTopicImage());
 
             responseModel.setMessage("Delete topic successfully");
             responseModel.setStatus("success");
@@ -175,15 +173,14 @@ public class TopicController {
         }
     }
 
-    @PostMapping(value = "/addPart")
+    @PostMapping(value = "/{topicId:.+}/addPart")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> addPartToTopic(@RequestBody TopicAndPartDTO topicAndPartDTO){
+    public ResponseEntity<ResponseModel> addPartToTopic(@PathVariable UUID topicId, @RequestParam UUID partId){
         ResponseModel responseModel = new ResponseModel();
         try{
-            ITopicService.addPartToTopic(topicAndPartDTO.getTopicId(), topicAndPartDTO.getPartId());
+            ITopicService.addPartToTopic(topicId, partId);
 
             responseModel.setMessage("Add part to topic successful");
-            responseModel.setResponseData(topicAndPartDTO);
             responseModel.setStatus("success");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
@@ -195,16 +192,15 @@ public class TopicController {
         }
     }
 
-    @PostMapping(value = "/deletePart")
+    @DeleteMapping(value = "/{topicId:.+}/deletePart")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> deletePartToTopic(@RequestBody TopicAndPartDTO topicAndPartDTO){
+    public ResponseEntity<ResponseModel> deletePartToTopic(@PathVariable UUID topicId, @RequestParam UUID partId){
         ResponseModel responseModel = new ResponseModel();
         try{
-            boolean check = ITopicService.deletePartToTopic(topicAndPartDTO.getTopicId(), topicAndPartDTO.getPartId());
+            boolean check = ITopicService.deletePartToTopic(topicId, partId);
 
             if(check){
                 responseModel.setMessage("Delete part to topic successful");
-                responseModel.setResponseData(topicAndPartDTO);
                 responseModel.setStatus("success");
             }else{
                 responseModel.setMessage("Delete part to topic fail: Topic don't have part");
@@ -221,9 +217,9 @@ public class TopicController {
         }
     }
 
-    @PostMapping(value = "/addQuestion")
+    @PostMapping(value = "/{topicId:.+}/addQuestion")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> addQuestionToTopic(@RequestParam UUID topicId, @RequestParam UUID questionId) {
+    public ResponseEntity<ResponseModel> addQuestionToTopic(@PathVariable UUID topicId, @RequestParam UUID questionId) {
         ResponseModel responseModel = new ResponseModel();
         try {
             Question question = IQuestionService.findQuestionById(questionId);
@@ -259,9 +255,9 @@ public class TopicController {
         }
     }
 
-    @PostMapping(value = "/deleteQuestion")
+    @DeleteMapping(value = "/{topicId:.+}/deleteQuestion")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> deleteQuestionToTopic(@RequestParam UUID topicId, @RequestParam UUID questionId) {
+    public ResponseEntity<ResponseModel> deleteQuestionToTopic(@PathVariable  UUID topicId, @RequestParam UUID questionId) {
         ResponseModel responseModel = new ResponseModel();
         try {
 

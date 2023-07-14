@@ -64,4 +64,9 @@ public class QuestionServiceImpl implements IQuestionService {
         List<Question> questionList = questionRepository.findAllByQuestionGroup(question);
         return questionList;
     }
+
+    @Override
+    public void deleteQuestion(Question question) {
+        questionRepository.delete(question);
+    }
 }

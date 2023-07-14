@@ -8,7 +8,8 @@ import java.util.UUID;
 public interface IAnswerService {
     void createAnswer(Answer answer);
     boolean existQuestion(Answer answer, Question question);
-
     Answer findAnswerToId(UUID answerID);
+
+    void deleteAnswer(Answer answer);
 
 }

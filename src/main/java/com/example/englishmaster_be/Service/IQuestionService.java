@@ -21,4 +21,6 @@ public interface IQuestionService {
     boolean checkQuestionGroup(Question question);
 
     List<Question> listQuestionGroup(Question question);
+
+    void deleteQuestion(Question question);
 }

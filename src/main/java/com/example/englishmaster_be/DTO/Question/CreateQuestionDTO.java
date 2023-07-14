@@ -9,8 +9,7 @@ public class CreateQuestionDTO {
     private int questionScore;
 
     private UUID partId;
-    
-    
+
 
 	public CreateQuestionDTO() {
 		super();

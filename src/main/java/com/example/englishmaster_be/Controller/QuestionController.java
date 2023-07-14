@@ -62,13 +62,13 @@ public class QuestionController {
         }
     }
 
-    @PostMapping(value = "/uploadfile", consumes = {"multipart/form-data"})
+    @PutMapping(value = "/{questionId:.+}/uploadfile", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> uploadFileQuestion(@ModelAttribute UploadMultiFileDTO uploadMultiFileDTO) {
+    public ResponseEntity<ResponseModel> uploadFileQuestion(@PathVariable UUID questionId, @ModelAttribute UploadMultiFileDTO uploadMultiFileDTO) {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
-            Question question = IQuestionService.findQuestionById(uploadMultiFileDTO.getId());
+            Question question = IQuestionService.findQuestionById(questionId);
             Arrays.asList(uploadMultiFileDTO.getContentData()).stream().forEach(file -> {
                 String filename = IFileStorageService.nameFile(file);
 
@@ -99,15 +99,15 @@ public class QuestionController {
         }
     }
 
-    @PostMapping(value = "/updatefile", consumes = {"multipart/form-data"})
+    @PutMapping(value = "/{questionId:.+}/updatefile", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> updateFileQuestion(@ModelAttribute UploadFileDTO uploadFileDTO) {
+    public ResponseEntity<ResponseModel> updateFileQuestion(@PathVariable UUID questionId, @ModelAttribute UploadFileDTO uploadFileDTO) {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
 
             String filename = IFileStorageService.nameFile(uploadFileDTO.getContentData());
-            Content content = IContentService.getContentToContentId(uploadFileDTO.getId());
+            Content content = IContentService.getContentToContentId(questionId);
 
             IFileStorageService.delete(content.getContentData());
 
@@ -118,7 +118,7 @@ public class QuestionController {
 
             IContentService.uploadContent(content);
 
-            Question question = IContentService.getContentToContentId(uploadFileDTO.getId()).getQuestion();
+                    Question question = IContentService.getContentToContentId(questionId).getQuestion();
             question.setUpdateAt(LocalDateTime.now());
             question.setUserUpdate(user);
 
@@ -172,9 +172,9 @@ public class QuestionController {
     }
 
 
-    @GetMapping(value = "/listTop10Question")
+    @GetMapping(value = "/{partId:.+}/listTop10Question")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> getTop10Question(@RequestParam int indexp, @RequestParam UUID partId) {
+    public ResponseEntity<ResponseModel> getTop10Question(@PathVariable UUID partId, @RequestParam int indexp) {
         ResponseModel responseModel = new ResponseModel();
         try {
             List<Question> questionList = IQuestionService.getTop10Question(indexp, partId);
@@ -199,9 +199,9 @@ public class QuestionController {
         }
     }
 
-    @GetMapping(value = "/checkQuestionGroup")
+    @GetMapping(value = "/{questionId:.+}/checkQuestionGroup")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> checkQuestionGroup(@RequestParam UUID questionId) {
+    public ResponseEntity<ResponseModel> checkQuestionGroup(@PathVariable UUID questionId) {
         ResponseModel responseModel = new ResponseModel();
         try {
             boolean check = IQuestionService.checkQuestionGroup(IQuestionService.findQuestionById(questionId));
@@ -224,9 +224,9 @@ public class QuestionController {
         }
     }
 
-    @GetMapping(value = "/listQuestionGroup")
+    @GetMapping(value = "/{questionId:.+}/listQuestionGroup")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> getQuestionGroupToQuestion(@RequestParam UUID questionId) {
+    public ResponseEntity<ResponseModel> getQuestionGroupToQuestion(@PathVariable UUID questionId) {
         ResponseModel responseModel = new ResponseModel();
         try {
 
@@ -253,9 +253,9 @@ public class QuestionController {
         }
     }
 
-    @GetMapping(value = "/listAnswer")
+    @GetMapping(value = "/{questionId:.+}/listAnswer")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> getAnswerToQuestion(@RequestParam UUID questionId) {
+    public ResponseEntity<ResponseModel> getAnswerToQuestion(@PathVariable UUID questionId) {
         ResponseModel responseModel = new ResponseModel();
         try {
 
@@ -276,6 +276,29 @@ public class QuestionController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             responseModel.setMessage("List answer to question fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @DeleteMapping(value = "/{questionId:.+}/deleteQuestion")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> deleteQuestion(@PathVariable UUID questionId) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            Question question = IQuestionService.findQuestionById(questionId);
+            IQuestionService.deleteQuestion(question);
+            for(Content content : question.getContentCollection()){
+                IFileStorageService.delete(content.getContentData());
+            }
+
+            responseModel.setMessage("Delete question successfully");
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Delete question fail: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
