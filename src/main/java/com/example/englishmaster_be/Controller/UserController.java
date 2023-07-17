@@ -283,9 +283,6 @@ public class UserController {
 
         User user = IUserService.currentUser();
 
-//        ConfirmationToken confirmationToken = confirmationTokenRepository.findByUserAndType(user, "REFRESH_TOKEN");
-//        confirmationTokenRepository.delete(confirmationToken);
-
         responseModel.setStatus("success");
         responseModel.setMessage("Log out successful");
 
