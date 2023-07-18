@@ -3,6 +3,7 @@ package com.example.englishmaster_be.Controller;
 import com.example.englishmaster_be.Configuration.jwt.JwtUtils;
 import com.example.englishmaster_be.DTO.*;
 import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.*;
 import jakarta.mail.MessagingException;
@@ -11,7 +12,10 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.*;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.*;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -59,13 +63,13 @@ public class UserController {
 
         boolean existingUser = userRepository.existsByEmail(user.getEmail());
 
-        if (!registerDTO.getPassword().equals(registerDTO.getConfirmPassword())){
+        if (!registerDTO.getPassword().equals(registerDTO.getConfirmPassword())) {
             responseModel.setMessage("Password and confirm password don't match");
             responseModel.setStatus("fail");
             return responseModel;
         }
 
-        if (existingUser){
+        if (existingUser) {
             responseModel.setMessage("This email already exists!");
             responseModel.setStatus("fail");
             return responseModel;
@@ -88,24 +92,24 @@ public class UserController {
         return responseModel;
     }
 
-    @GetMapping( "/register/confirm")
-    public ResponseModel confirmRegister(@RequestParam("token")String confirmationToken) {
+    @GetMapping("/register/confirm")
+    public ResponseModel confirmRegister(@RequestParam("token") String confirmationToken) {
 
         ResponseModel responseModel = new ResponseModel();
         ConfirmationToken confirmToken = confirmationTokenRepository.findByCodeAndType(confirmationToken, "ACTIVE");
-        if (confirmToken == null){
+        if (confirmToken == null) {
             responseModel.setMessage("Invalid verification code!");
             responseModel.setStatus("fail");
             return responseModel;
         }
 
-        if (confirmToken.getUser().isEnabled()){
+        if (confirmToken.getUser().isEnabled()) {
             responseModel.setMessage("Account has been verified!");
             responseModel.setStatus("fail");
             return responseModel;
         }
 
-        if ((confirmToken.getCreateAt().plusMinutes(5)).isBefore(LocalDateTime.now())){
+        if ((confirmToken.getCreateAt().plusMinutes(5)).isBefore(LocalDateTime.now())) {
             responseModel.setMessage("Verification code has expired!");
             responseModel.setStatus("fail");
             return responseModel;
@@ -121,10 +125,10 @@ public class UserController {
         return responseModel;
     }
 
-    @PostMapping ( "/login")
+    @PostMapping("/login")
     public ResponseModel login(@RequestBody UserLoginDTO loginDTO) {
         ResponseModel responseModel = new ResponseModel();
-        try{
+        try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getEmail(), loginDTO.getPassword()));
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -145,7 +149,7 @@ public class UserController {
             responseModel.setStatus("success");
             responseModel.setResponseData(authResponse);
             return responseModel;
-        }catch (AuthenticationException e){
+        } catch (AuthenticationException e) {
             responseModel.setMessage("login fail");
             responseModel.setStatus("fail");
             return responseModel;
@@ -153,12 +157,12 @@ public class UserController {
     }
 
     @PostMapping("/forgetPassword")
-    public ResponseModel forgetPassword(@RequestParam("email")String email) throws MessagingException, IOException {
+    public ResponseModel forgetPassword(@RequestParam("email") String email) throws MessagingException, IOException {
         ResponseModel responseModel = new ResponseModel();
 
         boolean existingUser = userRepository.existsByEmail(email);
 
-        if (!existingUser){
+        if (!existingUser) {
             responseModel.setMessage("This email don't exists!");
             responseModel.setStatus("fail");
             return responseModel;
@@ -190,13 +194,13 @@ public class UserController {
 
         ConfirmationToken confirmToken = confirmationTokenRepository.findByCodeAndType(token, "RESET_PASSWORD");
 
-        if (confirmToken == null){
+        if (confirmToken == null) {
             responseModel.setMessage("Invalid reset code!");
             responseModel.setStatus("fail");
             return responseModel;
         }
 
-        if (confirmToken.getCreateAt().plusMinutes(5).isBefore(LocalDateTime.now())){
+        if (confirmToken.getCreateAt().plusMinutes(5).isBefore(LocalDateTime.now())) {
             responseModel.setMessage("Reset code has expired!");
             responseModel.setStatus("fail");
             return responseModel;
@@ -215,19 +219,19 @@ public class UserController {
 
         ConfirmationToken confirmToken = confirmationTokenRepository.findByCodeAndType(changePasswordDTO.getCode(), "RESET_PASSWORD");
 
-        if (confirmToken == null){
+        if (confirmToken == null) {
             responseModel.setMessage("Invalid reset code!");
             responseModel.setStatus("fail");
             return responseModel;
         }
 
-        if (confirmToken.getCreateAt().plusMinutes(5).isBefore(LocalDateTime.now())){
+        if (confirmToken.getCreateAt().plusMinutes(5).isBefore(LocalDateTime.now())) {
             responseModel.setMessage("Reset code has expired!");
             responseModel.setStatus("fail");
             return responseModel;
         }
 
-        if (!changePasswordDTO.getConfirmPass().equals(changePasswordDTO.getNewPass())){
+        if (!changePasswordDTO.getConfirmPass().equals(changePasswordDTO.getNewPass())) {
             responseModel.setMessage("New pass and confirm pass don't match!");
             responseModel.setStatus("fail");
             return responseModel;
@@ -246,13 +250,13 @@ public class UserController {
     }
 
     @PostMapping("/refreshToken")
-    public ResponseModel refreshToken(@RequestBody RefreshTokenDTO refreshTokenDTO){
+    public ResponseModel refreshToken(@RequestBody RefreshTokenDTO refreshTokenDTO) {
         String refresh = refreshTokenDTO.getRequestRefresh();
         ResponseModel responseModel = new ResponseModel();
 
         ConfirmationToken token = IRefreshTokenService.findByToken(refresh);
 
-        if(token == null){
+        if (token == null) {
             responseModel.setMessage("Refresh token isn't in database!");
             responseModel.setStatus("fail");
             return responseModel;
@@ -260,13 +264,13 @@ public class UserController {
 
         responseModel = IRefreshTokenService.verifyExpiration(responseModel, token);
 
-        if (responseModel.getStatus() != null){
+        if (responseModel.getStatus() != null) {
             return responseModel;
         }
 
         String newToken = jwtUtils.generateTokenFromUsername(token.getUser().getEmail());
 
-        JSONObject obj= new JSONObject();
+        JSONObject obj = new JSONObject();
 
         obj.put("Access Token", newToken);
 
@@ -278,7 +282,7 @@ public class UserController {
     }
 
     @GetMapping("/logout")
-    public ResponseModel logoutUser(@RequestParam String access_token){
+    public ResponseModel logoutUser(@RequestParam String access_token) {
         ResponseModel responseModel = new ResponseModel();
 
         User user = IUserService.currentUser();
@@ -287,6 +291,28 @@ public class UserController {
         responseModel.setMessage("Log out successful");
 
         return responseModel;
+    }
+
+    @GetMapping("/information")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> informationUser() {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            User user = IUserService.currentUser();
+
+            UserResponse userResponse = new UserResponse(user);
+
+            responseModel.setResponseData(userResponse);
+            responseModel.setMessage("Information user successfully");
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Information user fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
     }
 
 
