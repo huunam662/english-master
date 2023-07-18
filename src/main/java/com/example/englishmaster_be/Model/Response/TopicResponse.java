@@ -10,8 +10,6 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
 
-@Getter
-@Setter
 public class TopicResponse {
     private UUID topicId;
 
