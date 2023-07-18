@@ -272,7 +272,7 @@ public class UserController {
 
         JSONObject obj = new JSONObject();
 
-        obj.put("Access Token", newToken);
+        obj.put("accessToken", newToken);
 
         responseModel.setStatus("success");
         responseModel.setMessage("Created new access token");

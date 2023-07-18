@@ -40,7 +40,7 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
 
     @Override
     public ResponseModel verifyExpiration(ResponseModel responseModel, ConfirmationToken token) {
-        if(token.getCreateAt().plusNanos(refreshTokenDurationMs).isBefore(LocalDateTime.now())){
+        if(token.getCreateAt().plusSeconds(refreshTokenDurationMs/1000).isBefore(LocalDateTime.now())){
             confirmationTokenRepository.delete(token);
             responseModel.setStatus("fail");
             responseModel.setMessage("Refresh token was expired. Please make a new signin request");
