@@ -18,5 +18,7 @@ public interface IUserService {
 
     User currentUser();
 
+    User findeUserByEmail(String email);
+
     User findUserById(UUID userId);
 }

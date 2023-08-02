@@ -28,6 +28,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/api")
@@ -59,6 +61,26 @@ public class UserController {
     public ResponseModel register(@RequestBody UserRegisterDTO registerDTO) throws IOException, MessagingException {
         ResponseModel responseModel = new ResponseModel();
 
+        String regex = "^(?=.*[0-9])"
+                + "(?=.*[a-z])(?=.*[A-Z])"
+                + "(?=.*[@#$%^&+=])"
+                + "(?=\\S+$).{8,20}$";
+
+        Pattern p = Pattern.compile(regex);
+
+        if (registerDTO.getPassword() == null){
+            responseModel.setMessage("Password is null");
+            responseModel.setStatus("fail");
+            return responseModel;
+        }
+
+        Matcher m = p.matcher(registerDTO.getPassword());
+        if(!m.matches()){
+            responseModel.setMessage("Password must contain at least 1 uppercase, 1 lowercase, 1 numeric, 1 special character and no spaces");
+            responseModel.setStatus("fail");
+            return responseModel;
+        }
+
         User user = IUserService.createUser(registerDTO);
 
         boolean existingUser = userRepository.existsByEmail(user.getEmail());
@@ -70,11 +92,16 @@ public class UserController {
         }
 
         if (existingUser) {
-            responseModel.setMessage("This email already exists!");
-            responseModel.setStatus("fail");
-            return responseModel;
-        }
+            User userExist = IUserService.findeUserByEmail(user.getEmail());
+            if(!userExist.isEnabled()){
+                userRepository.delete(userExist);
+            }else {
+                responseModel.setMessage("This email already exists!");
+                responseModel.setStatus("fail");
+                return responseModel;
+            }
 
+        }
 
         userRepository.save(user);
 
@@ -281,7 +308,9 @@ public class UserController {
         return responseModel;
     }
 
+
     @GetMapping("/logout")
+    @PreAuthorize("hasRole('USER')")
     public ResponseModel logoutUser(@RequestParam String access_token) {
         ResponseModel responseModel = new ResponseModel();
 
@@ -319,7 +348,7 @@ public class UserController {
     private void sendConfirmationEmail(String email, String confirmationToken) throws IOException, MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        String confirmationLink = "http://localhost:8080/api/register/confirm?token=" + confirmationToken;
+        String confirmationLink = "http://localhost:3000/register/confirm?token=" + confirmationToken;
 
 
         String templateContent = readTemplateContent("email_templates.html");
