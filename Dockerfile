@@ -2,8 +2,8 @@
 FROM openjdk:17-oracle
 WORKDIR /usr/src/app
 COPY . .
-RUN chmod 755 mvnw
+RUN chmod +x mvnw
 RUN bash mvnw install 
 # ENTRYPOINT ["/bin/sh", "mvnw" "spring-boot:run"]
 
-ENTRYPOINT ["ls"]
+ENTRYPOINT ["./mvnw", "spring-boot:run"]
