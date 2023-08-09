@@ -8,4 +8,4 @@ RUN echo $SHELL
 
 # ENTRYPOINT ["/bin/sh", "mvnw" "spring-boot:run"]
 
-ENTRYPOINT ["sh ./mvnw", "spring-boot:run"]
+ENTRYPOINT ["sh",  "./mvnw", "spring-boot:run"]
