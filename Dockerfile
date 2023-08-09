@@ -4,6 +4,8 @@ WORKDIR /usr/src/app
 COPY . .
 RUN chmod +x mvnw
 RUN bash mvnw install 
+RUN echo $SHELL
+
 # ENTRYPOINT ["/bin/sh", "mvnw" "spring-boot:run"]
 
-# ENTRYPOINT ["./mvnw", "spring-boot:run"]
+ENTRYPOINT ["sh ./mvnw", "spring-boot:run"]
