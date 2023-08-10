@@ -54,8 +54,7 @@ public class UserServiceImpl implements IUserService {
     public User currentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        User user = findUser(userDetails);
-        return user;
+        return findUser(userDetails);
     }
 
     @Override

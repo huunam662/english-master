@@ -15,6 +15,8 @@ public interface QuestionRepository extends JpaRepository<Question, UUID> {
     List<Question> findAllByQuestionGroup(Question question);
     Page<Question> findAllByQuestionGroupAndPart(Question question, Part part,Pageable pageable);
 
+    List<Question> findByTopicsAndPart(Topic topic, Part part);
+
     Page<Question> findAll(Pageable pageable);
     int countByQuestionGroup(Question question);
     boolean existsByQuestionGroup(Question question);

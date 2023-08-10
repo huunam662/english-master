@@ -8,13 +8,13 @@ public class DetailMockTestResponse {
     private UUID answerId;
     private String answerContent;
     private boolean correctAnswer;
-    private String explainDetails;
+	private int scoreAnswer;
 
     public DetailMockTestResponse(DetailMockTest detailMockTest){
         this.answerId = detailMockTest.getDetailMockTestId();
         this.answerContent = detailMockTest.getAnswer().getAnswerContent();
         this.correctAnswer = detailMockTest.getAnswer().isCorrectAnswer();
-        this.explainDetails = detailMockTest.getAnswer().getExplainDetails();
+		this.scoreAnswer = detailMockTest.getAnswer().getQuestion().getQuestionScore();
     }
 
 	public UUID getAnswerId() {
@@ -41,13 +41,11 @@ public class DetailMockTestResponse {
 		this.correctAnswer = correctAnswer;
 	}
 
-	public String getExplainDetails() {
-		return explainDetails;
+	public int getScoreAnswer() {
+		return scoreAnswer;
 	}
 
-	public void setExplainDetails(String explainDetails) {
-		this.explainDetails = explainDetails;
+	public void setScoreAnswer(int scoreAnswer) {
+		this.scoreAnswer = scoreAnswer;
 	}
-    
-    
 }

@@ -10,6 +10,7 @@ import java.util.UUID;
 public class UserResponse {
     private UUID userId;
     private String userName;
+    private String email;
     private String phone;
     private String address;
     private String avatar;
@@ -20,6 +21,7 @@ public class UserResponse {
     public UserResponse(User user) {
         this.userId = user.getUserId();
         this.userName = user.getName();
+        this.email = user.getEmail();
         this.phone = user.getPhone();
         this.address = user.getAddress();
         this.avatar = user.getAvatar();
@@ -43,6 +45,14 @@ public class UserResponse {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPhone() {

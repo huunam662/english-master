@@ -4,12 +4,21 @@ import com.example.englishmaster_be.DTO.MockTest.CreateMockTestDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Service.*;
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -25,6 +34,11 @@ public class MockTestController {
     private IMockTestService IMockTestService;
     @Autowired
     private IAnswerService IAnswerService;
+    @Autowired
+    private JavaMailSender mailSender;
+    @Autowired
+    private ResourceLoader resourceLoader;
+
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('USER')")
@@ -157,7 +171,6 @@ public class MockTestController {
             MockTest mockTest = IMockTestService.findMockTestToId(mockTestId);
 
             List<DetailMockTest> detailMockTestList = IMockTestService.getTop10DetailToCorrect(index, isCorrect, mockTest);
-            System.out.println(detailMockTestList);
 
             if(detailMockTestList != null){
                 List<DetailMockTestResponse> detailMockTestResponseList = new ArrayList<>();
@@ -182,5 +195,53 @@ public class MockTestController {
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
+    }
+
+    @GetMapping(value = "/{mockTestId:.+}/sendEmail")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> sendEmailToMock(@PathVariable UUID mockTestId){
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            User user = IUserService.currentUser();
+            MockTest mockTest = IMockTestService.findMockTestToId(mockTestId);
+
+            int correctAnswer = IMockTestService.countCorrectAnswer(mockTestId);
+
+            sendResultEmail(user.getEmail(), mockTest, correctAnswer);
+
+            responseModel.setMessage("Send email successfully");
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Send email fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    private void sendResultEmail(String email, MockTest mockTest, int correctAnswer) throws IOException, MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+
+        String templateContent = readTemplateContent("test_email.html");
+        templateContent = templateContent.replace("{{nameToeic}}", mockTest.getTopic().getTopicName());
+        templateContent = templateContent.replace("{{userName}}", mockTest.getUser().getName());
+        templateContent = templateContent.replace("{{correctAnswer}}", String.valueOf(correctAnswer));
+        templateContent = templateContent.replace("{{score}}", String.valueOf(mockTest.getScore()));
+        templateContent = templateContent.replace("{{timeAnswer}}", String.valueOf(mockTest.getTime()));
+
+        helper.setTo(email);
+        helper.setSubject("Thông tin bài thi");
+        helper.setText(templateContent, true);
+        mailSender.send(message);
+    }
+
+    private String readTemplateContent(String templateFileName) throws IOException {
+        Resource templateResource = resourceLoader.getResource("classpath:templates/" + templateFileName);
+        byte[] templateBytes = FileCopyUtils.copyToByteArray(templateResource.getInputStream());
+        return new String(templateBytes, StandardCharsets.UTF_8);
     }
 }

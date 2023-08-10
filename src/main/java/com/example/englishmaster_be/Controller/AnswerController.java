@@ -4,6 +4,7 @@ import com.example.englishmaster_be.DTO.Answer.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Service.*;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -153,5 +154,30 @@ public class AnswerController {
         }
     }
 
+    @GetMapping(value = "/{answerId:.+}/checkCorrect")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> checkCorrectAnswer(@PathVariable UUID answerId) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+
+            boolean check = IAnswerService.checkCorrectAnswer(answerId);
+            int score = IAnswerService.scoreAnswer(answerId);
+            JSONObject responseObject = new JSONObject();
+            responseObject.put("correctAnswer", check);
+            responseObject.put("scoreAnswer", score);
+
+            responseModel.setMessage("Check answer successfully");
+            responseModel.setResponseData(responseObject);
+            responseModel.setStatus("success");
+
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Check answer fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
 
 }

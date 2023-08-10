@@ -11,8 +11,6 @@ public class AnswerResponse {
     private UUID questionId;
     private UUID answerId;
     private String answerContent;
-    private boolean correctAnswer;
-    private String explainDetails;
     private String createAt;
     private String updateAt;
 
@@ -24,8 +22,6 @@ public class AnswerResponse {
         questionId = answer.getQuestion().getQuestionId();
         answerId = answer.getAnswerId();
         answerContent = answer.getAnswerContent();
-        correctAnswer = answer.isCorrectAnswer();
-        explainDetails =answer.getExplainDetails();
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
         createAt = sdf.format(Timestamp.valueOf(answer.getCreateAt()));
@@ -65,21 +61,6 @@ public class AnswerResponse {
 		this.answerContent = answerContent;
 	}
 
-	public boolean isCorrectAnswer() {
-		return correctAnswer;
-	}
-
-	public void setCorrectAnswer(boolean correctAnswer) {
-		this.correctAnswer = correctAnswer;
-	}
-
-	public String getExplainDetails() {
-		return explainDetails;
-	}
-
-	public void setExplainDetails(String explainDetails) {
-		this.explainDetails = explainDetails;
-	}
 
 	public String getCreateAt() {
 		return createAt;
