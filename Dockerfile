@@ -6,4 +6,4 @@ RUN chmod +x mvnw
 RUN bash mvnw install 
 # ENTRYPOINT ["/bin/sh", "mvnw" "spring-boot:run"]
 
-ENTRYPOINT ["./mvnw", "spring-boot:run"]
+# ENTRYPOINT ["./mvnw", "spring-boot:run"]
