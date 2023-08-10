@@ -9,5 +9,5 @@ sed -i 's|MOUNT-DATA-FOLDER|'$mount_data_folder'|' docker-compose.yaml
 echo "$CI_REGISTRY_PW" | sudo docker login registry.gitlab.com -u "$CI_REGISTRY_USER" --password-stdin
 sudo docker tag $image_name:$tag  $image_name:$img_bak_tag
 sudo docker-compose pull
-sudo docker-compose down
-sudo docker-compose --env-file .env up -d
+sudo docker-compose --project-name $project_name down
+sudo docker-compose --project-name $project_name --env-file .env up -d
