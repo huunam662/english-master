@@ -29,9 +29,8 @@ public class QuestionServiceImpl implements IQuestionService {
 
     @Override
     public Question findQuestionById(UUID questionId) {
-        Question question = questionRepository.findByQuestionId(questionId)
+        return questionRepository.findByQuestionId(questionId)
                 .orElseThrow(() -> new IllegalArgumentException("Question not found with ID: " + questionId));
-        return question;
     }
 
     @Override
@@ -61,8 +60,7 @@ public class QuestionServiceImpl implements IQuestionService {
 
     @Override
     public List<Question> listQuestionGroup(Question question) {
-        List<Question> questionList = questionRepository.findAllByQuestionGroup(question);
-        return questionList;
+        return questionRepository.findAllByQuestionGroup(question);
     }
 
     @Override

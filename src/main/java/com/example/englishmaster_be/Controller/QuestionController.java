@@ -7,6 +7,7 @@ import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Service.*;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -118,7 +119,7 @@ public class QuestionController {
 
             IContentService.uploadContent(content);
 
-                    Question question = IContentService.getContentToContentId(questionId).getQuestion();
+            Question question = IContentService.getContentToContentId(questionId).getQuestion();
             question.setUpdateAt(LocalDateTime.now());
             question.setUserUpdate(user);
 
@@ -149,6 +150,8 @@ public class QuestionController {
             User user = IUserService.currentUser();
             question.setQuestionGroup(IQuestionService.findQuestionById(createGroupQuestionDTO.getQuestionGroupId()));
             question.setQuestionNumberical(createGroupQuestionDTO.getQuestionNumberical());
+            question.setQuestionExplainVn(createGroupQuestionDTO.getQuestionExplainVn());
+            question.setQuestionExplainEn(createGroupQuestionDTO.getQuestionExplainEn());
             question.setUserCreate(user);
             question.setUserUpdate(user);
 
@@ -181,7 +184,7 @@ public class QuestionController {
 
             List<QuestionResponse> questionResponseList = new ArrayList<>();
 
-            for(Question question : questionList){
+            for (Question question : questionList) {
                 QuestionResponse questionResponse = new QuestionResponse(question);
                 questionResponseList.add(questionResponse);
             }
@@ -205,11 +208,11 @@ public class QuestionController {
         ResponseModel responseModel = new ResponseModel();
         try {
             boolean check = IQuestionService.checkQuestionGroup(IQuestionService.findQuestionById(questionId));
-            if(check){
+            if (check) {
                 responseModel.setMessage("Question has question group");
                 responseModel.setResponseData(true);
                 responseModel.setStatus("success");
-            }else {
+            } else {
                 responseModel.setMessage("Question doesn't have question group");
                 responseModel.setResponseData(false);
                 responseModel.setStatus("success");
@@ -232,16 +235,18 @@ public class QuestionController {
 
             Question question = IQuestionService.findQuestionById(questionId);
             List<Question> questionList = IQuestionService.listQuestionGroup(question);
+            JSONArray questionArray = new JSONArray();
 
-            List<QuestionResponse> questionResponseList = new ArrayList<>();
-
-            for(Question questionItem : questionList){
-                QuestionResponse questionResponse = new QuestionResponse(questionItem);
-                questionResponseList.add(questionResponse);
+            for (Question questionItem : questionList) {
+                JSONObject questionObject = new JSONObject();
+                questionObject.put("questionId", questionItem.getQuestionId());
+                questionObject.put("partId", questionItem.getPart().getPartId());
+                questionObject.put("questionGroup", questionItem.getQuestionGroup().getQuestionId());
+                questionArray.add(questionObject);
             }
 
             responseModel.setMessage("List question group successfully");
-            responseModel.setResponseData(questionResponseList);
+            responseModel.setResponseData(questionArray);
             responseModel.setStatus("success");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
@@ -263,9 +268,10 @@ public class QuestionController {
             Collection<Answer> answerCollection = question.getAnswers();
 
             JSONArray answerArray = new JSONArray();
-            for(Answer answer : answerCollection){
-                AnswerResponse answerResponse = new AnswerResponse(answer);
-                answerArray.add(answerResponse);
+            for (Answer answer : answerCollection) {
+                JSONObject answerObject = new JSONObject();
+                answerObject.put("answerId", answer.getAnswerId());
+                answerArray.add(answerObject);
 
             }
 
@@ -289,7 +295,7 @@ public class QuestionController {
         try {
             Question question = IQuestionService.findQuestionById(questionId);
             IQuestionService.deleteQuestion(question);
-            for(Content content : question.getContentCollection()){
+            for (Content content : question.getContentCollection()) {
                 IFileStorageService.delete(content.getContentData());
             }
 
@@ -299,6 +305,29 @@ public class QuestionController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             responseModel.setMessage("Delete question fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @GetMapping(value = "/{questionId:.+}/content")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> getContentToQuestion(@PathVariable UUID questionId) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+
+            Question question = IQuestionService.findQuestionById(questionId);
+
+            QuestionResponse questionResponse = new QuestionResponse(question);
+
+            responseModel.setMessage("Show content question successfully");
+            responseModel.setResponseData(questionResponse);
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Show content question fail: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);

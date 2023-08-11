@@ -18,6 +18,8 @@ public class TopicServiceImpl implements ITopicService {
     @Autowired
     private PartRepository partRepository;
     @Autowired
+    private QuestionRepository questionRepository;
+    @Autowired
     private IUserService IUserService;
 
     @Override
@@ -27,15 +29,33 @@ public class TopicServiceImpl implements ITopicService {
 
     @Override
     public Topic findTopicById(UUID topicId) {
-        Topic topic = topicRepository.findByTopicId(topicId)
+        return topicRepository.findByTopicId(topicId)
                 .orElseThrow(() -> new IllegalArgumentException("Topic not found with ID: " + topicId));
-        return topic;
     }
 
     @Override
     public List<Topic> getTop6Topic(int index) {
         Page<Topic> page = topicRepository.findAll(PageRequest.of(index, 6, Sort.by(Sort.Order.desc("updateAt"))));
         return page.getContent();
+    }
+
+    @Override
+    public List<Part> getPartToTopic(UUID topicId) {
+        Topic topic = topicRepository.findByTopicId(topicId)
+                .orElseThrow(() -> new IllegalArgumentException("Topic not found with ID: " + topicId));
+        Page<Part> page = partRepository.findByTopics(topic, PageRequest.of(0, 7, Sort.by(Sort.Order.asc("partName"))));
+        return page.getContent();
+    }
+
+    @Override
+    public List<Question> getQuestionOfPartToTopic(UUID topicId, UUID partId) {
+        Topic topic = topicRepository.findByTopicId(topicId)
+                .orElseThrow(() -> new IllegalArgumentException("Topic not found with ID: " + topicId));
+        Part part = partRepository.findByPartId(partId)
+                .orElseThrow(() -> new IllegalArgumentException("Part not found with ID: " + partId));
+        List<Question> listQuestion = questionRepository.findByTopicsAndPart(topic, part);
+        Collections.shuffle(listQuestion);
+        return listQuestion;
     }
 
     @Override

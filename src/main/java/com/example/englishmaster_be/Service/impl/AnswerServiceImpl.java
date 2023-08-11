@@ -22,15 +22,27 @@ public class AnswerServiceImpl implements IAnswerService {
 
     @Override
     public boolean existQuestion(Answer answer, Question question) {
-        if(answer.getQuestion().equals(question)){
-            return true;
-        }
-        return false;
+        return answer.getQuestion().equals(question);
     }
 
     @Override
     public Answer findAnswerToId(UUID answerID) {
-        return answerRepository.findByAnswerId(answerID);
+        return answerRepository.findByAnswerId(answerID)
+                .orElseThrow(() -> new IllegalArgumentException("Answer not found with ID: " + answerID));
+    }
+
+    @Override
+    public boolean checkCorrectAnswer(UUID answerId) {
+        Answer answer = answerRepository.findByAnswerId(answerId)
+                .orElseThrow(() -> new IllegalArgumentException("Answer not found with ID: " + answerId));
+        return answer.isCorrectAnswer();
+    }
+
+    @Override
+    public int scoreAnswer(UUID answerId) {
+        Answer answer = answerRepository.findByAnswerId(answerId)
+                .orElseThrow(() -> new IllegalArgumentException("Answer not found with ID: " + answerId));
+        return answer.getQuestion().getQuestionScore();
     }
 
     @Override

@@ -10,6 +10,9 @@ public class CreateQuestionDTO {
 
     private UUID partId;
 
+	private String questionExplainEn;
+	private String questionExplainVn;
+
 
 	public CreateQuestionDTO() {
 		super();
@@ -39,5 +42,19 @@ public class CreateQuestionDTO {
 		this.partId = partId;
 	}
 
-    
+	public String getQuestionExplainEn() {
+		return questionExplainEn;
+	}
+
+	public void setQuestionExplainEn(String questionExplainEn) {
+		this.questionExplainEn = questionExplainEn;
+	}
+
+	public String getQuestionExplainVn() {
+		return questionExplainVn;
+	}
+
+	public void setQuestionExplainVn(String questionExplainVn) {
+		this.questionExplainVn = questionExplainVn;
+	}
 }

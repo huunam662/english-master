@@ -10,6 +10,10 @@ public interface IAnswerService {
     boolean existQuestion(Answer answer, Question question);
     Answer findAnswerToId(UUID answerID);
 
+    boolean checkCorrectAnswer(UUID answerId);
+
+    int scoreAnswer(UUID answerId);
+
     void deleteAnswer(Answer answer);
 
 }

@@ -14,6 +14,8 @@ public interface ITopicService {
     Topic findTopicById(UUID topicId);
 
     List<Topic> getTop6Topic(int index);
+    List<Part> getPartToTopic(UUID topicId);
+    List<Question> getQuestionOfPartToTopic(UUID topicId, UUID partId);
 
     void addPartToTopic(UUID topicId, UUID partId);
     boolean deletePartToTopic(UUID topicId, UUID partId);

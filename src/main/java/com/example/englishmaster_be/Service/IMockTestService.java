@@ -18,4 +18,6 @@ public interface IMockTestService {
     MockTest findMockTestToId(UUID mockTestId);
 
     List<DetailMockTest> getTop10DetailToCorrect(int index, boolean isCorrect ,MockTest mockTest);
+
+    int countCorrectAnswer(UUID mockTestId);
 }

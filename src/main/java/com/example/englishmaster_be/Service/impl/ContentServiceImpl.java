@@ -19,8 +19,7 @@ public class ContentServiceImpl implements IContentService {
 
     @Override
     public Content getContentToContentId(UUID contentId) {
-        Content content = contentRepository.findByContentId(contentId)
+        return contentRepository.findByContentId(contentId)
                 .orElseThrow(() -> new IllegalArgumentException("Content not found with ID: " + contentId));
-        return content;
     }
 }

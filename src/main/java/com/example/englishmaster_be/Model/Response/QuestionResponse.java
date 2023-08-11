@@ -16,6 +16,7 @@ public class QuestionResponse {
     private int questionScore;
     private JSONArray contentList;
     private UUID questionGroup;
+
     private UUID partId;
     private String createAt;
     private String updateAt;
@@ -152,6 +153,6 @@ public class QuestionResponse {
 	public void setUserUpdate(JSONObject userUpdate) {
 		this.userUpdate = userUpdate;
 	}
-    
-    
+
+
 }

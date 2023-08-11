@@ -6,6 +6,7 @@ import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.TopicResponse;
 import com.example.englishmaster_be.Repository.TopicRepository;
 import com.example.englishmaster_be.Service.*;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -286,6 +287,64 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             responseModel.setMessage("Delete question to topic fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @GetMapping(value = "/{topicId:.+}/listPart")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> getPartToTopic(@PathVariable UUID topicId) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            List<Part> partList = ITopicService.getPartToTopic(topicId);
+
+            JSONArray responseArray = new JSONArray();
+
+            for(Part part : partList ){
+                JSONObject response = new JSONObject();
+                response.put("partId", part.getPartId());
+                response.put("partName", part.getPartName());
+                response.put("partType", part.getPartType());
+                responseArray.add(response);
+            }
+
+            responseModel.setMessage("Show part to topic successfully");
+
+            responseModel.setResponseData(responseArray);
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Show part to topic fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @GetMapping(value = "/{topicId:.+}/listQuestionToPart")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> getQuestionOfToTopic(@PathVariable UUID topicId, @RequestParam UUID partId) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            List<Question> questionList = ITopicService.getQuestionOfPartToTopic(topicId, partId);
+            JSONArray responseArray = new JSONArray();
+
+            for(Question question : questionList ){
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("questionId", question.getQuestionId());
+                responseArray.add(jsonObject);
+            }
+
+            responseModel.setMessage("Show question of part to topic successfully");
+            responseModel.setResponseData(responseArray);
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Show question of part to topic fail: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
