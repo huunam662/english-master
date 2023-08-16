@@ -50,7 +50,11 @@ public class QuestionServiceImpl implements IQuestionService {
 
     @Override
     public int countQuestionToQuestionGroup(Question question) {
-        return questionRepository.countByQuestionGroup(question);
+        int total = 0;
+        for(Question questionChild: listQuestionGroup(question)){
+            total++;
+        }
+        return total;
     }
 
     @Override
@@ -67,4 +71,5 @@ public class QuestionServiceImpl implements IQuestionService {
     public void deleteQuestion(Question question) {
         questionRepository.delete(question);
     }
+
 }

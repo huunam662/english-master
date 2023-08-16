@@ -3,6 +3,8 @@ package com.example.englishmaster_be.Controller;
 import com.example.englishmaster_be.DTO.Topic.*;
 import com.example.englishmaster_be.DTO.UploadFileDTO;
 import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.Model.Response.PartResponse;
+import com.example.englishmaster_be.Model.Response.QuestionResponse;
 import com.example.englishmaster_be.Model.Response.TopicResponse;
 import com.example.englishmaster_be.Repository.TopicRepository;
 import com.example.englishmaster_be.Service.*;
@@ -303,11 +305,11 @@ public class TopicController {
             JSONArray responseArray = new JSONArray();
 
             for(Part part : partList ){
-                JSONObject response = new JSONObject();
-                response.put("partId", part.getPartId());
-                response.put("partName", part.getPartName());
-                response.put("partType", part.getPartType());
-                responseArray.add(response);
+                int totalQuestion = ITopicService.totalQuestion(part, topicId);
+
+                PartResponse partResponse = new PartResponse(part, totalQuestion);
+
+                responseArray.add(partResponse);
             }
 
             responseModel.setMessage("Show part to topic successfully");
@@ -330,16 +332,25 @@ public class TopicController {
         ResponseModel responseModel = new ResponseModel();
         try {
             List<Question> questionList = ITopicService.getQuestionOfPartToTopic(topicId, partId);
-            JSONArray responseArray = new JSONArray();
+            List<QuestionResponse> questionResponseList = new ArrayList<>();
 
             for(Question question : questionList ){
-                JSONObject jsonObject = new JSONObject();
-                jsonObject.put("questionId", question.getQuestionId());
-                responseArray.add(jsonObject);
+                QuestionResponse questionResponse = new QuestionResponse(question);
+                if(IQuestionService.checkQuestionGroup(question)){
+                    List<Question> questionGroupList = IQuestionService.listQuestionGroup(question);
+                    List<QuestionResponse> questionGroupResponseList = new ArrayList<>();
+                    for(Question questionGroup : questionGroupList){
+                        QuestionResponse questionGroupResponse = new QuestionResponse(questionGroup);
+                        questionGroupResponseList.add(questionGroupResponse);
+                        questionResponse.setQuestionGroup(questionGroupResponseList);
+                    }
+                }
+
+                questionResponseList.add(questionResponse);
             }
 
             responseModel.setMessage("Show question of part to topic successfully");
-            responseModel.setResponseData(responseArray);
+            responseModel.setResponseData(questionResponseList);
             responseModel.setStatus("success");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);

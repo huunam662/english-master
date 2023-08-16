@@ -17,12 +17,10 @@ public class PartResponse {
     private String contentData;
     private String createAt;
     private String updateAt;
+	private int totalQuestion;
 
-    private JSONObject userCreate;
 
-    private JSONObject userUpdate;
-
-    public PartResponse(Part part) {
+public PartResponse(Part part) {
         String link;
         if(part.getContentData() == null){
             this.contentData = part.getContentData();
@@ -42,16 +40,31 @@ public class PartResponse {
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
         this.createAt = sdf.format(Timestamp.valueOf(part.getCreateAt()));
         this.updateAt = sdf.format(Timestamp.valueOf(part.getUpdateAt()));
-
-        userCreate = new JSONObject();
-        userUpdate = new JSONObject();
-
-        userCreate.put("User Id", part.getUserCreate().getUserId());
-        userCreate.put("User Name", part.getUserCreate().getName());
-
-        userUpdate.put("User Id", part.getUserUpdate().getUserId());
-        userUpdate.put("User Name", part.getUserUpdate().getName());
     }
+
+	public PartResponse(Part part, int totalQuestion) {
+		String link;
+		if(part.getContentData() == null){
+			this.contentData = part.getContentData();
+
+		}else {
+
+			link = GetExtension.linkName(part.getContentData());
+			this.contentData = link + part.getContentData();
+		}
+
+		this.partId = part.getPartId();
+		this.partName = part.getPartName();
+		this.partDescription = part.getPartDescription();
+		this.partType = part.getPartType();
+		this.contentType = part.getContentType();
+		this.totalQuestion = totalQuestion;
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+		this.createAt = sdf.format(Timestamp.valueOf(part.getCreateAt()));
+		this.updateAt = sdf.format(Timestamp.valueOf(part.getUpdateAt()));
+	}
+
 
 	public UUID getPartId() {
 		return partId;
@@ -117,21 +130,11 @@ public class PartResponse {
 		this.updateAt = updateAt;
 	}
 
-	public JSONObject getUserCreate() {
-		return userCreate;
+	public int getTotalQuestion() {
+		return totalQuestion;
 	}
 
-	public void setUserCreate(JSONObject userCreate) {
-		this.userCreate = userCreate;
+	public void setTotalQuestion(int totalQuestion) {
+		this.totalQuestion = totalQuestion;
 	}
-
-	public JSONObject getUserUpdate() {
-		return userUpdate;
-	}
-
-	public void setUserUpdate(JSONObject userUpdate) {
-		this.userUpdate = userUpdate;
-	}
-    
-    
 }
