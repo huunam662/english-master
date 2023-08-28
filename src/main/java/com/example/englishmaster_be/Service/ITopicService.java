@@ -28,4 +28,6 @@ public interface ITopicService {
     void updateTopic(Topic topic, UpdateTopicDTO updateTopicDTO);
 
     void deleteTopic(Topic topic);
+
+    int totalQuestion(Part part, UUID topicId);
 }

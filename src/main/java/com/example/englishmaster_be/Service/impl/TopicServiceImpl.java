@@ -3,8 +3,7 @@ package com.example.englishmaster_be.Service.impl;
 import com.example.englishmaster_be.DTO.Topic.UpdateTopicDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Repository.*;
-import com.example.englishmaster_be.Service.ITopicService;
-import com.example.englishmaster_be.Service.IUserService;
+import com.example.englishmaster_be.Service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -21,6 +20,9 @@ public class TopicServiceImpl implements ITopicService {
     private QuestionRepository questionRepository;
     @Autowired
     private IUserService IUserService;
+    @Autowired
+    private IQuestionService IQuestionService;
+
 
     @Override
     public void createTopic(Topic topic) {
@@ -138,5 +140,24 @@ public class TopicServiceImpl implements ITopicService {
     @Override
     public void deleteTopic(Topic topic) {
         topicRepository.delete(topic);
+    }
+
+    @Override
+    public int totalQuestion(Part part, UUID topicId) {
+        int total = 0;
+        Topic topic = topicRepository.findByTopicId(topicId)
+                .orElseThrow(() -> new IllegalArgumentException("Topic not found with ID: " + topicId));
+
+        for(Question question: topic.getQuestions()){
+            if(question.getPart().getPartId() == part.getPartId()){
+                boolean check = IQuestionService.checkQuestionGroup(question);
+                if(check){
+                    total = total + IQuestionService.countQuestionToQuestionGroup(question);
+                }else {
+                    total++;
+                }
+            }
+        }
+        return total;
     }
 }

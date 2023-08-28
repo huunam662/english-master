@@ -65,10 +65,8 @@ public class MockTestServiceImpl implements IMockTestService {
         int count = 0;
         MockTest mockTest = findMockTestToId(mockTestId);
         for(DetailMockTest detailMockTest : mockTest.getDetailMockTests()){
-            System.out.println(detailMockTest.getAnswer().isCorrectAnswer());
             if(detailMockTest.getAnswer().isCorrectAnswer()){
                 count = count + 1;
-                System.out.println(count);
             }
         }
         return count;

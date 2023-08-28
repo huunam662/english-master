@@ -233,7 +233,7 @@ public class PartController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
     }
 
-    @GetMapping(value = "/{partId:.+}/information")
+    @GetMapping(value = "/{partId:.+}/content")
     public ResponseEntity<ResponseModel> getPartToId(@PathVariable UUID partId){
         ResponseModel responseModel = new ResponseModel();
 

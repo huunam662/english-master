@@ -3,6 +3,7 @@ package com.example.englishmaster_be.Controller;
 import com.example.englishmaster_be.DTO.MockTest.CreateMockTestDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
+import com.example.englishmaster_be.Repository.MockTestRepository;
 import com.example.englishmaster_be.Service.*;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -26,6 +27,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/mockTest")
 public class MockTestController {
+    @Autowired
+    private MockTestRepository mockTestRepository;
     @Autowired
     private IUserService IUserService;
     @Autowired
@@ -131,26 +134,41 @@ public class MockTestController {
         }
     }
 
-    @PostMapping(value = "/{mockTestId:.+}/addAnswerToMockTest")
+    @PostMapping(value = "/{mockTestId:.+}/submitResult")
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> addAnswerToMockTest(@PathVariable UUID mockTestId, @RequestParam UUID answerId  ){
+    public ResponseEntity<ResponseModel> addAnswerToMockTest(@PathVariable UUID mockTestId, @RequestBody List<UUID> listAnswerId  ){
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
+            int totalCorrect = 0;
+            int score = 0;
 
             MockTest mockTest = IMockTestService.findMockTestToId(mockTestId);
-            Answer answer = IAnswerService.findAnswerToId(answerId);
+            List<DetailMockTestResponse> detailMockTestList = new ArrayList<>();
+            for(UUID answerId : listAnswerId){
+                Answer answer = IAnswerService.findAnswerToId(answerId);
 
-            DetailMockTest detailMockTest = new DetailMockTest(mockTest, answer);
-            detailMockTest.setUserCreate(user);
-            detailMockTest.setUserUpdate(user);
 
-            IMockTestService.createDetailMockTest(detailMockTest);
+                DetailMockTest detailMockTest = new DetailMockTest(mockTest, answer);
+                detailMockTest.setUserCreate(user);
+                detailMockTest.setUserUpdate(user);
 
-            DetailMockTestResponse detailMockTestResponse = new DetailMockTestResponse(detailMockTest);
+                IMockTestService.createDetailMockTest(detailMockTest);
 
+                DetailMockTestResponse detailMockTestResponse = new DetailMockTestResponse(detailMockTest);
+                if(answer.isCorrectAnswer()){
+                    totalCorrect++;
+                    score = score + answer.getQuestion().getQuestionScore();
+                }
+                detailMockTestList.add(detailMockTestResponse);
+            }
+
+            mockTest.setScore(score);
+            mockTestRepository.save(mockTest);
+
+            sendResultEmail(user.getEmail(), mockTest, totalCorrect);
             responseModel.setMessage("Create detail mock test successfully");
-            responseModel.setResponseData(detailMockTestResponse);
+            responseModel.setResponseData(detailMockTestList);
             responseModel.setStatus("success");
 
 
