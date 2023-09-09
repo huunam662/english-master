@@ -12,6 +12,7 @@ import java.util.UUID;
 
 public class TopicResponse {
     private UUID topicId;
+	private String packName;
 
     private String topicName;
 
@@ -38,9 +39,9 @@ public class TopicResponse {
     public TopicResponse(Topic topic) {
 
         String link = GetExtension.linkName(topic.getTopicImage());
-        System.out.println(link);
 
         this.topicId = topic.getTopicId();
+		this.packName = topic.getPack().getPackName();
         this.topicName = topic.getTopicName();
 
         this.topicImage =  link + topic.getTopicImage();
@@ -71,6 +72,14 @@ public class TopicResponse {
 
 	public void setTopicId(UUID topicId) {
 		this.topicId = topicId;
+	}
+
+	public String getPackName() {
+		return packName;
+	}
+
+	public void setPackName(String packName) {
+		this.packName = packName;
 	}
 
 	public String getTopicName() {
