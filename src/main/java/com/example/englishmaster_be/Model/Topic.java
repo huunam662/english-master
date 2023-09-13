@@ -75,6 +75,9 @@ public class Topic implements Serializable {
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL)
     private Collection<MockTest> mockTests;
 
+	@ManyToOne
+	@JoinColumn(name = "pack_id", referencedColumnName = "id")
+	private Pack pack;
 
     public Topic() {
         createAt = LocalDateTime.now();
@@ -222,7 +225,12 @@ public class Topic implements Serializable {
 	public void setMockTests(Collection<MockTest> mockTests) {
 		this.mockTests = mockTests;
 	}
-    
-    
 
+	public Pack getPack() {
+		return pack;
+	}
+
+	public void setPack(Pack pack) {
+		this.pack = pack;
+	}
 }
