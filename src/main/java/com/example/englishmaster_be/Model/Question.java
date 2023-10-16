@@ -28,8 +28,15 @@ public class Question implements Serializable {
     @JoinColumn(name = "question_group", referencedColumnName = "id")
     private Question questionGroup;
 
-    @Column(name = "question_numberical")
-    private int questionNumberical;
+	@Column(name = "question_explain_en")
+	private String questionExplainEn;
+
+	@Column(name = "question_explain_vn")
+	private String questionExplainVn;
+
+	@Column(name = "question_numberical")
+	private int questionNumberical;
+
 
     @ManyToOne
     @JoinColumn(name = "part_id", referencedColumnName = "id")
@@ -72,6 +79,8 @@ public class Question implements Serializable {
     public Question(CreateQuestionDTO createQuestionDTO){
         this.questionContent = createQuestionDTO.getQuestionContent();
         this.questionScore = createQuestionDTO.getQuestionScore();
+		this.questionExplainEn = createQuestionDTO.getQuestionExplainEn();
+		this.questionExplainVn = createQuestionDTO.getQuestionExplainVn();
 
         createAt = LocalDateTime.now();
         updateAt= LocalDateTime.now();
@@ -117,13 +126,6 @@ public class Question implements Serializable {
 		this.questionGroup = questionGroup;
 	}
 
-	public int getQuestionNumberical() {
-		return questionNumberical;
-	}
-
-	public void setQuestionNumberical(int questionNumberical) {
-		this.questionNumberical = questionNumberical;
-	}
 
 	public Part getPart() {
 		return part;
@@ -188,5 +190,28 @@ public class Question implements Serializable {
 	public void setContentCollection(Collection<Content> contentCollection) {
 		this.contentCollection = contentCollection;
 	}
-    
+
+	public int getQuestionNumberical() {
+		return questionNumberical;
+	}
+
+	public void setQuestionNumberical(int questionNumberical) {
+		this.questionNumberical = questionNumberical;
+	}
+
+	public String getQuestionExplainEn() {
+		return questionExplainEn;
+	}
+
+	public void setQuestionExplainEn(String questionExplainEn) {
+		this.questionExplainEn = questionExplainEn;
+	}
+
+	public String getQuestionExplainVn() {
+		return questionExplainVn;
+	}
+
+	public void setQuestionExplainVn(String questionExplainVn) {
+		this.questionExplainVn = questionExplainVn;
+	}
 }

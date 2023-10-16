@@ -1,6 +1,8 @@
 package com.example.englishmaster_be.DTO.Topic;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import org.springframework.web.multipart.MultipartFile;
+import io.swagger.v3.oas.annotations.Parameter;
 
 import java.time.LocalDateTime;
 
@@ -10,7 +12,17 @@ public class CreateTopicDTO {
     private String topicDiscription;
     private String topicType;
     private String workTime;
+
+	@Parameter(
+			example = "2023-09-06T14:30:00",
+			schema = @Schema(type = "string", format = "date-time", pattern = "yyyy-MM-dd'T'HH:mm:ss")
+	)
     private LocalDateTime startTime;
+
+	@Parameter(
+			example = "2023-09-06T14:30:00",
+			schema = @Schema(type = "string", format = "date-time", pattern = "yyyy-MM-dd'T'HH:mm:ss")
+	)
     private LocalDateTime endTime;
     private boolean enable;
 

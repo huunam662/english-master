@@ -35,9 +35,8 @@ public class PartSeviceImpl implements IPartService {
 
     @Override
     public Part getPartToId(UUID partId) {
-        Part part = partRepository.findByPartId(partId)
+        return partRepository.findByPartId(partId)
                 .orElseThrow(() -> new IllegalArgumentException("Part not found with ID: " + partId));
-        return part;
     }
 
     @Override

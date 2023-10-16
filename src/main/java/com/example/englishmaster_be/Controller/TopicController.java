@@ -3,13 +3,16 @@ package com.example.englishmaster_be.Controller;
 import com.example.englishmaster_be.DTO.Topic.*;
 import com.example.englishmaster_be.DTO.UploadFileDTO;
 import com.example.englishmaster_be.Model.*;
-import com.example.englishmaster_be.Model.Response.TopicResponse;
-import com.example.englishmaster_be.Repository.TopicRepository;
+import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Service.*;
-import org.json.simple.JSONObject;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.validation.constraints.*;
+import org.json.simple.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -31,6 +34,8 @@ public class TopicController {
     private IUserService IUserService;
     @Autowired
     private IQuestionService IQuestionService;
+    @Autowired
+    private JPAQueryFactory queryFactory;
 
     @PostMapping(value = "/create", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('USER')")
@@ -147,31 +152,115 @@ public class TopicController {
     }
 
     @GetMapping(value = "/listTopic")
-    public ResponseEntity<ResponseModel> getTop6Topic(@RequestParam int indexp) {
+    public ResponseEntity<ResponseModel> getAllTopic(@RequestParam(value = "page", defaultValue = "0") @Min(0) Integer page,
+                                                     @RequestParam(value = "size", defaultValue = "12") @Min(1) @Max(100) Integer size,
+                                                     @RequestParam(value = "sortBy", defaultValue = "updateAt") String sortBy,
+                                                     @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction sortDirection,
+                                                     @RequestParam(value = "pack", required = false) UUID packId,
+                                                     @RequestParam(value = "search", required = false) String search,
+                                                     @RequestParam(value = "type", required = false) String type) {
         ResponseModel responseModel = new ResponseModel();
+
         try {
-            List<Topic> topicList = ITopicService.getTop6Topic(indexp);
+            JSONObject responseObject = new JSONObject();
+
+            OrderSpecifier<?> orderSpecifier;
+
+            if ("name".equalsIgnoreCase(sortBy)) {
+                if(Sort.Direction.DESC.equals(sortDirection)){
+                    orderSpecifier = QTopic.topic.topicName.lower().desc();
+                }else {
+                    orderSpecifier = QTopic.topic.topicName.lower().asc();
+                }
+            } else if ("updateAt".equalsIgnoreCase(sortBy)) {
+                if(Sort.Direction.DESC.equals(sortDirection)){
+                    orderSpecifier = QTopic.topic.updateAt.desc();
+                }else {
+                    orderSpecifier = QTopic.topic.updateAt.asc();
+                }
+            } else {
+                if(Sort.Direction.DESC.equals(sortDirection)){
+                    orderSpecifier = QTopic.topic.updateAt.desc();
+                }else {
+                    orderSpecifier = QTopic.topic.updateAt.asc();
+                }
+            }
+
+
+            JPAQuery<Topic> query = queryFactory.selectFrom(QTopic.topic)
+                    .orderBy(orderSpecifier)
+                    .offset((long) page * size)
+                    .limit(size);
+
+            if (packId != null) {
+                query.where(QTopic.topic.pack.packId.eq(packId));
+            }
+
+            if (search != null && !search.isEmpty()) {
+                query.where(QTopic.topic.topicName.lower().like("%" + search.toLowerCase() + "%"));
+            }
+
+            if (type != null && !type.isEmpty()) {
+                query.where(QTopic.topic.topicType.lower().like(type.toLowerCase()));
+            }
+
+            long totalRecords = query.fetchCount();
+            long totalPages = (long) Math.ceil((double) totalRecords / size);
+            responseObject.put("totalPage", totalPages);
+
+            List<Topic> topicList = query.fetch();
 
             List<TopicResponse> topicResponseList = new ArrayList<>();
 
-            for(Topic topic : topicList ){
+            for (Topic topic : topicList) {
                 TopicResponse topicResponse = new TopicResponse(topic);
                 topicResponseList.add(topicResponse);
             }
 
-            responseModel.setMessage("Show 6 topic successfully");
+            responseObject.put("listTopic", topicResponseList);
 
-            responseModel.setResponseData(topicResponseList);
+            responseModel.setMessage("Show list topic successfully");
+            responseModel.setResponseData(responseObject);
             responseModel.setStatus("success");
 
-            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Show 6 topic fail: " + e.getMessage());
+            responseModel.setMessage("Show list topic fail: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
     }
+
+
+    @GetMapping(value = "/suggestTopic")
+    public ResponseEntity<ResponseModel> get5SuggestTopic(@RequestParam(value = "query") String query) {
+        ResponseModel responseModel = new ResponseModel();
+
+        try {
+            JSONArray responseArray = new JSONArray();
+
+            for (Topic topic : ITopicService.get5TopicName(query)) {
+                responseArray.add(topic.getTopicName());
+            }
+
+            responseModel.setMessage("Show list 5 topic name successfully");
+            responseModel.setResponseData(responseArray);
+            responseModel.setStatus("success");
+
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Show list 5 topic name fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
 
     @PostMapping(value = "/{topicId:.+}/addPart")
     @PreAuthorize("hasRole('USER')")
@@ -286,6 +375,73 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             responseModel.setMessage("Delete question to topic fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @GetMapping(value = "/{topicId:.+}/listPart")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> getPartToTopic(@PathVariable UUID topicId) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            List<Part> partList = ITopicService.getPartToTopic(topicId);
+
+            JSONArray responseArray = new JSONArray();
+
+            for(Part part : partList ){
+                int totalQuestion = ITopicService.totalQuestion(part, topicId);
+
+                PartResponse partResponse = new PartResponse(part, totalQuestion);
+
+                responseArray.add(partResponse);
+            }
+
+            responseModel.setMessage("Show part to topic successfully");
+
+            responseModel.setResponseData(responseArray);
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Show part to topic fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @GetMapping(value = "/{topicId:.+}/listQuestionToPart")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> getQuestionOfToTopic(@PathVariable UUID topicId, @RequestParam UUID partId) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            List<Question> questionList = ITopicService.getQuestionOfPartToTopic(topicId, partId);
+            List<QuestionResponse> questionResponseList = new ArrayList<>();
+
+            for(Question question : questionList ){
+                QuestionResponse questionResponse = new QuestionResponse(question);
+                if(IQuestionService.checkQuestionGroup(question)){
+                    List<Question> questionGroupList = IQuestionService.listQuestionGroup(question);
+                    List<QuestionResponse> questionGroupResponseList = new ArrayList<>();
+                    for(Question questionGroup : questionGroupList){
+                        QuestionResponse questionGroupResponse = new QuestionResponse(questionGroup);
+                        questionGroupResponseList.add(questionGroupResponse);
+                        questionResponse.setQuestionGroup(questionGroupResponseList);
+                    }
+                }
+
+                questionResponseList.add(questionResponse);
+            }
+
+            responseModel.setMessage("Show question of part to topic successfully");
+            responseModel.setResponseData(questionResponseList);
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Show question of part to topic fail: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);

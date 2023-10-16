@@ -23,4 +23,5 @@ public interface IQuestionService {
     List<Question> listQuestionGroup(Question question);
 
     void deleteQuestion(Question question);
+
 }

@@ -8,6 +8,8 @@ public class CreateGroupQuestionDTO {
     private int questionScore;
 
     private int questionNumberical;
+	private String questionExplainEn;
+	private String questionExplainVn;
 
     private UUID questionGroupId;
 
@@ -42,5 +44,20 @@ public class CreateGroupQuestionDTO {
 	public void setQuestionGroupId(UUID questionGroupId) {
 		this.questionGroupId = questionGroupId;
 	}
-    
+
+	public String getQuestionExplainEn() {
+		return questionExplainEn;
+	}
+
+	public void setQuestionExplainEn(String questionExplainEn) {
+		this.questionExplainEn = questionExplainEn;
+	}
+
+	public String getQuestionExplainVn() {
+		return questionExplainVn;
+	}
+
+	public void setQuestionExplainVn(String questionExplainVn) {
+		this.questionExplainVn = questionExplainVn;
+	}
 }

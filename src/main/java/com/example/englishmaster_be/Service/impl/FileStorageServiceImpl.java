@@ -98,9 +98,8 @@ public class FileStorageServiceImpl implements IFileStorageService {
         String timestamp = currentTime.format(formatter);
 
         // Tạo tên tệp tin mới bằng cách kết hợp tên gốc và thời gian hiện tại
-        String newFilename = fileNameDelete + "_" + timestamp + extension;
 
-        return newFilename;
+        return fileNameDelete + "_" + timestamp + extension;
     }
 
     private String getExtension(String filename) {

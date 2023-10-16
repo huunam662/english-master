@@ -11,34 +11,18 @@ public class AnswerResponse {
     private UUID questionId;
     private UUID answerId;
     private String answerContent;
-    private boolean correctAnswer;
-    private String explainDetails;
     private String createAt;
     private String updateAt;
-
-    private JSONObject userCreate;
-
-    private JSONObject userUpdate;
 
     public AnswerResponse(Answer answer) {
         questionId = answer.getQuestion().getQuestionId();
         answerId = answer.getAnswerId();
         answerContent = answer.getAnswerContent();
-        correctAnswer = answer.isCorrectAnswer();
-        explainDetails =answer.getExplainDetails();
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
         createAt = sdf.format(Timestamp.valueOf(answer.getCreateAt()));
         updateAt = sdf.format(Timestamp.valueOf(answer.getUpdateAt()));
 
-        userCreate = new JSONObject();
-        userUpdate = new JSONObject();
-
-        userCreate.put("User Id", answer.getUserCreate().getUserId());
-        userCreate.put("User Name", answer.getUserCreate().getName());
-
-        userUpdate.put("User Id", answer.getUserUpdate().getUserId());
-        userUpdate.put("User Name", answer.getUserUpdate().getName());
     }
 
 	public UUID getQuestionId() {
@@ -65,21 +49,6 @@ public class AnswerResponse {
 		this.answerContent = answerContent;
 	}
 
-	public boolean isCorrectAnswer() {
-		return correctAnswer;
-	}
-
-	public void setCorrectAnswer(boolean correctAnswer) {
-		this.correctAnswer = correctAnswer;
-	}
-
-	public String getExplainDetails() {
-		return explainDetails;
-	}
-
-	public void setExplainDetails(String explainDetails) {
-		this.explainDetails = explainDetails;
-	}
 
 	public String getCreateAt() {
 		return createAt;
@@ -97,21 +66,4 @@ public class AnswerResponse {
 		this.updateAt = updateAt;
 	}
 
-	public JSONObject getUserCreate() {
-		return userCreate;
-	}
-
-	public void setUserCreate(JSONObject userCreate) {
-		this.userCreate = userCreate;
-	}
-
-	public JSONObject getUserUpdate() {
-		return userUpdate;
-	}
-
-	public void setUserUpdate(JSONObject userUpdate) {
-		this.userUpdate = userUpdate;
-	}
-    
-    
 }

@@ -1,13 +1,14 @@
 package com.example.englishmaster_be.Model.Response;
 
 import com.example.englishmaster_be.Component.GetExtension;
-import com.example.englishmaster_be.Model.Question;
-import com.example.englishmaster_be.Model.Content;
+import com.example.englishmaster_be.Model.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class QuestionResponse {
@@ -15,14 +16,13 @@ public class QuestionResponse {
     private String questionContent;
     private int questionScore;
     private JSONArray contentList;
-    private UUID questionGroup;
+    private List<QuestionResponse> questionGroup;
+
     private UUID partId;
     private String createAt;
     private String updateAt;
 
-    private JSONObject userCreate;
-
-    private JSONObject userUpdate;
+	private List<AnswerResponse> listAnswer;
 
     public QuestionResponse(Question question){
         String link;
@@ -31,12 +31,6 @@ public class QuestionResponse {
         this.questionContent = question.getQuestionContent();
         this.questionScore = question.getQuestionScore();
 
-        if(question.getQuestionGroup() == null){
-            this.questionGroup = null;
-        }
-        else{
-            this.questionGroup = question.getQuestionGroup().getQuestionId();
-        }
 
         this.partId = question.getPart().getPartId();
 
@@ -44,9 +38,15 @@ public class QuestionResponse {
         this.createAt = sdf.format(Timestamp.valueOf(question.getCreateAt()));
         this.updateAt = sdf.format(Timestamp.valueOf(question.getUpdateAt()));
 
+		if(question.getAnswers() != null){
+			List<AnswerResponse> listAnswerResponse = new ArrayList<>();
+			for(Answer answer: question.getAnswers()){
+				listAnswerResponse.add(new AnswerResponse(answer));
+			}
+			this.listAnswer = listAnswerResponse;
+		}
+
         contentList = new JSONArray();
-        userCreate = new JSONObject();
-        userUpdate = new JSONObject();
 
         if(question.getContentCollection() != null){
             for(Content content1 : question.getContentCollection()){
@@ -65,12 +65,6 @@ public class QuestionResponse {
             }
         }
 
-
-        userCreate.put("User Id", question.getUserCreate().getUserId());
-        userCreate.put("User Name", question.getUserCreate().getName());
-
-        userUpdate.put("User Id", question.getUserUpdate().getUserId());
-        userUpdate.put("User Name", question.getUserUpdate().getName());
     }
 
 	public UUID getQuestionId() {
@@ -105,12 +99,16 @@ public class QuestionResponse {
 		this.contentList = contentList;
 	}
 
-	public UUID getQuestionGroup() {
+	public List<QuestionResponse> getQuestionGroup() {
 		return questionGroup;
 	}
 
-	public void setQuestionGroup(UUID questionGroup) {
+	public void setQuestionGroup(List<QuestionResponse> questionGroup) {
 		this.questionGroup = questionGroup;
+	}
+
+	public void setListAnswer(List<AnswerResponse> listAnswer) {
+		this.listAnswer = listAnswer;
 	}
 
 	public UUID getPartId() {
@@ -137,21 +135,11 @@ public class QuestionResponse {
 		this.updateAt = updateAt;
 	}
 
-	public JSONObject getUserCreate() {
-		return userCreate;
+	public List<AnswerResponse> getListAnswer() {
+		return listAnswer;
 	}
 
-	public void setUserCreate(JSONObject userCreate) {
-		this.userCreate = userCreate;
+	public void setListAnswerResponse(List<AnswerResponse> listAnswer) {
+		this.listAnswer = listAnswer;
 	}
-
-	public JSONObject getUserUpdate() {
-		return userUpdate;
-	}
-
-	public void setUserUpdate(JSONObject userUpdate) {
-		this.userUpdate = userUpdate;
-	}
-    
-    
 }

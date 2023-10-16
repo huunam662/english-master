@@ -13,7 +13,9 @@ public interface ITopicService {
 
     Topic findTopicById(UUID topicId);
 
-    List<Topic> getTop6Topic(int index);
+    List<Topic> get5TopicName(String query);
+    List<Part> getPartToTopic(UUID topicId);
+    List<Question> getQuestionOfPartToTopic(UUID topicId, UUID partId);
 
     void addPartToTopic(UUID topicId, UUID partId);
     boolean deletePartToTopic(UUID topicId, UUID partId);
@@ -26,4 +28,6 @@ public interface ITopicService {
     void updateTopic(Topic topic, UpdateTopicDTO updateTopicDTO);
 
     void deleteTopic(Topic topic);
+
+    int totalQuestion(Part part, UUID topicId);
 }

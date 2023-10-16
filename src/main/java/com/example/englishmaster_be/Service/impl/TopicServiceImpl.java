@@ -3,8 +3,8 @@ package com.example.englishmaster_be.Service.impl;
 import com.example.englishmaster_be.DTO.Topic.UpdateTopicDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Repository.*;
-import com.example.englishmaster_be.Service.ITopicService;
-import com.example.englishmaster_be.Service.IUserService;
+import com.example.englishmaster_be.Service.*;
+import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,12 @@ public class TopicServiceImpl implements ITopicService {
     @Autowired
     private PartRepository partRepository;
     @Autowired
+    private QuestionRepository questionRepository;
+    @Autowired
     private IUserService IUserService;
+    @Autowired
+    private IQuestionService IQuestionService;
+
 
     @Override
     public void createTopic(Topic topic) {
@@ -27,15 +32,33 @@ public class TopicServiceImpl implements ITopicService {
 
     @Override
     public Topic findTopicById(UUID topicId) {
-        Topic topic = topicRepository.findByTopicId(topicId)
+        return topicRepository.findByTopicId(topicId)
                 .orElseThrow(() -> new IllegalArgumentException("Topic not found with ID: " + topicId));
-        return topic;
     }
 
     @Override
-    public List<Topic> getTop6Topic(int index) {
-        Page<Topic> page = topicRepository.findAll(PageRequest.of(index, 6, Sort.by(Sort.Order.desc("updateAt"))));
+    public List<Topic> get5TopicName(String keyword) {
+        return topicRepository.findTopicsByQuery(keyword, PageRequest.of(0,5, Sort.by(Sort.Order.asc("topicName").ignoreCase())));
+
+    }
+
+    @Override
+    public List<Part> getPartToTopic(UUID topicId) {
+        Topic topic = topicRepository.findByTopicId(topicId)
+                .orElseThrow(() -> new IllegalArgumentException("Topic not found with ID: " + topicId));
+        Page<Part> page = partRepository.findByTopics(topic, PageRequest.of(0, 7, Sort.by(Sort.Order.asc("partName"))));
         return page.getContent();
+    }
+
+    @Override
+    public List<Question> getQuestionOfPartToTopic(UUID topicId, UUID partId) {
+        Topic topic = topicRepository.findByTopicId(topicId)
+                .orElseThrow(() -> new IllegalArgumentException("Topic not found with ID: " + topicId));
+        Part part = partRepository.findByPartId(partId)
+                .orElseThrow(() -> new IllegalArgumentException("Part not found with ID: " + partId));
+        List<Question> listQuestion = questionRepository.findByTopicsAndPart(topic, part);
+        Collections.shuffle(listQuestion);
+        return listQuestion;
     }
 
     @Override
@@ -118,5 +141,24 @@ public class TopicServiceImpl implements ITopicService {
     @Override
     public void deleteTopic(Topic topic) {
         topicRepository.delete(topic);
+    }
+
+    @Override
+    public int totalQuestion(Part part, UUID topicId) {
+        int total = 0;
+        Topic topic = topicRepository.findByTopicId(topicId)
+                .orElseThrow(() -> new IllegalArgumentException("Topic not found with ID: " + topicId));
+
+        for(Question question: topic.getQuestions()){
+            if(question.getPart().getPartId() == part.getPartId()){
+                boolean check = IQuestionService.checkQuestionGroup(question);
+                if(check){
+                    total = total + IQuestionService.countQuestionToQuestionGroup(question);
+                }else {
+                    total++;
+                }
+            }
+        }
+        return total;
     }
 }

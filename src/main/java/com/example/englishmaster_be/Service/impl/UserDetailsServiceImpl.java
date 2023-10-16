@@ -19,7 +19,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) {
         User user = userRepository.findByEmail(username);
-        if (user == null || user.isEnabled() == false) {
+        if (user == null || !user.isEnabled()) {
             throw new UsernameNotFoundException(username);
         }
         return new CustomUserDetails(user);

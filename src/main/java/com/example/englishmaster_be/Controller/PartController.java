@@ -6,6 +6,7 @@ import com.example.englishmaster_be.DTO.*;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.PartResponse;
 import com.example.englishmaster_be.Service.*;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +38,7 @@ public class PartController {
         try {
             User user = IUserService.currentUser();
 
-            Part part = new Part(createpartDTO.getPartName(), createpartDTO.getPartDiscription(), createpartDTO.getPartType());
+            Part part = new Part(createpartDTO.getPartName().toUpperCase(), createpartDTO.getPartDiscription(), createpartDTO.getPartType().toUpperCase());
 
             part.setUserCreate(user);
             part.setUserUpdate(user);
@@ -230,5 +231,30 @@ public class PartController {
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
+    }
+
+    @GetMapping(value = "/{partId:.+}/content")
+    public ResponseEntity<ResponseModel> getPartToId(@PathVariable UUID partId){
+        ResponseModel responseModel = new ResponseModel();
+
+        try {
+            Part part =IPartService.getPartToId(partId);
+            JSONObject partResponse = new JSONObject();
+            partResponse.put("partId", part.getPartId());
+            partResponse.put("partName", part.getPartName());
+            partResponse.put("partType", part.getPartType());
+            partResponse.put("partDescription", part.getPartDescription());
+
+            responseModel.setMessage("Show information part successfully");
+            responseModel.setResponseData(partResponse);
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        }catch (Exception e) {
+            responseModel.setMessage("Show information part: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
     }
 }
