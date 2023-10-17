@@ -4,6 +4,7 @@ import com.example.englishmaster_be.DTO.Topic.UpdateTopicDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.*;
+import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -36,9 +37,9 @@ public class TopicServiceImpl implements ITopicService {
     }
 
     @Override
-    public List<Topic> getTop6Topic(int index) {
-        Page<Topic> page = topicRepository.findAll(PageRequest.of(index, 6, Sort.by(Sort.Order.desc("updateAt"))));
-        return page.getContent();
+    public List<Topic> get5TopicName(String keyword) {
+        return topicRepository.findTopicsByQuery(keyword, PageRequest.of(0,5, Sort.by(Sort.Order.asc("topicName").ignoreCase())));
+
     }
 
     @Override
