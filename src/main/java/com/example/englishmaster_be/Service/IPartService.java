@@ -15,6 +15,8 @@ public interface IPartService {
 
     Part getPartToId(UUID partId);
 
+    Part getPartToName(String partName);
+
     boolean checkPart(Part part);
 
     boolean checkFilePart(Part part);

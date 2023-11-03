@@ -21,6 +21,8 @@ public class TopicResponse {
 
     private String topicType;
 
+	private int numberQuestion;
+
     private String workTime;
 
     private String startTime;
@@ -30,6 +32,8 @@ public class TopicResponse {
     private String createAt;
 
     private String updateAt;
+
+	private boolean isEnable;
 
     private JSONObject userCreate;
 
@@ -46,7 +50,9 @@ public class TopicResponse {
         this.topicImage =  link + topic.getTopicImage();
         this.topicDescription = topic.getTopicDescription();
         this.topicType = topic.getTopicType();
+		this.numberQuestion = topic.getNumberQuestion();
         this.workTime = topic.getWorkTime();
+		this.isEnable = topic.isEnable();
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
 
@@ -160,7 +166,20 @@ public class TopicResponse {
 	public void setUserUpdate(JSONObject userUpdate) {
 		this.userUpdate = userUpdate;
 	}
-    
-    
 
+	public int getNumberQuestion() {
+		return numberQuestion;
+	}
+
+	public void setNumberQuestion(int numberQuestion) {
+		this.numberQuestion = numberQuestion;
+	}
+
+	public boolean isEnable() {
+		return isEnable;
+	}
+
+	public void setEnable(boolean enable) {
+		isEnable = enable;
+	}
 }

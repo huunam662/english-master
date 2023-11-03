@@ -11,6 +11,7 @@ import jakarta.mail.internet.MimeMessage;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -56,6 +57,8 @@ public class UserController {
     JwtUtils jwtUtils;
     @Autowired
     private ResourceLoader resourceLoader;
+    @Value("${masterE.linkFE}")
+    private String linkFE;
 
     @PostMapping("/register")
     public ResponseModel register(@RequestBody UserRegisterDTO registerDTO) throws IOException, MessagingException {
@@ -323,7 +326,7 @@ public class UserController {
     }
 
     @GetMapping("/information")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> informationUser() {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -348,7 +351,7 @@ public class UserController {
     private void sendConfirmationEmail(String email, String confirmationToken) throws IOException, MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        String confirmationLink = "http://localhost:3000/register/confirm?token=" + confirmationToken;
+        String confirmationLink = linkFE + "/register/confirm?token=" + confirmationToken;
 
 
         String templateContent = readTemplateContent("email_templates.html");
@@ -366,7 +369,7 @@ public class UserController {
     private void sendForgetPassEmail(String email, String confirmationToken) throws MessagingException, IOException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        String confirmationLink = "http://localhost:8080/api/forgetPass/confirm?token=" + confirmationToken;
+        String confirmationLink = linkFE + "/api/forgetPass/confirm?token=" + confirmationToken;
 
         String templateContent = readTemplateContent("email_templates.html");
         templateContent = templateContent.replace("{{linkConfirm}}", confirmationLink);
