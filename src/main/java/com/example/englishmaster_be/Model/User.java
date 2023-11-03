@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.Model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -48,6 +49,8 @@ public class User implements Serializable {
 //    @OneToMany(mappedBy = "userUpdate", cascade = CascadeType.ALL)
 //    private Collection<Topic> topicUpdate;
 
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+	private Collection<FlashCard> flashCards;
     public User() {
         createAt = LocalDateTime.now();
         updateAt= LocalDateTime.now();
@@ -150,5 +153,11 @@ public class User implements Serializable {
 		this.confirmToken = confirmToken;
 	}
 
-    
+	public Collection<FlashCard> getFlashCards() {
+		return flashCards;
+	}
+	public void setFlashCards(Collection<FlashCard> flashCards) {
+		this.flashCards = flashCards;
+	}
+
 }
