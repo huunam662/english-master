@@ -369,7 +369,7 @@ public class UserController {
     private void sendForgetPassEmail(String email, String confirmationToken) throws MessagingException, IOException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        String confirmationLink = linkFE + "/api/forgetPass/confirm?token=" + confirmationToken;
+        String confirmationLink = linkFE + "/forgetPass/confirm?token=" + confirmationToken;
 
         String templateContent = readTemplateContent("email_templates.html");
         templateContent = templateContent.replace("{{linkConfirm}}", confirmationLink);
