@@ -11,9 +11,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -28,6 +30,8 @@ public class FlashCardController {
 
     @Autowired
     private IFlashCardService IFlashCardService;
+    @Autowired
+    private IFlashCardWordService IFlashCardWordService;
 
     @GetMapping(value = "/{flashCardId:.+}/listFlashCardWord")
     @PreAuthorize("hasRole('USER')")
@@ -122,6 +126,75 @@ public class FlashCardController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }
         catch (Exception e){responseModel.setMessage("Create flashcard fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
+    }
+
+    @PostMapping(value = "/{flashCardId:.+}/addWordToFlashCard", consumes = {"multipart/form-data"})
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> addWordToFlashCard(@PathVariable UUID flashCardId, @ModelAttribute CreateFlashCardWordDTO createFlashCardWordDTO){
+        ResponseModel responseModel = new ResponseModel();
+
+        try {
+            User user = IUserService.currentUser();
+            String filename = null;
+
+            MultipartFile image = createFlashCardWordDTO.getImage();
+
+            if (image != null && !image.isEmpty()) {
+                filename = IFileStorageService.nameFile(image);}
+
+            FlashCard flashCard = IFlashCardService.findFlashCardToId(flashCardId);
+
+            if(!flashCard.getUser().getUserId().equals(user.getUserId())){
+                responseModel.setMessage("You don't add word to flash card ");
+                responseModel.setStatus("success");
+                return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+            }
+
+            FlashCardWord flashCardWord = new FlashCardWord();
+            if(!createFlashCardWordDTO.getWord().isEmpty()){
+                flashCardWord.setWord(createFlashCardWordDTO.getWord());
+            }
+            if(!createFlashCardWordDTO.getDefine().isEmpty()){
+                flashCardWord.setDefine(createFlashCardWordDTO.getDefine());
+            }
+            if(!createFlashCardWordDTO.getType().isEmpty()){
+                flashCardWord.setType(createFlashCardWordDTO.getType());
+            }
+            if(!createFlashCardWordDTO.getSpelling().isEmpty()){
+                flashCardWord.setSpelling(createFlashCardWordDTO.getSpelling());
+            }
+            if(!createFlashCardWordDTO.getExample().isEmpty()){
+                flashCardWord.setExample(createFlashCardWordDTO.getExample());
+            }
+            if(!createFlashCardWordDTO.getNote().isEmpty()){
+                flashCardWord.setNote(createFlashCardWordDTO.getNote());
+            }
+            flashCardWord.setFlashCard(flashCard);
+            if(filename != null){
+                flashCardWord.setImage(filename);
+            }
+
+            flashCardWord.setUserUpdate(user);
+            flashCardWord.setUserCreate(user);
+
+            IFlashCardWordService.save(flashCardWord);
+            if(filename != null){
+                IFileStorageService.save(createFlashCardWordDTO.getImage(), filename);
+            }
+
+
+            FlashCardWordResponse flashCardWordResponse = new FlashCardWordResponse(flashCardWord);
+
+            responseModel.setMessage("Create word for flashcard successfully");
+            responseModel.setResponseData(flashCardWordResponse);
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        }
+        catch (Exception e){responseModel.setMessage("Create word for flashcard fail: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}

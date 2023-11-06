@@ -51,6 +51,8 @@ public class FlashCardWord implements Serializable {
     private User userUpdate;
 
     public FlashCardWord() {
+        createAt = LocalDateTime.now();
+        updateAt= LocalDateTime.now();
     }
 
     public UUID getWordId() {
