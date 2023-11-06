@@ -40,10 +40,19 @@ public class FlashCardWordResponse {
 
     public FlashCardWordResponse(FlashCardWord flashCardWord) {
 
+        String link;
+        if(flashCardWord.getImage() == null){
+            this.image = flashCardWord.getImage();
+
+        }else {
+
+            link = GetExtension.linkName(flashCardWord.getImage());
+            this.image = link + flashCardWord.getImage();
+        }
+
         this.wordId = flashCardWord.getWordId();
         this.flashCardId = flashCardWord.getFlashCard().getFlashCardId();
         this.word = flashCardWord.getWord();
-        this.image = flashCardWord.getImage();
         this.type = flashCardWord.getType();
         this.spelling = flashCardWord.getSpelling();
         this.example = flashCardWord.getExample();
