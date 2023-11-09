@@ -23,6 +23,8 @@ public class Topic implements Serializable {
     @Column(name = "topic_image")
     private String topicImage;
 
+	@Column(name = "number_question")
+	private int numberQuestion;
     @Column(name = "topic_description")
     private String topicDescription;
 
@@ -232,5 +234,13 @@ public class Topic implements Serializable {
 
 	public void setPack(Pack pack) {
 		this.pack = pack;
+	}
+
+	public int getNumberQuestion() {
+		return numberQuestion;
+	}
+
+	public void setNumberQuestion(int numberQuestion) {
+		this.numberQuestion = numberQuestion;
 	}
 }

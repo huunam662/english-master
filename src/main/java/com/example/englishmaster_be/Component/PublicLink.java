@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PublicLink {
     private static String link;
-    @Value("${masterE.link}")
+    @Value("${masterE.linkFE}")
     public void setLink(String link) {
         PublicLink.link = link;
     }
