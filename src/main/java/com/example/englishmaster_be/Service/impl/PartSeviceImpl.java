@@ -40,6 +40,17 @@ public class PartSeviceImpl implements IPartService {
     }
 
     @Override
+    public Part getPartToName(String partName) {
+        List<Part> listPart = partRepository.findAll();
+        for(Part part: listPart){
+            if(part.getPartName().substring(0, 6).equalsIgnoreCase(partName)){
+                return part;
+            }
+        }
+        return null;
+    }
+
+    @Override
     public boolean checkPart(Part part) {
         List<Part> partList = partRepository.findAll();
         for(Part partCheck : partList){

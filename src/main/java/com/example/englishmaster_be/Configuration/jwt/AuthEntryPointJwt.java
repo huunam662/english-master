@@ -29,7 +29,6 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 
 
         ResponseModel responseModel = new ResponseModel();
-        System.out.println(responseModel.getTimeStamp());
 
         responseModel.setMessage(authException.getMessage());
         responseModel.setStatus("fail");
