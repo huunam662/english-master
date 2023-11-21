@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class PackServiceImpl implements IPackService {
@@ -32,6 +33,12 @@ public class PackServiceImpl implements IPackService {
             }
         }
         return true;
+    }
+
+    @Override
+    public Pack findPackById(UUID packId) {
+        return packRepository.findByPackId(packId)
+                .orElseThrow(() -> new IllegalArgumentException("Pack not found with ID: " + packId));
     }
 
     @Override

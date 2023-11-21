@@ -1,5 +1,9 @@
 package com.example.englishmaster_be.DTO.Question;
 
+import com.example.englishmaster_be.DTO.Answer.CreateListAnswerDTO;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 import java.util.UUID;
 
 public class CreateQuestionDTO {
@@ -8,7 +12,15 @@ public class CreateQuestionDTO {
 
     private int questionScore;
 
+	private MultipartFile contentImage;
+
+	private MultipartFile contentAudio;
+
     private UUID partId;
+
+	private List<CreateListAnswerDTO> listAnswer;
+
+	private List<CreateQuestionDTO> listQuestionChild;
 
 	private String questionExplainEn;
 	private String questionExplainVn;
@@ -56,5 +68,37 @@ public class CreateQuestionDTO {
 
 	public void setQuestionExplainVn(String questionExplainVn) {
 		this.questionExplainVn = questionExplainVn;
+	}
+
+	public List<CreateListAnswerDTO> getListAnswer() {
+		return listAnswer;
+	}
+
+	public void setListAnswer(List<CreateListAnswerDTO> listAnswer) {
+		this.listAnswer = listAnswer;
+	}
+
+	public MultipartFile getContentImage() {
+		return contentImage;
+	}
+
+	public void setContentImage(MultipartFile contentImage) {
+		this.contentImage = contentImage;
+	}
+
+	public MultipartFile getContentAudio() {
+		return contentAudio;
+	}
+
+	public void setContentAudio(MultipartFile contentAudio) {
+		this.contentAudio = contentAudio;
+	}
+
+	public List<CreateQuestionDTO> getListQuestionChild() {
+		return listQuestionChild;
+	}
+
+	public void setListQuestionChild(List<CreateQuestionDTO> listQuestionChild) {
+		this.listQuestionChild = listQuestionChild;
 	}
 }

@@ -68,6 +68,9 @@ public class TopicServiceImpl implements ITopicService {
         Part part = partRepository.findByPartId(partId)
                 .orElseThrow(() -> new IllegalArgumentException("Part not found with ID: " + partId));
 
+        if (topic.getParts() == null) {
+            topic.setParts(new ArrayList<>());
+        }
         topic.getParts().add(part);
         topicRepository.save(topic);
     }

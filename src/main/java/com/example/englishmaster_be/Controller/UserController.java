@@ -34,6 +34,7 @@ import java.util.regex.Pattern;
 
 @RestController
 @RequestMapping("/api")
+@SuppressWarnings("unchecked")
 public class UserController {
     @Autowired
     private IUserService IUserService;
@@ -329,12 +330,19 @@ public class UserController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> informationUser() {
         ResponseModel responseModel = new ResponseModel();
+        JSONObject objectResponse = new JSONObject();
         try {
             User user = IUserService.currentUser();
+            if (user.getRole().getRoleName().equals("ROLE_ADMIN")) {
+                objectResponse.put("Role", "ADMIN");
+            } else {
+                objectResponse.put("Role", "USER");
+            }
 
             UserResponse userResponse = new UserResponse(user);
+            objectResponse.put("User", userResponse);
 
-            responseModel.setResponseData(userResponse);
+            responseModel.setResponseData(objectResponse);
             responseModel.setMessage("Information user successfully");
             responseModel.setStatus("success");
 
