@@ -86,7 +86,7 @@ public class Topic implements Serializable {
         updateAt= LocalDateTime.now();
     }
 
-    public Topic(String topicName, String topicImage, String topicDescription, String topicType, String workTime, LocalDateTime startTime, LocalDateTime endTime, boolean enable) {
+    public Topic(String topicName, String topicImage, String topicDescription, String topicType, String workTime, LocalDateTime startTime, LocalDateTime endTime) {
         this.topicName = topicName;
         this.topicImage = topicImage;
         this.topicDescription = topicDescription;
@@ -94,7 +94,7 @@ public class Topic implements Serializable {
         this.workTime = workTime;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.enable = enable;
+        this.enable = true;
 
         createAt = LocalDateTime.now();
         updateAt= LocalDateTime.now();

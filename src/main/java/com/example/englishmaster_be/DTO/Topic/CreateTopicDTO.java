@@ -5,13 +5,22 @@ import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.Parameter;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.UUID;
 
 public class CreateTopicDTO {
     private String topicName;
     private MultipartFile topicImage;
-    private String topicDiscription;
+    private String topicDescription;
+
+	private UUID topicPack;
     private String topicType;
     private String workTime;
+
+
+	private int numberQuestion;
+
+	private List<UUID> listPart;
 
 	@Parameter(
 			example = "2023-09-06T14:30:00",
@@ -24,7 +33,6 @@ public class CreateTopicDTO {
 			schema = @Schema(type = "string", format = "date-time", pattern = "yyyy-MM-dd'T'HH:mm:ss")
 	)
     private LocalDateTime endTime;
-    private boolean enable;
 
     public CreateTopicDTO() {
     }
@@ -45,12 +53,12 @@ public class CreateTopicDTO {
 		this.topicImage = topicImage;
 	}
 
-	public String getTopicDiscription() {
-		return topicDiscription;
+	public String getTopicDescription() {
+		return topicDescription;
 	}
 
-	public void setTopicDiscription(String topicDiscription) {
-		this.topicDiscription = topicDiscription;
+	public void setTopicDescription(String topicDescription) {
+		this.topicDescription = topicDescription;
 	}
 
 	public String getTopicType() {
@@ -85,13 +93,27 @@ public class CreateTopicDTO {
 		this.endTime = endTime;
 	}
 
-	public boolean isEnable() {
-		return enable;
+	public UUID getTopicPack() {
+		return topicPack;
 	}
 
-	public void setEnable(boolean enable) {
-		this.enable = enable;
+	public void setTopicPack(UUID topicPack) {
+		this.topicPack = topicPack;
 	}
-    
-    
+
+	public int getNumberQuestion() {
+		return numberQuestion;
+	}
+
+	public void setNumberQuestion(int numberQuestion) {
+		this.numberQuestion = numberQuestion;
+	}
+
+	public List<UUID> getListPart() {
+		return listPart;
+	}
+
+	public void setListPart(List<UUID> listPart) {
+		this.listPart = listPart;
+	}
 }

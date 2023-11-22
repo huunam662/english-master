@@ -54,7 +54,7 @@ public class Answer implements Serializable {
     }
 
     public Answer(CreateAnswerDTO createAnswerDTO){
-        this.answerContent = createAnswerDTO.getAnswerContent();
+        this.answerContent = createAnswerDTO.getContentAnswer();
         this.correctAnswer = createAnswerDTO.isCorrectAnswer();
         this.explainDetails = createAnswerDTO.getExplainDetails();
 
