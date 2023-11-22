@@ -34,7 +34,7 @@ public class QuestionController {
 
 
     @PostMapping(value = "/create")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> createQuestion(@RequestBody CreateQuestionDTO createQuestionDTO) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -101,7 +101,7 @@ public class QuestionController {
     }
 
     @PutMapping(value = "/{questionId:.+}/updatefile", consumes = {"multipart/form-data"})
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> updateFileQuestion(@PathVariable UUID questionId, @ModelAttribute UploadFileDTO uploadFileDTO) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -141,7 +141,7 @@ public class QuestionController {
     }
 
     @PostMapping(value = "/create/groupQuestion")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> createGroupQuestion(@RequestBody CreateGroupQuestionDTO createGroupQuestionDTO) {
         ResponseModel responseModel = new ResponseModel();
         try {

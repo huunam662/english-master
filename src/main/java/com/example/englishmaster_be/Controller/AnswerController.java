@@ -26,7 +26,7 @@ public class AnswerController {
     private IQuestionService IQuestionService;
 
     @PostMapping(value = "/create")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> createAnswer(@RequestBody CreateAnswerDTO createAnswerDTO) {
         ResponseModel responseModel = new ResponseModel();
         try {
