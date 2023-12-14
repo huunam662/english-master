@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Model.Response;
 
+import com.example.englishmaster_be.Component.GetExtension;
 import com.example.englishmaster_be.Model.User;
 
 import java.sql.Timestamp;
@@ -24,7 +25,12 @@ public class UserResponse {
         this.email = user.getEmail();
         this.phone = user.getPhone();
         this.address = user.getAddress();
-        this.avatar = user.getAvatar();
+        if(user.getAvatar() == null){
+            this.avatar = null;
+        }else {
+            String link = GetExtension.linkName(user.getAvatar());
+            this.avatar = link + user.getAvatar();
+        }
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
         this.createAt = sdf.format(Timestamp.valueOf(user.getCreateAt()));

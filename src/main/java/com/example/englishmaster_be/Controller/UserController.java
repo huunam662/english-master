@@ -2,17 +2,25 @@ package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Configuration.jwt.JwtUtils;
 import com.example.englishmaster_be.DTO.*;
+import com.example.englishmaster_be.DTO.User.*;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.*;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.core.io.*;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.*;
@@ -23,12 +31,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +47,8 @@ import java.util.regex.Pattern;
 public class UserController {
     @Autowired
     private IUserService IUserService;
+    @Autowired
+    private IFileStorageService IFileStorageService;
     @Autowired
     private UserRepository userRepository;
 
@@ -49,6 +60,8 @@ public class UserController {
 
     @Autowired
     private IRefreshTokenService IRefreshTokenService;
+    @Autowired
+    private JPAQueryFactory queryFactory;
 
     @Autowired
     PasswordEncoder passwordEncoder;
@@ -355,6 +368,120 @@ public class UserController {
         }
     }
 
+    @PatchMapping(value ="/changeProfile", consumes = {"multipart/form-data"})
+    @PreAuthorize("hasRole('USER')" )
+    public ResponseEntity<ResponseModel> changeProfile(@ModelAttribute("profileUser") ChangeProfileDTO changeProfileDTO) {
+        ResponseModel responseModel = new ResponseModel();
+        JSONObject objectResponse = new JSONObject();
+        try {
+            User user = IUserService.currentUser();
+
+            String filename = null;
+
+            MultipartFile image = changeProfileDTO.getAvatar();
+
+            if (image != null && !image.isEmpty()) {
+                filename = IFileStorageService.nameFile(image);
+            }
+
+            if(!changeProfileDTO.getName().isEmpty()){
+                user.setName(changeProfileDTO.getName());
+            }
+
+            if(!changeProfileDTO.getAddress().isEmpty()){
+                user.setAddress(changeProfileDTO.getAddress());
+            }
+            if(!changeProfileDTO.getPhone().isEmpty()){
+                user.setPhone(changeProfileDTO.getPhone());
+            }
+
+            if(filename != null){
+                if(user.getAvatar() != null){
+                    IFileStorageService.delete(user.getAvatar());
+                }
+                user.setAvatar(filename);
+            }
+            IUserService.save(user);
+            if(filename != null){
+                IFileStorageService.save(changeProfileDTO.getAvatar(), filename);
+            }
+
+            UserResponse userResponse = new UserResponse(user);
+            if (user.getRole().getRoleName().equals("ROLE_ADMIN")) {
+                objectResponse.put("Role", "ADMIN");
+            } else {
+                objectResponse.put("Role", "USER");
+            }
+            objectResponse.put("User", userResponse);
+
+            responseModel.setResponseData(objectResponse);
+            responseModel.setMessage("Change profile user successfully");
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Change profile user fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @PatchMapping(value ="/changePass")
+    @PreAuthorize("hasRole('USER')" )
+    public ResponseEntity<ResponseModel> changePass(@RequestBody ChangePassDTO changePassDTO) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            User user = IUserService.currentUser();
+
+            String regex = "^(?=.*[0-9])"
+                    + "(?=.*[a-z])(?=.*[A-Z])"
+                    + "(?=.*[@#$%^&+=])"
+                    + "(?=\\S+$).{8,20}$";
+
+            Pattern p = Pattern.compile(regex);
+
+            if(!changePassDTO.getConfirmPass().equals(changePassDTO.getNewPass())){
+                responseModel.setMessage("Password and confirm password don't match");
+                responseModel.setStatus("fail");
+                return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+            }
+
+            Matcher m = p.matcher(changePassDTO.getNewPass());
+            if(!m.matches()){
+                responseModel.setMessage("Password must contain at least 1 uppercase, 1 lowercase, 1 numeric, 1 special character and no spaces");
+                responseModel.setStatus("fail");
+                return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+            }
+
+
+            if(!passwordEncoder.matches(changePassDTO.getOldPass(), user.getPassword())){
+                responseModel.setMessage("Old password don't correct");
+                responseModel.setStatus("fail");
+                return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+            }
+
+            if (passwordEncoder.matches(changePassDTO.getNewPass(), user.getPassword())) {
+                responseModel.setMessage("New password can't be the same as the old one");
+                responseModel.setStatus("fail");
+                return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+            }
+
+            user.setPassword(passwordEncoder.encode(changePassDTO.getNewPass()));
+            IUserService.save(user);
+
+            responseModel.setMessage("Change pass user successfully");
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Change pass user fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
 
     private void sendConfirmationEmail(String email, String confirmationToken) throws IOException, MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
@@ -372,6 +499,82 @@ public class UserController {
         helper.setSubject("Xác nhận tài khoản");
         helper.setText(templateContent, true);
         mailSender.send(message);
+    }
+
+    @GetMapping(value = "/listExamResultsUser")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> getExamResultsUser(@RequestParam(value = "page", defaultValue = "0") @Min(0) Integer page,
+                                                     @RequestParam(value = "size", defaultValue = "5") @Min(1) @Max(100) Integer size,
+                                                     @RequestParam(value = "sortBy", defaultValue = "updateAt") String sortBy,
+                                                     @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction sortDirection) {
+        ResponseModel responseModel = new ResponseModel();
+
+        try {
+            User user = IUserService.currentUser();
+            JSONObject responseObject = new JSONObject();
+
+            OrderSpecifier<?> orderSpecifier;
+
+
+            if(Sort.Direction.DESC.equals(sortDirection)){
+                orderSpecifier = QTopic.topic.updateAt.desc();
+            }else {
+                orderSpecifier = QTopic.topic.updateAt.asc();
+            }
+
+            JPAQuery<Topic> queryMockTest = queryFactory.select(QMockTest.mockTest.topic)
+                    .from(QMockTest.mockTest)
+                    .where(QMockTest.mockTest.user.userId.eq(user.getUserId()))
+                    .groupBy(QMockTest.mockTest.topic);
+
+            List<Topic> listTopicUser = queryMockTest.fetch();
+
+            JPAQuery<Topic> query = queryFactory.selectFrom(QTopic.topic)
+                    .orderBy(orderSpecifier)
+                    .offset((long) page * size)
+                    .limit(size);
+            query.where(QTopic.topic.in(listTopicUser));
+
+            List<Topic> dataTopic = query.fetch();
+            List<JSONObject> jsonTopicArray = new ArrayList<>();
+            for(Topic topic: dataTopic){
+                JSONObject jsonObject = new JSONObject();
+                jsonObject.put("Topic", new TopicResponse(topic));
+
+                JPAQuery<MockTest> queryListMockTest = queryFactory.selectFrom(QMockTest.mockTest);
+                queryListMockTest.where(QMockTest.mockTest.user.userId.eq(user.getUserId()));
+                queryListMockTest.where(QMockTest.mockTest.topic.eq(topic));
+
+                List<MockTestResponse> jsonMockTestArray = new ArrayList<>();
+                for(MockTest mockTest: queryListMockTest.fetch()){
+                    jsonMockTestArray.add(new MockTestResponse(mockTest));
+                }
+                jsonObject.put("listMockTest", jsonMockTestArray);
+
+                jsonTopicArray.add(jsonObject);
+            }
+
+            long totalRecords = query.fetchCount();
+            long totalPages = (long) Math.ceil((double) totalRecords / size);
+            responseObject.put("totalPage", totalPages);
+            responseObject.put("totalRecords", totalRecords);
+            System.out.println(jsonTopicArray);
+            responseObject.put("listTopicUser", jsonTopicArray);
+            System.out.println(responseObject);
+
+            responseModel.setMessage("Show list mock test result successfully");
+            responseModel.setResponseData(responseObject);
+            responseModel.setStatus("success");
+
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Show list mock test result fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
     }
 
     private void sendForgetPassEmail(String email, String confirmationToken) throws MessagingException, IOException {
