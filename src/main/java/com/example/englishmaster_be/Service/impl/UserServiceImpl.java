@@ -46,6 +46,11 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    public void delete(User user) {
+        userRepository.delete(user);
+    }
+
+    @Override
     public void changePassword(User user, String newpass) {
         user.setPassword(passwordEncoder.encode((newpass)));
     }

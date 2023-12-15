@@ -14,6 +14,9 @@ public interface ITopicService {
     Topic findTopicById(UUID topicId);
 
     List<Topic> get5TopicName(String query);
+    List<Topic> getAllTopicToPack(Pack pack);
+
+
     List<Part> getPartToTopic(UUID topicId);
     List<Question> getQuestionOfPartToTopic(UUID topicId, UUID partId);
 

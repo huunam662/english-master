@@ -15,6 +15,7 @@ public class UserResponse {
     private String phone;
     private String address;
     private String avatar;
+    private boolean enable;
 
     private String createAt;
     private String updateAt;
@@ -25,6 +26,7 @@ public class UserResponse {
         this.email = user.getEmail();
         this.phone = user.getPhone();
         this.address = user.getAddress();
+        this.enable = user.isEnabled();
         if(user.getAvatar() == null){
             this.avatar = null;
         }else {
@@ -99,5 +101,13 @@ public class UserResponse {
 
     public void setUpdateAt(String updateAt) {
         this.updateAt = updateAt;
+    }
+
+    public boolean isEnable() {
+        return enable;
+    }
+
+    public void setEnable(boolean enable) {
+        this.enable = enable;
     }
 }

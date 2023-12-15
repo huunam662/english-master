@@ -12,6 +12,7 @@ public interface IUserService {
 
     User createUser(UserRegisterDTO userRegisterDTO);
     void save(User user);
+    void delete(User user);
 
     void changePassword(User user, String newpass);
 
