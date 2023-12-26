@@ -8,4 +8,8 @@ import java.util.UUID;
 
 public interface AnswerRepository extends JpaRepository<Answer, UUID> {
     Optional<Answer> findByAnswerId(UUID answerId);
+
+    Optional<Answer> findByQuestionAndCorrectAnswer(Question question, boolean isCorrect);
+
+
 }

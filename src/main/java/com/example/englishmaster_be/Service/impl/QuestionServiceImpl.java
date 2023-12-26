@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Service.impl;
 
+import com.example.englishmaster_be.Model.Answer;
 import com.example.englishmaster_be.Model.Part;
 import com.example.englishmaster_be.Model.Question;
 import com.example.englishmaster_be.Repository.PartRepository;
@@ -19,6 +20,7 @@ public class QuestionServiceImpl implements IQuestionService {
 
     @Autowired
     private QuestionRepository questionRepository;
+
 
     @Autowired
     private PartRepository partRepository;
@@ -71,5 +73,6 @@ public class QuestionServiceImpl implements IQuestionService {
     public void deleteQuestion(Question question) {
         questionRepository.delete(question);
     }
+
 
 }
