@@ -43,6 +43,12 @@ public class TopicServiceImpl implements ITopicService {
     }
 
     @Override
+    public List<Topic> getAllTopicToPack(Pack pack) {
+        return topicRepository.findAllByPack(pack);
+    }
+
+
+    @Override
     public List<Part> getPartToTopic(UUID topicId) {
         Topic topic = topicRepository.findByTopicId(topicId)
                 .orElseThrow(() -> new IllegalArgumentException("Topic not found with ID: " + topicId));

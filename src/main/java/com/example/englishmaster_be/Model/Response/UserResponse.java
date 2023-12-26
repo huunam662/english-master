@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Model.Response;
 
+import com.example.englishmaster_be.Component.GetExtension;
 import com.example.englishmaster_be.Model.User;
 
 import java.sql.Timestamp;
@@ -14,6 +15,7 @@ public class UserResponse {
     private String phone;
     private String address;
     private String avatar;
+    private boolean enable;
 
     private String createAt;
     private String updateAt;
@@ -24,7 +26,13 @@ public class UserResponse {
         this.email = user.getEmail();
         this.phone = user.getPhone();
         this.address = user.getAddress();
-        this.avatar = user.getAvatar();
+        this.enable = user.isEnabled();
+        if(user.getAvatar() == null){
+            this.avatar = null;
+        }else {
+            String link = GetExtension.linkName(user.getAvatar());
+            this.avatar = link + user.getAvatar();
+        }
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
         this.createAt = sdf.format(Timestamp.valueOf(user.getCreateAt()));
@@ -93,5 +101,13 @@ public class UserResponse {
 
     public void setUpdateAt(String updateAt) {
         this.updateAt = updateAt;
+    }
+
+    public boolean isEnable() {
+        return enable;
+    }
+
+    public void setEnable(boolean enable) {
+        this.enable = enable;
     }
 }

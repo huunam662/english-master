@@ -72,5 +72,21 @@ public class MockTestServiceImpl implements IMockTestService {
         return count;
     }
 
+    @Override
+    public List<MockTest> getAllMockTestByYearMonthAndDay(Topic topic, String year, String month, String day) {
+        if(day == null && month != null){
+            return  mockTestRepository.findAllByYearMonth(year, month, topic);
+        }
+        if(month == null){
+            return mockTestRepository.findAllByYear(year, topic);
+        }
+        return mockTestRepository.findAllByYearMonthAndDay(year, month, day, topic);
+    }
+
+    @Override
+    public List<MockTest> getAllMockTestToTopic(Topic topic) {
+        return mockTestRepository.findAllByTopic(topic);
+    }
+
 
 }
