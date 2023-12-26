@@ -7,6 +7,8 @@ import com.example.englishmaster_be.Repository.MockTestRepository;
 import com.example.englishmaster_be.Service.*;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -26,6 +28,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/mockTest")
+@SuppressWarnings("unchecked")
 public class MockTestController {
     @Autowired
     private MockTestRepository mockTestRepository;
@@ -33,6 +36,8 @@ public class MockTestController {
     private IUserService IUserService;
     @Autowired
     private ITopicService ITopicService;
+    @Autowired
+    private IQuestionService IQuestionService;
     @Autowired
     private IMockTestService IMockTestService;
     @Autowired
@@ -148,7 +153,6 @@ public class MockTestController {
             for(UUID answerId : listAnswerId){
                 Answer answer = IAnswerService.findAnswerToId(answerId);
 
-
                 DetailMockTest detailMockTest = new DetailMockTest(mockTest, answer);
                 detailMockTest.setUserCreate(user);
                 detailMockTest.setUserUpdate(user);
@@ -233,6 +237,106 @@ public class MockTestController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             responseModel.setMessage("Send email fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @GetMapping(value = "/{mockTestId:.+}/listPart")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> getPartToMockTest(@PathVariable UUID mockTestId) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            User currentUser = IUserService.currentUser();
+
+            MockTest mockTest = IMockTestService.findMockTestToId(mockTestId);
+
+            if(!currentUser.equals(mockTest.getUser())){
+                responseModel.setMessage("You cannot view other people's tests");
+                responseModel.setStatus("fail");
+                return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+            }
+
+            List<Part> partList = mockTest.getTopic().getParts().stream().toList();
+
+            JSONObject responseObject = new JSONObject();
+            JSONArray responseArray = new JSONArray();
+
+            responseObject.put("TopicName", mockTest.getTopic().getTopicName());
+            responseObject.put("TopicTime", mockTest.getTopic().getWorkTime());
+
+            for(Part part : partList ){
+                int totalQuestion = ITopicService.totalQuestion(part, mockTest.getTopic().getTopicId());
+
+                PartResponse partResponse = new PartResponse(part, totalQuestion);
+                responseArray.add(partResponse);
+            }
+
+            responseObject.put("Part", responseArray);
+            responseModel.setMessage("Show part to mock test successfully");
+
+            responseModel.setResponseData(responseObject);
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Show part to mock test fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @GetMapping(value = "/{mockTestId:.+}/listQuestionToPart")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> getQuestionOfToMockTest(@PathVariable UUID mockTestId, @RequestParam UUID partId) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            User currentUser = IUserService.currentUser();
+
+            MockTest mockTest = IMockTestService.findMockTestToId(mockTestId);
+
+            if(!currentUser.equals(mockTest.getUser())){
+                responseModel.setMessage("You cannot view other people's tests");
+                responseModel.setStatus("fail");
+                return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+            }
+
+            List<Question> questionList = ITopicService.getQuestionOfPartToTopic(mockTest.getTopic().getTopicId(), partId);
+            List<QuestionMockTestResponse> questionMockTestResponseList = new ArrayList<>();
+
+            for(Question question : questionList ){
+
+                if(IQuestionService.checkQuestionGroup(question)){
+                    QuestionMockTestResponse questionMockTestResponse = new QuestionMockTestResponse(question);
+
+                    List<Question> questionGroupList = IQuestionService.listQuestionGroup(question);
+                    List<QuestionMockTestResponse> questionGroupResponseList = new ArrayList<>();
+                    for(Question questionGroup : questionGroupList){
+                        Answer answerCorrect = IAnswerService.correctAnswer(questionGroup);
+                        Answer answerChoice = IAnswerService.choiceAnswer(questionGroup, mockTest);
+                        QuestionMockTestResponse questionGroupResponse = new QuestionMockTestResponse(questionGroup, answerChoice, answerCorrect);
+                        questionGroupResponseList.add(questionGroupResponse);
+                        questionMockTestResponse.setQuestionGroup(questionGroupResponseList);
+                    }
+
+                    questionMockTestResponseList.add(questionMockTestResponse);
+                }else {
+                    Answer answerCorrect = IAnswerService.correctAnswer(question);
+                    Answer answerChoice = IAnswerService.choiceAnswer(question, mockTest);
+                    QuestionMockTestResponse questionGroupResponse = new QuestionMockTestResponse(question, answerChoice, answerCorrect);
+                    questionMockTestResponseList.add(questionGroupResponse);
+                }
+            }
+
+            responseModel.setMessage("Show question of part to mock test successfully");
+            responseModel.setResponseData(questionMockTestResponseList);
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Show question of part to mock test fail: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);

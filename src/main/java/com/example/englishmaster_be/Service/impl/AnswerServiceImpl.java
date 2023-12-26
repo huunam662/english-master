@@ -14,6 +14,8 @@ public class AnswerServiceImpl implements IAnswerService {
     private AnswerRepository answerRepository;
     @Autowired
     private QuestionRepository questionRepository;
+    @Autowired
+    private DetailMockTestRepository detailMockTestRepository;
 
     @Override
     public void createAnswer(Answer answer) {
@@ -48,6 +50,21 @@ public class AnswerServiceImpl implements IAnswerService {
     @Override
     public void deleteAnswer(Answer answer) {
         answerRepository.delete(answer);
+    }
+
+    @Override
+    public Answer correctAnswer(Question question) {
+        return answerRepository.findByQuestionAndCorrectAnswer(question, true).orElseThrow(() -> new IllegalArgumentException("Question don't have correct answer"));
+    }
+
+    @Override
+    public Answer choiceAnswer(Question question, MockTest mockTest) {
+        for(DetailMockTest detailMockTest: detailMockTestRepository.findAllByMockTest(mockTest)){
+            if(detailMockTest.getAnswer().getQuestion().equals(question)){
+                return detailMockTest.getAnswer();
+            }
+        }
+        return null;
     }
 
 }
