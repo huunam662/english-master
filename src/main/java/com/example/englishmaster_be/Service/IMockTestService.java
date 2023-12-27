@@ -1,8 +1,6 @@
 package com.example.englishmaster_be.Service;
 
-import com.example.englishmaster_be.Model.DetailMockTest;
-import com.example.englishmaster_be.Model.MockTest;
-import com.example.englishmaster_be.Model.User;
+import com.example.englishmaster_be.Model.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,4 +18,7 @@ public interface IMockTestService {
     List<DetailMockTest> getTop10DetailToCorrect(int index, boolean isCorrect ,MockTest mockTest);
 
     int countCorrectAnswer(UUID mockTestId);
+
+    List<MockTest> getAllMockTestByYearMonthAndDay(Topic topic, String year, String month, String day);
+    List<MockTest> getAllMockTestToTopic(Topic topic);
 }

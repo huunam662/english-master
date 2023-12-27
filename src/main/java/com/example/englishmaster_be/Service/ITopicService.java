@@ -2,7 +2,6 @@ package com.example.englishmaster_be.Service;
 
 import com.example.englishmaster_be.DTO.Topic.UpdateTopicDTO;
 import com.example.englishmaster_be.Model.*;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +13,9 @@ public interface ITopicService {
     Topic findTopicById(UUID topicId);
 
     List<Topic> get5TopicName(String query);
+    List<Topic> getAllTopicToPack(Pack pack);
+
+
     List<Part> getPartToTopic(UUID topicId);
     List<Question> getQuestionOfPartToTopic(UUID topicId, UUID partId);
 
@@ -30,4 +32,5 @@ public interface ITopicService {
     void deleteTopic(Topic topic);
 
     int totalQuestion(Part part, UUID topicId);
+
 }

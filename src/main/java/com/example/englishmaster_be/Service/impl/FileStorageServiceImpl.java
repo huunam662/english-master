@@ -2,6 +2,10 @@ package com.example.englishmaster_be.Service.impl;
 
 
 import com.example.englishmaster_be.Service.IFileStorageService;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.Bucket;
+import com.google.cloud.storage.Storage;
+import com.google.firebase.cloud.StorageClient;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.*;
 import org.springframework.stereotype.Service;
@@ -32,28 +36,65 @@ public class FileStorageServiceImpl implements IFileStorageService {
         }
     }
 
+//    @Override
+//    public Resource load(String filename) {
+//        Path root = Paths.get(fileSave);
+//        try {
+//            Path file = root.resolve(filename);
+//            Resource resource = new UrlResource(file.toUri());
+//
+//            if (resource.exists() || resource.isReadable()) {
+//                return resource;
+//            } else {
+//                throw new RuntimeException("Could not read the file!");
+//            }
+//        } catch (MalformedURLException e) {
+//            throw new RuntimeException("Error: " + e.getMessage());
+//        }
+//    }
+
+
     @Override
     public Resource load(String filename) {
-        Path root = Paths.get(fileSave);
         try {
-            Path file = root.resolve(filename);
-            Resource resource = new UrlResource(file.toUri());
+            String bucketName = "connect-student-nodejs.appspot.com";
+            Bucket bucket = StorageClient.getInstance().bucket(bucketName);
+            Storage storage = bucket.getStorage();
+            Blob blob = storage.get(bucketName, filename);
 
-            if (resource.exists() || resource.isReadable()) {
-                return resource;
-            } else {
+            if (blob != null) {
+                byte[] content = blob.getContent();
+                return new ByteArrayResource(content);
+            }else {
                 throw new RuntimeException("Could not read the file!");
             }
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Error: " + e.getMessage());
+        }catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
         }
+
     }
+
+//    @Override
+//    public void save(MultipartFile file, String fileName) {
+//        Path root = Paths.get(fileSave);
+//        try {
+//            Files.copy(file.getInputStream(), root.resolve(fileName));
+//        } catch (Exception e) {
+//            if (e instanceof FileAlreadyExistsException) {
+//                throw new RuntimeException("A file of that name already exists.");
+//            }
+//            throw new RuntimeException(e.getMessage());
+//        }
+//
+//    }
 
     @Override
     public void save(MultipartFile file, String fileName) {
-        Path root = Paths.get(fileSave);
         try {
-            Files.copy(file.getInputStream(), root.resolve(fileName));
+            String bucketName = "connect-student-nodejs.appspot.com";
+            Bucket bucket = StorageClient.getInstance().bucket(bucketName);
+
+            bucket.create(fileName, file.getBytes(), file.getContentType());
         } catch (Exception e) {
             if (e instanceof FileAlreadyExistsException) {
                 throw new RuntimeException("A file of that name already exists.");
@@ -62,8 +103,7 @@ public class FileStorageServiceImpl implements IFileStorageService {
         }
 
     }
-
-
+    
     @Override
     public Stream<Path> loadAll() {
         Path root = Paths.get(fileSave);
@@ -74,15 +114,22 @@ public class FileStorageServiceImpl implements IFileStorageService {
         }
     }
 
+//    @Override
+//    public boolean delete(String filename) {
+//        Path root = Paths.get(fileSave);
+//        try {
+//            Path file = root.resolve(filename);
+//            return Files.deleteIfExists(file);
+//        } catch (IOException e) {
+//            throw new RuntimeException("Error: " + e.getMessage());
+//        }
+//    }
+
     @Override
     public boolean delete(String filename) {
-        Path root = Paths.get(fileSave);
-        try {
-            Path file = root.resolve(filename);
-            return Files.deleteIfExists(file);
-        } catch (IOException e) {
-            throw new RuntimeException("Error: " + e.getMessage());
-        }
+        String bucketName = "connect-student-nodejs.appspot.com";
+        Bucket bucket = StorageClient.getInstance().bucket(bucketName);
+        return bucket.get(filename).delete();
     }
 
     @Override

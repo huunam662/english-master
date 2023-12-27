@@ -15,5 +15,6 @@ public interface IAnswerService {
     int scoreAnswer(UUID answerId);
 
     void deleteAnswer(Answer answer);
-
+    Answer correctAnswer(Question question);
+    Answer choiceAnswer(Question question, MockTest mockTest);
 }
