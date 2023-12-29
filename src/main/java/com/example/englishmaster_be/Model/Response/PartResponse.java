@@ -1,8 +1,7 @@
 package com.example.englishmaster_be.Model.Response;
 
-import com.example.englishmaster_be.Component.GetExtension;
+import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.Model.Part;
-import org.json.simple.JSONObject;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;

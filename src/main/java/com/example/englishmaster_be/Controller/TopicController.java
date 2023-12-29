@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Controller;
 
-import com.example.englishmaster_be.Component.GetExtension;
+import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.DTO.Answer.CreateListAnswerDTO;
 import com.example.englishmaster_be.DTO.Question.CreateQuestionDTO;
 import com.example.englishmaster_be.DTO.Topic.*;
@@ -40,6 +40,8 @@ public class TopicController {
     private IPackService IPackService;
     @Autowired
     private IPartService IPartService;
+    @Autowired
+    private ICommentService ICommentService;
     @Autowired
     private IContentService IContentService;
     @Autowired
@@ -462,7 +464,7 @@ public class TopicController {
                     }
                     question.getContentCollection().add(content);
                     IContentService.uploadContent(content);
-                    IFileStorageService.save(createQuestionDTO.getContentImage(), filename);
+                    IFileStorageService.save(createQuestionDTO.getContentAudio(), filename);
                 }
 
                 IQuestionService.createQuestion(question);
@@ -526,6 +528,7 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
     }
+
 
     @GetMapping(value = "/{topicId:.+}/listPart")
     @PreAuthorize("hasRole('USER')")
@@ -620,4 +623,38 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
     }
+
+    @GetMapping(value = "/{topicId:.+}/listComment")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> listComment(@PathVariable UUID topicId){
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            Topic topic = ITopicService.findTopicById(topicId);
+            List<Comment> commentList = new ArrayList<>();;
+
+            List<CommentResponse> commentResponseList = new ArrayList<>();
+
+            if(topic.getComments() != null && !topic.getComments().stream().toList().isEmpty()){
+                commentList = topic.getComments().stream().toList();
+                for (Comment comment : commentList) {
+                    if (comment.getCommentParent() == null) {
+                        commentResponseList.add(new CommentResponse(comment, ICommentService.checkCommentParent(comment)));
+
+                    }
+                }
+            }
+            responseModel.setMessage("Show list comment successful");
+            responseModel.setResponseData(commentResponseList);
+            responseModel.setStatus("success");
+
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        }catch (Exception e) {
+            responseModel.setMessage("Show list comment fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
 }

@@ -1,11 +1,9 @@
 package com.example.englishmaster_be.Controller;
 
 
-import com.example.englishmaster_be.Component.EnglishWordDictionary;
-import com.example.englishmaster_be.Model.Response.UnsplashSearchResponse;
+import com.example.englishmaster_be.Helper.EnglishWordDictionary;
 import com.example.englishmaster_be.Model.ResponseModel;
 import com.fasterxml.jackson.databind.*;
-import feign.Headers;
 import org.apache.http.Header;
 import org.apache.http.client.methods.*;
 import org.apache.http.impl.client.*;
@@ -18,8 +16,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
-import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 

@@ -1,6 +1,5 @@
-package com.example.englishmaster_be.Component;
+package com.example.englishmaster_be.Helper;
 
-import lombok.Getter;
 import org.springframework.stereotype.Component;
 
 @Component

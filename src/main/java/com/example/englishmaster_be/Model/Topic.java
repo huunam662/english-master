@@ -42,6 +42,8 @@ public class Topic implements Serializable {
     @Column(name = "end_time")
     private LocalDateTime endTime;
 
+	@OneToMany(mappedBy = "topic")
+	private Collection<Comment> comments;
     @ManyToMany
     @JoinTable(name = "topic_question",
             joinColumns = @JoinColumn(name = "topic_id"),
@@ -124,6 +126,14 @@ public class Topic implements Serializable {
 		this.topicImage = topicImage;
 	}
 
+	public int getNumberQuestion() {
+		return numberQuestion;
+	}
+
+	public void setNumberQuestion(int numberQuestion) {
+		this.numberQuestion = numberQuestion;
+	}
+
 	public String getTopicDescription() {
 		return topicDescription;
 	}
@@ -162,6 +172,14 @@ public class Topic implements Serializable {
 
 	public void setEndTime(LocalDateTime endTime) {
 		this.endTime = endTime;
+	}
+
+	public Collection<Comment> getComments() {
+		return comments;
+	}
+
+	public void setComments(Collection<Comment> comments) {
+		this.comments = comments;
 	}
 
 	public Collection<Question> getQuestions() {
@@ -234,13 +252,5 @@ public class Topic implements Serializable {
 
 	public void setPack(Pack pack) {
 		this.pack = pack;
-	}
-
-	public int getNumberQuestion() {
-		return numberQuestion;
-	}
-
-	public void setNumberQuestion(int numberQuestion) {
-		this.numberQuestion = numberQuestion;
 	}
 }
