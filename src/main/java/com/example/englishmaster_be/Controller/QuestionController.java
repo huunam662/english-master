@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Controller;
 
-import com.example.englishmaster_be.Component.GetExtension;
+import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.DTO.Question.*;
 import com.example.englishmaster_be.DTO.*;
 import com.example.englishmaster_be.Model.*;

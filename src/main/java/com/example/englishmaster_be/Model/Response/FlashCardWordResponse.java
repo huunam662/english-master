@@ -1,16 +1,12 @@
 package com.example.englishmaster_be.Model.Response;
 
-import com.example.englishmaster_be.Component.GetExtension;
-import com.example.englishmaster_be.Model.FlashCard;
+import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.Model.FlashCardWord;
-import com.example.englishmaster_be.Model.Topic;
-import com.example.englishmaster_be.Model.User;
 import org.json.simple.JSONObject;
 
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class FlashCardWordResponse {

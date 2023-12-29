@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Component;
+package com.example.englishmaster_be.Helper;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PublicLink {
     private static String link;
-    @Value("${masterE.linkFE}")
+    @Value("${masterE.linkBE}")
     public void setLink(String link) {
         PublicLink.link = link;
     }

@@ -265,6 +265,7 @@ public class MockTestController {
 
             responseObject.put("TopicName", mockTest.getTopic().getTopicName());
             responseObject.put("TopicTime", mockTest.getTopic().getWorkTime());
+            responseObject.put("TopicId", mockTest.getTopic().getTopicId());
 
             for(Part part : partList ){
                 int totalQuestion = ITopicService.totalQuestion(part, mockTest.getTopic().getTopicId());

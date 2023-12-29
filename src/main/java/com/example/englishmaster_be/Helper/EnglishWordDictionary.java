@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Component;
+package com.example.englishmaster_be.Helper;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;

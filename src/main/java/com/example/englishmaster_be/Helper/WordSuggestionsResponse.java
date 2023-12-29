@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Component;
+package com.example.englishmaster_be.Helper;
 
 public class WordSuggestionsResponse {
     private String[] suggestions;

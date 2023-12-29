@@ -1,9 +1,8 @@
 package com.example.englishmaster_be.Model.Response;
 
-import com.example.englishmaster_be.Component.GetExtension;
+import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.Model.Answer;
 import com.example.englishmaster_be.Model.Content;
-import com.example.englishmaster_be.Model.MockTest;
 import com.example.englishmaster_be.Model.Question;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
