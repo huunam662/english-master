@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.Model;
 
 import jakarta.persistence.*;
-import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -42,6 +41,9 @@ public class User implements Serializable {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Collection<ConfirmationToken> confirmToken;
+
+	@OneToMany(mappedBy = "userComment")
+	private Collection<Comment> comments;
 
 //    @OneToMany(mappedBy = "userCreate", cascade = CascadeType.ALL)
 //    private Collection<Topic> topicCreate;
@@ -133,8 +135,8 @@ public class User implements Serializable {
 		return isEnabled;
 	}
 
-	public void setEnabled(boolean isEnabled) {
-		this.isEnabled = isEnabled;
+	public void setEnabled(boolean enabled) {
+		isEnabled = enabled;
 	}
 
 	public Role getRole() {
@@ -153,11 +155,19 @@ public class User implements Serializable {
 		this.confirmToken = confirmToken;
 	}
 
+	public Collection<Comment> getComments() {
+		return comments;
+	}
+
+	public void setComments(Collection<Comment> comments) {
+		this.comments = comments;
+	}
+
 	public Collection<FlashCard> getFlashCards() {
 		return flashCards;
 	}
+
 	public void setFlashCards(Collection<FlashCard> flashCards) {
 		this.flashCards = flashCards;
 	}
-
 }
