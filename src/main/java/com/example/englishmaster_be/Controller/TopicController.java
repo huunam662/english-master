@@ -22,10 +22,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 
 @RestController
@@ -635,7 +632,7 @@ public class TopicController {
             List<CommentResponse> commentResponseList = new ArrayList<>();
 
             if(topic.getComments() != null && !topic.getComments().stream().toList().isEmpty()){
-                commentList = topic.getComments().stream().toList();
+                commentList = topic.getComments().stream().sorted(Comparator.comparing(Comment::getCreateAt).reversed()).toList();
                 for (Comment comment : commentList) {
                     if (comment.getCommentParent() == null) {
                         commentResponseList.add(new CommentResponse(comment, ICommentService.checkCommentParent(comment)));

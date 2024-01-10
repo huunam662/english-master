@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.Model;
 
 import jakarta.persistence.*;
+import lombok.Getter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -44,6 +45,9 @@ public class User implements Serializable {
 
 	@OneToMany(mappedBy = "userComment")
 	private Collection<Comment> comments;
+
+	@OneToMany(mappedBy = "userPost")
+	private Collection<Post> posts;
 
 //    @OneToMany(mappedBy = "userCreate", cascade = CascadeType.ALL)
 //    private Collection<Topic> topicCreate;
@@ -169,5 +173,13 @@ public class User implements Serializable {
 
 	public void setFlashCards(Collection<FlashCard> flashCards) {
 		this.flashCards = flashCards;
+	}
+
+	public void setPosts(Collection<Post> posts) {
+		this.posts = posts;
+	}
+
+	public Collection<Post> getPosts() {
+		return posts;
 	}
 }

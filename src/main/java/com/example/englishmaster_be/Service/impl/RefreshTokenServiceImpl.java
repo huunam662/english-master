@@ -28,6 +28,14 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
     }
 
     @Override
+    public void deleteRefreshToken(String token) {
+        ConfirmationToken confirmationToken = confirmationTokenRepository.findByCodeAndType(token, "REFRESH_TOKEN");
+        if(confirmationToken != null){
+            confirmationTokenRepository.delete(confirmationToken);
+        }
+    }
+
+    @Override
     public ConfirmationToken createRefreshToken(String email) {
         ConfirmationToken confirmationToken  = new ConfirmationToken(userRepository.findByEmail(email));
 
