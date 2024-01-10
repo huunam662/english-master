@@ -50,6 +50,29 @@ public class TopicController {
     @Autowired
     private JPAQueryFactory queryFactory;
 
+    @GetMapping(value = "/{topicId:.+}/inforTopic")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> getInformationTopic(@PathVariable UUID topicId) {
+        ResponseModel responseModel = new ResponseModel();
+
+        try {
+            Topic topic = ITopicService.findTopicById(topicId);
+
+            responseModel.setMessage("Show list topic successfully");
+            responseModel.setResponseData(new TopicResponse(topic));
+            responseModel.setStatus("success");
+
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Show list topic fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
     @PostMapping(value = "/create", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> createTopic(@ModelAttribute CreateTopicDTO createtopicDTO) {
