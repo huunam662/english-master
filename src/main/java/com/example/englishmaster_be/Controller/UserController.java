@@ -18,9 +18,9 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.configurationprocessor.json.JSONArray;
 import org.springframework.core.io.*;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.*;
@@ -47,6 +47,7 @@ import java.util.regex.Pattern;
 public class UserController {
     @Autowired
     private IUserService IUserService;
+
     @Autowired
     private IFileStorageService IFileStorageService;
     @Autowired
@@ -573,6 +574,26 @@ public class UserController {
             responseModel.setMessage("Show list mock test result fail: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @PostMapping("/auth/signout")
+    public ResponseEntity<ResponseModel> logoutUser(@RequestBody RefreshTokenDTO refreshTokenDTO) {
+
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            String refresh = refreshTokenDTO.getRequestRefresh();
+            IRefreshTokenService.deleteRefreshToken(refresh);
+
+            responseModel.setMessage("Sign out successful");
+            responseModel.setStatus("success");
+            return ResponseEntity.status(HttpStatus.OK)
+                        .body(responseModel);
+        }catch (AuthenticationException e) {
+            responseModel.setMessage("Sign out fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED.value()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
     }

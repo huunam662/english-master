@@ -32,6 +32,10 @@ public class Comment implements Serializable {
     @JoinColumn(name = "topic_id", referencedColumnName = "id")
     private Topic topic;
 
+    @ManyToOne
+    @JoinColumn(name = "post_id", referencedColumnName = "id")
+    private Post post;
+
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
     @Column(name = "create_at")
@@ -80,6 +84,14 @@ public class Comment implements Serializable {
 
     public void setTopic(Topic topic) {
         this.topic = topic;
+    }
+
+    public Post getPost() {
+        return post;
+    }
+
+    public void setPost(Post post) {
+        this.post = post;
     }
 
     public LocalDateTime getCreateAt() {

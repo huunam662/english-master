@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 public interface IRefreshTokenService {
 
     ConfirmationToken findByToken(String token);
+
+    void deleteRefreshToken(String token);
     ConfirmationToken createRefreshToken(String email);
 
     ResponseModel verifyExpiration(ResponseModel responseModel, ConfirmationToken token);
