@@ -33,5 +33,10 @@ public class FlashCardServiceImpl implements IFlashCardService {
         flashCardRepository.save(flashCard);
     }
 
+    @Override
+    public void delete(FlashCard flashCard) {
+        flashCardRepository.delete(flashCard);
+    }
+
 
 }

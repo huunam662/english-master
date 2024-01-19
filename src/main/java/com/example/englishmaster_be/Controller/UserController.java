@@ -487,7 +487,8 @@ public class UserController {
     private void sendConfirmationEmail(String email, String confirmationToken) throws IOException, MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        String confirmationLink = linkFE + "/register/confirm?token=" + confirmationToken;
+        String confirmationLink = linkFE + "register/confirm?token=" + confirmationToken;
+
 
 
         String templateContent = readTemplateContent("email_templates.html");
@@ -559,9 +560,7 @@ public class UserController {
             long totalPages = (long) Math.ceil((double) totalRecords / size);
             responseObject.put("totalPage", totalPages);
             responseObject.put("totalRecords", totalRecords);
-            System.out.println(jsonTopicArray);
             responseObject.put("listTopicUser", jsonTopicArray);
-            System.out.println(responseObject);
 
             responseModel.setMessage("Show list mock test result successfully");
             responseModel.setResponseData(responseObject);
