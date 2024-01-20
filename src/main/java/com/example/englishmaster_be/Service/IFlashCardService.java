@@ -11,4 +11,6 @@ public interface IFlashCardService {
     List<FlashCard> findFlashCardToUser(User user);
 
     void saveFlashCard(FlashCard flashCard);
+
+    void delete(FlashCard flashCard);
 }

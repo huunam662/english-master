@@ -15,7 +15,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -97,17 +96,17 @@ public class FlashCardController {
 
     @PostMapping(value = "/addFlashCardUser", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('USER')")
-    public ResponseEntity<ResponseModel> addFlashCardUser(@ModelAttribute CreateFlashCardTO createFlashCardTO){
+    public ResponseEntity<ResponseModel> addFlashCardUser(@ModelAttribute CreateFlashCardDTO createFlashCardDTO){
         ResponseModel responseModel = new ResponseModel();
 
         try {
             User user = IUserService.currentUser();
 
-            String filename = IFileStorageService.nameFile(createFlashCardTO.getFlashCardImage());
+            String filename = IFileStorageService.nameFile(createFlashCardDTO.getFlashCardImage());
 
             FlashCard flashCard = new FlashCard();
-            flashCard.setFlashCardTitle(createFlashCardTO.getFlashCardTitle());
-            flashCard.setFlashCardDescription(createFlashCardTO.getFlashCardDescription());
+            flashCard.setFlashCardTitle(createFlashCardDTO.getFlashCardTitle());
+            flashCard.setFlashCardDescription(createFlashCardDTO.getFlashCardDescription());
             flashCard.setFlashCardImage(filename);
             flashCard.setUser(user);
 
@@ -115,7 +114,7 @@ public class FlashCardController {
             flashCard.setUserCreate(user);
 
             IFlashCardService.saveFlashCard(flashCard);
-            IFileStorageService.save(createFlashCardTO.getFlashCardImage(), filename);
+            IFileStorageService.save(createFlashCardDTO.getFlashCardImage(), filename);
 
             FlashCardResponse flashCardResponse = new FlashCardResponse(flashCard);
 
@@ -195,6 +194,72 @@ public class FlashCardController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }
         catch (Exception e){responseModel.setMessage("Create word for flashcard fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
+    }
+
+    @DeleteMapping(value = "/{flashCardId:.+}/removeFlashCard")
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> removeWord(@PathVariable UUID flashCardId){
+        ResponseModel responseModel = new ResponseModel();
+
+        try {
+            FlashCard flashCard = IFlashCardService.findFlashCardToId(flashCardId);
+
+            if(flashCard.getFlashCardImage() != null){
+                IFileStorageService.delete(flashCard.getFlashCardImage());
+            }
+
+            IFlashCardService.delete(flashCard);
+            responseModel.setMessage("Delete flashcard successfully");
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        }
+        catch (Exception e){responseModel.setMessage("Delete flashcard fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
+    }
+
+
+    @PutMapping(value = "/{flashCardId:.+}/updateFlashCard", consumes = {"multipart/form-data"})
+    @PreAuthorize("hasRole('USER')")
+    public ResponseEntity<ResponseModel> updateFlashCard(@PathVariable UUID flashCardId, @ModelAttribute CreateFlashCardDTO createFlashCardDTO){
+        ResponseModel responseModel = new ResponseModel();
+
+        try {
+            String filename = null;
+
+            MultipartFile image = createFlashCardDTO.getFlashCardImage();
+
+            if (image != null && !image.isEmpty()) {
+                filename = IFileStorageService.nameFile(image);}
+
+            FlashCard flashCard = IFlashCardService.findFlashCardToId(flashCardId);
+
+            flashCard.setFlashCardTitle(createFlashCardDTO.getFlashCardTitle());
+            flashCard.setFlashCardDescription(createFlashCardDTO.getFlashCardDescription());
+
+            if(filename != null){
+               IFileStorageService.delete(flashCard.getFlashCardImage());
+                flashCard.setFlashCardImage(filename);
+            }
+
+
+            IFlashCardService.saveFlashCard(flashCard);
+            if(filename != null){
+                IFileStorageService.save(createFlashCardDTO.getFlashCardImage(), filename);
+            }
+            FlashCardResponse flashCardResponse = new FlashCardResponse(flashCard);
+            responseModel.setMessage("Update flashcard successfully");
+            responseModel.setResponseData(flashCardResponse);
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        }
+        catch (Exception e){responseModel.setMessage("Update flashcard fail: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
