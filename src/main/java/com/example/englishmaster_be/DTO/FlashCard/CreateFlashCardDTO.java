@@ -2,14 +2,14 @@ package com.example.englishmaster_be.DTO.FlashCard;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public class CreateFlashCardTO {
+public class CreateFlashCardDTO {
     private String flashCardTitle;
 
     private String flashCardDescription;
 
     private MultipartFile flashCardImage;
 
-    public CreateFlashCardTO() {
+    public CreateFlashCardDTO() {
     }
 
     public String getFlashCardTitle() {
