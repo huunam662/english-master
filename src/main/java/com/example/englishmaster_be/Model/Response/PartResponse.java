@@ -36,7 +36,7 @@ public PartResponse(Part part) {
         this.partType = part.getPartType();
         this.contentType = part.getContentType();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
         this.createAt = sdf.format(Timestamp.valueOf(part.getCreateAt()));
         this.updateAt = sdf.format(Timestamp.valueOf(part.getUpdateAt()));
     }
@@ -59,7 +59,7 @@ public PartResponse(Part part) {
 		this.contentType = part.getContentType();
 		this.totalQuestion = totalQuestion;
 
-		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
 		this.createAt = sdf.format(Timestamp.valueOf(part.getCreateAt()));
 		this.updateAt = sdf.format(Timestamp.valueOf(part.getUpdateAt()));
 	}

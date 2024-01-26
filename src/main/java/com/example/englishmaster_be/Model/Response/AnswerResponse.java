@@ -19,7 +19,7 @@ public class AnswerResponse {
         answerId = answer.getAnswerId();
         answerContent = answer.getAnswerContent();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
         createAt = sdf.format(Timestamp.valueOf(answer.getCreateAt()));
         updateAt = sdf.format(Timestamp.valueOf(answer.getUpdateAt()));
 

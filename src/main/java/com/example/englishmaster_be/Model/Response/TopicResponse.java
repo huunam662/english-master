@@ -10,6 +10,7 @@ import java.util.UUID;
 
 public class TopicResponse {
     private UUID topicId;
+	private UUID packId;
 	private String packName;
 
     private String topicName;
@@ -43,6 +44,7 @@ public class TopicResponse {
         String link = GetExtension.linkName(topic.getTopicImage());
 
         this.topicId = topic.getTopicId();
+		this.packId = topic.getPack().getPackId();
 		this.packName = topic.getPack().getPackName();
         this.topicName = topic.getTopicName();
 
@@ -53,7 +55,7 @@ public class TopicResponse {
         this.workTime = topic.getWorkTime();
 		this.isEnable = topic.isEnable();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
 
         this.startTime = sdf.format(Timestamp.valueOf(topic.getStartTime()));
         this.endTime = sdf.format(Timestamp.valueOf(topic.getEndTime()));
@@ -76,6 +78,14 @@ public class TopicResponse {
 
 	public void setTopicId(UUID topicId) {
 		this.topicId = topicId;
+	}
+
+	public UUID getPackId() {
+		return packId;
+	}
+
+	public void setPackId(UUID packId) {
+		this.packId = packId;
 	}
 
 	public String getPackName() {

@@ -56,7 +56,7 @@ public class CommentResponse {
         }
         this.isCommentParent = isCommentParent;
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
         this.createAt = sdf.format(Timestamp.valueOf(comment.getCreateAt()));
         this.updateAt = sdf.format(Timestamp.valueOf(comment.getUpdateAt()));
     }
