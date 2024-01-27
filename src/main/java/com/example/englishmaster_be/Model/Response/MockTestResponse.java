@@ -27,7 +27,7 @@ public class MockTestResponse {
         this.time = mockTest.getTime();
         this.topicId = mockTest.getTopic().getTopicId();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
         this.createAt = sdf.format(Timestamp.valueOf(mockTest.getCreateAt()));
         this.updateAt = sdf.format(Timestamp.valueOf(mockTest.getUpdateAt()));
 

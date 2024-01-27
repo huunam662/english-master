@@ -27,7 +27,7 @@ public class NewsResponse {
         this.newsImage =  link + news.getImage();
         this.isEnable = news.isEnable();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
 
         this.createAt = sdf.format(Timestamp.valueOf(news.getCreateAt()));
         this.updateAt = sdf.format(Timestamp.valueOf(news.getUpdateAt()));

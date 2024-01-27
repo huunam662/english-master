@@ -34,7 +34,7 @@ public class QuestionResponse {
 
         this.partId = question.getPart().getPartId();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
         this.createAt = sdf.format(Timestamp.valueOf(question.getCreateAt()));
         this.updateAt = sdf.format(Timestamp.valueOf(question.getUpdateAt()));
 

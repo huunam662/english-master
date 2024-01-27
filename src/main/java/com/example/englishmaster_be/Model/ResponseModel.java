@@ -13,7 +13,7 @@ public class ResponseModel {
     private String violations;
 
     public ResponseModel() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
         timeStamp = sdf.format(Timestamp.valueOf(LocalDateTime.now()));
     }
 
@@ -22,7 +22,7 @@ public class ResponseModel {
         this.responseData = responseData;
         this.status = status;
         this.violations = violations;
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
         timeStamp = sdf.format(Timestamp.valueOf(LocalDateTime.now()));
     }
 

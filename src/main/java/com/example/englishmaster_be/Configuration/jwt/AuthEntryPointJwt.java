@@ -36,7 +36,7 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 
         final ObjectMapper mapper = new ObjectMapper();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
         mapper.setDateFormat(sdf);
         mapper.writeValue(response.getOutputStream(), responseModel);
 

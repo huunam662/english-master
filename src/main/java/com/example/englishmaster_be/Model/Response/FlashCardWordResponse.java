@@ -55,7 +55,7 @@ public class FlashCardWordResponse {
         this.note = flashCardWord.getNote();
         this.define = flashCardWord.getDefine();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
         this.createAt = sdf.format(Timestamp.valueOf(flashCardWord.getCreateAt()));
         this.updateAt = sdf.format(Timestamp.valueOf(flashCardWord.getUpdateAt()));
 

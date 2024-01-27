@@ -35,7 +35,7 @@ public class PostResponse {
             this.userAvatar = link + post.getUserPost().getAvatar();
         }
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
         this.createAt = sdf.format(Timestamp.valueOf(post.getCreateAt()));
         this.updateAt = sdf.format(Timestamp.valueOf(post.getUpdateAt()));
     }
