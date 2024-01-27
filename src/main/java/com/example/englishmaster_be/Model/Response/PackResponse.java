@@ -16,7 +16,7 @@ public class PackResponse {
     public PackResponse(Pack pack) {
         this.packId = pack.getPackId();
         this.packName = pack.getPackName();
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
         this.createAt = sdf.format(Timestamp.valueOf(pack.getCreateAt()));
         this.updateAt = sdf.format(Timestamp.valueOf(pack.getUpdateAt()));
     }

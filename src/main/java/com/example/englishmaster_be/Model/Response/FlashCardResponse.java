@@ -44,7 +44,7 @@ public class FlashCardResponse {
         this.flashCardTitle = flashCard.getFlashCardTitle();
         this.flashCardDescription = flashCard.getFlashCardDescription();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy hh:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
         this.createAt = sdf.format(Timestamp.valueOf(flashCard.getCreateAt()));
         this.updateAt = sdf.format(Timestamp.valueOf(flashCard.getUpdateAt()));
 

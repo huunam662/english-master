@@ -551,7 +551,7 @@ public class TopicController {
 
 
     @GetMapping(value = "/{topicId:.+}/listPart")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> getPartToTopic(@PathVariable UUID topicId) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -582,7 +582,7 @@ public class TopicController {
     }
 
     @GetMapping(value = "/{topicId:.+}/listQuestionToPart")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> getQuestionOfToTopic(@PathVariable UUID topicId, @RequestParam UUID partId) {
         ResponseModel responseModel = new ResponseModel();
         try {

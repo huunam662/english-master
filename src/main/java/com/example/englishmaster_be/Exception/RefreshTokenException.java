@@ -11,3 +11,4 @@ public class RefreshTokenException extends RuntimeException{
         super(String.format("Failed for [%s]: %s", token, message));
     }
 }
+
