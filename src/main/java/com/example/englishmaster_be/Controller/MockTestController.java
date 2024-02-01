@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -258,7 +259,7 @@ public class MockTestController {
                 return ResponseEntity.status(HttpStatus.OK).body(responseModel);
             }
 
-            List<Part> partList = mockTest.getTopic().getParts().stream().toList();
+            List<Part> partList = mockTest.getTopic().getParts().stream().sorted(Comparator.comparing(Part::getCreateAt)).toList();
 
             JSONObject responseObject = new JSONObject();
             JSONArray responseArray = new JSONArray();
