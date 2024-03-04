@@ -1,11 +1,13 @@
 package com.example.englishmaster_be.Model.Response;
 
 import com.example.englishmaster_be.Helper.GetExtension;
-import com.example.englishmaster_be.Model.Topic;
+import com.example.englishmaster_be.Model.*;
 import org.json.simple.JSONObject;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 public class TopicResponse {
@@ -20,6 +22,8 @@ public class TopicResponse {
     private String topicDescription;
 
     private String topicType;
+
+	private List<UUID> listPart;
 
 	private int numberQuestion;
 
@@ -54,6 +58,12 @@ public class TopicResponse {
 		this.numberQuestion = topic.getNumberQuestion();
         this.workTime = topic.getWorkTime();
 		this.isEnable = topic.isEnable();
+
+		List<UUID> listPart = new ArrayList<>();
+		for(Part part : topic.getParts()){
+			listPart.add(part.getPartId());
+		}
+		this.listPart = listPart;
 
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
 
@@ -90,6 +100,14 @@ public class TopicResponse {
 
 	public String getPackName() {
 		return packName;
+	}
+
+	public List<UUID> getListPart() {
+		return listPart;
+	}
+
+	public void setListPart(List<UUID> listPart) {
+		this.listPart = listPart;
 	}
 
 	public void setPackName(String packName) {

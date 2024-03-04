@@ -66,7 +66,7 @@ public class FileStorageServiceImpl implements IFileStorageService {
                 byte[] content = blob.getContent();
                 return new ByteArrayResource(content);
             }else {
-                throw new RuntimeException("Could not read the file!");
+                return null;
             }
         }catch (Exception e) {
             throw new RuntimeException(e.getMessage());

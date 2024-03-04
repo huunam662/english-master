@@ -27,7 +27,6 @@ public interface ITopicService {
     boolean existQuestionInTopic(Topic topic, Question question);
     boolean existPartInTopic(Topic topic, Part part);
 
-    void updateTopic(Topic topic, UpdateTopicDTO updateTopicDTO);
 
     void deleteTopic(Topic topic);
 
