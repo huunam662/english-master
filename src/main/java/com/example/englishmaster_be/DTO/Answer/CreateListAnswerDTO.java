@@ -3,11 +3,20 @@ package com.example.englishmaster_be.DTO.Answer;
 import java.util.UUID;
 
 public class CreateListAnswerDTO {
+    private UUID idAnswer;
     private String contentAnswer;
     private boolean correctAnswer;
 
     public CreateListAnswerDTO(){
 
+    }
+
+    public UUID getIdAnswer() {
+        return idAnswer;
+    }
+
+    public void setIdAnswer(UUID idAnswer) {
+        this.idAnswer = idAnswer;
     }
 
     public String getContentAnswer() {
