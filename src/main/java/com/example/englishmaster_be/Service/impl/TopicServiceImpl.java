@@ -131,23 +131,6 @@ public class TopicServiceImpl implements ITopicService {
     }
 
     @Override
-    public void updateTopic(Topic topic, UpdateTopicDTO updateTopicDTO) {
-        topic.setTopicName(updateTopicDTO.getTopicName());
-        topic.setTopicDescription(updateTopicDTO.getTopicDiscription());
-        topic.setTopicType(updateTopicDTO.getTopicType());
-        topic.setWorkTime(updateTopicDTO.getWorkTime());
-        topic.setStartTime(updateTopicDTO.getStartTime());
-        topic.setEndTime(updateTopicDTO.getEndTime());
-        topic.setEnable(updateTopicDTO.isEnable());
-        topic.setUpdateAt(LocalDateTime.now());
-
-        User user = IUserService.currentUser();
-        topic.setUserUpdate(user);
-
-        topicRepository.save(topic);
-    }
-
-    @Override
     public void deleteTopic(Topic topic) {
         topicRepository.delete(topic);
     }

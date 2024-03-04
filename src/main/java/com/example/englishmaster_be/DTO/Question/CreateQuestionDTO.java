@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public class CreateQuestionDTO {
 
+	private UUID questionId;
     private String questionContent;
 
     private int questionScore;
@@ -28,6 +29,14 @@ public class CreateQuestionDTO {
 
 	public CreateQuestionDTO() {
 		super();
+	}
+
+	public UUID getQuestionId() {
+		return questionId;
+	}
+
+	public void setQuestionId(UUID questionId) {
+		this.questionId = questionId;
 	}
 
 	public String getQuestionContent() {

@@ -19,7 +19,9 @@ import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -44,9 +46,9 @@ public class TopicController {
     @Autowired
     private IAnswerService IAnswerService;
     @Autowired
-    private IUserService IUserService;
-    @Autowired
     private IQuestionService IQuestionService;
+    @Autowired
+    private IUserService IUserService;
     @Autowired
     private JPAQueryFactory queryFactory;
 
@@ -114,18 +116,57 @@ public class TopicController {
         }
     }
 
-    @PutMapping(value = "/{topicId:.+}/update")
+    @PutMapping(value = "/{topicId:.+}/updateTopic", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseModel> updateTopic(@PathVariable UUID topicId, @RequestBody UpdateTopicDTO updateTopicDTO){
+    public ResponseEntity<ResponseModel> updateTopic(@PathVariable UUID topicId, @ModelAttribute UpdateTopicDTO updateTopicDTO){
         ResponseModel responseModel = new ResponseModel();
         try {
-            Topic topic = ITopicService.findTopicById(topicId);
+            User user = IUserService.currentUser();
+            String filename = null;
 
-            ITopicService.updateTopic(topic, updateTopicDTO);
+            MultipartFile image = updateTopicDTO.getTopicImage();
+
+            if (image != null && !image.isEmpty()) {
+                filename = IFileStorageService.nameFile(image);}
+
+            Pack pack = IPackService.findPackById(updateTopicDTO.getTopicPack());
+
+            Topic topic = ITopicService.findTopicById(topicId);
+            topic.setTopicName(updateTopicDTO.getTopicName());
+            topic.setTopicDescription(updateTopicDTO.getTopicDescription());
+            if(filename != null){
+                topic.setTopicImage(filename);
+            }
+            topic.setTopicType(updateTopicDTO.getTopicType());
+            topic.setWorkTime(updateTopicDTO.getWorkTime());
+            topic.setStartTime(updateTopicDTO.getStartTime());
+            topic.setEndTime(updateTopicDTO.getEndTime());
+            topic.setPack(pack);
+            topic.setNumberQuestion(updateTopicDTO.getNumberQuestion());
+            topic.setUserUpdate(user);
+
+            if(filename != null && topic.getTopicImage() != null && IFileStorageService.load(topic.getTopicImage()) != null){
+                IFileStorageService.delete(topic.getTopicImage());
+            }
+
+            ITopicService.createTopic(topic);
+
+            if(filename != null){
+                IFileStorageService.save(updateTopicDTO.getTopicImage(), filename);
+            }
+
+            List<Part> listPart = new ArrayList<>();
+            for(UUID partId : updateTopicDTO.getListPart()){
+                Part part = IPartService.getPartToId(partId);
+                listPart.add(part);
+            }
+            topic.setParts(listPart);
+            ITopicService.createTopic(topic);
 
             TopicResponse topicResponse = new TopicResponse(topic);
 
             responseModel.setMessage("Update topic successfully");
+
             responseModel.setResponseData(topicResponse);
             responseModel.setStatus("success");
 
@@ -364,31 +405,133 @@ public class TopicController {
 
     @PostMapping(value = "/{topicId:.+}/addQuestion")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseModel> addQuestionToTopic(@PathVariable UUID topicId, @RequestParam UUID questionId) {
+    public ResponseEntity<ResponseModel> addQuestionToTopic(@PathVariable UUID topicId, @ModelAttribute CreateQuestionDTO createQuestionDTO) {
         ResponseModel responseModel = new ResponseModel();
+
+        User user = IUserService.currentUser();
         try {
-            Question question = IQuestionService.findQuestionById(questionId);
+
+            Question question = new Question();
+            question.setQuestionContent(createQuestionDTO.getQuestionContent());
+            question.setQuestionScore(createQuestionDTO.getQuestionScore());
+            question.setUserCreate(user);
+            question.setUserUpdate(user);
+
+            Part part = IPartService.getPartToId(createQuestionDTO.getPartId());
+            question.setPart(part);
+            IQuestionService.createQuestion(question);
+
+
+            if(createQuestionDTO.getListAnswer() != null && !createQuestionDTO.getListAnswer().isEmpty()){
+                for(CreateListAnswerDTO createListAnswerDTO: createQuestionDTO.getListAnswer() ){
+                    Answer answer = new Answer();
+                    answer.setQuestion(question);
+                    answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
+                    answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
+                    answer.setUserUpdate(user);
+                    answer.setUserCreate(user);
+
+                    IAnswerService.createAnswer(answer);
+                    if(question.getAnswers() == null){
+                        question.setAnswers(new ArrayList<>());
+                    }
+                    question.getAnswers().add(answer);
+                }
+            }
+
+            if(createQuestionDTO.getListQuestionChild() != null && !createQuestionDTO.getListQuestionChild().isEmpty() ){
+                for (CreateQuestionDTO createQuestionChildDTO : createQuestionDTO.getListQuestionChild()){
+                    Question questionChild = new Question();
+                    questionChild.setQuestionGroup(question);
+                    questionChild.setQuestionContent(createQuestionChildDTO.getQuestionContent());
+                    questionChild.setQuestionScore(createQuestionChildDTO.getQuestionScore());
+                    questionChild.setPart(question.getPart());
+                    questionChild.setUserCreate(user);
+                    questionChild.setUserUpdate(user);
+
+                    IQuestionService.createQuestion(questionChild);
+
+                    for(CreateListAnswerDTO createListAnswerDTO: createQuestionChildDTO.getListAnswer() ){
+                        Answer answer = new Answer();
+                        answer.setQuestion(questionChild);
+                        answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
+                        answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
+                        answer.setUserUpdate(user);
+                        answer.setUserCreate(user);
+
+                        IAnswerService.createAnswer(answer);
+                        if(questionChild.getAnswers() == null){
+                            questionChild.setAnswers(new ArrayList<>());
+                        }
+                        questionChild.getAnswers().add(answer);
+                    }
+
+                    IQuestionService.createQuestion(questionChild);
+                }
+
+            }
+
+            if(createQuestionDTO.getContentImage() != null && !createQuestionDTO.getContentImage().isEmpty()){
+                String filename = IFileStorageService.nameFile(createQuestionDTO.getContentImage());
+                Content content = new Content(question, GetExtension.typeFile(filename), filename);
+                content.setUserCreate(user);
+                content.setUserUpdate(user);
+
+                if(question.getContentCollection() == null){
+                    question.setContentCollection(new ArrayList<>());
+                }
+                question.getContentCollection().add(content);
+                IContentService.uploadContent(content);
+                IFileStorageService.save(createQuestionDTO.getContentImage(), filename);
+            }
+            if(createQuestionDTO.getContentAudio() != null && !createQuestionDTO.getContentAudio().isEmpty()){
+                String filename = IFileStorageService.nameFile(createQuestionDTO.getContentAudio());
+                Content content = new Content(question, GetExtension.typeFile(filename), filename);
+                content.setUserCreate(user);
+                content.setUserUpdate(user);
+
+                if(question.getContentCollection() == null){
+                    question.setContentCollection(new ArrayList<>());
+                }
+                question.getContentCollection().add(content);
+                IContentService.uploadContent(content);
+                IFileStorageService.save(createQuestionDTO.getContentAudio(), filename);
+            }
+
+            IQuestionService.createQuestion(question);
+
             Topic topic = ITopicService.findTopicById(topicId);
-            Part part = question.getPart();
-
-            User user = IUserService.currentUser();
-
 
             if(ITopicService.existPartInTopic(topic, part)){
                 topic.setUserUpdate(user);
                 topic.setUpdateAt(LocalDateTime.now());
                 ITopicService.addQuestionToTopic(topic, question);
+
+                Question question1 = IQuestionService.findQuestionById(question.getQuestionId());
+                QuestionResponse questionResponse = new QuestionResponse(question1);
+
+                if(IQuestionService.checkQuestionGroup(question1)){
+                    List<Question> questionGroupList = IQuestionService.listQuestionGroup(question1);
+                    List<QuestionResponse> questionGroupResponseList = new ArrayList<>();
+
+                    for(Question questionGroup : questionGroupList){
+                        QuestionResponse questionGroupResponse;
+
+                        Answer answerCorrect = IAnswerService.correctAnswer(questionGroup);
+                        questionGroupResponse = new QuestionResponse(questionGroup, answerCorrect);
+                        questionGroupResponseList.add(questionGroupResponse);
+                        questionResponse.setQuestionGroup(questionGroupResponseList);
+                    }
+                }else {
+                    Answer answerCorrect = IAnswerService.correctAnswer(question1);
+                    questionResponse.setAnswerCorrect(answerCorrect.getAnswerId());
+                }
+                responseModel.setResponseData(questionResponse);
                 responseModel.setMessage("Add question to topic successfully");
             }else{
                 responseModel.setMessage("Part of question don't have in topic");
             }
 
-            JSONObject response = new JSONObject();
-            response.put("Topic Id", topicId);
-            response.put("Question Id", questionId);
-
-
-            responseModel.setResponseData(response);
             responseModel.setStatus("success");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
@@ -399,6 +542,7 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
     }
+
 
 
     @PostMapping(value = "/{topicId:.+}/addListQuestion", consumes = {"multipart/form-data"})
@@ -414,8 +558,6 @@ public class TopicController {
                 question.setQuestionScore(createQuestionDTO.getQuestionScore());
                 question.setUserCreate(user);
                 question.setUserUpdate(user);
-
-
 
                 Part part = IPartService.getPartToId(createQuestionDTO.getPartId());
                 question.setPart(part);
@@ -438,21 +580,28 @@ public class TopicController {
                 if(createQuestionDTO.getListQuestionChild() != null && !createQuestionDTO.getListQuestionChild().isEmpty() ){
                     for (CreateQuestionDTO createQuestionChildDTO : createQuestionDTO.getListQuestionChild()){
                         Question questionChild = new Question();
-                        questionChild.setQuestionId(UUID.randomUUID());
+                        questionChild.setQuestionGroup(question);
                         questionChild.setQuestionContent(createQuestionChildDTO.getQuestionContent());
                         questionChild.setQuestionScore(createQuestionChildDTO.getQuestionScore());
+                        questionChild.setPart(question.getPart());
                         questionChild.setUserCreate(user);
                         questionChild.setUserUpdate(user);
 
+                        IQuestionService.createQuestion(questionChild);
+
                         for(CreateListAnswerDTO createListAnswerDTO: createQuestionChildDTO.getListAnswer() ){
                             Answer answer = new Answer();
-                            answer.setQuestion(question);
+                            answer.setQuestion(questionChild);
                             answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
                             answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
                             answer.setUserUpdate(user);
                             answer.setUserCreate(user);
 
                             IAnswerService.createAnswer(answer);
+                            if(questionChild.getAnswers() == null){
+                                questionChild.setAnswers(new ArrayList<>());
+                            }
+                            questionChild.getAnswers().add(answer);
                         }
 
                         IQuestionService.createQuestion(questionChild);
@@ -584,24 +733,39 @@ public class TopicController {
     @GetMapping(value = "/{topicId:.+}/listQuestionToPart")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> getQuestionOfToTopic(@PathVariable UUID topicId, @RequestParam UUID partId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String userRole = authentication.getAuthorities().iterator().next().getAuthority();
         ResponseModel responseModel = new ResponseModel();
         try {
             List<Question> questionList = ITopicService.getQuestionOfPartToTopic(topicId, partId);
             List<QuestionResponse> questionResponseList = new ArrayList<>();
-
             for(Question question : questionList ){
                 QuestionResponse questionResponse = new QuestionResponse(question);
+
                 if(IQuestionService.checkQuestionGroup(question)){
                     List<Question> questionGroupList = IQuestionService.listQuestionGroup(question);
                     List<QuestionResponse> questionGroupResponseList = new ArrayList<>();
+
                     for(Question questionGroup : questionGroupList){
-                        QuestionResponse questionGroupResponse = new QuestionResponse(questionGroup);
+                        QuestionResponse questionGroupResponse;
+                        if(userRole.equals("ROLE_ADMIN")){
+                            Answer answerCorrect = IAnswerService.correctAnswer(questionGroup);
+                            questionGroupResponse = new QuestionResponse(questionGroup, answerCorrect);
+                        }else {
+                            questionGroupResponse = new QuestionResponse(questionGroup);
+                        }
                         questionGroupResponseList.add(questionGroupResponse);
                         questionResponse.setQuestionGroup(questionGroupResponseList);
                     }
+                }else {
+                    if(userRole.equals("ROLE_ADMIN"))   {
+                        Answer answerCorrect = IAnswerService.correctAnswer(question);
+                        questionResponse.setAnswerCorrect(answerCorrect.getAnswerId());
+                    }
                 }
-
                 questionResponseList.add(questionResponse);
+
+
             }
 
             responseModel.setMessage("Show question of part to topic successfully");
@@ -616,6 +780,7 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
     }
+
 
     @PatchMapping(value = "/{topicId:.+}/enableTopic")
     @PreAuthorize("hasRole('ADMIN')")

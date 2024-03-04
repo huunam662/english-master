@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Controller;
 
+import com.example.englishmaster_be.DTO.Answer.CreateListAnswerDTO;
 import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.DTO.Question.*;
 import com.example.englishmaster_be.DTO.*;
@@ -289,7 +290,7 @@ public class QuestionController {
     }
 
     @DeleteMapping(value = "/{questionId:.+}/deleteQuestion")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> deleteQuestion(@PathVariable UUID questionId) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -305,6 +306,132 @@ public class QuestionController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             responseModel.setMessage("Delete question fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @PutMapping(value = "/{questionId:.+}/editQuestion")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResponseModel> editQuestion(@PathVariable UUID questionId, @ModelAttribute CreateQuestionDTO createQuestionDTO) {
+        ResponseModel responseModel = new ResponseModel();
+
+        User user = IUserService.currentUser();
+        try {
+
+            Question question = IQuestionService.findQuestionById(questionId);
+            question.setQuestionContent(createQuestionDTO.getQuestionContent());
+            question.setQuestionScore(createQuestionDTO.getQuestionScore());
+            question.setUserUpdate(user);
+
+            IQuestionService.createQuestion(question);
+
+
+            if(createQuestionDTO.getListAnswer() != null && !createQuestionDTO.getListAnswer().isEmpty()){
+                for(CreateListAnswerDTO createListAnswerDTO: createQuestionDTO.getListAnswer() ){
+                    Answer answer = IAnswerService.findAnswerToId(createListAnswerDTO.getIdAnswer());
+                    answer.setQuestion(question);
+                    answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
+                    answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
+                    answer.setUserUpdate(user);
+
+                    IAnswerService.createAnswer(answer);
+                }
+            }
+
+            if(createQuestionDTO.getListQuestionChild() != null && !createQuestionDTO.getListQuestionChild().isEmpty() ){
+                for (CreateQuestionDTO createQuestionChildDTO : createQuestionDTO.getListQuestionChild()){
+                    Question questionChild = IQuestionService.findQuestionById(createQuestionChildDTO.getQuestionId());
+                    questionChild.setQuestionContent(createQuestionChildDTO.getQuestionContent());
+                    questionChild.setQuestionScore(createQuestionChildDTO.getQuestionScore());
+                    questionChild.setUserUpdate(user);
+
+                    for(CreateListAnswerDTO createListAnswerDTO: createQuestionChildDTO.getListAnswer() ){
+                        Answer answer = IAnswerService.findAnswerToId(createListAnswerDTO.getIdAnswer());
+                        answer.setQuestion(questionChild);
+                        answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
+                        answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
+                        answer.setUserUpdate(user);
+
+                        IAnswerService.createAnswer(answer);
+
+                    }
+                    IQuestionService.createQuestion(questionChild);
+                }
+            }
+
+            if(createQuestionDTO.getContentImage() != null && !createQuestionDTO.getContentImage().isEmpty()){
+                for (Content content : question.getContentCollection()) {
+                    if(content.getContentType().equals("IMAGE")){
+                        question.getContentCollection().remove(content);
+                        IContentService.delete(IContentService.getContentToContentId(content.getContentId()));
+                        IFileStorageService.delete(content.getContentData());
+
+                    }
+                }
+                String filename = IFileStorageService.nameFile(createQuestionDTO.getContentImage());
+                Content content = new Content(question, GetExtension.typeFile(filename), filename);
+                content.setUserUpdate(user);
+                content.setUserCreate(user);
+
+                if(question.getContentCollection() == null){
+                    question.setContentCollection(new ArrayList<>());
+                }
+                question.getContentCollection().add(content);
+                IContentService.uploadContent(content);
+                IFileStorageService.save(createQuestionDTO.getContentImage(), filename);
+            }
+            if(createQuestionDTO.getContentAudio() != null && !createQuestionDTO.getContentAudio().isEmpty()){
+                for (Content content : question.getContentCollection()) {
+                    if(content.getContentType().equals("AUDIO")){
+                        question.getContentCollection().remove(content);
+                        IContentService.delete(IContentService.getContentToContentId(content.getContentId()));
+                        IFileStorageService.delete(content.getContentData());
+                    }
+                }
+                String filename = IFileStorageService.nameFile(createQuestionDTO.getContentAudio());
+                Content content = new Content(question, GetExtension.typeFile(filename), filename);
+                content.setUserUpdate(user);
+                content.setUserCreate(user);
+
+                if(question.getContentCollection() == null){
+                    question.setContentCollection(new ArrayList<>());
+                }
+                question.getContentCollection().add(content);
+                IContentService.uploadContent(content);
+                IFileStorageService.save(createQuestionDTO.getContentAudio(), filename);
+            }
+
+            IQuestionService.createQuestion(question);
+
+            Question question1 = IQuestionService.findQuestionById(questionId);
+            QuestionResponse questionResponse = new QuestionResponse(question1);
+
+            if(IQuestionService.checkQuestionGroup(question1)){
+                List<Question> questionGroupList = IQuestionService.listQuestionGroup(question1);
+                List<QuestionResponse> questionGroupResponseList = new ArrayList<>();
+
+                for(Question questionGroup : questionGroupList){
+                    QuestionResponse questionGroupResponse;
+
+                    Answer answerCorrect = IAnswerService.correctAnswer(questionGroup);
+                    questionGroupResponse = new QuestionResponse(questionGroup, answerCorrect);
+                    questionGroupResponseList.add(questionGroupResponse);
+                    questionResponse.setQuestionGroup(questionGroupResponseList);
+                }
+            }else {
+                Answer answerCorrect = IAnswerService.correctAnswer(question1);
+                questionResponse.setAnswerCorrect(answerCorrect.getAnswerId());
+            }
+            responseModel.setResponseData(questionResponse);
+
+            responseModel.setMessage("Update question to topic successfully");
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Update question to topic fail: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
@@ -333,4 +460,5 @@ public class QuestionController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
     }
+
 }
