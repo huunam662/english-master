@@ -6,13 +6,14 @@ import org.json.simple.JSONObject;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.UUID;
+import java.util.*;
 
 public class MockTestResponse {
     private UUID mockTestID;
     private int score;
     private Time time;
     private UUID topicId;
+	private Object user;
 
     private String createAt;
     private String updateAt;
@@ -26,6 +27,11 @@ public class MockTestResponse {
         this.score = mockTest.getScore();
         this.time = mockTest.getTime();
         this.topicId = mockTest.getTopic().getTopicId();
+
+		Map<String, Object> userObj = new HashMap<>();
+		userObj.put("user_id", mockTest.getUser().getUserId());
+		userObj.put("user_name",  mockTest.getUser().getName());
+		this.user = userObj;
 
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
         this.createAt = sdf.format(Timestamp.valueOf(mockTest.getCreateAt()));
@@ -104,6 +110,12 @@ public class MockTestResponse {
 	public void setUserUpdate(JSONObject userUpdate) {
 		this.userUpdate = userUpdate;
 	}
-    
-    
+
+	public Object getUser() {
+		return user;
+	}
+
+	public void setUser(Object user) {
+		this.user = user;
+	}
 }

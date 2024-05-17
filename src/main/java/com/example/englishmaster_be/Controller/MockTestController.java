@@ -5,13 +5,19 @@ import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Repository.MockTestRepository;
 import com.example.englishmaster_be.Service.*;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.jpa.impl.JPAQuery;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -48,6 +54,8 @@ public class MockTestController {
     @Autowired
     private ResourceLoader resourceLoader;
 
+    @Autowired
+    private JPAQueryFactory queryFactory;
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('USER')")
@@ -82,7 +90,7 @@ public class MockTestController {
     }
 
     @GetMapping(value = "/listMockTest")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> listTop10MockTest(@RequestParam int index){
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -110,6 +118,56 @@ public class MockTestController {
         }
     }
 
+    @GetMapping(value = "/listMockTestAdmin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResponseModel> listMockTestOfAdmin(@RequestParam(value = "page", defaultValue = "0") @Min(0) Integer page,
+                                                         @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
+                                                         @RequestParam(value = "sortBy", defaultValue = "updateAt") String sortBy,
+                                                         @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction sortDirection){
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            JSONObject responseObject = new JSONObject();
+            OrderSpecifier<?> orderSpecifier;
+
+
+            if(Sort.Direction.DESC.equals(sortDirection)){
+                orderSpecifier = QMockTest.mockTest.updateAt.desc();
+            }else {
+                orderSpecifier = QMockTest.mockTest.updateAt.asc();
+            }
+
+            JPAQuery<MockTest> query = queryFactory.selectFrom(QMockTest.mockTest)
+                    .orderBy(orderSpecifier)
+                    .offset((long) page * size)
+                    .limit(size);
+
+            long totalRecords = query.fetchCount();
+            long totalPages = (long) Math.ceil((double) totalRecords / size);
+            responseObject.put("totalRecords", totalRecords);
+            responseObject.put("totalPages", totalPages);
+
+            List<MockTest> mockTestList = query.fetch();
+
+            List<MockTestResponse> mockTestResponseList = new ArrayList<>();
+
+            for(MockTest mockTest : mockTestList){
+                MockTestResponse mockTestResponse = new MockTestResponse(mockTest);
+                mockTestResponseList.add(mockTestResponse);
+            }
+
+            responseObject.put("listMockTest", mockTestResponseList);
+            responseModel.setMessage("List mock test successful");
+            responseModel.setResponseData(responseObject);
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        }catch (Exception e) {
+            responseModel.setMessage("List mock test fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
     @GetMapping(value = "/{userId:.+}/listTestToUser")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ResponseModel> listMockTestToUser(@RequestParam int index, @PathVariable UUID userId){
