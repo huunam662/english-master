@@ -28,6 +28,7 @@ public class FileController {
                 .contentType(MediaType.IMAGE_JPEG).body(file);
     }
 
+    
     @GetMapping("/showAudio/{filename:.+}")
     public ResponseEntity<Resource> showAudio(@PathVariable String filename) {
         Resource file = IFileStorageService.load(filename);
