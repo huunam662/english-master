@@ -1,7 +1,7 @@
 #!/bin/bash
 export project_name="englistmaster-be"
 export image_name="registry.gitlab.com/meu-solutions/englistmaster-be"
-export port_mapping="6001"
+export port_mapping="6002"
 export environment_json_path="app/config/release.json" 
 export environment_name="staging"
 export mount_data_folder="/var/data"
