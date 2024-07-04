@@ -10,6 +10,6 @@ echo "$CI_REGISTRY_PW" | sudo docker login registry.gitlab.com -u "$CI_REGISTRY_
 sudo docker container prune -f
 sudo docker image prune -a -f
 sudo docker tag $image_name:$tag  $image_name:$img_bak_tag
-sudo docker-compose pull
-sudo docker-compose --project-name $project_name down
-sudo docker-compose --project-name $project_name --env-file .env up -d
+sudo docker compose pull
+sudo docker compose --project-name $project_name down
+sudo docker compose --project-name $project_name --env-file .env up -d
