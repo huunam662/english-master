@@ -328,8 +328,8 @@ public class QuestionController {
             IQuestionService.createQuestion(question);
 
 
-            if(createQuestionDTO.getListAnswer() != null && !createQuestionDTO.getListAnswer().isEmpty()){
-                for(CreateListAnswerDTO createListAnswerDTO: createQuestionDTO.getListAnswer() ){
+            if (createQuestionDTO.getListAnswer() != null && !createQuestionDTO.getListAnswer().isEmpty()) {
+                for (CreateListAnswerDTO createListAnswerDTO : createQuestionDTO.getListAnswer()) {
                     Answer answer = IAnswerService.findAnswerToId(createListAnswerDTO.getIdAnswer());
                     answer.setQuestion(question);
                     answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
@@ -340,14 +340,14 @@ public class QuestionController {
                 }
             }
 
-            if(createQuestionDTO.getListQuestionChild() != null && !createQuestionDTO.getListQuestionChild().isEmpty() ){
-                for (CreateQuestionDTO createQuestionChildDTO : createQuestionDTO.getListQuestionChild()){
+            if (createQuestionDTO.getListQuestionChild() != null && !createQuestionDTO.getListQuestionChild().isEmpty()) {
+                for (CreateQuestionDTO createQuestionChildDTO : createQuestionDTO.getListQuestionChild()) {
                     Question questionChild = IQuestionService.findQuestionById(createQuestionChildDTO.getQuestionId());
                     questionChild.setQuestionContent(createQuestionChildDTO.getQuestionContent());
                     questionChild.setQuestionScore(createQuestionChildDTO.getQuestionScore());
                     questionChild.setUserUpdate(user);
 
-                    for(CreateListAnswerDTO createListAnswerDTO: createQuestionChildDTO.getListAnswer() ){
+                    for (CreateListAnswerDTO createListAnswerDTO : createQuestionChildDTO.getListAnswer()) {
                         Answer answer = IAnswerService.findAnswerToId(createListAnswerDTO.getIdAnswer());
                         answer.setQuestion(questionChild);
                         answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
@@ -361,9 +361,9 @@ public class QuestionController {
                 }
             }
 
-            if(createQuestionDTO.getContentImage() != null && !createQuestionDTO.getContentImage().isEmpty()){
+            if (createQuestionDTO.getContentImage() != null && !createQuestionDTO.getContentImage().isEmpty()) {
                 for (Content content : question.getContentCollection()) {
-                    if(content.getContentType().equals("IMAGE")){
+                    if (content.getContentType().equals("IMAGE")) {
                         question.getContentCollection().remove(content);
                         IContentService.delete(IContentService.getContentToContentId(content.getContentId()));
                         IFileStorageService.delete(content.getContentData());
@@ -375,16 +375,16 @@ public class QuestionController {
                 content.setUserUpdate(user);
                 content.setUserCreate(user);
 
-                if(question.getContentCollection() == null){
+                if (question.getContentCollection() == null) {
                     question.setContentCollection(new ArrayList<>());
                 }
                 question.getContentCollection().add(content);
                 IContentService.uploadContent(content);
                 IFileStorageService.save(createQuestionDTO.getContentImage(), filename);
             }
-            if(createQuestionDTO.getContentAudio() != null && !createQuestionDTO.getContentAudio().isEmpty()){
+            if (createQuestionDTO.getContentAudio() != null && !createQuestionDTO.getContentAudio().isEmpty()) {
                 for (Content content : question.getContentCollection()) {
-                    if(content.getContentType().equals("AUDIO")){
+                    if (content.getContentType().equals("AUDIO")) {
                         question.getContentCollection().remove(content);
                         IContentService.delete(IContentService.getContentToContentId(content.getContentId()));
                         IFileStorageService.delete(content.getContentData());
@@ -395,7 +395,7 @@ public class QuestionController {
                 content.setUserUpdate(user);
                 content.setUserCreate(user);
 
-                if(question.getContentCollection() == null){
+                if (question.getContentCollection() == null) {
                     question.setContentCollection(new ArrayList<>());
                 }
                 question.getContentCollection().add(content);
@@ -408,11 +408,11 @@ public class QuestionController {
             Question question1 = IQuestionService.findQuestionById(questionId);
             QuestionResponse questionResponse = new QuestionResponse(question1);
 
-            if(IQuestionService.checkQuestionGroup(question1)){
+            if (IQuestionService.checkQuestionGroup(question1)) {
                 List<Question> questionGroupList = IQuestionService.listQuestionGroup(question1);
                 List<QuestionResponse> questionGroupResponseList = new ArrayList<>();
 
-                for(Question questionGroup : questionGroupList){
+                for (Question questionGroup : questionGroupList) {
                     QuestionResponse questionGroupResponse;
 
                     Answer answerCorrect = IAnswerService.correctAnswer(questionGroup);
@@ -420,7 +420,7 @@ public class QuestionController {
                     questionGroupResponseList.add(questionGroupResponse);
                     questionResponse.setQuestionGroup(questionGroupResponseList);
                 }
-            }else {
+            } else {
                 Answer answerCorrect = IAnswerService.correctAnswer(question1);
                 questionResponse.setAnswerCorrect(answerCorrect.getAnswerId());
             }
