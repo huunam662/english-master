@@ -12,8 +12,8 @@ import java.util.stream.Stream;
 
 @Component
 public class EnglishWordDictionary {
-    @Value("${dictionary.file.path}")
-    private String dictionaryFilePath;
+    //@Value("${dictionary.file.path}")
+    private String dictionaryFilePath = "english.txt";
 
     private Set<String> wordSet = new HashSet<>();
 
