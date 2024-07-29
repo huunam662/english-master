@@ -7,6 +7,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,7 +18,7 @@ public class SwaggerConfiguration {
         return new OpenAPI().addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
                 .components(new Components().addSecuritySchemes("Bearer Authentication", createAPIKeyScheme()))
                 .info(new Info().title("Master English API")
-                        .description("Some custom description of API."));
+                        .description("Some custom description of API.")).addServersItem(new Server().url("/englishmaster"));
     }
 
     private SecurityScheme createAPIKeyScheme() {
@@ -25,4 +26,5 @@ public class SwaggerConfiguration {
                 .bearerFormat("JWT")
                 .scheme("bearer");
     }
+
 }
