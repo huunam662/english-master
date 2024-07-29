@@ -86,14 +86,14 @@ public class UserController {
 
         Pattern p = Pattern.compile(regex);
 
-        if (registerDTO.getPassword() == null){
+        if (registerDTO.getPassword() == null) {
             responseModel.setMessage("Password is null");
             responseModel.setStatus("fail");
             return responseModel;
         }
 
         Matcher m = p.matcher(registerDTO.getPassword());
-        if(!m.matches()){
+        if (!m.matches()) {
             responseModel.setMessage("Password must contain at least 1 uppercase, 1 lowercase, 1 numeric, 1 special character and no spaces");
             responseModel.setStatus("fail");
             return responseModel;
@@ -111,9 +111,9 @@ public class UserController {
 
         if (existingUser) {
             User userExist = IUserService.findeUserByEmail(user.getEmail());
-            if(!userExist.isEnabled()){
+            if (!userExist.isEnabled()) {
                 userRepository.delete(userExist);
-            }else {
+            } else {
                 responseModel.setMessage("This email already exists!");
                 responseModel.setStatus("fail");
                 return responseModel;
@@ -369,8 +369,8 @@ public class UserController {
         }
     }
 
-    @PatchMapping(value ="/changeProfile", consumes = {"multipart/form-data"})
-    @PreAuthorize("hasRole('USER')" )
+    @PatchMapping(value = "/changeProfile", consumes = {"multipart/form-data"})
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ResponseModel> changeProfile(@ModelAttribute("profileUser") ChangeProfileDTO changeProfileDTO) {
         ResponseModel responseModel = new ResponseModel();
         JSONObject objectResponse = new JSONObject();
@@ -385,25 +385,25 @@ public class UserController {
                 filename = IFileStorageService.nameFile(image);
             }
 
-            if(!changeProfileDTO.getName().isEmpty()){
+            if (!changeProfileDTO.getName().isEmpty()) {
                 user.setName(changeProfileDTO.getName());
             }
 
-            if(!changeProfileDTO.getAddress().isEmpty()){
+            if (!changeProfileDTO.getAddress().isEmpty()) {
                 user.setAddress(changeProfileDTO.getAddress());
             }
-            if(!changeProfileDTO.getPhone().isEmpty()){
+            if (!changeProfileDTO.getPhone().isEmpty()) {
                 user.setPhone(changeProfileDTO.getPhone());
             }
 
-            if(filename != null){
-                if(user.getAvatar() != null){
+            if (filename != null) {
+                if (user.getAvatar() != null) {
                     IFileStorageService.delete(user.getAvatar());
                 }
                 user.setAvatar(filename);
             }
             IUserService.save(user);
-            if(filename != null){
+            if (filename != null) {
                 IFileStorageService.save(changeProfileDTO.getAvatar(), filename);
             }
 
@@ -428,8 +428,8 @@ public class UserController {
         }
     }
 
-    @PatchMapping(value ="/changePass")
-    @PreAuthorize("hasRole('USER')" )
+    @PatchMapping(value = "/changePass")
+    @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ResponseModel> changePass(@RequestBody ChangePassDTO changePassDTO) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -442,21 +442,21 @@ public class UserController {
 
             Pattern p = Pattern.compile(regex);
 
-            if(!changePassDTO.getConfirmPass().equals(changePassDTO.getNewPass())){
+            if (!changePassDTO.getConfirmPass().equals(changePassDTO.getNewPass())) {
                 responseModel.setMessage("Password and confirm password don't match");
                 responseModel.setStatus("fail");
                 return ResponseEntity.status(HttpStatus.OK).body(responseModel);
             }
 
             Matcher m = p.matcher(changePassDTO.getNewPass());
-            if(!m.matches()){
+            if (!m.matches()) {
                 responseModel.setMessage("Password must contain at least 1 uppercase, 1 lowercase, 1 numeric, 1 special character and no spaces");
                 responseModel.setStatus("fail");
                 return ResponseEntity.status(HttpStatus.OK).body(responseModel);
             }
 
 
-            if(!passwordEncoder.matches(changePassDTO.getOldPass(), user.getPassword())){
+            if (!passwordEncoder.matches(changePassDTO.getOldPass(), user.getPassword())) {
                 responseModel.setMessage("Old password don't correct");
                 responseModel.setStatus("fail");
                 return ResponseEntity.status(HttpStatus.OK).body(responseModel);
@@ -490,7 +490,6 @@ public class UserController {
         String confirmationLink = linkFE + "register/confirm?token=" + confirmationToken;
 
 
-
         String templateContent = readTemplateContent("email_templates.html");
         templateContent = templateContent.replace("{{linkConfirm}}", confirmationLink);
         templateContent = templateContent.replace("{{btnConfirm}}", "Confirm");
@@ -506,9 +505,9 @@ public class UserController {
     @GetMapping(value = "/listExamResultsUser")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ResponseModel> getExamResultsUser(@RequestParam(value = "page", defaultValue = "0") @Min(0) Integer page,
-                                                     @RequestParam(value = "size", defaultValue = "5") @Min(1) @Max(100) Integer size,
-                                                     @RequestParam(value = "sortBy", defaultValue = "updateAt") String sortBy,
-                                                     @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction sortDirection) {
+                                                            @RequestParam(value = "size", defaultValue = "5") @Min(1) @Max(100) Integer size,
+                                                            @RequestParam(value = "sortBy", defaultValue = "updateAt") String sortBy,
+                                                            @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction sortDirection) {
         ResponseModel responseModel = new ResponseModel();
 
         try {
@@ -518,9 +517,9 @@ public class UserController {
             OrderSpecifier<?> orderSpecifier;
 
 
-            if(Sort.Direction.DESC.equals(sortDirection)){
+            if (Sort.Direction.DESC.equals(sortDirection)) {
                 orderSpecifier = QTopic.topic.updateAt.desc();
-            }else {
+            } else {
                 orderSpecifier = QTopic.topic.updateAt.asc();
             }
 
@@ -539,7 +538,7 @@ public class UserController {
 
             List<Topic> dataTopic = query.fetch();
             List<JSONObject> jsonTopicArray = new ArrayList<>();
-            for(Topic topic: dataTopic){
+            for (Topic topic : dataTopic) {
                 JSONObject jsonObject = new JSONObject();
                 jsonObject.put("Topic", new TopicResponse(topic));
 
@@ -548,7 +547,7 @@ public class UserController {
                 queryListMockTest.where(QMockTest.mockTest.topic.eq(topic));
 
                 List<MockTestResponse> jsonMockTestArray = new ArrayList<>();
-                for(MockTest mockTest: queryListMockTest.fetch()){
+                for (MockTest mockTest : queryListMockTest.fetch()) {
                     jsonMockTestArray.add(new MockTestResponse(mockTest));
                 }
                 jsonObject.put("listMockTest", jsonMockTestArray);
@@ -588,8 +587,8 @@ public class UserController {
             responseModel.setMessage("Sign out successful");
             responseModel.setStatus("success");
             return ResponseEntity.status(HttpStatus.OK)
-                        .body(responseModel);
-        }catch (AuthenticationException e) {
+                    .body(responseModel);
+        } catch (AuthenticationException e) {
             responseModel.setMessage("Sign out fail: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED.value()));

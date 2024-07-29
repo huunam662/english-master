@@ -7,7 +7,6 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-
 @SpringBootApplication
 public class EnglishmasterBeApplication {
 

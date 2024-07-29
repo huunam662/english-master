@@ -44,7 +44,7 @@ public class AdminController {
                                                     @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
                                                     @RequestParam(value = "sortBy", defaultValue = "updateAt") String sortBy,
                                                     @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction sortDirection,
-                                                    @RequestParam(value = "enable", required = false) String isEnable){
+                                                    @RequestParam(value = "enable", required = false) String isEnable) {
         ResponseModel responseModel = new ResponseModel();
         try {
 
@@ -53,9 +53,9 @@ public class AdminController {
             OrderSpecifier<?> orderSpecifier;
 
 
-            if(Sort.Direction.DESC.equals(sortDirection)){
+            if (Sort.Direction.DESC.equals(sortDirection)) {
                 orderSpecifier = QUser.user.updateAt.desc();
-            }else {
+            } else {
                 orderSpecifier = QUser.user.updateAt.asc();
             }
 
@@ -66,7 +66,7 @@ public class AdminController {
 
             query.where(QUser.user.role.roleName.notEqualsIgnoreCase("ROLE_ADMIN"));
 
-            if (isEnable != null){
+            if (isEnable != null) {
                 query.where(QUser.user.isEnabled.eq(isEnable.equalsIgnoreCase("enable")));
             }
 
@@ -93,7 +93,7 @@ public class AdminController {
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-        }catch (Exception e) {
+        } catch (Exception e) {
             responseModel.setMessage("List user fail: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
@@ -103,7 +103,7 @@ public class AdminController {
 
     @PatchMapping(value = "/{userId:.+}/enableUser")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseModel> enableUser(@PathVariable UUID userId, @RequestParam boolean enable){
+    public ResponseEntity<ResponseModel> enableUser(@PathVariable UUID userId, @RequestParam boolean enable) {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.findUserById(userId);
@@ -111,18 +111,18 @@ public class AdminController {
             user.setEnabled(enable);
             IUserService.save(user);
 
-            if(enable){
+            if (enable) {
                 responseModel.setMessage("Enable account of user successful");
-            }else{
+            } else {
                 responseModel.setMessage("Disable account of user successful");
             }
             responseModel.setStatus("success");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-        }catch (Exception e) {
-            if(enable){
+        } catch (Exception e) {
+            if (enable) {
                 responseModel.setMessage("Enable account of user fail" + e.getMessage());
-            }else{
+            } else {
                 responseModel.setMessage("Disable account of user fail" + e.getMessage());
             }
             responseModel.setStatus("fail");
@@ -133,7 +133,7 @@ public class AdminController {
 
     @DeleteMapping(value = "/{userId:.+}/deleteUser")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseModel> deleteUser(@PathVariable UUID userId){
+    public ResponseEntity<ResponseModel> deleteUser(@PathVariable UUID userId) {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.findUserById(userId);
@@ -144,7 +144,7 @@ public class AdminController {
             responseModel.setStatus("success");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-        }catch (Exception e) {
+        } catch (Exception e) {
             responseModel.setMessage("Delete account of user fail" + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
@@ -154,8 +154,8 @@ public class AdminController {
 
     @GetMapping(value = "/countMockTestOfTopic")
     @PreAuthorize("hasRole('ADMIN') ")
-    public ResponseEntity<ResponseModel> countMockTestOfTopic(@RequestParam(value = "date", required = false)  String date,
-                                                              @RequestParam(value = "pack") UUID packId  ){
+    public ResponseEntity<ResponseModel> countMockTestOfTopic(@RequestParam(value = "date", required = false) String date,
+                                                              @RequestParam(value = "pack") UUID packId) {
         ResponseModel responseModel = new ResponseModel();
         try {
             Pack pack = IPackService.findPackById(packId);
@@ -163,22 +163,22 @@ public class AdminController {
             List<JSONObject> responseArray = new ArrayList<>();
 
             List<Topic> listTopic = ITopicService.getAllTopicToPack(pack);
-            for(Topic topic : listTopic){
+            for (Topic topic : listTopic) {
                 List<MockTest> mockTests;
-                if(date != null){
+                if (date != null) {
                     String[] str = date.split("-");
-                    String day = null, year , month = null ;
+                    String day = null, year, month = null;
                     year = str[0];
 
-                    if(str.length > 1){
+                    if (str.length > 1) {
                         month = str[1];
-                        if(str.length > 2){
+                        if (str.length > 2) {
                             day = str[2];
                         }
                     }
 
                     mockTests = IMockTestService.getAllMockTestByYearMonthAndDay(topic, year, month, day);
-                }else {
+                } else {
                     mockTests = IMockTestService.getAllMockTestToTopic(topic);
                 }
 
@@ -194,7 +194,7 @@ public class AdminController {
             responseModel.setResponseData(responseArray);
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-        }catch (Exception e) {
+        } catch (Exception e) {
             responseModel.setMessage("List topic and count mock test fail: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
