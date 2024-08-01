@@ -3,6 +3,8 @@ package com.example.englishmaster_be.Repository;
 import com.example.englishmaster_be.Model.ConfirmationToken;
 import com.example.englishmaster_be.Model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,4 +20,6 @@ public interface ConfirmationTokenRepository extends JpaRepository<ConfirmationT
 
     List<ConfirmationToken> findAllByUserAndType(User user, String type);
 
+    @Query("SELECT ct FROM ConfirmationToken ct WHERE ct.user.userId = :userId")
+    Iterable<? extends ConfirmationToken> findByUserId(@Param("userId") UUID userId);
 }
