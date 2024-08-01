@@ -79,38 +79,50 @@ public class UserController {
     public ResponseModel register(@RequestBody UserRegisterDTO registerDTO) throws IOException, MessagingException {
         ResponseModel responseModel = new ResponseModel();
 
-        String regex = "^(?=.*[0-9])"
+        String regexPassword = "^(?=.*[0-9])"
                 + "(?=.*[a-z])(?=.*[A-Z])"
                 + "(?=.*[@#$%^&+=])"
                 + "(?=\\S+$).{8,20}$";
 
-        Pattern p = Pattern.compile(regex);
+        String regexEmail = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
+                + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
 
+        Pattern patternPassword = Pattern.compile(regexPassword);
+        Pattern patternEmail = Pattern.compile(regexEmail);
+
+        // Email validation
+        Matcher matcherEmail = patternEmail.matcher(registerDTO.getEmail());
+        if (!matcherEmail.matches()) {
+            responseModel.setMessage("Email is not in correct format");
+            responseModel.setStatus("fail");
+            return responseModel;
+        }
+
+        // Password validation
         if (registerDTO.getPassword() == null) {
             responseModel.setMessage("Password is null");
             responseModel.setStatus("fail");
             return responseModel;
         }
 
-        Matcher m = p.matcher(registerDTO.getPassword());
-        if (!m.matches()) {
-            responseModel.setMessage("Password must contain at least 1 uppercase, 1 lowercase, 1 numeric, 1 special character and no spaces");
+        Matcher matcherPassword = patternPassword.matcher(registerDTO.getPassword());
+        if (!matcherPassword.matches()) {
+            responseModel.setMessage("Password must contain at least 1 uppercase, 1 lowercase, 1 numeric, 1 special character, and no spaces");
             responseModel.setStatus("fail");
             return responseModel;
         }
 
-        User user = IUserService.createUser(registerDTO);
-
-        boolean existingUser = userRepository.existsByEmail(user.getEmail());
-
+        // Password and confirm password match validation
         if (!registerDTO.getPassword().equals(registerDTO.getConfirmPassword())) {
             responseModel.setMessage("Password and confirm password don't match");
             responseModel.setStatus("fail");
             return responseModel;
         }
 
+        // Check if user already exists
+        boolean existingUser = userRepository.existsByEmail(registerDTO.getEmail());
         if (existingUser) {
-            User userExist = IUserService.findeUserByEmail(user.getEmail());
+            User userExist = IUserService.findeUserByEmail(registerDTO.getEmail());
             if (!userExist.isEnabled()) {
                 userRepository.delete(userExist);
             } else {
@@ -118,22 +130,23 @@ public class UserController {
                 responseModel.setStatus("fail");
                 return responseModel;
             }
-
         }
 
+        // Create and save the user
+        User user = IUserService.createUser(registerDTO);
         userRepository.save(user);
 
+        // Create and save the confirmation token
         ConfirmationToken confirmationToken = new ConfirmationToken(user);
         confirmationToken.setType("ACTIVE");
         confirmationToken.setCode(UUID.randomUUID().toString());
-
         confirmationTokenRepository.save(confirmationToken);
 
-        sendConfirmationEmail(user.getEmail(), confirmationToken.getCode().toString());
+        // Send confirmation email
+        sendConfirmationEmail(user.getEmail(), confirmationToken.getCode());
 
         responseModel.setMessage("Sent a confirmation mail!");
         responseModel.setStatus("success");
-
         return responseModel;
     }
 
@@ -155,7 +168,7 @@ public class UserController {
         }
 
         if ((confirmToken.getCreateAt().plusMinutes(5)).isBefore(LocalDateTime.now())) {
-            responseModel.setMessage("Verification code has expired!");
+            responseModel.setMessage("Verification code has expired, Please register again! ");
             responseModel.setStatus("fail");
             return responseModel;
         }

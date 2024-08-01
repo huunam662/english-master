@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.nio.file.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.stream.Stream;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class FileStorageServiceImpl implements IFileStorageService {
@@ -25,7 +25,8 @@ public class FileStorageServiceImpl implements IFileStorageService {
     private String fileSave;
 //    private final Path root = Paths.get("D:\\Workplace\\FileEnglishMaster");
 //    private final Path root = Paths.get(fileSave);
-    
+
+
     @Override
     public void init() {
         Path root = Paths.get(fileSave);
@@ -65,10 +66,10 @@ public class FileStorageServiceImpl implements IFileStorageService {
             if (blob != null) {
                 byte[] content = blob.getContent();
                 return new ByteArrayResource(content);
-            }else {
+            } else {
                 return null;
             }
-        }catch (Exception e) {
+        } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
 
@@ -101,18 +102,26 @@ public class FileStorageServiceImpl implements IFileStorageService {
             }
             throw new RuntimeException(e.getMessage());
         }
+    }
 
-    }
-    
     @Override
-    public Stream<Path> loadAll() {
-        Path root = Paths.get(fileSave);
+    public List<String> loadAll() {
+        List<String> fileNames = new ArrayList<>();
         try {
-            return Files.walk(root, 1).filter(path -> !path.equals(root)).map(root::relativize);
-        } catch (IOException e) {
-            throw new RuntimeException("Could not load the files!");
+            String bucketName = "connect-student-nodejs.appspot.com";
+            Bucket bucket = StorageClient.getInstance().bucket(bucketName);
+
+            for (Blob blob : bucket.list().iterateAll()) {
+                if (blob != null) {
+                    fileNames.add(blob.getName());
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Could not load the files!", e);
         }
+        return fileNames;
     }
+
 
 //    @Override
 //    public boolean delete(String filename) {
@@ -133,7 +142,7 @@ public class FileStorageServiceImpl implements IFileStorageService {
     }
 
     @Override
-    public String nameFile(MultipartFile file){
+    public String nameFile(MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
         String extension = getExtension(originalFilename);
         String fileNameDelete = deleteExtension(originalFilename);
@@ -157,7 +166,7 @@ public class FileStorageServiceImpl implements IFileStorageService {
         return "";
     }
 
-    private String deleteExtension(String filename){
+    private String deleteExtension(String filename) {
         int dotIndex = filename.lastIndexOf(".");
         return filename.substring(0, dotIndex);
     }
