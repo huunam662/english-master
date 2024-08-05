@@ -1,11 +1,9 @@
 package com.example.englishmaster_be.ScheduledTask;
 
-import com.example.englishmaster_be.Model.ConfirmationToken;
 import com.example.englishmaster_be.Model.QUser;
 import com.example.englishmaster_be.Model.User;
 import com.example.englishmaster_be.Repository.ConfirmationTokenRepository;
 import com.example.englishmaster_be.Repository.UserRepository;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +25,7 @@ public class ScheduledTasks {
     private JPAQueryFactory queryFactory;
 
     @Transactional
-    @Scheduled(fixedRate = 60000) // Run every minute
+    @Scheduled(fixedRate = 10000000)
     public void deleteExpiredUsers() {
         QUser qUser = QUser.user;
         LocalDateTime expirationTime = LocalDateTime.now().minusMinutes(5);

@@ -789,25 +789,33 @@ public class TopicController {
         try {
             Topic topic = ITopicService.findTopicById(topicId);
 
-            topic.setEnable(!enable);
+            if (topic == null) {
+                responseModel.setMessage("Topic not found");
+                responseModel.setStatus("fail");
+                responseModel.setViolations(String.valueOf(HttpStatus.NOT_FOUND));
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
+            }
+
+            topic.setEnable(enable);
             topic.setUpdateAt(LocalDateTime.now());
             ITopicService.createTopic(topic);
 
             if (enable) {
-                responseModel.setMessage("Enable topic successfully");
+                responseModel.setMessage("Topic enabled successfully");
             } else {
-                responseModel.setMessage("Disable topic fail");
+                responseModel.setMessage("Topic disabled successfully");
             }
             responseModel.setStatus("success");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Enable topic fail: " + e.getMessage());
+            responseModel.setMessage("Failed to enable/disable topic: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
     }
+
 
     @GetMapping(value = "/{topicId:.+}/listComment")
     @PreAuthorize("hasRole('USER')")
