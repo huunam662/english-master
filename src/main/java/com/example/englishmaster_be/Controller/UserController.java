@@ -168,7 +168,7 @@ public class UserController {
         }
 
         if ((confirmToken.getCreateAt().plusMinutes(5)).isBefore(LocalDateTime.now())) {
-            responseModel.setMessage("Verification code has expired, Please register again! ");
+            responseModel.setMessage("Verification code has expired, Please register again!");
             responseModel.setStatus("fail");
             return responseModel;
         }

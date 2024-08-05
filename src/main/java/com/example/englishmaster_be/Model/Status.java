@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -30,4 +31,7 @@ public class Status implements Serializable {
     @ManyToOne
     @JoinColumn(name = "type", referencedColumnName = "id")
     Type type;
+
+    @OneToMany(mappedBy = "status")
+    private List<Topic> topicList;
 }
