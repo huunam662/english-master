@@ -7,6 +7,8 @@ import com.example.englishmaster_be.DTO.Topic.*;
 import com.example.englishmaster_be.DTO.UploadFileDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
+import com.example.englishmaster_be.Repository.StatusRepository;
+import com.example.englishmaster_be.Repository.TopicRepository;
 import com.example.englishmaster_be.Service.*;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -52,6 +54,11 @@ public class TopicController {
     @Autowired
     private JPAQueryFactory queryFactory;
 
+    @Autowired
+    private TopicRepository topicRepository;
+    @Autowired
+    private StatusRepository statusRepository;
+
     @GetMapping(value = "/{topicId:.+}/inforTopic")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ResponseModel> getInformationTopic(@PathVariable UUID topicId) {
@@ -77,44 +84,48 @@ public class TopicController {
 
     @PostMapping(value = "/create", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseModel> createTopic(@ModelAttribute CreateTopicDTO createtopicDTO) {
+    public ResponseEntity<ResponseModel> createTopic(@ModelAttribute CreateTopicDTO createTopicDTO) {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
-            String filename = IFileStorageService.nameFile(createtopicDTO.getTopicImage());
-            Pack pack = IPackService.findPackById(createtopicDTO.getTopicPack());
+            String filename = IFileStorageService.nameFile(createTopicDTO.getTopicImage());
+            Pack pack = IPackService.findPackById(createTopicDTO.getTopicPack());
 
-            Topic topic = new Topic(createtopicDTO.getTopicName(), filename, createtopicDTO.getTopicDescription(), createtopicDTO.getTopicType(),
-                    createtopicDTO.getWorkTime(), createtopicDTO.getStartTime(), createtopicDTO.getEndTime());
+            Topic topic = new Topic(
+                    createTopicDTO.getTopicName(),
+                    filename,
+                    createTopicDTO.getTopicDescription(),
+                    createTopicDTO.getTopicType(),
+                    createTopicDTO.getWorkTime(),
+                    createTopicDTO.getStartTime(),
+                    createTopicDTO.getEndTime()
+            );
 
             topic.setPack(pack);
-            topic.setNumberQuestion(createtopicDTO.getNumberQuestion());
+            topic.setNumberQuestion(createTopicDTO.getNumberQuestion());
             topic.setUserCreate(user);
             topic.setUserUpdate(user);
+            topic.setStatus(statusRepository.findById(UUID.fromString("34b1b787-dae8-4c10-b0a9-cb7beea6f2e9")).orElse(null));
 
             ITopicService.createTopic(topic);
-            IFileStorageService.save(createtopicDTO.getTopicImage(), filename);
+            IFileStorageService.save(createTopicDTO.getTopicImage(), filename);
 
-            for (UUID partId : createtopicDTO.getListPart()) {
-                ITopicService.addPartToTopic(topic.getTopicId(), partId);
-            }
+            createTopicDTO.getListPart().forEach(partId -> ITopicService.addPartToTopic(topic.getTopicId(), partId));
 
             TopicResponse topicResponse = new TopicResponse(topic);
-
             responseModel.setMessage("Create topic successfully");
-
             responseModel.setResponseData(topicResponse);
             responseModel.setStatus("success");
 
-
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Create topic fail: " + e.getMessage());
+            responseModel.setMessage("Create topic failed: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
     }
+
 
     @PutMapping(value = "/{topicId:.+}/updateTopic", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('ADMIN')")
@@ -277,6 +288,7 @@ public class TopicController {
                     .offset((long) page * size)
                     .limit(size);
 
+
             if (authentication != null) {
                 Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
 
@@ -308,12 +320,14 @@ public class TopicController {
 
             List<Topic> topicList = query.fetch();
 
+
             List<TopicResponse> topicResponseList = new ArrayList<>();
 
             for (Topic topic : topicList) {
                 TopicResponse topicResponse = new TopicResponse(topic);
                 topicResponseList.add(topicResponse);
             }
+
 
             responseObject.put("listTopic", topicResponseList);
 
@@ -330,6 +344,32 @@ public class TopicController {
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
+    }
+
+    @GetMapping("/getTopic")
+    public ResponseEntity<ResponseModel> getTopic(@RequestParam(value = "id", required = false) UUID id) {
+        ResponseModel responseModel = new ResponseModel();
+
+        if (id == null) {
+            responseModel.setStatus("fail");
+            responseModel.setMessage("Topic ID is required");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseModel);
+        }
+
+        JPAQuery<Topic> query = queryFactory.selectFrom(QTopic.topic)
+                .where(QTopic.topic.topicId.eq(id));
+        Topic topic = query.fetchOne();
+
+        if (topic == null) {
+            responseModel.setStatus("fail");
+            responseModel.setMessage("Topic not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
+        }
+
+        TopicResponse topicResponse = new TopicResponse(topic);
+        responseModel.setStatus("success");
+        responseModel.setResponseData(topicResponse);
+        return ResponseEntity.status(HttpStatus.OK).body(responseModel);
     }
 
 
@@ -798,13 +838,13 @@ public class TopicController {
 
             topic.setEnable(enable);
             topic.setUpdateAt(LocalDateTime.now());
+
+            UUID statusId = enable ? UUID.fromString("34b1b787-dae8-4c10-b0a9-cb7beea6f2e9") : UUID.fromString("4211abfc-76f4-48d8-96b9-2f524e82e2b0");
+            topic.setStatus(statusRepository.findById(statusId).orElse(null));
+
             ITopicService.createTopic(topic);
 
-            if (enable) {
-                responseModel.setMessage("Topic enabled successfully");
-            } else {
-                responseModel.setMessage("Topic disabled successfully");
-            }
+            responseModel.setMessage(enable ? "Topic enabled successfully" : "Topic disabled successfully");
             responseModel.setStatus("success");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
