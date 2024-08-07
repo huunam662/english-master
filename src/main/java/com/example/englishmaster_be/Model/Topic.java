@@ -257,4 +257,12 @@ public class Topic implements Serializable {
     public void setPack(Pack pack) {
         this.pack = pack;
     }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public void setStatus(Status status) {
+        this.status = status;
+    }
 }
