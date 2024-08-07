@@ -4,7 +4,6 @@ import com.example.englishmaster_be.DTO.Type.CreateTypeDTO;
 import com.example.englishmaster_be.Model.Response.TypeResponse;
 import com.example.englishmaster_be.Model.ResponseModel;
 import com.example.englishmaster_be.Service.ITypeService;
-import com.example.englishmaster_be.Service.impl.TypeServiceImpl;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
