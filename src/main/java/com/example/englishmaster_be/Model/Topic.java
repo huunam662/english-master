@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.Model;
 
 import jakarta.persistence.*;
+import lombok.ToString;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -11,6 +12,7 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "topics")
+@ToString
 public class Topic implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
