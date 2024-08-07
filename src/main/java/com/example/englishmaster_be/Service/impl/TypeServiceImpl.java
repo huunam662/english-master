@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.DTO.Type.CreateTypeDTO;
-import com.example.englishmaster_be.Model.QStatus;
 import com.example.englishmaster_be.Model.QType;
 import com.example.englishmaster_be.Model.Response.TypeResponse;
 import com.example.englishmaster_be.Model.Type;
@@ -53,11 +52,16 @@ public class TypeServiceImpl implements ITypeService {
 
     @Override
     public TypeResponse createType(CreateTypeDTO createTypeDTO) {
-        Type type = typeRepository.save(Type.builder()
+        Type type = Type.builder()
                 .typeName(createTypeDTO.getTypeName())
                 .nameSlug(createTypeDTO.getNameSlug())
-                .build());
-        return new TypeResponse(type);
+                .build();
+        typeRepository.save(type);
+        return TypeResponse.builder()
+                .typeId(type.getTypeId())
+                .typeName(createTypeDTO.getTypeName())
+                .nameSlug(createTypeDTO.getNameSlug())
+                .build();
     }
 
     @Override
