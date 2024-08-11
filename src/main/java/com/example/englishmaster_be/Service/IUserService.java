@@ -25,4 +25,6 @@ public interface IUserService {
     User findeUserByEmail(String email);
 
     User findUserById(UUID userId);
+
+    void logoutUser();
 }
