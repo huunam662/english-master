@@ -66,14 +66,21 @@ public class UserController {
 
     @Autowired
     PasswordEncoder passwordEncoder;
+
     @Autowired
     AuthenticationManager authenticationManager;
+
     @Autowired
     JwtUtils jwtUtils;
+
     @Autowired
     private ResourceLoader resourceLoader;
+
     @Value("${masterE.linkFE}")
     private String linkFE;
+
+    @Autowired
+    private IInvalidTokenService IInvalidTokenService;
 
     @PostMapping("/register")
     public ResponseModel register(@RequestBody UserRegisterDTO registerDTO) throws IOException, MessagingException {
@@ -340,19 +347,6 @@ public class UserController {
     }
 
 
-    @GetMapping("/logout")
-    @PreAuthorize("hasRole('USER')")
-    public ResponseModel logoutUser(@RequestParam String access_token) {
-        ResponseModel responseModel = new ResponseModel();
-
-        User user = IUserService.currentUser();
-
-        responseModel.setStatus("success");
-        responseModel.setMessage("Log out successful");
-
-        return responseModel;
-    }
-
     @GetMapping("/information")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> informationUser() {
@@ -589,22 +583,28 @@ public class UserController {
         }
     }
 
-    @PostMapping("/auth/signout")
-    public ResponseEntity<ResponseModel> logoutUser(@RequestBody RefreshTokenDTO refreshTokenDTO) {
-
+    @PostMapping("/logout")
+    public ResponseEntity<ResponseModel> logoutUser(@RequestBody UserLogoutDTO userLogoutDTO) {
         ResponseModel responseModel = new ResponseModel();
-        try {
-            String refresh = refreshTokenDTO.getRequestRefresh();
-            IRefreshTokenService.deleteRefreshToken(refresh);
 
-            responseModel.setMessage("Sign out successful");
+        try {
+            User user = IUserService.currentUser();
+            if (user != null) {
+                IUserService.logoutUser();
+            }
+
+            IInvalidTokenService.insertInvalidToken(userLogoutDTO.getAccessToken());
+
+            String refreshToken = userLogoutDTO.getRefreshToken();
+            IRefreshTokenService.deleteRefreshToken(refreshToken);
+
+            responseModel.setMessage("Logout successful");
             responseModel.setStatus("success");
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(responseModel);
-        } catch (AuthenticationException e) {
-            responseModel.setMessage("Sign out fail: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Logout failed: " + e.getMessage());
             responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED.value()));
+            responseModel.setViolations(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
     }
