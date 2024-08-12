@@ -171,76 +171,116 @@ public class ExcelServiceImpl implements IExcelService {
 
     @Override
     public CreateListQuestionByExcelFileDTO parseReadingPartDTO(MultipartFile file) throws IOException {
+        // Mở workbook từ file Excel được upload
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
-            Sheet sheet = workbook.getSheetAt(6); // Giả định dữ liệu nằm ở sheet đầu tiên
+            // Lấy sheet thứ 7 (index 6) từ workbook
+            Sheet sheet = workbook.getSheetAt(6);
+            // Khởi tạo list để lưu các phần reading
             List<CreateQuestionByExcelFileDTO> readingParts = new ArrayList<>();
+            // Biến để theo dõi phần reading hiện tại đang xử lý
+            CreateQuestionByExcelFileDTO currentReadingPart = null;
 
-            for (int i = 0; i <= sheet.getLastRowNum(); i++) {
+            // Duyệt qua từng dòng trong sheet, bắt đầu từ dòng thứ 2 (index 1)
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
+                if (row == null) continue;  // Bỏ qua dòng trống
 
-                if (row != null) {
-                    // Kiểm tra nếu là tiêu đề của một đoạn Reading mới (ví dụ: "Question Content")
-                    if (isReadingPartHeader(row)) {
-                        CreateQuestionByExcelFileDTO readingPart = new CreateQuestionByExcelFileDTO();
+                // Lấy giá trị của ô đầu tiên trong dòng
+                String firstCellValue = getStringCellValue(row, 0);
 
-                        // Lấy tiêu đề của đoạn Reading
-                        String readingContent = sheet.getRow(i + 1).getCell(1).getStringCellValue();
-                        readingPart.setQuestionContent(readingContent);
-
-                        System.out.println(readingContent);
-
-                        List<CreateQuestionByExcelFileDTO> questionsChild = new ArrayList<>();
-                        i += 2; // Bỏ qua dòng "Score"
-
-                        while (i <= sheet.getLastRowNum()) {
-                            row = sheet.getRow(i);
-                            if (row == null || isReadingPartHeader(row)) {
-                                break; // Dừng lại nếu gặp tiêu đề mới hoặc dòng rỗng
-                            }
-
-                            // Lấy dữ liệu của câu hỏi
-                            CreateQuestionByExcelFileDTO question = new CreateQuestionByExcelFileDTO();
-                            question.setQuestionContent(getStringCellValue(row, 1));
-                            question.setQuestionScore(getNumericCellValue(row, 7));
-                            question.setPartId(UUID.fromString("57572f04-27cf-4da7-8344-ac484c7d9e08"));
-                            question.setContentImage(getStringCellValue(row, 8));
-                            question.setContentAudio(getStringCellValue(row, 9));
-
-                            List<CreateListAnswerDTO> listAnswerDTO = processAnswers(
-                                    getStringCellValue(row, 2),
-                                    getStringCellValue(row, 3),
-                                    getStringCellValue(row, 4),
-                                    getStringCellValue(row, 5),
-                                    getStringCellValue(row, 6)
-                            );
-                            question.setListAnswer(listAnswerDTO);
-
-                            questionsChild.add(question);
-                            i++;
-                        }
-
-                        readingPart.setListQuestionChild(questionsChild);
-                        readingParts.add(readingPart);
+                // Xử lý các trường hợp dựa vào giá trị của ô đầu tiên
+                if (firstCellValue.equalsIgnoreCase("Question Content")) {
+                    // Nếu là "Question Content", tạo một phần reading mới
+                    if (currentReadingPart != null) {
+                        readingParts.add(currentReadingPart);
                     }
+                    currentReadingPart = new CreateQuestionByExcelFileDTO();
+                    currentReadingPart.setPartId(UUID.fromString("22b25c09-33db-4e3a-b228-37b331b39c96"));
+                    currentReadingPart.setQuestionContent(getStringCellValue(row, 1));
+                } else if (firstCellValue.equalsIgnoreCase("Score")) {
+                    // Nếu là "Score", set điểm cho phần reading hiện tại
+                    if (currentReadingPart != null) {
+                        currentReadingPart.setQuestionScore(getNumericCellValue(row, 1));
+                    }
+                } else if (firstCellValue.equalsIgnoreCase("STT")) {
+                    // Bỏ qua dòng tiêu đề
+                    continue;
+                } else if (currentReadingPart != null) {
+                    // Xử lý câu hỏi con
+                    CreateQuestionByExcelFileDTO question = new CreateQuestionByExcelFileDTO();
+                    // Set các thuộc tính cho câu hỏi
+                    question.setQuestionContent(getStringCellValue(row, 1));
+                    question.setQuestionScore(getNumericCellValue(row, 7));
+                    question.setPartId(UUID.fromString("57572f04-27cf-4da7-8344-ac484c7d9e08"));
+                    question.setContentImage(getStringCellValue(row, 8));
+                    question.setContentAudio(getStringCellValue(row, 9));
+
+                    // Xử lý các câu trả lời
+                    List<CreateListAnswerDTO> listAnswerDTO = processAnswers(
+                            getStringCellValue(row, 2),
+                            getStringCellValue(row, 3),
+                            getStringCellValue(row, 4),
+                            getStringCellValue(row, 5),
+                            getStringCellValue(row, 6)
+                    );
+                    question.setListAnswer(listAnswerDTO);
+
+                    // Thêm câu hỏi vào danh sách câu hỏi con của phần reading hiện tại
+                    if (currentReadingPart.getListQuestionChild() == null) {
+                        currentReadingPart.setListQuestionChild(new ArrayList<>());
+                    }
+                    currentReadingPart.getListQuestionChild().add(question);
                 }
             }
-            CreateListQuestionByExcelFileDTO createListQuestionByExcelFileDTO = new CreateListQuestionByExcelFileDTO();
-            createListQuestionByExcelFileDTO.setQuestions(readingParts);
 
-            return createListQuestionByExcelFileDTO;
+            // Thêm phần reading cuối cùng vào danh sách (nếu có)
+            if (currentReadingPart != null) {
+                readingParts.add(currentReadingPart);
+            }
+
+            // Tạo và trả về kết quả cuối cùng
+            CreateListQuestionByExcelFileDTO result = new CreateListQuestionByExcelFileDTO();
+            result.setQuestions(readingParts);
+            return result;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return null;  // Trả về null nếu có lỗi xảy ra
     }
+
 
     private boolean isReadingPartHeader(Row row) {
         // Kiểm tra nếu ô đầu tiên có nội dung như "Question Content" hoặc "STT"
-        return row.getCell(1) != null &&
-                (row.getCell(1).getStringCellValue().equalsIgnoreCase("Question Content") ||
-                        row.getCell(1).getStringCellValue().equalsIgnoreCase("STT"));
+        return row.getCell(0) != null &&
+                (row.getCell(0).getStringCellValue().equalsIgnoreCase("Question Content") ||
+                        row.getCell(0).getStringCellValue().equalsIgnoreCase("Score"));
     }
 
     private String getStringCellValue(Row row, int cellIndex) {
         Cell cell = row.getCell(cellIndex);
-        return (cell != null) ? cell.getStringCellValue() : null;
+        if (cell == null) {
+            return "";
+        }
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    return cell.getDateCellValue().toString();
+                } else {
+                    return String.valueOf(cell.getNumericCellValue());
+                }
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            case FORMULA:
+                try {
+                    return cell.getStringCellValue();
+                } catch (IllegalStateException e) {
+                    return String.valueOf(cell.getNumericCellValue());
+                }
+            default:
+                return "";
+        }
     }
 
     private int getNumericCellValue(Row row, int cellIndex) {

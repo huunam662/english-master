@@ -64,7 +64,7 @@ public class ScheduledTasks {
         logger.info("Starting deleteExpiredToken task");
         try {
             QInvalidToken qInvalidToken = QInvalidToken.invalidToken;
-            LocalDateTime expirationTime = LocalDateTime.now().minusDays(1);
+            LocalDateTime expirationTime = LocalDateTime.now();
 
             List<InvalidToken> tokensToDelete = queryFactory.selectFrom(qInvalidToken)
                     .where(qInvalidToken.expireTime.before(expirationTime)).fetch();
