@@ -69,8 +69,13 @@ public class TopicResponse {
 
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
 
-        this.startTime = sdf.format(Timestamp.valueOf(topic.getStartTime()));
-        this.endTime = sdf.format(Timestamp.valueOf(topic.getEndTime()));
+        if (topic.getStartTime() != null && topic.getEndTime() != null &&
+                topic.getCreateAt() != null && topic.getUpdateAt() != null) {
+
+            this.startTime = sdf.format(Timestamp.valueOf(topic.getStartTime()));
+            this.endTime = sdf.format(Timestamp.valueOf(topic.getEndTime()));
+
+        }
         this.createAt = sdf.format(Timestamp.valueOf(topic.getCreateAt()));
         this.updateAt = sdf.format(Timestamp.valueOf(topic.getUpdateAt()));
 
