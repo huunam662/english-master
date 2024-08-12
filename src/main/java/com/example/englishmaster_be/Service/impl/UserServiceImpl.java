@@ -30,7 +30,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public User createUser(UserRegisterDTO userRegisterDTO) {
-        User user= new User();
+        User user = new User();
 
         user.setEmail(userRegisterDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userRegisterDTO.getPassword()));
@@ -63,8 +63,11 @@ public class UserServiceImpl implements IUserService {
     @Override
     public User currentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        return findUser(userDetails);
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            return findUser(userDetails);
+        }
+        return null;
     }
 
     @Override
@@ -75,6 +78,14 @@ public class UserServiceImpl implements IUserService {
     @Override
     public User findUserById(UUID userId) {
         return userRepository.findByUserId(userId);
+    }
+
+    @Override
+    public void logoutUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
+            SecurityContextHolder.getContext().setAuthentication(null);
+        }
     }
 
 }
