@@ -12,4 +12,6 @@ public interface PartRepository extends JpaRepository<Part, UUID> {
     Optional<Part> findByPartId(UUID partID);
 
     Page<Part> findByTopics(Topic topic, Pageable pageable);
+
+    Optional<Part> findByPartName(String partName);
 }

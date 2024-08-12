@@ -37,11 +37,11 @@ public class Topic implements Serializable {
     private String workTime;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "start_time")
+    @Column(name = "start_time", nullable = true)
     private LocalDateTime startTime;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "end_time")
+    @Column(name = "end_time", nullable = true)
     private LocalDateTime endTime;
 
     @OneToMany(mappedBy = "topic")

@@ -8,4 +8,6 @@ import java.util.UUID;
 
 public interface PackRepository extends JpaRepository<Pack, UUID> {
     Optional<Pack> findByPackId(UUID packId);
+
+    Optional<Pack> findByPackName(String topicPackName);
 }
