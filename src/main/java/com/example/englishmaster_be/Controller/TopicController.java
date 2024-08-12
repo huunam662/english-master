@@ -59,6 +59,9 @@ public class TopicController {
     @Autowired
     private StatusRepository statusRepository;
 
+    @Autowired
+    private IExcelService excelService;
+
     @GetMapping(value = "/{topicId:.+}/inforTopic")
     @PreAuthorize("hasRole('USER')")
     public ResponseEntity<ResponseModel> getInformationTopic(@PathVariable UUID topicId) {
@@ -97,8 +100,8 @@ public class TopicController {
                     createTopicDTO.getTopicDescription(),
                     createTopicDTO.getTopicType(),
                     createTopicDTO.getWorkTime(),
-                    createTopicDTO.getStartTime(),
-                    createTopicDTO.getEndTime()
+                    null,
+                    null
             );
 
             topic.setPack(pack);
@@ -122,6 +125,61 @@ public class TopicController {
             responseModel.setMessage("Create topic failed: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @PostMapping(value = "/createTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResponseModel> createTopicByExcelFile(@RequestParam("file") MultipartFile file) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            // Parse Excel file thành DTO
+            CreateTopicByExcelFileDTO createTopicByExcelFileDTO = excelService.parseCreateTopicDTO(file);
+
+            // Lấy user hiện tại
+            User user = IUserService.currentUser();
+
+            // Tìm pack theo ID
+            Pack pack = IPackService.findPackById(createTopicByExcelFileDTO.getTopicPackId());
+
+            // Tạo đối tượng Topic từ DTO
+            Topic topic = new Topic(
+                    createTopicByExcelFileDTO.getTopicName(),
+                    createTopicByExcelFileDTO.getTopicImageName(),
+                    createTopicByExcelFileDTO.getTopicDescription(),
+                    createTopicByExcelFileDTO.getTopicType(),
+                    createTopicByExcelFileDTO.getWorkTime(),
+                    createTopicByExcelFileDTO.getStartTime(),  // startTime có thể là null
+                    createTopicByExcelFileDTO.getEndTime()     // endTime có thể là null
+            );
+
+            // Thiết lập các thuộc tính cho topic
+            topic.setPack(pack);
+            topic.setNumberQuestion(createTopicByExcelFileDTO.getNumberQuestion());
+            topic.setUserCreate(user);
+            topic.setUserUpdate(user);
+            topic.setStatus(statusRepository.findById(UUID.fromString("34b1b787-dae8-4c10-b0a9-cb7beea6f2e9")).orElse(null));
+
+            // Tạo topic
+            ITopicService.createTopic(topic);
+
+            // Thêm các phần vào topic
+            createTopicByExcelFileDTO.getListPart().forEach(partId -> ITopicService.addPartToTopic(topic.getTopicId(), partId));
+
+            // Tạo TopicResponse và trả về kết quả
+            TopicResponse topicResponse = new TopicResponse(topic);
+            responseModel.setMessage("Create topic successfully");
+            responseModel.setResponseData(topicResponse);
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        }
+        catch (Exception e) {
+//            responseModel.setMessage("Create topic failed: " + e.getMessage());
+//            responseModel.setStatus("fail");
+//            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
     }

@@ -22,7 +22,7 @@ public class CreateTopicByExcelFileDTO {
     String topicType;
     String workTime;
     int numberQuestion;
-    UUID topicPackName;
+    UUID topicPackId;
 
     List<UUID> listPart;
 
