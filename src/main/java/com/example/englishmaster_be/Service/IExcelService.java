@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.Service;
 
 import com.example.englishmaster_be.DTO.Topic.CreateListQuestionByExcelFileDTO;
-import com.example.englishmaster_be.DTO.Topic.CreateListQuestionDTO;
 import com.example.englishmaster_be.DTO.Topic.CreateTopicByExcelFileDTO;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,7 +10,9 @@ public interface IExcelService {
 
     CreateTopicByExcelFileDTO parseCreateTopicDTO(MultipartFile file) throws IOException;
 
-    CreateListQuestionByExcelFileDTO parseReadingPartDTO (MultipartFile file) throws IOException;
+    CreateListQuestionByExcelFileDTO parseReadingPart67DTO(MultipartFile file, int part) throws IOException;
 
-    CreateListQuestionByExcelFileDTO parseCreateListQuestionDTO(MultipartFile file) throws IOException;
+    CreateListQuestionByExcelFileDTO parseReadingPart5DTO(MultipartFile file) throws IOException;
+
+    CreateListQuestionByExcelFileDTO parseListeningPart12DTO(MultipartFile file, int part) throws IOException;
 }

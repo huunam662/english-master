@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Controller;
 
+import com.example.englishmaster_be.DTO.Question.CreateQuestionByExcelFileDTO;
 import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.DTO.Answer.CreateListAnswerDTO;
 import com.example.englishmaster_be.DTO.Question.CreateQuestionDTO;
@@ -176,10 +177,9 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }
         catch (Exception e) {
-//            responseModel.setMessage("Create topic failed: " + e.getMessage());
-//            responseModel.setStatus("fail");
-//            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            e.printStackTrace();
+            responseModel.setMessage("Create topic failed: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
     }
@@ -340,12 +340,10 @@ public class TopicController {
                 }
             }
 
-
             JPAQuery<Topic> query = queryFactory.selectFrom(QTopic.topic)
                     .orderBy(orderSpecifier)
                     .offset((long) page * size)
                     .limit(size);
-
 
             if (authentication != null) {
                 Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
@@ -732,6 +730,121 @@ public class TopicController {
                     question.getContentCollection().add(content);
                     IContentService.uploadContent(content);
                     IFileStorageService.save(createQuestionDTO.getContentAudio(), filename);
+                }
+
+                IQuestionService.createQuestion(question);
+
+                Topic topic = ITopicService.findTopicById(topicId);
+
+                if (ITopicService.existPartInTopic(topic, part)) {
+                    topic.setUserUpdate(user);
+                    topic.setUpdateAt(LocalDateTime.now());
+                    ITopicService.addQuestionToTopic(topic, question);
+                    responseModel.setMessage("Add question to topic successfully");
+                } else {
+                    responseModel.setMessage("Part of question don't have in topic");
+                }
+            }
+
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Add question to topic fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @PostMapping(value = "/{topicId:.+}/addListQuestionByExcelFile", consumes = {"multipart/form-data"})
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResponseModel> addListQuestionToTopicByExcelFile(@PathVariable UUID topicId, @RequestParam("file") MultipartFile file, @RequestParam("part") int partName) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            User user = IUserService.currentUser();
+            CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseReadingPart67DTO(file, partName);
+
+            for (CreateQuestionByExcelFileDTO createQuestionDTO : excelFileDTO.getQuestions()) {
+                Question question = new Question();
+                question.setQuestionContent(createQuestionDTO.getQuestionContent());
+                question.setQuestionScore(createQuestionDTO.getQuestionScore());
+                question.setUserCreate(user);
+                question.setUserUpdate(user);
+                question.setQuestionExplainEn(createQuestionDTO.getQuestionExplainEn());
+                question.setQuestionExplainVn(createQuestionDTO.getQuestionExplainVn());
+
+                Part part = IPartService.getPartToId(createQuestionDTO.getPartId());
+                question.setPart(part);
+                IQuestionService.createQuestion(question);
+
+                if (createQuestionDTO.getListAnswer() != null && !createQuestionDTO.getListAnswer().isEmpty()) {
+                    for (CreateListAnswerDTO createListAnswerDTO : createQuestionDTO.getListAnswer()) {
+                        Answer answer = new Answer();
+                        answer.setQuestion(question);
+                        answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
+                        answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
+                        answer.setUserUpdate(user);
+                        answer.setUserCreate(user);
+
+                        IAnswerService.createAnswer(answer);
+                    }
+                }
+
+                if (createQuestionDTO.getListQuestionChild() != null && !createQuestionDTO.getListQuestionChild().isEmpty()) {
+                    for (CreateQuestionByExcelFileDTO createQuestionChildDTO : createQuestionDTO.getListQuestionChild()) {
+                        Question questionChild = new Question();
+                        questionChild.setQuestionGroup(question);
+                        questionChild.setQuestionContent(createQuestionChildDTO.getQuestionContent());
+                        questionChild.setQuestionScore(createQuestionChildDTO.getQuestionScore());
+                        questionChild.setPart(question.getPart());
+                        questionChild.setUserCreate(user);
+                        questionChild.setUserUpdate(user);
+                        questionChild.setQuestionExplainEn(createQuestionChildDTO.getQuestionExplainEn());
+                        questionChild.setQuestionExplainVn(createQuestionChildDTO.getQuestionExplainVn());
+
+                        IQuestionService.createQuestion(questionChild);
+
+                        for (CreateListAnswerDTO createListAnswerDTO : createQuestionChildDTO.getListAnswer()) {
+                            Answer answer = new Answer();
+                            answer.setQuestion(questionChild);
+                            answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
+                            answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
+                            answer.setUserUpdate(user);
+                            answer.setUserCreate(user);
+
+                            IAnswerService.createAnswer(answer);
+                            if (questionChild.getAnswers() == null) {
+                                questionChild.setAnswers(new ArrayList<>());
+                            }
+                            questionChild.getAnswers().add(answer);
+                        }
+
+                        IQuestionService.createQuestion(questionChild);
+                    }
+                }
+
+                if (createQuestionDTO.getContentImage() != null) {
+                    Content content = new Content(question, GetExtension.typeFile(createQuestionDTO.getContentImage()), createQuestionDTO.getContentImage());
+                    content.setUserCreate(user);
+                    content.setUserUpdate(user);
+
+                    if (question.getContentCollection() == null) {
+                        question.setContentCollection(new ArrayList<>());
+                    }
+                    question.getContentCollection().add(content);
+                    IContentService.uploadContent(content);
+                }
+                if (createQuestionDTO.getContentAudio() != null) {
+                    Content content = new Content(question, GetExtension.typeFile(createQuestionDTO.getContentAudio()), createQuestionDTO.getContentAudio());
+                    content.setUserCreate(user);
+                    content.setUserUpdate(user);
+
+                    if (question.getContentCollection() == null) {
+                        question.setContentCollection(new ArrayList<>());
+                    }
+                    question.getContentCollection().add(content);
+                    IContentService.uploadContent(content);
                 }
 
                 IQuestionService.createQuestion(question);
