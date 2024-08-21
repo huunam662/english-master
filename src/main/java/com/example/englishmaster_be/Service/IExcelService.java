@@ -15,4 +15,12 @@ public interface IExcelService {
     CreateListQuestionByExcelFileDTO parseReadingPart5DTO(MultipartFile file) throws IOException;
 
     CreateListQuestionByExcelFileDTO parseListeningPart12DTO(MultipartFile file, int part) throws IOException;
+
+    CreateListQuestionByExcelFileDTO parseListeningPart34DTO(MultipartFile file, int part) throws IOException;
+
+    CreateListQuestionByExcelFileDTO parseAllPartsDTO(MultipartFile file) throws IOException;
+
+    boolean isExcelFile(MultipartFile file);
+
+
 }

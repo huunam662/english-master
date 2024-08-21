@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Service;
 
+import com.example.englishmaster_be.DTO.Topic.CreateListQuestionByExcelFileDTO;
 import com.example.englishmaster_be.DTO.Topic.UpdateTopicDTO;
 import com.example.englishmaster_be.Model.*;
 
@@ -32,4 +33,5 @@ public interface ITopicService {
 
     int totalQuestion(Part part, UUID topicId);
 
+//    void processQuestions(CreateListQuestionByExcelFileDTO excelFileDTO, UUID topicId, User user, ResponseModel responseModel);
 }
