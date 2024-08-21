@@ -27,4 +27,6 @@ public interface IUserService {
     User findUserById(UUID userId);
 
     void logoutUser();
+
+    boolean existsEmail(String email);
 }
