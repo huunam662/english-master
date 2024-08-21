@@ -1,6 +1,10 @@
 package com.example.englishmaster_be.Service.impl;
 
+import com.example.englishmaster_be.DTO.Answer.CreateListAnswerDTO;
+import com.example.englishmaster_be.DTO.Question.CreateQuestionByExcelFileDTO;
+import com.example.englishmaster_be.DTO.Topic.CreateListQuestionByExcelFileDTO;
 import com.example.englishmaster_be.DTO.Topic.UpdateTopicDTO;
+import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.*;
@@ -11,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.*;
+
 @Service
 public class TopicServiceImpl implements ITopicService {
     @Autowired
@@ -23,6 +28,7 @@ public class TopicServiceImpl implements ITopicService {
     private IUserService IUserService;
     @Autowired
     private IQuestionService IQuestionService;
+
 
 
     @Override
@@ -38,7 +44,7 @@ public class TopicServiceImpl implements ITopicService {
 
     @Override
     public List<Topic> get5TopicName(String keyword) {
-        return topicRepository.findTopicsByQuery(keyword, PageRequest.of(0,5, Sort.by(Sort.Order.asc("topicName").ignoreCase())));
+        return topicRepository.findTopicsByQuery(keyword, PageRequest.of(0, 5, Sort.by(Sort.Order.asc("topicName").ignoreCase())));
 
     }
 
@@ -88,8 +94,8 @@ public class TopicServiceImpl implements ITopicService {
         Part part = partRepository.findByPartId(partId)
                 .orElseThrow(() -> new IllegalArgumentException("Part not found with ID: " + partId));
 
-        for (Part partTopic : topic.getParts()){
-            if (partTopic.equals(part)){
+        for (Part partTopic : topic.getParts()) {
+            if (partTopic.equals(part)) {
                 topic.getParts().remove(part);
                 topicRepository.save(topic);
                 return true;
@@ -112,8 +118,8 @@ public class TopicServiceImpl implements ITopicService {
 
     @Override
     public boolean existQuestionInTopic(Topic topic, Question question) {
-        for(Question questionItem : topic.getQuestions()){
-            if(questionItem.equals(question)){
+        for (Question questionItem : topic.getQuestions()) {
+            if (questionItem.equals(question)) {
                 return true;
             }
         }
@@ -122,8 +128,8 @@ public class TopicServiceImpl implements ITopicService {
 
     @Override
     public boolean existPartInTopic(Topic topic, Part part) {
-        for(Part partItem : topic.getParts()){
-            if(partItem.equals(part)){
+        for (Part partItem : topic.getParts()) {
+            if (partItem.equals(part)) {
                 return true;
             }
         }
@@ -141,16 +147,17 @@ public class TopicServiceImpl implements ITopicService {
         Topic topic = topicRepository.findByTopicId(topicId)
                 .orElseThrow(() -> new IllegalArgumentException("Topic not found with ID: " + topicId));
 
-        for(Question question: topic.getQuestions()){
-            if(question.getPart().getPartId() == part.getPartId()){
+        for (Question question : topic.getQuestions()) {
+            if (question.getPart().getPartId() == part.getPartId()) {
                 boolean check = IQuestionService.checkQuestionGroup(question);
-                if(check){
+                if (check) {
                     total = total + IQuestionService.countQuestionToQuestionGroup(question);
-                }else {
+                } else {
                     total++;
                 }
             }
         }
         return total;
     }
+
 }

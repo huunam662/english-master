@@ -175,8 +175,7 @@ public class TopicController {
             responseModel.setStatus("success");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             responseModel.setMessage("Create topic failed: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
@@ -757,112 +756,101 @@ public class TopicController {
         }
     }
 
-    @PostMapping(value = "/{topicId:.+}/addListQuestionByExcelFile", consumes = {"multipart/form-data"})
+    @PostMapping(value = "/{topicId:.+}/addListQuestionPart12ToTopicByExcelFile", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseModel> addListQuestionToTopicByExcelFile(@PathVariable UUID topicId, @RequestParam("file") MultipartFile file, @RequestParam("part") int partName) {
+    public ResponseEntity<ResponseModel> addListQuestionPart12ToTopicByExcelFile(@PathVariable UUID topicId, @RequestParam("file") MultipartFile file, @RequestParam("part") int partName) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            User user = IUserService.currentUser();
+            CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseListeningPart12DTO(file, partName);
+
+            processQuestions(excelFileDTO, topicId, user, responseModel);
+
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Add question to topic fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @PostMapping(value = "/{topicId:.+}/addListQuestionPart34ToTopicByExcelFile", consumes = {"multipart/form-data"})
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResponseModel> addListQuestionPart34ToTopicByExcelFile(@PathVariable UUID topicId, @RequestParam("file") MultipartFile file, @RequestParam("part") int partName) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            User user = IUserService.currentUser();
+            CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseListeningPart34DTO(file, partName);
+
+            processQuestions(excelFileDTO, topicId, user, responseModel);
+
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Add question to topic fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @PostMapping(value = "/{topicId:.+}/addListQuestionPart5ToTopicByExcelFile", consumes = {"multipart/form-data"})
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResponseModel> addListQuestionPart5ToTopicByExcelFile(@PathVariable UUID topicId, @RequestParam("file") MultipartFile file) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            User user = IUserService.currentUser();
+            CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseReadingPart5DTO(file);
+
+            processQuestions(excelFileDTO, topicId, user, responseModel);
+
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Add question to topic fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    @PostMapping(value = "/{topicId:.+}/addListQuestionPart67ToTopicByExcelFile", consumes = {"multipart/form-data"})
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResponseModel> addListQuestionPart67ToTopicByExcelFile(@PathVariable UUID topicId, @RequestParam("file") MultipartFile file, @RequestParam("part") int partName) {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
             CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseReadingPart67DTO(file, partName);
 
-            for (CreateQuestionByExcelFileDTO createQuestionDTO : excelFileDTO.getQuestions()) {
-                Question question = new Question();
-                question.setQuestionContent(createQuestionDTO.getQuestionContent());
-                question.setQuestionScore(createQuestionDTO.getQuestionScore());
-                question.setUserCreate(user);
-                question.setUserUpdate(user);
-                question.setQuestionExplainEn(createQuestionDTO.getQuestionExplainEn());
-                question.setQuestionExplainVn(createQuestionDTO.getQuestionExplainVn());
-
-                Part part = IPartService.getPartToId(createQuestionDTO.getPartId());
-                question.setPart(part);
-                IQuestionService.createQuestion(question);
-
-                if (createQuestionDTO.getListAnswer() != null && !createQuestionDTO.getListAnswer().isEmpty()) {
-                    for (CreateListAnswerDTO createListAnswerDTO : createQuestionDTO.getListAnswer()) {
-                        Answer answer = new Answer();
-                        answer.setQuestion(question);
-                        answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
-                        answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
-                        answer.setUserUpdate(user);
-                        answer.setUserCreate(user);
-
-                        IAnswerService.createAnswer(answer);
-                    }
-                }
-
-                if (createQuestionDTO.getListQuestionChild() != null && !createQuestionDTO.getListQuestionChild().isEmpty()) {
-                    for (CreateQuestionByExcelFileDTO createQuestionChildDTO : createQuestionDTO.getListQuestionChild()) {
-                        Question questionChild = new Question();
-                        questionChild.setQuestionGroup(question);
-                        questionChild.setQuestionContent(createQuestionChildDTO.getQuestionContent());
-                        questionChild.setQuestionScore(createQuestionChildDTO.getQuestionScore());
-                        questionChild.setPart(question.getPart());
-                        questionChild.setUserCreate(user);
-                        questionChild.setUserUpdate(user);
-                        questionChild.setQuestionExplainEn(createQuestionChildDTO.getQuestionExplainEn());
-                        questionChild.setQuestionExplainVn(createQuestionChildDTO.getQuestionExplainVn());
-
-                        IQuestionService.createQuestion(questionChild);
-
-                        for (CreateListAnswerDTO createListAnswerDTO : createQuestionChildDTO.getListAnswer()) {
-                            Answer answer = new Answer();
-                            answer.setQuestion(questionChild);
-                            answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
-                            answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
-                            answer.setUserUpdate(user);
-                            answer.setUserCreate(user);
-
-                            IAnswerService.createAnswer(answer);
-                            if (questionChild.getAnswers() == null) {
-                                questionChild.setAnswers(new ArrayList<>());
-                            }
-                            questionChild.getAnswers().add(answer);
-                        }
-
-                        IQuestionService.createQuestion(questionChild);
-                    }
-                }
-
-                if (createQuestionDTO.getContentImage() != null) {
-                    Content content = new Content(question, GetExtension.typeFile(createQuestionDTO.getContentImage()), createQuestionDTO.getContentImage());
-                    content.setUserCreate(user);
-                    content.setUserUpdate(user);
-
-                    if (question.getContentCollection() == null) {
-                        question.setContentCollection(new ArrayList<>());
-                    }
-                    question.getContentCollection().add(content);
-                    IContentService.uploadContent(content);
-                }
-                if (createQuestionDTO.getContentAudio() != null) {
-                    Content content = new Content(question, GetExtension.typeFile(createQuestionDTO.getContentAudio()), createQuestionDTO.getContentAudio());
-                    content.setUserCreate(user);
-                    content.setUserUpdate(user);
-
-                    if (question.getContentCollection() == null) {
-                        question.setContentCollection(new ArrayList<>());
-                    }
-                    question.getContentCollection().add(content);
-                    IContentService.uploadContent(content);
-                }
-
-                IQuestionService.createQuestion(question);
-
-                Topic topic = ITopicService.findTopicById(topicId);
-
-                if (ITopicService.existPartInTopic(topic, part)) {
-                    topic.setUserUpdate(user);
-                    topic.setUpdateAt(LocalDateTime.now());
-                    ITopicService.addQuestionToTopic(topic, question);
-                    responseModel.setMessage("Add question to topic successfully");
-                } else {
-                    responseModel.setMessage("Part of question don't have in topic");
-                }
-            }
+            processQuestions(excelFileDTO, topicId, user, responseModel);
 
             responseModel.setStatus("success");
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Add question to topic fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
 
+    @PostMapping(value = "/{topicId:.+}/addAllPartsToTopicByExcelFile", consumes = {"multipart/form-data"})
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResponseModel> addAllPartsToTopicByExcelFile(@PathVariable UUID topicId, @RequestParam("file") MultipartFile file) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            User user = IUserService.currentUser();
+
+            CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseAllPartsDTO(file);
+
+            processQuestions(excelFileDTO, topicId, user, responseModel);
+
+            responseModel.setStatus("success");
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             responseModel.setMessage("Add question to topic fail: " + e.getMessage());
@@ -1059,6 +1047,104 @@ public class TopicController {
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
+    private void processQuestions(CreateListQuestionByExcelFileDTO excelFileDTO, UUID topicId, User user, ResponseModel responseModel) {
+        for (CreateQuestionByExcelFileDTO createQuestionDTO : excelFileDTO.getQuestions()) {
+            Question question = new Question();
+            question.setQuestionContent(createQuestionDTO.getQuestionContent());
+            question.setQuestionScore(createQuestionDTO.getQuestionScore());
+            question.setUserCreate(user);
+            question.setUserUpdate(user);
+            question.setQuestionExplainEn(createQuestionDTO.getQuestionExplainEn());
+            question.setQuestionExplainVn(createQuestionDTO.getQuestionExplainVn());
+
+            Part part = IPartService.getPartToId(createQuestionDTO.getPartId());
+            question.setPart(part);
+            IQuestionService.createQuestion(question);
+
+            if (createQuestionDTO.getListAnswer() != null && !createQuestionDTO.getListAnswer().isEmpty()) {
+                for (CreateListAnswerDTO createListAnswerDTO : createQuestionDTO.getListAnswer()) {
+                    Answer answer = new Answer();
+                    answer.setQuestion(question);
+                    answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
+                    answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
+                    answer.setUserUpdate(user);
+                    answer.setUserCreate(user);
+
+                    IAnswerService.createAnswer(answer);
+                }
+            }
+
+            if (createQuestionDTO.getListQuestionChild() != null && !createQuestionDTO.getListQuestionChild().isEmpty()) {
+                for (CreateQuestionByExcelFileDTO createQuestionChildDTO : createQuestionDTO.getListQuestionChild()) {
+                    Question questionChild = new Question();
+                    questionChild.setQuestionGroup(question);
+                    questionChild.setQuestionContent(createQuestionChildDTO.getQuestionContent());
+                    questionChild.setQuestionScore(createQuestionChildDTO.getQuestionScore());
+                    questionChild.setPart(question.getPart());
+                    questionChild.setUserCreate(user);
+                    questionChild.setUserUpdate(user);
+                    questionChild.setQuestionExplainEn(createQuestionChildDTO.getQuestionExplainEn());
+                    questionChild.setQuestionExplainVn(createQuestionChildDTO.getQuestionExplainVn());
+
+                    IQuestionService.createQuestion(questionChild);
+
+                    for (CreateListAnswerDTO createListAnswerDTO : createQuestionChildDTO.getListAnswer()) {
+                        Answer answer = new Answer();
+                        answer.setQuestion(questionChild);
+                        answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
+                        answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
+                        answer.setUserUpdate(user);
+                        answer.setUserCreate(user);
+
+                        IAnswerService.createAnswer(answer);
+                        if (questionChild.getAnswers() == null) {
+                            questionChild.setAnswers(new ArrayList<>());
+                        }
+                        questionChild.getAnswers().add(answer);
+                    }
+
+                    IQuestionService.createQuestion(questionChild);
+                }
+            }
+
+            if (createQuestionDTO.getContentImage() != null) {
+                Content content = new Content(question, GetExtension.typeFile(createQuestionDTO.getContentImage()), createQuestionDTO.getContentImage());
+                content.setUserCreate(user);
+                content.setUserUpdate(user);
+
+                if (question.getContentCollection() == null) {
+                    question.setContentCollection(new ArrayList<>());
+                }
+                question.getContentCollection().add(content);
+                IContentService.uploadContent(content);
+            }
+            if (createQuestionDTO.getContentAudio() != null) {
+                Content content = new Content(question, GetExtension.typeFile(createQuestionDTO.getContentAudio()), createQuestionDTO.getContentAudio());
+                content.setUserCreate(user);
+                content.setUserUpdate(user);
+
+                if (question.getContentCollection() == null) {
+                    question.setContentCollection(new ArrayList<>());
+                }
+                question.getContentCollection().add(content);
+                IContentService.uploadContent(content);
+            }
+
+            IQuestionService.createQuestion(question);
+
+            Topic topic = ITopicService.findTopicById(topicId);
+
+            if (ITopicService.existPartInTopic(topic, part)) {
+                topic.setUserUpdate(user);
+                topic.setUpdateAt(LocalDateTime.now());
+                ITopicService.addQuestionToTopic(topic, question);
+                responseModel.setMessage("Add question to topic successfully");
+            } else {
+                responseModel.setMessage("Part of question don't have in topic");
+            }
         }
     }
 
