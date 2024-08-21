@@ -13,7 +13,8 @@ public class MockTestResponse {
     private int score;
     private Time time;
     private UUID topicId;
-	private Object user;
+    private Object user;
+    private int correctAnswers;
 
     private String createAt;
     private String updateAt;
@@ -27,11 +28,12 @@ public class MockTestResponse {
         this.score = mockTest.getScore();
         this.time = mockTest.getTime();
         this.topicId = mockTest.getTopic().getTopicId();
+        this.correctAnswers = mockTest.getCorrectAnswers();
 
-		Map<String, Object> userObj = new HashMap<>();
-		userObj.put("user_id", mockTest.getUser().getUserId());
-		userObj.put("user_name",  mockTest.getUser().getName());
-		this.user = userObj;
+        Map<String, Object> userObj = new HashMap<>();
+        userObj.put("user_id", mockTest.getUser().getUserId());
+        userObj.put("user_name", mockTest.getUser().getName());
+        this.user = userObj;
 
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
         this.createAt = sdf.format(Timestamp.valueOf(mockTest.getCreateAt()));
@@ -47,75 +49,83 @@ public class MockTestResponse {
         userUpdate.put("User Name", mockTest.getUserUpdate().getName());
     }
 
-	public UUID getMockTestID() {
-		return mockTestID;
-	}
+    public UUID getMockTestID() {
+        return mockTestID;
+    }
 
-	public void setMockTestID(UUID mockTestID) {
-		this.mockTestID = mockTestID;
-	}
+    public void setMockTestID(UUID mockTestID) {
+        this.mockTestID = mockTestID;
+    }
 
-	public int getScore() {
-		return score;
-	}
+    public int getScore() {
+        return score;
+    }
 
-	public void setScore(int score) {
-		this.score = score;
-	}
+    public void setScore(int score) {
+        this.score = score;
+    }
 
-	public Time getTime() {
-		return time;
-	}
+    public Time getTime() {
+        return time;
+    }
 
-	public void setTime(Time time) {
-		this.time = time;
-	}
+    public void setTime(Time time) {
+        this.time = time;
+    }
 
-	public UUID getTopicId() {
-		return topicId;
-	}
+    public UUID getTopicId() {
+        return topicId;
+    }
 
-	public void setTopicId(UUID topicId) {
-		this.topicId = topicId;
-	}
+    public void setTopicId(UUID topicId) {
+        this.topicId = topicId;
+    }
 
-	public String getCreateAt() {
-		return createAt;
-	}
+    public String getCreateAt() {
+        return createAt;
+    }
 
-	public void setCreateAt(String createAt) {
-		this.createAt = createAt;
-	}
+    public void setCreateAt(String createAt) {
+        this.createAt = createAt;
+    }
 
-	public String getUpdateAt() {
-		return updateAt;
-	}
+    public String getUpdateAt() {
+        return updateAt;
+    }
 
-	public void setUpdateAt(String updateAt) {
-		this.updateAt = updateAt;
-	}
+    public void setUpdateAt(String updateAt) {
+        this.updateAt = updateAt;
+    }
 
-	public JSONObject getUserCreate() {
-		return userCreate;
-	}
+    public JSONObject getUserCreate() {
+        return userCreate;
+    }
 
-	public void setUserCreate(JSONObject userCreate) {
-		this.userCreate = userCreate;
-	}
+    public void setUserCreate(JSONObject userCreate) {
+        this.userCreate = userCreate;
+    }
 
-	public JSONObject getUserUpdate() {
-		return userUpdate;
-	}
+    public JSONObject getUserUpdate() {
+        return userUpdate;
+    }
 
-	public void setUserUpdate(JSONObject userUpdate) {
-		this.userUpdate = userUpdate;
-	}
+    public void setUserUpdate(JSONObject userUpdate) {
+        this.userUpdate = userUpdate;
+    }
 
-	public Object getUser() {
-		return user;
-	}
+    public Object getUser() {
+        return user;
+    }
 
-	public void setUser(Object user) {
-		this.user = user;
-	}
+    public void setUser(Object user) {
+        this.user = user;
+    }
+
+    public int getCorrectAnswers() {
+        return correctAnswers;
+    }
+
+    public void setCorrectAnswers(int correctAnswers) {
+        this.correctAnswers = correctAnswers;
+    }
 }
