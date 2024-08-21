@@ -14,13 +14,11 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.*;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.*;
@@ -32,11 +30,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -47,6 +43,9 @@ import java.util.regex.Pattern;
 public class UserController {
     @Autowired
     private IUserService IUserService;
+
+    @Autowired
+    private IOtpService IOtpService;
 
     @Autowired
     private IFileStorageService IFileStorageService;
@@ -223,31 +222,72 @@ public class UserController {
 
     @PostMapping("/forgetPassword")
     public ResponseModel forgetPassword(@RequestParam("email") String email) throws MessagingException, IOException {
+
         ResponseModel responseModel = new ResponseModel();
 
-        boolean existingUser = userRepository.existsByEmail(email);
+        // Check mail already exists email in the database
+
+        // userService.existsEmail(email)
+        boolean existingUser = IUserService.existsEmail(email);
 
         if (!existingUser) {
-            responseModel.setMessage("This email don't exists!");
+            responseModel.setMessage("Email không tồn tại");
             responseModel.setStatus("fail");
             return responseModel;
         }
 
-        User user = userRepository.findByEmail(email);
+        // generate Otp
+        String otp = IOtpService.generateOtp(email);
 
-        ConfirmationToken confirmationToken = new ConfirmationToken(user);
-        confirmationToken.setType("RESET_PASSWORD");
+        // then send a mail to user
+        sendOtpToEmail(email, otp);
 
-        String format3 = LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyyyHHmmss"));
-        String generatedString = RandomStringUtils.randomAlphabetic(10) + format3;
+        responseModel.setMessage("Vui lòng kiểm tra email để xác thực mã OTP");
+        responseModel.setStatus("success ");
 
-        confirmationToken.setCode(generatedString);
+        return responseModel;
+    }
+    @PostMapping("/verifyOtp")
+    public ResponseModel verifyOtp(@RequestParam String otp){
+        ResponseModel responseModel = new ResponseModel();
+        // Retrieve the email associated with this OTP from Redis
+        String email = IOtpService.getEmailByOtp(otp);
+        if (email == null){
+            responseModel.setMessage("OTP đã hết hiệu lực");
+            responseModel.setStatus("fail");
+        }
 
-        confirmationTokenRepository.save(confirmationToken);
+        // Verify the OTP with the email
+        boolean isOtpValid = IOtpService.validateOtp(email,otp);
 
-        sendForgetPassEmail(user.getEmail(), generatedString);
+        if (!isOtpValid) {
+            responseModel.setMessage("OTP không hợp lệ");
+            responseModel.setStatus("fail");
+        }
 
-        responseModel.setMessage("Sent a reset password mail!");
+        responseModel.setMessage("Xác thực thành công");
+        responseModel.setStatus("success");
+        return responseModel;
+    }
+    @PostMapping("/changePassword")
+    public ResponseModel changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+        ResponseModel responseModel = new ResponseModel();
+
+        ConfirmationToken confirmToken = confirmationTokenRepository.findByCodeAndType(changePasswordDTO.getCode(), "RESET_PASSWORD");
+
+        if (!changePasswordDTO.getNewPass().equalsIgnoreCase(changePasswordDTO.getConfirmPass())){
+            responseModel.setMessage("Mật khẩu không trùng khớp");
+            responseModel.setStatus("fail");
+        }
+
+
+        Otp otpObj = (Otp) IOtpService.getOtpObject(changePasswordDTO.getCode());
+
+        User user = IUserService.findeUserByEmail(otpObj.getEmail());
+        IUserService.changePassword(user, changePasswordDTO.getNewPass());
+        userRepository.save(user);
+
+        responseModel.setMessage("Mật khẩu đã được đặt lại thành công");
         responseModel.setStatus("success");
 
         return responseModel;
@@ -278,41 +318,7 @@ public class UserController {
         return responseModel;
     }
 
-    @PostMapping("/changePassword")
-    public ResponseModel changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
-        ResponseModel responseModel = new ResponseModel();
 
-        ConfirmationToken confirmToken = confirmationTokenRepository.findByCodeAndType(changePasswordDTO.getCode(), "RESET_PASSWORD");
-
-        if (confirmToken == null) {
-            responseModel.setMessage("Invalid reset code!");
-            responseModel.setStatus("fail");
-            return responseModel;
-        }
-
-        if (confirmToken.getCreateAt().plusMinutes(5).isBefore(LocalDateTime.now())) {
-            responseModel.setMessage("Reset code has expired!");
-            responseModel.setStatus("fail");
-            return responseModel;
-        }
-
-        if (!changePasswordDTO.getConfirmPass().equals(changePasswordDTO.getNewPass())) {
-            responseModel.setMessage("New pass and confirm pass don't match!");
-            responseModel.setStatus("fail");
-            return responseModel;
-        }
-
-        User user = confirmToken.getUser();
-        IUserService.changePassword(user, changePasswordDTO.getNewPass());
-
-        userRepository.save(user);
-        confirmationTokenRepository.delete(confirmToken);
-
-        responseModel.setMessage("Changed password!");
-        responseModel.setStatus("success");
-
-        return responseModel;
-    }
 
     @PostMapping("/refreshToken")
     public ResponseModel refreshToken(@RequestBody RefreshTokenDTO refreshTokenDTO) {
@@ -621,6 +627,22 @@ public class UserController {
 
         helper.setTo(email);
         helper.setSubject("Quên tài khoản");
+        helper.setText(templateContent, true);
+        mailSender.send(message);
+    }
+    private void sendOtpToEmail(String email, String otp) throws MessagingException, IOException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        String otpMessage = "Ma OTP xac thuc la "+otp+", hieu luc 1 phut";
+
+        // Nếu bạn vẫn muốn sử dụng template, thay thế nội dung theo cách này:
+        String templateContent = readTemplateContent("sendOtpEmail.html");
+        templateContent = templateContent.replace("{{otpMessage}}", otpMessage);
+        templateContent = templateContent.replace("{{btnConfirm}}", otp);
+        templateContent = templateContent.replace("{{nameLink}}", "Xác thực mã OTP");
+
+        helper.setTo(email);
+        helper.setSubject("Quên mật khẩu");
         helper.setText(templateContent, true);
         mailSender.send(message);
     }
