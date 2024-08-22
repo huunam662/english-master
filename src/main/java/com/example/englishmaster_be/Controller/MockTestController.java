@@ -221,8 +221,14 @@ public class MockTestController {
             int[] correctAnswers = new int[7];
             int[] scores = new int[7];
 
+            List<UUID> partInTopic = new ArrayList<>();
+
             for (UUID answerId : listAnswerId) {
                 Answer answer = IAnswerService.findAnswerToId(answerId);
+                UUID part = answer.getQuestion().getPart().getPartId();
+                if (!partInTopic.contains(part)) {
+                    partInTopic.add(part);
+                }
                 DetailMockTest detailMockTest = new DetailMockTest(mockTest, answer);
                 detailMockTest.setUserCreate(user);
                 detailMockTest.setUserUpdate(user);
@@ -243,10 +249,11 @@ public class MockTestController {
                 }
             }
 
-            // Save the results for each part
-            for (int i = 0; i < 7; i++) {
-                if (correctAnswers[i] >= 0 || scores[i] >= 0) {
-                    saveResultMockTest(mockTest, getPartUUID(i), correctAnswers[i], scores[i], user);
+            // Save the results for each part that is in the topic
+            for (UUID partId : partInTopic) {
+                int partIndex = getPartIndex(partId);
+                if (partIndex != -1) {
+                    saveResultMockTest(mockTest, partId, correctAnswers[partIndex], scores[partIndex], user);
                 }
             }
 
@@ -269,6 +276,7 @@ public class MockTestController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
     }
+
 
     private int getPartIndex(UUID partId) {
         Map<UUID, Integer> partIdToIndexMap = Map.of(
