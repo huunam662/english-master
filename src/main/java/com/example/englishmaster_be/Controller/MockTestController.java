@@ -262,7 +262,7 @@ public class MockTestController {
             mockTestRepository.save(mockTest);
 
             // Pass the arrays to sendResultEmail method
-            sendResultEmail(user.getEmail(), mockTest, totalCorrect, correctAnswers, scores);
+            sendResultEmail(user.getEmail(), mockTest, totalCorrect, correctAnswers, scores, partInTopic);
 
             responseModel.setMessage("Create detail mock test successfully");
             responseModel.setResponseData(detailMockTestList);
@@ -361,8 +361,20 @@ public class MockTestController {
             MockTest mockTest = IMockTestService.findMockTestToId(mockTestId);
 
             int correctAnswer = IMockTestService.countCorrectAnswer(mockTestId);
+            int[] corrects = new int[7];
+            int[] scores = new int[7];
+            List<UUID> listPartId = new ArrayList<>();
 
-//            sendResultEmail(user.getEmail(), mockTest, correctAnswer);
+            List<ResultMockTest> resultMockTestList = resultMockTestRepository.findByMockTest_MockTestId(mockTest.getMockTestId());
+
+            for (ResultMockTest resultMockTest : resultMockTestList) {
+                int partIndex = getPartIndex(resultMockTest.getPart().getPartId());
+                corrects[partIndex] = correctAnswer;
+                scores[partIndex] = resultMockTest.getScore();
+                listPartId.add(resultMockTest.getPart().getPartId());
+            }
+
+            sendResultEmail(user.getEmail(), mockTest, correctAnswer, corrects, scores, listPartId);
 
             responseModel.setMessage("Send email successfully");
             responseModel.setStatus("success");
@@ -477,7 +489,7 @@ public class MockTestController {
         }
     }
 
-    private void sendResultEmail(String email, MockTest mockTest, int correctAnswer, int[] corrects, int[] scores) throws IOException, MessagingException {
+    private void sendResultEmail(String email, MockTest mockTest, int correctAnswer, int[] corrects, int[] scores, List<UUID> listPartId) throws IOException, MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
@@ -487,12 +499,18 @@ public class MockTestController {
         templateContent = templateContent.replace("{{userName}}", mockTest.getUser().getName());
         templateContent = templateContent.replace("{{correctAnswer}}", String.valueOf(correctAnswer));
         templateContent = templateContent.replace("{{score}}", String.valueOf(mockTest.getScore()));
+        templateContent = templateContent.replace("{{timeAnswer}}", String.valueOf(mockTest.getTime()));
 
-        // Loop through parts and replace placeholders
+        StringBuilder partsHtml = new StringBuilder();
+
         for (int i = 0; i < 7; i++) {
-            templateContent = templateContent.replace("{{correct" + (i + 1) + "}}", String.valueOf(corrects[i]));
-            templateContent = templateContent.replace("{{score" + (i + 1) + "}}", String.valueOf(scores[i]));
+            if (listPartId.contains(getPartUUID(i))) {
+                String partHtml = "<p>Số câu đúng part " + (i + 1) + ": " + corrects[i] + "<br>Số điểm part " + (i + 1) + ": " + scores[i] + "</p>";
+                partsHtml.append(partHtml);
+            }
         }
+
+        templateContent = templateContent.replace("{{parts}}", partsHtml.toString());
 
         helper.setTo(email);
         helper.setSubject("Thông tin bài thi");
