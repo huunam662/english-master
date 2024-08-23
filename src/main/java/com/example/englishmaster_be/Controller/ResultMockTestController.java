@@ -42,7 +42,7 @@ public class ResultMockTestController {
     public ResponseEntity<ResponseModel> getAllResult() {
         ResponseModel responseModel = new ResponseModel();
         List<ResultMockTestResponse> resultMockTestResponses = IResultMockTestService.getAllResultMockTests();
-        if (resultMockTestResponses != null) {
+        if (resultMockTestResponses != null && !resultMockTestResponses.isEmpty()) {
             responseModel.setResponseData(resultMockTestResponses);
             responseModel.setStatus("success");
             responseModel.setMessage("Get all result mock test successfully");
@@ -59,7 +59,7 @@ public class ResultMockTestController {
         ResponseModel responseModel = new ResponseModel();
         List<ResultMockTestResponse> resultMockTestResponses = IResultMockTestService.getResultMockTestsByPartIdAndMockTestId(partId, mockTestId);
 
-        if (resultMockTestResponses != null) {
+        if ((resultMockTestResponses != null) && !resultMockTestResponses.isEmpty()) {
             responseModel.setResponseData(resultMockTestResponses);
             responseModel.setStatus("success");
             responseModel.setMessage("Get result mock test successfully");
