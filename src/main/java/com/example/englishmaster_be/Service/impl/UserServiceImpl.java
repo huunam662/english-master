@@ -88,8 +88,5 @@ public class UserServiceImpl implements IUserService {
         }
     }
 
-    @Override
-    public boolean existsEmail(String email) {
-        return userRepository.existsByEmail(email);
-    }
+
 }

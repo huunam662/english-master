@@ -28,5 +28,4 @@ public interface IUserService {
 
     void logoutUser();
 
-    boolean existsEmail(String email);
 }
