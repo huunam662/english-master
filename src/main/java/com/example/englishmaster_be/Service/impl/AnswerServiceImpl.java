@@ -1,5 +1,7 @@
 package com.example.englishmaster_be.Service.impl;
 
+import com.example.englishmaster_be.Exception.CustomException;
+import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.IAnswerService;
@@ -30,20 +32,20 @@ public class AnswerServiceImpl implements IAnswerService {
     @Override
     public Answer findAnswerToId(UUID answerID) {
         return answerRepository.findByAnswerId(answerID)
-                .orElseThrow(() -> new IllegalArgumentException("Answer not found with ID: " + answerID));
+                .orElseThrow(() -> new CustomException(Error.ANSWER_NOT_FOUND));
     }
 
     @Override
     public boolean checkCorrectAnswer(UUID answerId) {
         Answer answer = answerRepository.findByAnswerId(answerId)
-                .orElseThrow(() -> new IllegalArgumentException("Answer not found with ID: " + answerId));
+                .orElseThrow(() -> new CustomException(Error.ANSWER_NOT_FOUND));
         return answer.isCorrectAnswer();
     }
 
     @Override
     public int scoreAnswer(UUID answerId) {
         Answer answer = answerRepository.findByAnswerId(answerId)
-                .orElseThrow(() -> new IllegalArgumentException("Answer not found with ID: " + answerId));
+                .orElseThrow(() -> new CustomException(Error.ANSWER_NOT_FOUND));
         return answer.getQuestion().getQuestionScore();
     }
 
@@ -54,13 +56,13 @@ public class AnswerServiceImpl implements IAnswerService {
 
     @Override
     public Answer correctAnswer(Question question) {
-        return answerRepository.findByQuestionAndCorrectAnswer(question, true).orElseThrow(() -> new IllegalArgumentException("Question don't have correct answer"));
+        return answerRepository.findByQuestionAndCorrectAnswer(question, true).orElseThrow(() -> new CustomException(Error.ANSWER_BY_CORRECT_QUESTION_NOT_FOUND));
     }
 
     @Override
     public Answer choiceAnswer(Question question, MockTest mockTest) {
-        for(DetailMockTest detailMockTest: detailMockTestRepository.findAllByMockTest(mockTest)){
-            if(detailMockTest.getAnswer().getQuestion().equals(question)){
+        for (DetailMockTest detailMockTest : detailMockTestRepository.findAllByMockTest(mockTest)) {
+            if (detailMockTest.getAnswer().getQuestion().equals(question)) {
                 return detailMockTest.getAnswer();
             }
         }
