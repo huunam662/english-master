@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Configuration.jwt;
 
+import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Model.ResponseModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
@@ -21,24 +22,21 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
-            throws IOException, ServletException {
+            throws IOException {
         logger.error("Unauthorized error: {}", authException.getMessage());
-
+        Error error = Error.UNAUTHENTICATED;
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(200);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 
         ResponseModel responseModel = new ResponseModel();
-
-        responseModel.setMessage(authException.getMessage());
+        responseModel.setMessage(error.getMessage());
         responseModel.setStatus("fail");
-        responseModel.setViolations(String.valueOf(HttpServletResponse.SC_UNAUTHORIZED));
-
+        responseModel.setViolations(error.getViolation());
 
         final ObjectMapper mapper = new ObjectMapper();
-
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
         mapper.setDateFormat(sdf);
         mapper.writeValue(response.getOutputStream(), responseModel);
-
     }
+
 }

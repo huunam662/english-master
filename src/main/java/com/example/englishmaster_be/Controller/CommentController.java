@@ -61,7 +61,7 @@ public class CommentController {
     }
 
     @PostMapping(value = "/{topicId:.+}/addCommentToTopic")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> createCommentToTopic(@PathVariable UUID topicId, @RequestBody CreateCommentDTO createCommentDTO){
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -94,7 +94,7 @@ public class CommentController {
     }
 
     @PostMapping(value = "/{postId:.+}/addCommentToPost")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> createCommentToPost(@PathVariable UUID postId, @RequestBody CreateCommentDTO createCommentDTO){
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -128,7 +128,7 @@ public class CommentController {
 
 
     @PostMapping(value = "/{commentId:.+}/addCommentToComment")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> createCommentToComment(@PathVariable UUID commentId, @RequestBody CreateCommentDTO createCommentDTO){
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -167,7 +167,7 @@ public class CommentController {
     }
 
     @PatchMapping(value = "/{commentId:.+}/updateComment")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> updateComment(@PathVariable UUID commentId, @RequestBody CreateCommentDTO createCommentDTO){
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -202,7 +202,7 @@ public class CommentController {
     }
 
     @DeleteMapping(value = "/{commentId:.+}/deleteComment")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> deleteComment(@PathVariable UUID commentId){
         ResponseModel responseModel = new ResponseModel();
         try {

@@ -26,7 +26,7 @@ public class FlashCardWordController {
     private IFileStorageService IFileStorageService;
 
     @DeleteMapping(value = "/{flashCardWordId:.+}/removeWord")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> removeWord(@PathVariable UUID flashCardWordId){
         ResponseModel responseModel = new ResponseModel();
 
@@ -46,7 +46,7 @@ public class FlashCardWordController {
     }
 
     @PutMapping(value = "/{flashCardWordId:.+}/updateWord", consumes = {"multipart/form-data"})
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> updateWord(@PathVariable UUID flashCardWordId, @ModelAttribute CreateFlashCardWordDTO createFlashCardWordDTO){
         ResponseModel responseModel = new ResponseModel();
 

@@ -1,10 +1,8 @@
 package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.DTO.MockTest.CreateResultMockTestDTO;
-import com.example.englishmaster_be.Model.QResultMockTest;
+import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.ResultMockTestResponse;
-import com.example.englishmaster_be.Model.ResultMockTest;
-import com.example.englishmaster_be.Model.User;
 import com.example.englishmaster_be.Repository.ResultMockTestRepository;
 import com.example.englishmaster_be.Service.IMockTestService;
 import com.example.englishmaster_be.Service.IPartService;
@@ -66,12 +64,15 @@ public class ResultMockTestServiceImpl implements IResultMockTestService {
     public List<ResultMockTestResponse> getResultMockTestsByPartIdAndMockTestId(UUID partId, UUID mockTestId) {
         QResultMockTest qResultMockTest = QResultMockTest.resultMockTest;
 
+
         BooleanBuilder builder = new BooleanBuilder();
 
         if (partId != null) {
+            Part part = IPartService.getPartToId(partId);
             builder.and(qResultMockTest.part.partId.eq(partId));
         }
         if (mockTestId != null) {
+            MockTest mockTest = IMockTestService.findMockTestToId(mockTestId);
             builder.and(qResultMockTest.mockTest.mockTestId.eq(mockTestId));
         }
 

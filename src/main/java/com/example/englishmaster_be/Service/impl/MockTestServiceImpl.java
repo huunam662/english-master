@@ -1,5 +1,7 @@
 package com.example.englishmaster_be.Service.impl;
 
+import com.example.englishmaster_be.Exception.CustomException;
+import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.IMockTestService;
@@ -43,15 +45,15 @@ public class MockTestServiceImpl implements IMockTestService {
 
     @Override
     public MockTest findMockTestToId(UUID mockTestId) {
-        return mockTestRepository.findByMockTestId(mockTestId);
+        return mockTestRepository.findByMockTestId(mockTestId).orElseThrow(() -> new CustomException(Error.MOCK_TEST_NOT_FOUND));
     }
 
     @Override
-    public List<DetailMockTest> getTop10DetailToCorrect(int index, boolean isCorrect ,MockTest mockTest) {
+    public List<DetailMockTest> getTop10DetailToCorrect(int index, boolean isCorrect, MockTest mockTest) {
         Page<DetailMockTest> detailMockTestPage = detailMockTestRepository.findAllByMockTest(mockTest, PageRequest.of(index, 10, Sort.by(Sort.Order.desc("updateAt"))));
-        for(DetailMockTest detailMockTest : detailMockTestPage.getContent()){
-            if(detailMockTest.getAnswer().isCorrectAnswer() != isCorrect){
-                if(detailMockTestPage.getContent().size() == 1){
+        for (DetailMockTest detailMockTest : detailMockTestPage.getContent()) {
+            if (detailMockTest.getAnswer().isCorrectAnswer() != isCorrect) {
+                if (detailMockTestPage.getContent().size() == 1) {
                     return null;
                 }
                 detailMockTestPage.getContent().remove(detailMockTest);
@@ -64,8 +66,8 @@ public class MockTestServiceImpl implements IMockTestService {
     public int countCorrectAnswer(UUID mockTestId) {
         int count = 0;
         MockTest mockTest = findMockTestToId(mockTestId);
-        for(DetailMockTest detailMockTest : mockTest.getDetailMockTests()){
-            if(detailMockTest.getAnswer().isCorrectAnswer()){
+        for (DetailMockTest detailMockTest : mockTest.getDetailMockTests()) {
+            if (detailMockTest.getAnswer().isCorrectAnswer()) {
                 count = count + 1;
             }
         }
@@ -74,10 +76,10 @@ public class MockTestServiceImpl implements IMockTestService {
 
     @Override
     public List<MockTest> getAllMockTestByYearMonthAndDay(Topic topic, String year, String month, String day) {
-        if(day == null && month != null){
-            return  mockTestRepository.findAllByYearMonth(year, month, topic);
+        if (day == null && month != null) {
+            return mockTestRepository.findAllByYearMonth(year, month, topic);
         }
-        if(month == null){
+        if (month == null) {
             return mockTestRepository.findAllByYear(year, topic);
         }
         return mockTestRepository.findAllByYearMonthAndDay(year, month, day, topic);

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface MockTestRepository extends JpaRepository<MockTest, UUID> {
@@ -15,7 +16,8 @@ public interface MockTestRepository extends JpaRepository<MockTest, UUID> {
     List<MockTest> findAllByTopic(Topic topic);
 
     Page<MockTest> findAllByUser(User user, Pageable pageable);
-    MockTest findByMockTestId(UUID mockTestId);
+
+    Optional<MockTest> findByMockTestId(UUID mockTestId);
 
     @Query(value = "SELECT p FROM MockTest p WHERE " +
             "(:year IS NULL OR YEAR(p.createAt) = :year) AND " +
