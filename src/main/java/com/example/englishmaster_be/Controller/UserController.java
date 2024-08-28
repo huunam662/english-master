@@ -30,6 +30,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -221,28 +222,30 @@ public class UserController {
     }
 
     @PostMapping("/forgetPassword")
-    public ResponseEntity<String> forgetPassword(@RequestParam("email") String email) throws MessagingException, IOException {
+    public ResponseEntity<ResponseModel> forgetPassword(@RequestParam("email") String email) throws MessagingException, IOException {
 
         boolean checkEmailExists = IUserService.existsEmail(email);
-        if (email == null || email.isEmpty()){
-            return new ResponseEntity<>("Email không được bỏ trống",HttpStatus.BAD_REQUEST);
-        }
-
-        if (!checkEmailExists){
-            return new ResponseEntity<>("Không tìm thấy email "+email,HttpStatus.OK);
+        ResponseModel responseModel = new ResponseModel();
+        if (!checkEmailExists) {
+            responseModel.setMessage("Email does not exist!");
+            responseModel.setStatus("fail");
         }
 
         String otp = IOtpService.generateOtp(email);
 
         sendOtpToEmail(email, otp);
 
-        return new ResponseEntity("Kiểm tra email của bạn để xác thực mã OTP.",HttpStatus.OK);
-    }
-    @PostMapping("/verifyOtp")
-    public ResponseEntity<String> verifyOtp(@RequestParam String otp){
+        responseModel.setStatus("success");
+        responseModel.setMessage("Kiểm tra email của bạn để xác thực mã OTP.");
 
-        if (otp == null || otp.isEmpty()){
-            return new ResponseEntity<>("OTP không được bỏ trống",HttpStatus.BAD_REQUEST);
+        return ResponseEntity.ok(responseModel);
+    }
+
+    @PostMapping("/verifyOtp")
+    public ResponseEntity<String> verifyOtp(@RequestParam String otp) {
+
+        if (otp == null || otp.isEmpty()) {
+            return new ResponseEntity<>("OTP không được bỏ trống", HttpStatus.BAD_REQUEST);
         }
 
 
@@ -256,6 +259,7 @@ public class UserController {
 
         return new ResponseEntity<>("Mã OTP đã được xác thực thành công.", HttpStatus.OK);
     }
+
     @PostMapping("/changePassword")
     public ResponseEntity changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
 
@@ -312,7 +316,6 @@ public class UserController {
 
         return responseModel;
     }
-
 
 
     @PostMapping("/refreshToken")
@@ -625,10 +628,11 @@ public class UserController {
         helper.setText(templateContent, true);
         mailSender.send(message);
     }
+
     private void sendOtpToEmail(String email, String otp) throws MessagingException, IOException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        String otpMessage = "Ma OTP xac thuc la "+otp+", hieu luc 10 phut";
+        String otpMessage = "Ma OTP xac thuc la " + otp + ", hieu luc 10 phut";
 
         // Nếu bạn vẫn muốn sử dụng template, thay thế nội dung theo cách này:
         String templateContent = readTemplateContent("sendOtpEmail.html");
