@@ -64,7 +64,7 @@ public class TopicController {
     private IExcelService excelService;
 
     @GetMapping(value = "/{topicId:.+}/inforTopic")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> getInformationTopic(@PathVariable UUID topicId) {
         ResponseModel responseModel = new ResponseModel();
 
@@ -1017,7 +1017,7 @@ public class TopicController {
 
 
     @GetMapping(value = "/{topicId:.+}/listComment")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> listComment(@PathVariable UUID topicId) {
         ResponseModel responseModel = new ResponseModel();
         try {

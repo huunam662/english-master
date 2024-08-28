@@ -31,7 +31,7 @@ public class PartController {
     private IPartService IPartService;
 
     @PostMapping(value = "/create")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> createPart(@RequestBody CreatePartDTO createpartDTO){
         ResponseModel responseModel = new ResponseModel();
 
@@ -66,7 +66,7 @@ public class PartController {
     }
 
     @PutMapping(value = "/{partId:.+}/uploadfile", consumes = {"multipart/form-data"} )
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> uploadFilePart(@PathVariable UUID partId, @ModelAttribute UploadMultiFileDTO uploadMultiFileDTO){
         ResponseModel responseModel = new ResponseModel();
 
@@ -104,7 +104,7 @@ public class PartController {
     }
 
     @PutMapping(value = "/{partId:.+}/uploadText")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> uploadTextPart(@PathVariable UUID partId, @RequestBody UploadTextDTO uploadTextDTO){
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -162,7 +162,7 @@ public class PartController {
     }
 
     @DeleteMapping(value = "/{partId:.+}/delete")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> deletePart(@PathVariable UUID partId){
         ResponseModel responseModel = new ResponseModel();
 
@@ -189,7 +189,7 @@ public class PartController {
     }
 
     @PutMapping(value = "/{partId:.+}/update")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> updatePart(@PathVariable UUID partId, @RequestBody UpdatePartDTO updatePartDTO){
         ResponseModel responseModel = new ResponseModel();
 

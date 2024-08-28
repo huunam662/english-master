@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -67,7 +66,7 @@ public class AnswerController {
     }
 
     @PutMapping(value = "/{answerId:.+}/update")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> updateAnswer(@PathVariable UUID answerId, @RequestBody UpdateAnswerDTO updateAnswerDTO) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -111,7 +110,7 @@ public class AnswerController {
     }
 
     @DeleteMapping(value = "/{answerId:.+}/delete")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> deleteAnswer(@PathVariable UUID answerId) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -131,7 +130,7 @@ public class AnswerController {
     }
 
     @GetMapping(value = "/{answerId:.+}/getDetailAnswer")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> getDetailAnswer(@PathVariable UUID answerId) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -155,7 +154,7 @@ public class AnswerController {
     }
 
     @GetMapping(value = "/{answerId:.+}/checkCorrect")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> checkCorrectAnswer(@PathVariable UUID answerId) {
         ResponseModel responseModel = new ResponseModel();
         try {

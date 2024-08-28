@@ -64,7 +64,7 @@ public class MockTestController {
     private IPartService IPartService;
 
     @PostMapping(value = "/create")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> createMockTest(@RequestBody CreateMockTestDTO createMockTestDTO) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -176,7 +176,7 @@ public class MockTestController {
     }
 
     @GetMapping(value = "/{userId:.+}/listTestToUser")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> listMockTestToUser(@RequestParam int index, @PathVariable UUID userId) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -206,7 +206,7 @@ public class MockTestController {
     }
 
     @PostMapping(value = "/{mockTestId:.+}/submitResult")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> addAnswerToMockTest(@PathVariable UUID mockTestId, @RequestBody List<UUID> listAnswerId) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -319,7 +319,7 @@ public class MockTestController {
 
 
     @GetMapping(value = "/{mockTestId:.+}/listCorrectAnswer")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> listCorrectAnswer(@RequestParam int index, @RequestParam boolean isCorrect, @PathVariable UUID mockTestId) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -353,7 +353,7 @@ public class MockTestController {
     }
 
     @GetMapping(value = "/{mockTestId:.+}/sendEmail")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> sendEmailToMock(@PathVariable UUID mockTestId) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -389,7 +389,7 @@ public class MockTestController {
     }
 
     @GetMapping(value = "/{mockTestId:.+}/listPart")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> getPartToMockTest(@PathVariable UUID mockTestId) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -435,7 +435,7 @@ public class MockTestController {
     }
 
     @GetMapping(value = "/{mockTestId:.+}/listQuestionToPart")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> getQuestionOfToMockTest(@PathVariable UUID mockTestId, @RequestParam UUID partId) {
         ResponseModel responseModel = new ResponseModel();
         try {

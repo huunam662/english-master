@@ -13,7 +13,7 @@ public class ExamController {
     private ResponseModel response =new ResponseModel();
 
     @GetMapping("/user")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public String userAccess() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();

@@ -22,7 +22,7 @@ public class PackController {
     private IPackService IPackService;
 
     @PostMapping(value = "/create")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> createPack(@RequestParam String packName ){
         ResponseModel responseModel = new ResponseModel();
 
