@@ -221,43 +221,64 @@ public class UserController {
     }
 
     @PostMapping("/forgetPassword")
-    public ResponseEntity<String> forgetPassword(@RequestParam("email") String email) throws MessagingException, IOException {
+    public ResponseModel forgetPassword(@RequestParam("email") String email) throws MessagingException, IOException {
+
+        ResponseModel responseModel = new ResponseModel();
 
         boolean checkEmailExists = IUserService.existsEmail(email);
+
         if (email == null || email.isEmpty()){
-            return new ResponseEntity<>("Email không được bỏ trống",HttpStatus.BAD_REQUEST);
+            responseModel.setMessage("Vui lòng điền email để hỗ trợ");
+            responseModel.setStatus("fail");
+            return responseModel;
         }
 
         if (!checkEmailExists){
-            return new ResponseEntity<>("Không tìm thấy email "+email,HttpStatus.OK);
+            responseModel.setMessage("Không tìm thấy email "+email);
+            responseModel.setStatus("fail");
+            return responseModel;
         }
 
         String otp = IOtpService.generateOtp(email);
 
         sendOtpToEmail(email, otp);
 
-        return new ResponseEntity("Kiểm tra email của bạn để xác thực mã OTP.",HttpStatus.OK);
+        responseModel.setMessage("Vui lòng kiểm tra email của bạn để xác thực mã OTP");
+        responseModel.setStatus("success");
+
+        return responseModel;
     }
     @PostMapping("/verifyOtp")
-    public ResponseEntity<String> verifyOtp(@RequestParam String otp){
+    public ResponseModel verifyOtp(@RequestParam String otp){
+
+        ResponseModel responseModel = new ResponseModel();
 
         if (otp == null || otp.isEmpty()){
-            return new ResponseEntity<>("OTP không được bỏ trống",HttpStatus.BAD_REQUEST);
+            responseModel.setMessage("OTP không được bỏ trống");
+            responseModel.setStatus("fail");
+            return responseModel;
         }
-
 
         boolean isOtpValid = IOtpService.validateOtp(otp);
 
         if (!isOtpValid) {
-            return new ResponseEntity<>("Mã OTP đã hết hiệu lực", HttpStatus.BAD_REQUEST);
+            responseModel.setMessage("Mã OTP đã hết hiệu lực");
+            responseModel.setStatus("fail");
+            return responseModel;
         }
 
         IOtpService.updateOtpStatusToVerified(otp);
 
-        return new ResponseEntity<>("Mã OTP đã được xác thực thành công.", HttpStatus.OK);
+        responseModel.setMessage("Mã OTP đã được xác thực thành công.");
+        responseModel.setStatus("success");
+
+        return responseModel;
     }
+
     @PostMapping("/changePassword")
-    public ResponseEntity changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+    public ResponseModel changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+
+        ResponseModel responseModel = new ResponseModel();
 
         String otp = changePasswordDTO.getCode();
         String newPassword = changePasswordDTO.getNewPass();
@@ -267,23 +288,34 @@ public class UserController {
         boolean isOtpValid = IOtpService.validateOtp(otp);
 
         if (!isOtpValid) {
-            return new ResponseEntity<>("Mã OTP đã hết hạn", HttpStatus.BAD_REQUEST);
+            responseModel.setMessage("Mã OTP đã hết hạn");
+            responseModel.setStatus("fail");
+            return responseModel;
         }
         // Validate new password and confirm password
         if (newPassword == null || newPassword.isEmpty()) {
-            return new ResponseEntity<>("Mật khẩu mới không được bỏ trống", HttpStatus.BAD_REQUEST);
+            responseModel.setMessage("Mật khẩu mới không được bỏ trống.");
+            responseModel.setStatus("fail");
+            return responseModel;
         }
+
         if (!newPassword.equals(confirmPassword)) {
-            return new ResponseEntity<>("Mật khẩu mới và xác nhận mật khẩu không khớp", HttpStatus.BAD_REQUEST);
+            responseModel.setMessage("Mật khẩu mới và xác nhận mật khẩu không khớp");
+            responseModel.setStatus("fail");
+            return responseModel;
         }
 
         // Update the user's password
         boolean isPasswordUpdated = IUserService.updatePassword(otp, newPassword);
         if (isPasswordUpdated) {
             IOtpService.deleteOtp(otp);
-            return new ResponseEntity<>("Mật khẩu đã được thay đổi thành công.", HttpStatus.OK);
+            responseModel.setMessage("Mật khẩu đã được thay đổi thành công.");
+            responseModel.setStatus("fail");
+            return responseModel;
         } else {
-            return new ResponseEntity<>("Không thể thay đổi mật khẩu. Vui lòng thử lại.", HttpStatus.BAD_REQUEST);
+            responseModel.setMessage("Không thể thay đổi mật khẩu. Vui lòng thử lại.");
+            responseModel.setStatus("fail");
+            return responseModel;
         }
     }
 
@@ -312,8 +344,6 @@ public class UserController {
 
         return responseModel;
     }
-
-
 
     @PostMapping("/refreshToken")
     public ResponseModel refreshToken(@RequestBody RefreshTokenDTO refreshTokenDTO) {
@@ -628,7 +658,7 @@ public class UserController {
     private void sendOtpToEmail(String email, String otp) throws MessagingException, IOException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        String otpMessage = "Ma OTP xac thuc la "+otp+", hieu luc 10 phut";
+        String otpMessage = "Mã OTP xác thực là "+otp+", hiệu lực 10 phút";
 
         // Nếu bạn vẫn muốn sử dụng template, thay thế nội dung theo cách này:
         String templateContent = readTemplateContent("sendOtpEmail.html");
