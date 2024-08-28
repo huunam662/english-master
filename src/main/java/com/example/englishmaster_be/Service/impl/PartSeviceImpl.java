@@ -1,5 +1,7 @@
 package com.example.englishmaster_be.Service.impl;
 
+import com.example.englishmaster_be.Exception.CustomException;
+import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Model.Part;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.IPartService;
@@ -13,10 +15,11 @@ import java.util.UUID;
 public class PartSeviceImpl implements IPartService {
     @Autowired
     private PartRepository partRepository;
+
     @Override
     public boolean createPart(Part part) {
         boolean check = checkPart(part);
-        if(check){
+        if (check) {
             partRepository.save(part);
             return true;
         }
@@ -36,14 +39,14 @@ public class PartSeviceImpl implements IPartService {
     @Override
     public Part getPartToId(UUID partId) {
         return partRepository.findByPartId(partId)
-                .orElseThrow(() -> new IllegalArgumentException("Part not found with ID: " + partId));
+                .orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND));
     }
 
     @Override
     public Part getPartToName(String partName) {
         List<Part> listPart = partRepository.findAll();
-        for(Part part: listPart){
-            if(part.getPartName().substring(0, 6).equalsIgnoreCase(partName)){
+        for (Part part : listPart) {
+            if (part.getPartName().substring(0, 6).equalsIgnoreCase(partName)) {
                 return part;
             }
         }
@@ -53,8 +56,8 @@ public class PartSeviceImpl implements IPartService {
     @Override
     public boolean checkPart(Part part) {
         List<Part> partList = partRepository.findAll();
-        for(Part partCheck : partList){
-            if (partCheck.getPartName().toLowerCase().equals(part.getPartName().toLowerCase())){
+        for (Part partCheck : partList) {
+            if (partCheck.getPartName().toLowerCase().equals(part.getPartName().toLowerCase())) {
                 return false;
             }
         }
@@ -63,7 +66,7 @@ public class PartSeviceImpl implements IPartService {
 
     @Override
     public boolean checkFilePart(Part part) {
-        if(part.getContentType() == null)
+        if (part.getContentType() == null)
             return false;
         return true;
     }

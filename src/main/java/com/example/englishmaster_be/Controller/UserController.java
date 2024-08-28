@@ -30,6 +30,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -248,6 +249,7 @@ public class UserController {
 
         return responseModel;
     }
+
     @PostMapping("/verifyOtp")
     public ResponseModel verifyOtp(@RequestParam String otp){
 
@@ -408,7 +410,7 @@ public class UserController {
     }
 
     @PatchMapping(value = "/changeProfile", consumes = {"multipart/form-data"})
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> changeProfile(@ModelAttribute("profileUser") ChangeProfileDTO changeProfileDTO) {
         ResponseModel responseModel = new ResponseModel();
         JSONObject objectResponse = new JSONObject();
@@ -467,7 +469,7 @@ public class UserController {
     }
 
     @PatchMapping(value = "/changePass")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> changePass(@RequestBody ChangePassDTO changePassDTO) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -541,7 +543,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/listExamResultsUser")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> getExamResultsUser(@RequestParam(value = "page", defaultValue = "0") @Min(0) Integer page,
                                                             @RequestParam(value = "size", defaultValue = "5") @Min(1) @Max(100) Integer size,
                                                             @RequestParam(value = "sortBy", defaultValue = "updateAt") String sortBy,
@@ -655,6 +657,7 @@ public class UserController {
         helper.setText(templateContent, true);
         mailSender.send(message);
     }
+
     private void sendOtpToEmail(String email, String otp) throws MessagingException, IOException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);

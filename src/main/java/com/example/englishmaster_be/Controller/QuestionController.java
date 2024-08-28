@@ -65,7 +65,7 @@ public class QuestionController {
     }
 
     @PutMapping(value = "/{questionId:.+}/uploadfile", consumes = {"multipart/form-data"})
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> uploadFileQuestion(@PathVariable UUID questionId, @ModelAttribute UploadMultiFileDTO uploadMultiFileDTO) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -177,7 +177,7 @@ public class QuestionController {
 
 
     @GetMapping(value = "/{partId:.+}/listTop10Question")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> getTop10Question(@PathVariable UUID partId, @RequestParam int indexp) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -204,7 +204,7 @@ public class QuestionController {
     }
 
     @GetMapping(value = "/{questionId:.+}/checkQuestionGroup")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> checkQuestionGroup(@PathVariable UUID questionId) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -229,7 +229,7 @@ public class QuestionController {
     }
 
     @GetMapping(value = "/{questionId:.+}/listQuestionGroup")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> getQuestionGroupToQuestion(@PathVariable UUID questionId) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -260,7 +260,7 @@ public class QuestionController {
     }
 
     @GetMapping(value = "/{questionId:.+}/listAnswer")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> getAnswerToQuestion(@PathVariable UUID questionId) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -439,7 +439,7 @@ public class QuestionController {
     }
 
     @GetMapping(value = "/{questionId:.+}/content")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> getContentToQuestion(@PathVariable UUID questionId) {
         ResponseModel responseModel = new ResponseModel();
         try {
