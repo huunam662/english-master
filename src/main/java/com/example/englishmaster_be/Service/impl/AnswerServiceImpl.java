@@ -24,6 +24,11 @@ public class AnswerServiceImpl implements IAnswerService {
         answerRepository.save(answer);
     }
 
+//    @Override
+//    public AnswerResponse createAnswer(Answer answer) {
+//
+//    }
+
     @Override
     public boolean existQuestion(Answer answer, Question question) {
         return answer.getQuestion().equals(question);

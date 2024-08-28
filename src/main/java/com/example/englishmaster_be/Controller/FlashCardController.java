@@ -33,7 +33,7 @@ public class FlashCardController {
     private IFlashCardWordService IFlashCardWordService;
 
     @GetMapping(value = "/{flashCardId:.+}/listFlashCardWord")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> getWordToFlashCard(@PathVariable UUID flashCardId){
         ResponseModel responseModel = new ResponseModel();
 
@@ -65,7 +65,7 @@ public class FlashCardController {
 
 
     @GetMapping(value = "/listFlashCardUser")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> listFlashCardUser(){
         ResponseModel responseModel = new ResponseModel();
 
@@ -95,7 +95,7 @@ public class FlashCardController {
 
 
     @PostMapping(value = "/addFlashCardUser", consumes = {"multipart/form-data"})
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> addFlashCardUser(@ModelAttribute CreateFlashCardDTO createFlashCardDTO){
         ResponseModel responseModel = new ResponseModel();
 
@@ -131,7 +131,7 @@ public class FlashCardController {
     }
 
     @PostMapping(value = "/{flashCardId:.+}/addWordToFlashCard", consumes = {"multipart/form-data"})
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> addWordToFlashCard(@PathVariable UUID flashCardId, @ModelAttribute CreateFlashCardWordDTO createFlashCardWordDTO){
         ResponseModel responseModel = new ResponseModel();
 
@@ -200,7 +200,7 @@ public class FlashCardController {
     }
 
     @DeleteMapping(value = "/{flashCardId:.+}/removeFlashCard")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> removeWord(@PathVariable UUID flashCardId){
         ResponseModel responseModel = new ResponseModel();
 
@@ -225,7 +225,7 @@ public class FlashCardController {
 
 
     @PutMapping(value = "/{flashCardId:.+}/updateFlashCard", consumes = {"multipart/form-data"})
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> updateFlashCard(@PathVariable UUID flashCardId, @ModelAttribute CreateFlashCardDTO createFlashCardDTO){
         ResponseModel responseModel = new ResponseModel();
 

@@ -82,7 +82,7 @@ public class PostController {
     }
 
     @PostMapping(value = "/createPost")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> createPost(@RequestBody CreatePostDTO createPostDTO){
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -110,7 +110,7 @@ public class PostController {
     }
 
     @PatchMapping(value = "/{postId:.+}/updatePost")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> updatePost(@PathVariable UUID postId, @RequestBody CreatePostDTO updatePostDTO){
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -177,7 +177,7 @@ public class PostController {
     }
 
     @DeleteMapping(value = "/{postId:.+}/deletePost")
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> deletePost(@PathVariable UUID postId){
         ResponseModel responseModel = new ResponseModel();
         try {
