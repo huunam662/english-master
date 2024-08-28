@@ -29,4 +29,7 @@ public interface IUserService {
     void logoutUser();
 
     boolean existsEmail(String email);
+
+    boolean updatePassword(String otp,String newPassword);
+
 }

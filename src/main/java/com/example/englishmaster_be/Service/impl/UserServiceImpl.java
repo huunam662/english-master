@@ -16,6 +16,8 @@ import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements IUserService {
+    @Autowired
+    private OtpRepository otpRepository;
 
 
     @Autowired
@@ -87,9 +89,27 @@ public class UserServiceImpl implements IUserService {
             SecurityContextHolder.getContext().setAuthentication(null);
         }
     }
-
     @Override
     public boolean existsEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    @Override
+    public boolean updatePassword(String otp, String newPassword) {
+        Otp otpRecord = otpRepository.findById(otp).orElse(null);
+        if (otpRecord == null || !"Verified".equals(otpRecord.getStatus())) {
+            return false;
+        }
+        User user = userRepository.findByEmail(otpRecord.getEmail());
+        if (user == null) {
+            return false;
+        }
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+
+        otpRecord.setStatus("Used");
+        otpRepository.save(otpRecord);
+
+        return true;
     }
 }
