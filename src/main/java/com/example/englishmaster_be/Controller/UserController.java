@@ -285,7 +285,9 @@ public class UserController {
         boolean isPasswordUpdated = IUserService.updatePassword(otp, newPassword);
         if (isPasswordUpdated) {
             IOtpService.deleteOtp(otp);
-            return new ResponseEntity<>("Mật khẩu đã được thay đổi thành công.", HttpStatus.OK);
+            responseModel.setMessage("Mật khẩu đã được thay đổi thành công.");
+            responseModel.setStatus("success");
+            return responseModel;
         } else {
             return new ResponseEntity<>("Không thể thay đổi mật khẩu. Vui lòng thử lại.", HttpStatus.BAD_REQUEST);
         }
