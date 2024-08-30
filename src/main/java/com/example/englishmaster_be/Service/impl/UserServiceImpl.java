@@ -19,7 +19,6 @@ public class UserServiceImpl implements IUserService {
     @Autowired
     private OtpRepository otpRepository;
 
-
     @Autowired
     private RoleRepository roleRepository;
 
