@@ -312,7 +312,7 @@ public class UserController {
         if (isPasswordUpdated) {
             IOtpService.deleteOtp(otp);
             responseModel.setMessage("Mật khẩu đã được thay đổi thành công.");
-            responseModel.setStatus("fail");
+            responseModel.setStatus("success");
             return responseModel;
         } else {
             responseModel.setMessage("Không thể thay đổi mật khẩu. Vui lòng thử lại.");
