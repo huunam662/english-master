@@ -6,11 +6,14 @@ import lombok.Setter;
 @Setter
 @Getter
 public class CustomException extends RuntimeException {
-    private Error error;
+    private final Error error;
 
     public CustomException(Error error) {
         super(error.getMessage());
         this.error = error;
     }
+
+
+
 
 }

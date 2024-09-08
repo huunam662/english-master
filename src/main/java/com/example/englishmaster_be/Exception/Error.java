@@ -16,8 +16,16 @@ public enum Error {
     EXPIRED_TOKEN("Token Expired", "Your token has expired", HttpStatus.UNAUTHORIZED),
     INVALID_TOKEN("Invalid Token", "Your token is malformed and cannot be processed", HttpStatus.UNAUTHORIZED),
     UNSUPPORTED_TOKEN("Unsupported Token", "Your token is unsupported", HttpStatus.UNAUTHORIZED),
+    CAN_NOT_CREATE_TOPIC_BY_EXCEL("Can not be created by excel", "Can not create topic by excel", HttpStatus.BAD_REQUEST),
+    CAN_NOT_CREATE_PART_1_BY_EXCEL("Can not be create part 1 by excel file", "Can not be create part 1 by excel file", HttpStatus.BAD_REQUEST),
+    CAN_NOT_CREATE_PART_2_BY_EXCEL("Can not be create part 2 by excel file", "Can not be create part 2 by excel file", HttpStatus.BAD_REQUEST),
+    CAN_NOT_CREATE_PART_3_BY_EXCEL("Can not be create part 3 by excel file", "Can not be create part 3 by excel file", HttpStatus.BAD_REQUEST),
+    CAN_NOT_CREATE_PART_4_BY_EXCEL("Can not be create part 4 by excel file", "Can not be create part 4 by excel file", HttpStatus.BAD_REQUEST),
+    CAN_NOT_CREATE_PART_5_BY_EXCEL("Can not be create part 5 by excel file", "Can not be create part 5 by excel file", HttpStatus.BAD_REQUEST),
+    CAN_NOT_CREATE_PART_6_BY_EXCEL("Can not be create part 6 by excel file", "Can not be create part 6 by excel file", HttpStatus.BAD_REQUEST),
+    CAN_NOT_CREATE_PART_7_BY_EXCEL("Can not be create part 7 by excel file", "Can not be create part 7 by excel file", HttpStatus.BAD_REQUEST),
 
-    ;
+    CONTENT_NOT_FOUND("Content not found", "Content not found", HttpStatus.BAD_REQUEST);
 
     private final String message;
     private final String violation;

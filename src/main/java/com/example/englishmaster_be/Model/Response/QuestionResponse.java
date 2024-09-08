@@ -23,10 +23,10 @@ public class QuestionResponse {
     private String createAt;
     private String updateAt;
 
-	private List<AnswerResponse> listAnswer;
-	private UUID answerCorrect;
+    private List<AnswerResponse> listAnswer;
+    private UUID answerCorrect;
 
-    public QuestionResponse(Question question){
+    public QuestionResponse(Question question) {
         String link;
 
         this.questionId = question.getQuestionId();
@@ -40,27 +40,30 @@ public class QuestionResponse {
         this.createAt = sdf.format(Timestamp.valueOf(question.getCreateAt()));
         this.updateAt = sdf.format(Timestamp.valueOf(question.getUpdateAt()));
 
-		if(question.getAnswers() != null){
-			List<AnswerResponse> listAnswerResponse = new ArrayList<>();
-			for(Answer answer: question.getAnswers()){
-				listAnswerResponse.add(new AnswerResponse(answer));
-			}
-			this.listAnswer = listAnswerResponse;
-		}
+        if (question.getAnswers() != null) {
+            List<AnswerResponse> listAnswerResponse = new ArrayList<>();
+            for (Answer answer : question.getAnswers()) {
+                listAnswerResponse.add(new AnswerResponse(answer));
+            }
+            this.listAnswer = listAnswerResponse;
+        }
 
         contentList = new JSONArray();
-
-        if(question.getContentCollection() != null){
-            for(Content content1 : question.getContentCollection()){
+        if (!question.getContentCollection().isEmpty()) {
+            for (Content content1 : question.getContentCollection()) {
                 JSONObject content = new JSONObject();
                 content.put("Content Type", content1.getContentType());
 
-                if(content1.getContentData() == null){
-                    content.put("Content Data", content1.getContentData());
+                if (content1.getContentData() == null) {
+                    content.put("Content Data", null);
 
-                }else {
-                    link = GetExtension.linkName(content1.getContentData());
-                    content.put("Content Data", link + content1.getContentData());
+                } else {
+                    if (content1.getContentData().startsWith("https")) {
+                        content.put("Content Data", content1.getContentData());
+                    } else {
+                        link = GetExtension.linkName(content1.getContentData());
+                        content.put("Content Data", link + content1.getContentData());
+                    }
                 }
 
                 contentList.add(content);
@@ -69,130 +72,134 @@ public class QuestionResponse {
 
     }
 
-	public QuestionResponse(Question question, Answer answerCorrect){
-		String link;
+    public QuestionResponse(Question question, Answer answerCorrect) {
+        String link;
 
-		this.questionId = question.getQuestionId();
-		this.questionContent = question.getQuestionContent();
-		this.questionScore = question.getQuestionScore();
-		this.answerCorrect = answerCorrect.getAnswerId();
+        this.questionId = question.getQuestionId();
+        this.questionContent = question.getQuestionContent();
+        this.questionScore = question.getQuestionScore();
+        this.answerCorrect = answerCorrect.getAnswerId();
 
-		this.partId = question.getPart().getPartId();
+        this.partId = question.getPart().getPartId();
 
-		SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
-		this.createAt = sdf.format(Timestamp.valueOf(question.getCreateAt()));
-		this.updateAt = sdf.format(Timestamp.valueOf(question.getUpdateAt()));
+        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
+        this.createAt = sdf.format(Timestamp.valueOf(question.getCreateAt()));
+        this.updateAt = sdf.format(Timestamp.valueOf(question.getUpdateAt()));
 
-		if(question.getAnswers() != null){
-			List<AnswerResponse> listAnswerResponse = new ArrayList<>();
-			for(Answer answer: question.getAnswers()){
-				listAnswerResponse.add(new AnswerResponse(answer));
-			}
-			this.listAnswer = listAnswerResponse;
-		}
+        if (question.getAnswers() != null) {
+            List<AnswerResponse> listAnswerResponse = new ArrayList<>();
+            for (Answer answer : question.getAnswers()) {
+                listAnswerResponse.add(new AnswerResponse(answer));
+            }
+            this.listAnswer = listAnswerResponse;
+        }
 
-		contentList = new JSONArray();
+        contentList = new JSONArray();
 
-		if(question.getContentCollection() != null){
-			for(Content content1 : question.getContentCollection()){
-				JSONObject content = new JSONObject();
-				content.put("Content Type", content1.getContentType());
+        if (question.getContentCollection() != null) {
+            for (Content content1 : question.getContentCollection()) {
+                JSONObject content = new JSONObject();
+                content.put("Content Type", content1.getContentType());
 
-				if(content1.getContentData() == null){
-					content.put("Content Data", content1.getContentData());
+                if (content1.getContentData() == null) {
+                    content.put("Content Data", content1.getContentData());
 
-				}else {
-					link = GetExtension.linkName(content1.getContentData());
-					content.put("Content Data", link + content1.getContentData());
-				}
+                } else {
+                    if (content1.getContentData().startsWith("https")) {
+                        content.put("Content Data", content1.getContentData());
+                    } else {
+                        link = GetExtension.linkName(content1.getContentData());
+                        content.put("Content Data", link + content1.getContentData());
+                    }
+                }
 
-				contentList.add(content);
-			}
-		}
+                contentList.add(content);
+            }
+        }
 
-	}
+    }
 
-	public UUID getQuestionId() {
-		return questionId;
-	}
+    public UUID getQuestionId() {
+        return questionId;
+    }
 
-	public void setQuestionId(UUID questionId) {
-		this.questionId = questionId;
-	}
+    public void setQuestionId(UUID questionId) {
+        this.questionId = questionId;
+    }
 
-	public String getQuestionContent() {
-		return questionContent;
-	}
+    public String getQuestionContent() {
+        return questionContent;
+    }
 
-	public void setQuestionContent(String questionContent) {
-		this.questionContent = questionContent;
-	}
+    public void setQuestionContent(String questionContent) {
+        this.questionContent = questionContent;
+    }
 
-	public int getQuestionScore() {
-		return questionScore;
-	}
+    public int getQuestionScore() {
+        return questionScore;
+    }
 
-	public void setQuestionScore(int questionScore) {
-		this.questionScore = questionScore;
-	}
+    public void setQuestionScore(int questionScore) {
+        this.questionScore = questionScore;
+    }
 
-	public JSONArray getContentList() {
-		return contentList;
-	}
+    public JSONArray getContentList() {
+        return contentList;
+    }
 
-	public void setContentList(JSONArray contentList) {
-		this.contentList = contentList;
-	}
+    public void setContentList(JSONArray contentList) {
+        this.contentList = contentList;
+    }
 
-	public List<QuestionResponse> getQuestionGroup() {
-		return questionGroup;
-	}
+    public List<QuestionResponse> getQuestionGroup() {
+        return questionGroup;
+    }
 
-	public void setQuestionGroup(List<QuestionResponse> questionGroup) {
-		this.questionGroup = questionGroup;
-	}
+    public void setQuestionGroup(List<QuestionResponse> questionGroup) {
+        this.questionGroup = questionGroup;
+    }
 
-	public void setListAnswer(List<AnswerResponse> listAnswer) {
-		this.listAnswer = listAnswer;
-	}
+    public void setListAnswer(List<AnswerResponse> listAnswer) {
+        this.listAnswer = listAnswer;
+    }
 
-	public UUID getPartId() {
-		return partId;
-	}
+    public UUID getPartId() {
+        return partId;
+    }
 
-	public void setPartId(UUID partId) {
-		this.partId = partId;
-	}
+    public void setPartId(UUID partId) {
+        this.partId = partId;
+    }
 
-	public String getCreateAt() {
-		return createAt;
-	}
+    public String getCreateAt() {
+        return createAt;
+    }
 
-	public void setCreateAt(String createAt) {
-		this.createAt = createAt;
-	}
+    public void setCreateAt(String createAt) {
+        this.createAt = createAt;
+    }
 
-	public String getUpdateAt() {
-		return updateAt;
-	}
+    public String getUpdateAt() {
+        return updateAt;
+    }
 
-	public void setUpdateAt(String updateAt) {
-		this.updateAt = updateAt;
-	}
+    public void setUpdateAt(String updateAt) {
+        this.updateAt = updateAt;
+    }
 
-	public List<AnswerResponse> getListAnswer() {
-		return listAnswer;
-	}
+    public List<AnswerResponse> getListAnswer() {
+        return listAnswer;
+    }
 
-	public void setListAnswerResponse(List<AnswerResponse> listAnswer) {
-		this.listAnswer = listAnswer;
-	}
+    public void setListAnswerResponse(List<AnswerResponse> listAnswer) {
+        this.listAnswer = listAnswer;
+    }
 
-	public UUID getAnswerCorrect() {
-		return answerCorrect;
-	}
+    public UUID getAnswerCorrect() {
+        return answerCorrect;
+    }
 
-	public void setAnswerCorrect(UUID answerCorrect) {
-		this.answerCorrect = answerCorrect;
-	}
+    public void setAnswerCorrect(UUID answerCorrect) {
+        this.answerCorrect = answerCorrect;
+    }
 }
