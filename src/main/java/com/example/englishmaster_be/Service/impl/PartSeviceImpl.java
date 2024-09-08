@@ -3,6 +3,7 @@ package com.example.englishmaster_be.Service.impl;
 import com.example.englishmaster_be.Exception.CustomException;
 import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Model.Part;
+import com.example.englishmaster_be.Model.Response.PartResponse;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.IPartService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,8 +57,11 @@ public class PartSeviceImpl implements IPartService {
     @Override
     public boolean checkPart(Part part) {
         List<Part> partList = partRepository.findAll();
+        for (Part partRes : partList) {
+            System.out.println(new PartResponse(partRes).getPartName());
+        }
         for (Part partCheck : partList) {
-            if (partCheck.getPartName().toLowerCase().equals(part.getPartName().toLowerCase())) {
+            if (partCheck.getPartName().equalsIgnoreCase(part.getPartName())) {
                 return false;
             }
         }

@@ -1,6 +1,8 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.DTO.Question.CreateQuestionByExcelFileDTO;
+import com.example.englishmaster_be.Exception.CustomException;
+import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.DTO.Answer.CreateListAnswerDTO;
 import com.example.englishmaster_be.DTO.Question.CreateQuestionDTO;
@@ -8,6 +10,7 @@ import com.example.englishmaster_be.DTO.Topic.*;
 import com.example.englishmaster_be.DTO.UploadFileDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
+import com.example.englishmaster_be.Repository.ContentRepository;
 import com.example.englishmaster_be.Repository.StatusRepository;
 import com.example.englishmaster_be.Repository.TopicRepository;
 import com.example.englishmaster_be.Service.*;
@@ -62,6 +65,8 @@ public class TopicController {
 
     @Autowired
     private IExcelService excelService;
+    @Autowired
+    private ContentRepository contentRepository;
 
     @GetMapping(value = "/{topicId:.+}/inforTopic")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
@@ -762,7 +767,7 @@ public class TopicController {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
-            CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseListeningPart12DTO(file, partName);
+            CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseListeningPart12DTO(topicId, file, partName);
 
             processQuestions(excelFileDTO, topicId, user, responseModel);
 
@@ -783,7 +788,7 @@ public class TopicController {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
-            CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseListeningPart34DTO(file, partName);
+            CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseListeningPart34DTO(topicId, file, partName);
 
             processQuestions(excelFileDTO, topicId, user, responseModel);
 
@@ -804,7 +809,7 @@ public class TopicController {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
-            CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseReadingPart5DTO(file);
+            CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseReadingPart5DTO(topicId, file);
 
             processQuestions(excelFileDTO, topicId, user, responseModel);
 
@@ -825,7 +830,7 @@ public class TopicController {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
-            CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseReadingPart67DTO(file, partName);
+            CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseReadingPart67DTO(topicId, file, partName);
 
             processQuestions(excelFileDTO, topicId, user, responseModel);
 
@@ -846,7 +851,7 @@ public class TopicController {
         try {
             User user = IUserService.currentUser();
 
-            CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseAllPartsDTO(file);
+            CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseAllPartsDTO(topicId, file);
 
             processQuestions(excelFileDTO, topicId, user, responseModel);
 
@@ -962,9 +967,11 @@ public class TopicController {
                         questionResponse.setAnswerCorrect(answerCorrect.getAnswerId());
                     }
                 }
-                questionResponseList.add(questionResponse);
-
-
+                if (question.getContentCollection().size() > 1) {
+                    questionResponseList.add(0, questionResponse);
+                } else {
+                    questionResponseList.add(questionResponse);
+                }
             }
 
             responseModel.setMessage("Show question of part to topic successfully");
@@ -1052,90 +1059,35 @@ public class TopicController {
 
     private void processQuestions(CreateListQuestionByExcelFileDTO excelFileDTO, UUID topicId, User user, ResponseModel responseModel) {
         for (CreateQuestionByExcelFileDTO createQuestionDTO : excelFileDTO.getQuestions()) {
-            Question question = new Question();
-            question.setQuestionContent(createQuestionDTO.getQuestionContent());
-            question.setQuestionScore(createQuestionDTO.getQuestionScore());
-            question.setUserCreate(user);
-            question.setUserUpdate(user);
-            question.setQuestionExplainEn(createQuestionDTO.getQuestionExplainEn());
-            question.setQuestionExplainVn(createQuestionDTO.getQuestionExplainVn());
+            // Tạo câu hỏi và lưu nó trước khi xử lý câu trả lời
+            Question question = createQuestion(createQuestionDTO, user);
+            IQuestionService.createQuestion(question); // Lưu câu hỏi trước
 
-            Part part = IPartService.getPartToId(createQuestionDTO.getPartId());
-            question.setPart(part);
-            IQuestionService.createQuestion(question);
+            // Xử lý câu trả lời
+            processAnswers(createQuestionDTO.getListAnswer(), question, user);
 
-            if (createQuestionDTO.getListAnswer() != null && !createQuestionDTO.getListAnswer().isEmpty()) {
-                for (CreateListAnswerDTO createListAnswerDTO : createQuestionDTO.getListAnswer()) {
-                    Answer answer = new Answer();
-                    answer.setQuestion(question);
-                    answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
-                    answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
-                    answer.setUserUpdate(user);
-                    answer.setUserCreate(user);
-
-                    IAnswerService.createAnswer(answer);
-                }
-            }
-
+            // Tương tự cho questionChild
             if (createQuestionDTO.getListQuestionChild() != null && !createQuestionDTO.getListQuestionChild().isEmpty()) {
                 for (CreateQuestionByExcelFileDTO createQuestionChildDTO : createQuestionDTO.getListQuestionChild()) {
-                    Question questionChild = new Question();
+                    Question questionChild = createQuestion(createQuestionChildDTO, user);
                     questionChild.setQuestionGroup(question);
-                    questionChild.setQuestionContent(createQuestionChildDTO.getQuestionContent());
-                    questionChild.setQuestionScore(createQuestionChildDTO.getQuestionScore());
-                    questionChild.setPart(question.getPart());
-                    questionChild.setUserCreate(user);
-                    questionChild.setUserUpdate(user);
-                    questionChild.setQuestionExplainEn(createQuestionChildDTO.getQuestionExplainEn());
-                    questionChild.setQuestionExplainVn(createQuestionChildDTO.getQuestionExplainVn());
 
-                    IQuestionService.createQuestion(questionChild);
+                    IQuestionService.createQuestion(questionChild); // Lưu câu hỏi con trước
 
-                    for (CreateListAnswerDTO createListAnswerDTO : createQuestionChildDTO.getListAnswer()) {
-                        Answer answer = new Answer();
-                        answer.setQuestion(questionChild);
-                        answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
-                        answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
-                        answer.setUserUpdate(user);
-                        answer.setUserCreate(user);
-
-                        IAnswerService.createAnswer(answer);
-                        if (questionChild.getAnswers() == null) {
-                            questionChild.setAnswers(new ArrayList<>());
-                        }
-                        questionChild.getAnswers().add(answer);
-                    }
-
-                    IQuestionService.createQuestion(questionChild);
+                    processAnswers(createQuestionChildDTO.getListAnswer(), questionChild, user);
+                    processContent(createQuestionChildDTO.getContentImage(), createQuestionChildDTO.getContentAudio(), questionChild, user);
                 }
             }
 
-            if (createQuestionDTO.getContentImage() != null) {
-                Content content = new Content(question, GetExtension.typeFile(createQuestionDTO.getContentImage()), createQuestionDTO.getContentImage());
-                content.setUserCreate(user);
-                content.setUserUpdate(user);
+            // Xử lý content
+            processContent(createQuestionDTO.getContentImage(), createQuestionDTO.getContentAudio(), question, user);
 
-                if (question.getContentCollection() == null) {
-                    question.setContentCollection(new ArrayList<>());
-                }
-                question.getContentCollection().add(content);
-                IContentService.uploadContent(content);
-            }
-            if (createQuestionDTO.getContentAudio() != null) {
-                Content content = new Content(question, GetExtension.typeFile(createQuestionDTO.getContentAudio()), createQuestionDTO.getContentAudio());
-                content.setUserCreate(user);
-                content.setUserUpdate(user);
-
-                if (question.getContentCollection() == null) {
-                    question.setContentCollection(new ArrayList<>());
-                }
-                question.getContentCollection().add(content);
-                IContentService.uploadContent(content);
-            }
-
+            // Lưu câu hỏi đã cập nhật với content
             IQuestionService.createQuestion(question);
 
+            // Xử lý topic
             Topic topic = ITopicService.findTopicById(topicId);
+            Part part = question.getPart();
 
             if (ITopicService.existPartInTopic(topic, part)) {
                 topic.setUserUpdate(user);
@@ -1145,6 +1097,69 @@ public class TopicController {
             } else {
                 responseModel.setMessage("Part of question don't have in topic");
             }
+        }
+    }
+
+    private Question createQuestion(CreateQuestionByExcelFileDTO createQuestionDTO, User user) {
+        Question question = new Question();
+        question.setQuestionContent(createQuestionDTO.getQuestionContent());
+        question.setQuestionScore(createQuestionDTO.getQuestionScore());
+        question.setUserCreate(user);
+        question.setUserUpdate(user);
+        question.setQuestionExplainEn(createQuestionDTO.getQuestionExplainEn());
+        question.setQuestionExplainVn(createQuestionDTO.getQuestionExplainVn());
+
+        Part part = IPartService.getPartToId(createQuestionDTO.getPartId());
+        question.setPart(part);
+
+        return question;
+    }
+
+    private void processAnswers(List<CreateListAnswerDTO> listAnswerDTO, Question question, User user) {
+        if (listAnswerDTO != null && !listAnswerDTO.isEmpty()) {
+            for (CreateListAnswerDTO createListAnswerDTO : listAnswerDTO) {
+                Answer answer = new Answer();
+                answer.setQuestion(question);
+                answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
+                answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
+                answer.setUserUpdate(user);
+                answer.setUserCreate(user);
+
+                IAnswerService.createAnswer(answer);
+
+                if (question.getAnswers() == null) {
+                    question.setAnswers(new ArrayList<>());
+                }
+                question.getAnswers().add(answer);
+            }
+        }
+    }
+
+    private void processContent(String contentImage, String contentAudio, Question question, User user) {
+        if (contentImage != null) {
+            Content content = contentRepository.findByContentData(contentImage)
+                    .orElseThrow(() -> new CustomException(Error.CONTENT_NOT_FOUND));
+            content.setUserUpdate(user);
+
+            if (question.getContentCollection() == null) {
+                question.setContentCollection(new ArrayList<>());
+            }
+            content.setQuestion(question);
+            question.getContentCollection().add(content);
+            IContentService.uploadContent(content);
+        }
+
+        if (contentAudio != null) {
+            Content content = contentRepository.findByContentData(contentAudio)
+                    .orElseThrow(() -> new CustomException(Error.CONTENT_NOT_FOUND));
+            content.setUserUpdate(user);
+
+            if (question.getContentCollection() == null) {
+                question.setContentCollection(new ArrayList<>());
+            }
+            content.setQuestion(question);
+            question.getContentCollection().add(content);
+            IContentService.uploadContent(content);
         }
     }
 
