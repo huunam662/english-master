@@ -108,4 +108,20 @@ public class CreateQuestionByExcelFileDTO {
     public void setListQuestionChild(List<CreateQuestionByExcelFileDTO> listQuestionChild) {
         this.listQuestionChild = listQuestionChild;
     }
+
+    @Override
+    public String toString() {
+        return "CreateQuestionByExcelFileDTO{" +
+                "questionId=" + questionId +
+                ", questionContent='" + questionContent + '\'' +
+                ", questionScore=" + questionScore +
+                ", contentImage='" + contentImage + '\'' +
+                ", contentAudio='" + contentAudio + '\'' +
+                ", partId=" + partId +
+                ", listAnswer=" + listAnswer +
+                ", listQuestionChild=" + listQuestionChild +
+                ", questionExplainEn='" + questionExplainEn + '\'' +
+                ", questionExplainVn='" + questionExplainVn + '\'' +
+                '}';
+    }
 }

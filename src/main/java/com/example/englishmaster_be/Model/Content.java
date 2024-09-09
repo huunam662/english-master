@@ -1,6 +1,9 @@
 package com.example.englishmaster_be.Model;
 
+import com.example.englishmaster_be.DTO.Content.CreateContentDTO;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -8,6 +11,8 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Setter
+@Getter
 @Entity
 @Table(name = "content")
 public class Content implements Serializable {
@@ -46,6 +51,12 @@ public class Content implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "question_id"))
     private Question question;
 
+    @Column(name = "topic_id")
+    private UUID topicId;
+
+    @Column(name = "code")
+    private String code;
+
 
     public Content(Question question, String contentType, String contentData) {
         this.question = question;
@@ -60,69 +71,15 @@ public class Content implements Serializable {
 
     }
 
-	public UUID getContentId() {
-		return contentId;
-	}
+    public Content(CreateContentDTO createContentDTO) {
+        this.contentType = createContentDTO.getContentType();
+        this.contentData = createContentDTO.getContentData();
+        this.code = createContentDTO.getCode();
+        this.topicId = createContentDTO.getTopicId();
 
-	public void setContentId(UUID contentId) {
-		this.contentId = contentId;
-	}
+        createAt = LocalDateTime.now();
+        updateAt = LocalDateTime.now();
+    }
 
-	public String getContentType() {
-		return contentType;
-	}
 
-	public void setContentType(String contentType) {
-		this.contentType = contentType;
-	}
-
-	public String getContentData() {
-		return contentData;
-	}
-
-	public void setContentData(String contentData) {
-		this.contentData = contentData;
-	}
-
-	public LocalDateTime getCreateAt() {
-		return createAt;
-	}
-
-	public void setCreateAt(LocalDateTime createAt) {
-		this.createAt = createAt;
-	}
-
-	public User getUserCreate() {
-		return userCreate;
-	}
-
-	public void setUserCreate(User userCreate) {
-		this.userCreate = userCreate;
-	}
-
-	public LocalDateTime getUpdateAt() {
-		return updateAt;
-	}
-
-	public void setUpdateAt(LocalDateTime updateAt) {
-		this.updateAt = updateAt;
-	}
-
-	public User getUserUpdate() {
-		return userUpdate;
-	}
-
-	public void setUserUpdate(User userUpdate) {
-		this.userUpdate = userUpdate;
-	}
-
-	public Question getQuestion() {
-		return question;
-	}
-
-	public void setQuestion(Question question) {
-		this.question = question;
-	}
-    
-    
 }

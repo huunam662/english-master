@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/excel")
@@ -32,13 +33,13 @@ public class ImportExcelFileController {
             responseModel.setMessage("File processed successfully");
         } catch (Exception e) {
             responseModel.setStatus("error");
-            responseModel.setMessage("Error processing file: " + e.getMessage());
+            responseModel.setMessage("Error proces sing file: " + e.getMessage());
         }
         return responseModel;
     }
 
     @PostMapping(value = "/importQuestionPart67", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseModel getCreateQuestionPart67ByExcelFileDTO(@RequestParam("file") MultipartFile file, @RequestParam("part") int part) throws IOException {
+    public ResponseModel getCreateQuestionPart67ByExcelFileDTO(@RequestParam("topicId") UUID topicId, @RequestParam("file") MultipartFile file, @RequestParam("part") int part) throws IOException {
         ResponseModel responseModel = new ResponseModel();
 
         if (file.isEmpty()) {
@@ -55,7 +56,7 @@ public class ImportExcelFileController {
         }
 
         try {
-            CreateListQuestionByExcelFileDTO createTopicByExcelFileDTO = excelService.parseReadingPart67DTO(file, part);
+            CreateListQuestionByExcelFileDTO createTopicByExcelFileDTO = excelService.parseReadingPart67DTO(topicId, file, part);
             responseModel.setResponseData(createTopicByExcelFileDTO);
             responseModel.setStatus("success");
             responseModel.setMessage("File processed successfully");
@@ -67,7 +68,7 @@ public class ImportExcelFileController {
     }
 
     @PostMapping(value = "/importQuestionPart5", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseModel getCreateQuestionByExcelFileDTO(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseModel getCreateQuestionByExcelFileDTO(@RequestParam("topicId") UUID topicId, @RequestParam("file") MultipartFile file) throws IOException {
         ResponseModel responseModel = new ResponseModel();
         if (file.isEmpty()) {
             responseModel.setStatus("error");
@@ -75,7 +76,7 @@ public class ImportExcelFileController {
             return responseModel;
         }
         try {
-            CreateListQuestionByExcelFileDTO createTopicByExcelFileDTO = excelService.parseReadingPart5DTO(file);
+            CreateListQuestionByExcelFileDTO createTopicByExcelFileDTO = excelService.parseReadingPart5DTO(topicId, file);
             responseModel.setResponseData(createTopicByExcelFileDTO);
             responseModel.setStatus("success");
             responseModel.setMessage("File processed successfully");
@@ -87,7 +88,7 @@ public class ImportExcelFileController {
     }
 
     @PostMapping(value = "/importQuestionPart12", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseModel getCreateQuestionPart12ByExcelFileDTO(@RequestParam("file") MultipartFile file, @RequestParam("part") int part) throws IOException {
+    public ResponseModel getCreateQuestionPart12ByExcelFileDTO(@RequestParam("topicId") UUID topicId, @RequestParam("file") MultipartFile file, @RequestParam("part") int part) throws IOException {
         ResponseModel responseModel = new ResponseModel();
 
         if (file.isEmpty()) {
@@ -104,7 +105,7 @@ public class ImportExcelFileController {
         }
 
         try {
-            CreateListQuestionByExcelFileDTO createTopicByExcelFileDTO = excelService.parseListeningPart12DTO(file, part);
+            CreateListQuestionByExcelFileDTO createTopicByExcelFileDTO = excelService.parseListeningPart12DTO(topicId, file, part);
             responseModel.setResponseData(createTopicByExcelFileDTO);
             responseModel.setStatus("success");
             responseModel.setMessage("File processed successfully");
@@ -117,7 +118,7 @@ public class ImportExcelFileController {
 
 
     @PostMapping(value = "/importQuestionPart34", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseModel getCreateQuestionPart34ByExcelFileDTO(@RequestParam("file") MultipartFile file, @RequestParam("part") int part) throws IOException {
+    public ResponseModel getCreateQuestionPart34ByExcelFileDTO(@RequestParam("topicId") UUID topicId, @RequestParam("file") MultipartFile file, @RequestParam("part") int part) throws IOException {
         ResponseModel responseModel = new ResponseModel();
 
         if (file.isEmpty()) {
@@ -134,7 +135,7 @@ public class ImportExcelFileController {
         }
 
         try {
-            CreateListQuestionByExcelFileDTO createTopicByExcelFileDTO = excelService.parseListeningPart34DTO(file, part);
+            CreateListQuestionByExcelFileDTO createTopicByExcelFileDTO = excelService.parseListeningPart34DTO(topicId, file, part);
             responseModel.setResponseData(createTopicByExcelFileDTO);
             responseModel.setStatus("success");
             responseModel.setMessage("File processed successfully");
@@ -146,7 +147,7 @@ public class ImportExcelFileController {
     }
 
     @PostMapping(value = "/importAllParts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseModel getCreateQuestionAllPartByExcelFileDTO(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseModel getCreateQuestionAllPartByExcelFileDTO(@RequestParam("topicId") UUID topicId, @RequestParam("file") MultipartFile file) throws IOException {
         ResponseModel responseModel = new ResponseModel();
         if (file.isEmpty()) {
             responseModel.setStatus("error");
@@ -154,7 +155,7 @@ public class ImportExcelFileController {
             return responseModel;
         }
         try {
-            CreateListQuestionByExcelFileDTO createTopicByExcelFileDTO = excelService.parseAllPartsDTO(file);
+            CreateListQuestionByExcelFileDTO createTopicByExcelFileDTO = excelService.parseAllPartsDTO(topicId, file);
             responseModel.setResponseData(createTopicByExcelFileDTO);
             responseModel.setStatus("success");
             responseModel.setMessage("File processed successfully");

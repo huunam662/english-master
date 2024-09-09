@@ -2,6 +2,8 @@ package com.example.englishmaster_be.Model.Response;
 
 import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.Model.*;
+import lombok.Getter;
+import lombok.Setter;
 
 
 import java.sql.Timestamp;
@@ -103,14 +105,6 @@ public class CommentResponse {
 
     public UUID getTopicId() {
         return topicId;
-    }
-
-    public void setTopicId(UUID topicId) {
-        this.topicId = topicId;
-    }
-
-    public UUID getPostId() {
-        return postId;
     }
 
     public void setPostId(UUID postId) {

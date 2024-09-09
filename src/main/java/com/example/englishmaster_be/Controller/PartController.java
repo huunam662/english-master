@@ -32,7 +32,7 @@ public class PartController {
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<ResponseModel> createPart(@RequestBody CreatePartDTO createpartDTO){
+    public ResponseEntity<ResponseModel> createPart(@RequestBody CreatePartDTO createpartDTO) {
         ResponseModel responseModel = new ResponseModel();
 
         try {
@@ -47,36 +47,36 @@ public class PartController {
 
             PartResponse partResponse = new PartResponse(part);
 
-            if (checkPart){
+            if (checkPart) {
                 responseModel.setMessage("Create part successfully");
                 responseModel.setResponseData(partResponse);
                 responseModel.setStatus("success");
-            }
-            else {
+            } else {
                 responseModel.setMessage("Create part fail: The part name is already exist");
                 responseModel.setStatus("fail");
             }
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-        }
-        catch (Exception e){responseModel.setMessage("Create part fail: " + e.getMessage());
+        } catch (Exception e) {
+            responseModel.setMessage("Create part fail: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
     }
 
-    @PutMapping(value = "/{partId:.+}/uploadfile", consumes = {"multipart/form-data"} )
+    @PutMapping(value = "/{partId:.+}/uploadfile", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<ResponseModel> uploadFilePart(@PathVariable UUID partId, @ModelAttribute UploadMultiFileDTO uploadMultiFileDTO){
+    public ResponseEntity<ResponseModel> uploadFilePart(@PathVariable UUID partId, @ModelAttribute UploadMultiFileDTO uploadMultiFileDTO) {
         ResponseModel responseModel = new ResponseModel();
 
         try {
             User user = IUserService.currentUser();
 
             Part part = IPartService.getPartToId(partId);
-            Arrays.asList(uploadMultiFileDTO.getContentData()).stream().forEach(file ->{
+            Arrays.asList(uploadMultiFileDTO.getContentData()).stream().forEach(file -> {
                 String filename = IFileStorageService.nameFile(file);
-                if(IPartService.checkFilePart(part)){
+                if (IPartService.checkFilePart(part)) {
                     boolean existed = IFileStorageService.delete(part.getContentData());
                 }
                 part.setContentType(GetExtension.typeFile(filename));
@@ -96,16 +96,17 @@ public class PartController {
             responseModel.setStatus("success");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-        }
-        catch (Exception e){responseModel.setMessage("Create part fail: " + e.getMessage());
+        } catch (Exception e) {
+            responseModel.setMessage("Create part fail: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
     }
 
     @PutMapping(value = "/{partId:.+}/uploadText")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<ResponseModel> uploadTextPart(@PathVariable UUID partId, @RequestBody UploadTextDTO uploadTextDTO){
+    public ResponseEntity<ResponseModel> uploadTextPart(@PathVariable UUID partId, @RequestBody UploadTextDTO uploadTextDTO) {
         ResponseModel responseModel = new ResponseModel();
         try {
 
@@ -127,15 +128,16 @@ public class PartController {
             responseModel.setStatus("success");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-        }
-        catch (Exception e){responseModel.setMessage("Upload file part fail: " + e.getMessage());
+        } catch (Exception e) {
+            responseModel.setMessage("Upload file part fail: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
     }
 
     @GetMapping(value = "/listPart")
-    public ResponseEntity<ResponseModel> getAllPart(){
+    public ResponseEntity<ResponseModel> getAllPart() {
         ResponseModel responseModel = new ResponseModel();
 
         try {
@@ -143,7 +145,7 @@ public class PartController {
 
             List<PartResponse> partResponseList = new ArrayList<>();
 
-            for(Part part : partList){
+            for (Part part : partList) {
                 PartResponse partResponse = new PartResponse(part);
                 partResponseList.add(partResponse);
             }
@@ -153,7 +155,7 @@ public class PartController {
             responseModel.setStatus("success");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-        }catch (Exception e) {
+        } catch (Exception e) {
             responseModel.setMessage("Show all part: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
@@ -163,14 +165,14 @@ public class PartController {
 
     @DeleteMapping(value = "/{partId:.+}/delete")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<ResponseModel> deletePart(@PathVariable UUID partId){
+    public ResponseEntity<ResponseModel> deletePart(@PathVariable UUID partId) {
         ResponseModel responseModel = new ResponseModel();
 
         try {
 
             Part part = IPartService.getPartToId(partId);
 
-            if(part.getContentData() != null){
+            if (part.getContentData() != null) {
                 IFileStorageService.delete(part.getContentData());
             }
 
@@ -180,7 +182,7 @@ public class PartController {
             responseModel.setStatus("success");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-        }catch (Exception e) {
+        } catch (Exception e) {
             responseModel.setMessage("Delete part: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
@@ -190,7 +192,7 @@ public class PartController {
 
     @PutMapping(value = "/{partId:.+}/update")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<ResponseModel> updatePart(@PathVariable UUID partId, @RequestBody UpdatePartDTO updatePartDTO){
+    public ResponseEntity<ResponseModel> updatePart(@PathVariable UUID partId, @RequestBody UpdatePartDTO updatePartDTO) {
         ResponseModel responseModel = new ResponseModel();
 
         try {
@@ -206,39 +208,39 @@ public class PartController {
             part.setUserUpdate(user);
             part.setUpdateAt(LocalDateTime.now());
 
+
             boolean checkPart = IPartService.checkPart(part);
-            if(partNameOld.equals(updatePartDTO.getPartName())){
+            if (partNameOld.equals(updatePartDTO.getPartName())) {
                 checkPart = true;
             }
-
             PartResponse partResponse = new PartResponse(part);
 
-            if (checkPart){
+            if (checkPart) {
                 IPartService.updatePart(part);
 
                 responseModel.setMessage("Update part successfully");
                 responseModel.setResponseData(partResponse);
                 responseModel.setStatus("success");
-            }
-            else {
+            } else {
                 responseModel.setMessage("Create part fail: The part name is already exist");
                 responseModel.setStatus("fail");
             }
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-        }
-        catch (Exception e){responseModel.setMessage("Create part fail: " + e.getMessage());
+        } catch (Exception e) {
+            responseModel.setMessage("Create part fail: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
     }
 
     @GetMapping(value = "/{partId:.+}/content")
-    public ResponseEntity<ResponseModel> getPartToId(@PathVariable UUID partId){
+    public ResponseEntity<ResponseModel> getPartToId(@PathVariable UUID partId) {
         ResponseModel responseModel = new ResponseModel();
 
         try {
-            Part part =IPartService.getPartToId(partId);
+            Part part = IPartService.getPartToId(partId);
             JSONObject partResponse = new JSONObject();
             partResponse.put("partId", part.getPartId());
             partResponse.put("partName", part.getPartName());
@@ -250,7 +252,7 @@ public class PartController {
             responseModel.setStatus("success");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-        }catch (Exception e) {
+        } catch (Exception e) {
             responseModel.setMessage("Show information part: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));

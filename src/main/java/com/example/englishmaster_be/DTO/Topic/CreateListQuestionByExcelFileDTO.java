@@ -18,4 +18,11 @@ public class CreateListQuestionByExcelFileDTO {
     public void setQuestions(List<CreateQuestionByExcelFileDTO> questions) {
         this.questions = questions;
     }
+
+    @Override
+    public String toString() {
+        return "CreateListQuestionByExcelFileDTO{" +
+                "questions=" + questions +
+                '}';
+    }
 }
