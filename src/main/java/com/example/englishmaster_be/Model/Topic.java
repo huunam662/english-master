@@ -46,6 +46,7 @@ public class Topic implements Serializable {
 
     @OneToMany(mappedBy = "topic")
     private Collection<Comment> comments;
+
     @ManyToMany
     @JoinTable(name = "topic_question",
             joinColumns = @JoinColumn(name = "topic_id"),
@@ -78,7 +79,7 @@ public class Topic implements Serializable {
     @JoinColumn(name = "update_by", referencedColumnName = "id")
     private User userUpdate;
 
-    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL,orphanRemoval = true)
     private Collection<MockTest> mockTests;
 
     @ManyToOne

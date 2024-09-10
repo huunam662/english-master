@@ -56,10 +56,10 @@ public class MockTest implements Serializable {
     @JoinColumn(name = "update_by", referencedColumnName = "id")
     private User userUpdate;
 
-    @OneToMany(mappedBy = "mockTest")
+    @OneToMany(mappedBy = "mockTest",cascade = CascadeType.ALL,orphanRemoval = true)
     private Collection<DetailMockTest> detailMockTests;
 
-    @OneToMany(mappedBy = "mockTest")
+    @OneToMany(mappedBy = "mockTest",cascade = CascadeType.ALL,orphanRemoval = true)
     private Collection<ResultMockTest> resultMockTests;
 
 
