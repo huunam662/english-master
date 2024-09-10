@@ -245,7 +245,6 @@ public class UserController {
 
         responseModel.setMessage("Kiểm tra email của bạn để xác thực mã OTP.");
         responseModel.setStatus("success");
-
         return responseModel;
     }
 
