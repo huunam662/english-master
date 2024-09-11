@@ -2,11 +2,13 @@ package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.DTO.MockTest.CreateMockTestDTO;
 import com.example.englishmaster_be.DTO.MockTest.CreateResultMockTestDTO;
+import com.example.englishmaster_be.Exception.CustomException;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Repository.MockTestRepository;
 import com.example.englishmaster_be.Repository.ResultMockTestRepository;
 import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.Service.impl.MockTestServiceImpl;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -95,6 +97,31 @@ public class MockTestController {
         }
     }
 
+    @PostMapping(value = "/findMockTest")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseModel> findMockTest(@RequestParam UUID id){
+
+        ResponseModel responseModel = new ResponseModel();
+
+        try {
+            //Find MockTest by MockTestId
+            MockTest mockTest = IMockTestService.findMockTestToId(id);
+            MockTestResponse mockTestResponse =new MockTestResponse(mockTest);
+            // Set success response
+            responseModel.setMessage("Find MockTest successfully");
+            responseModel.setStatus("success");
+            responseModel.setResponseData(mockTestResponse);
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        }catch (Exception e){
+            // Handle exception and return error response
+           responseModel.setMessage(e.getMessage());
+           responseModel.setStatus("fail");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
+        }
+
+    }
+
     @GetMapping(value = "/listMockTest")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> listTop10MockTest(@RequestParam int index) {
@@ -107,7 +134,6 @@ public class MockTestController {
                 MockTestResponse mockTestResponse = new MockTestResponse(mockTest);
                 mockTestResponseList.add(mockTestResponse);
             }
-
 
             responseModel.setMessage("Get top 10 mock test successfully");
 
