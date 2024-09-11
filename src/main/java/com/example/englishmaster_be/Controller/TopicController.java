@@ -288,23 +288,29 @@ public class TopicController {
     @DeleteMapping(value = "/{topicId:.+}/delete")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> deleteTopic(@PathVariable UUID topicId) {
+
         ResponseModel responseModel = new ResponseModel();
+
         try {
+            // Find topic by TopicId and throw an exception if not found
             Topic topic = ITopicService.findTopicById(topicId);
 
+            // Delete topic and related image
             ITopicService.deleteTopic(topic);
             IFileStorageService.delete(topic.getTopicImage());
 
+            // Set success response
             responseModel.setMessage("Delete topic successfully");
             responseModel.setStatus("success");
 
-
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-        } catch (Exception e) {
-            responseModel.setMessage("Delete topic fail: " + e.getMessage());
+
+        } catch (IllegalArgumentException e) {
+
+            // Handle exception and return error response
+            responseModel.setMessage(e.getMessage());
             responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
         }
     }
 
