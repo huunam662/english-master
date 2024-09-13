@@ -39,7 +39,7 @@ public class UploadController {
         ResponseModel responseModel = new ResponseModel();
         String urlFile = IUploadService.upload(file, dir, isPrivateFile, topicId, code);
         if (urlFile != null && urlFile.startsWith("https")) {
-            responseModel.setMessage(urlFile);
+            responseModel.setMessage("Successfully uploaded file");
             responseModel.setStatus("success");
             responseModel.setResponseData(urlFile);
             return ResponseEntity.ok(responseModel);

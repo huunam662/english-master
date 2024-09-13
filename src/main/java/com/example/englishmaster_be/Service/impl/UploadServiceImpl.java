@@ -8,6 +8,7 @@ import com.example.englishmaster_be.Service.IUploadService;
 import com.example.englishmaster_be.Service.IUserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
@@ -21,18 +22,14 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Service
+@AllArgsConstructor
 public class UploadServiceImpl implements IUploadService {
-    @Autowired
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+    private final ContentRepository contentRepository;
+    private final IUserService IUserService;
 
-    @Autowired
-    private ContentRepository contentRepository;
-
-    @Autowired
-    private IUserService IUserService;
-
-    private static String UPLOAD_API_URL = "https://meuupload.meu-solutions.com/api/v1.0/upload/single";
-    private static String TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJidWNrZXQiOiJtZXVlbmdsaXNoIiwiaWF0IjoxNTE2MjM5MDIyfQ.jIAXLrrGhQseo8iZ6CNhXjf1Izs_nOK_RrcndzHYhJE18w0nPsx3PaHkG52zTARDWYasosOvTps_h_8-IAQ2FDZXgb2F5IhAukbDDEM7yL7bBtpZrgPnybbhu4TFcGMeealUvatifU1LUEKardPe62b12SdEiUkmag9lIjD81vBZ2KSAYJAFVchQ012dOPzT-O7qg2uBvfc-1XwKHBW5emMCEmlJh_DZ-rORSPvLpXzau9nhELAP9Hg-MCipmhhHR_4iaxX1ljhe4mq3T8rva86sLVDnOVzVB6I_Yl5S5zo2CCVM-5StxkAQABHtHzGeFsPYeHwK0ySwbYYHVF01lw";
+    private final static String UPLOAD_API_URL = "https://meuupload.meu-solutions.com/api/v1.0/upload/single";
+    private final static String TOKEN = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJidWNrZXQiOiJtZXVlbmdsaXNoIiwiaWF0IjoxNTE2MjM5MDIyfQ.jIAXLrrGhQseo8iZ6CNhXjf1Izs_nOK_RrcndzHYhJE18w0nPsx3PaHkG52zTARDWYasosOvTps_h_8-IAQ2FDZXgb2F5IhAukbDDEM7yL7bBtpZrgPnybbhu4TFcGMeealUvatifU1LUEKardPe62b12SdEiUkmag9lIjD81vBZ2KSAYJAFVchQ012dOPzT-O7qg2uBvfc-1XwKHBW5emMCEmlJh_DZ-rORSPvLpXzau9nhELAP9Hg-MCipmhhHR_4iaxX1ljhe4mq3T8rva86sLVDnOVzVB6I_Yl5S5zo2CCVM-5StxkAQABHtHzGeFsPYeHwK0ySwbYYHVF01lw";
 
     @Override
     public String upload(MultipartFile file, String dir, boolean isPrivateFile, UUID topicId, String code) {
