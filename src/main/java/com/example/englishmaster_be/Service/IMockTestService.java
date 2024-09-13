@@ -1,6 +1,8 @@
 package com.example.englishmaster_be.Service;
 
 import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.Model.Response.MockTestResponse;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -14,6 +16,8 @@ public interface IMockTestService {
     List<MockTest> getTop10MockTestToUser(int index, User user);
 
     MockTest findMockTestToId(UUID mockTestId);
+
+    ResponseEntity<ResponseModel> findMockTestById(UUID mockTestId);
 
     List<DetailMockTest> getTop10DetailToCorrect(int index, boolean isCorrect ,MockTest mockTest);
 
