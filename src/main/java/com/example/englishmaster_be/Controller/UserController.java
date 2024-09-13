@@ -223,6 +223,7 @@ public class UserController {
 
         @PostMapping("/forgetPassword")
         public ResponseModel forgetPassword(@RequestParam("email") String email) throws MessagingException, IOException {
+
             ResponseModel responseModel = new ResponseModel();
 
             boolean checkEmailExists = IUserService.existsEmail(email);
