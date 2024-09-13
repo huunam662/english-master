@@ -97,16 +97,14 @@ public class MockTestController {
         }
     }
 
-    @PostMapping(value = "/findMockTest")
+    @GetMapping(value = "/getMockTestById")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<ResponseModel> findMockTest(@RequestParam UUID id){
-
+    public ResponseEntity<ResponseModel> getMockTest(@RequestParam UUID id){
         ResponseModel responseModel = new ResponseModel();
-
         try {
             //Find MockTest by MockTestId
             MockTest mockTest = IMockTestService.findMockTestToId(id);
-            MockTestResponse mockTestResponse =new MockTestResponse(mockTest);
+            MockTestResponse mockTestResponse = new MockTestResponse(mockTest);
             // Set success response
             responseModel.setMessage("Find MockTest successfully");
             responseModel.setStatus("success");
@@ -117,9 +115,8 @@ public class MockTestController {
             // Handle exception and return error response
            responseModel.setMessage(e.getMessage());
            responseModel.setStatus("fail");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
+           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
         }
-
     }
 
     @GetMapping(value = "/listMockTest")
