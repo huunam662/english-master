@@ -68,8 +68,9 @@ public class ExcelServiceImpl implements IExcelService {
             } catch (Exception e) {
                 throw new CustomException(Error.CAN_NOT_CREATE_TOPIC_BY_EXCEL);
             }
+        } else {
+            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
         }
-        return null;
     }
 
     @Override
@@ -147,8 +148,9 @@ public class ExcelServiceImpl implements IExcelService {
                     throw new CustomException(Error.CAN_NOT_CREATE_PART_2_BY_EXCEL);
                 }
             }
+        } else {
+            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
         }
-        return null;
     }
 
 
@@ -193,10 +195,11 @@ public class ExcelServiceImpl implements IExcelService {
                 resultDTO.setQuestions(listQuestionDTO);
                 return resultDTO;
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new CustomException(Error.CAN_NOT_CREATE_PART_5_BY_EXCEL);
             }
+        } else {
+            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
         }
-        return null;
     }
 
     @Override
@@ -274,10 +277,15 @@ public class ExcelServiceImpl implements IExcelService {
                 result.setQuestions(listeningParts);
                 return result;
             } catch (Exception e) {
-                e.printStackTrace();
+                if (part == 3) {
+                    throw new CustomException(Error.CAN_NOT_CREATE_PART_3_BY_EXCEL);
+                } else {
+                    throw new CustomException(Error.CAN_NOT_CREATE_PART_4_BY_EXCEL);
+                }
             }
+        } else {
+            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
         }
-        return null;
     }
 
 
@@ -361,10 +369,15 @@ public class ExcelServiceImpl implements IExcelService {
                 result.setQuestions(readingParts);
                 return result;
             } catch (Exception e) {
-                e.printStackTrace();
+                if (part == 6) {
+                    throw new CustomException(Error.CAN_NOT_CREATE_PART_6_BY_EXCEL);
+                } else {
+                    throw new CustomException(Error.CAN_NOT_CREATE_PART_7_BY_EXCEL);
+                }
             }
+        } else {
+            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
         }
-        return null;  // Trả về null nếu có lỗi xảy ra
     }
 
     @Override
