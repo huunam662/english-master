@@ -100,23 +100,7 @@ public class MockTestController {
     @GetMapping(value = "/getMockTestById")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> getMockTest(@RequestParam UUID id){
-        ResponseModel responseModel = new ResponseModel();
-        try {
-            //Find MockTest by MockTestId
-            MockTest mockTest = IMockTestService.findMockTestToId(id);
-            MockTestResponse mockTestResponse = new MockTestResponse(mockTest);
-            // Set success response
-            responseModel.setMessage("Find MockTest successfully");
-            responseModel.setStatus("success");
-            responseModel.setResponseData(mockTestResponse);
-
-            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-        }catch (Exception e){
-            // Handle exception and return error response
-           responseModel.setMessage(e.getMessage());
-           responseModel.setStatus("fail");
-           return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
-        }
+        return IMockTestService.findMockTestById(id);
     }
 
     @GetMapping(value = "/listMockTest")
