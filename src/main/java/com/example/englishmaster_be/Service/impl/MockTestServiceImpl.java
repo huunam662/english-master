@@ -3,10 +3,13 @@ package com.example.englishmaster_be.Service.impl;
 import com.example.englishmaster_be.Exception.CustomException;
 import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.Model.Response.MockTestResponse;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.IMockTestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,6 +23,21 @@ public class MockTestServiceImpl implements IMockTestService {
 
     @Autowired
     private DetailMockTestRepository detailMockTestRepository;
+
+    @Override
+    public ResponseEntity<ResponseModel> findMockTestById(UUID mockTestId) {
+        ResponseModel responseModel = new ResponseModel();
+
+        MockTest mockTest = mockTestRepository.findByMockTestId(mockTestId)
+                .orElseThrow(() -> new CustomException(Error.MOCK_TEST_NOT_FOUND));
+
+        MockTestResponse mockTestResponse = new MockTestResponse(mockTest);
+        responseModel.setMessage("Find MockTest successfully");
+        responseModel.setStatus("success");
+        responseModel.setResponseData(mockTestResponse);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+    }
 
     @Override
     public void createMockTest(MockTest mockTest) {

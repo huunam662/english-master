@@ -27,7 +27,7 @@ public class OtpServiceImpl implements IOtpService {
         otpObj.setOtp(otpCode);
         otpObj.setEmail(email);
         otpObj.setStatus("Unverified");
-        otpObj.setExpirationTime(LocalDateTime.now().plusMinutes(10));
+        otpObj.setExpirationTime(LocalDateTime.now().plusMinutes(1));
         otpObj.setCreatedAt(LocalDateTime.now());
         otpRepository.save(otpObj);
 
