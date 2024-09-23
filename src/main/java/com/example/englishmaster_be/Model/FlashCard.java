@@ -14,8 +14,8 @@ import java.util.UUID;
 @Table(name = "flash_card")
 public class FlashCard implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", columnDefinition = "BINARY(16)")
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID flashCardId;
 
     @ManyToOne

@@ -13,8 +13,8 @@ import java.util.UUID;
 @Table(name = "feedback")
 public class Feedback implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", columnDefinition = "BINARY(16)")
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID feedbackId;
 
     @Column(name = "name")

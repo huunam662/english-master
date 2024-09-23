@@ -10,6 +10,10 @@ import com.example.englishmaster_be.Service.*;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.validation.constraints.Max;
@@ -190,6 +194,22 @@ public class UserController {
         return responseModel;
     }
 
+//    @Operation(summary = "Login a user",
+//            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
+//                    required = true,
+//                    content = @Content(
+//                            mediaType = "application/json",
+//                            examples = @ExampleObject(
+//                                    name = "Login Example",
+//                                    value = "{ \"email\": \"admin@meuenglish.com\", \"password\": \"admin123\" }"
+//                            )
+//                    )
+//            ),
+//            responses = {
+//                    @ApiResponse(responseCode = "200", description = "Login successful"),
+//                    @ApiResponse(responseCode = "401", description = "Login failed")
+//            }
+//    )
     @PostMapping("/login")
     public ResponseModel login(@RequestBody UserLoginDTO loginDTO) {
         ResponseModel responseModel = new ResponseModel();
@@ -221,114 +241,114 @@ public class UserController {
         }
     }
 
-        @PostMapping("/forgetPassword")
-        public ResponseModel forgetPassword(@RequestParam("email") String email) throws MessagingException, IOException {
+    @PostMapping("/forgetPassword")
+    public ResponseModel forgetPassword(@RequestParam("email") String email) throws MessagingException, IOException {
 
-            ResponseModel responseModel = new ResponseModel();
+        ResponseModel responseModel = new ResponseModel();
 
-            boolean checkEmailExists = IUserService.existsEmail(email);
+        boolean checkEmailExists = IUserService.existsEmail(email);
 
-            if (email == null || email.isEmpty()){
-                responseModel.setMessage("Vui lòng điền email để được hỗ trợ");
-                responseModel.setStatus("fail");
-                return responseModel;
-            }
-
-            if (!checkEmailExists) {
-                responseModel.setMessage("Không tìm thấy email "+email);
-                responseModel.setStatus("fail");
-                return responseModel;
-            }
-
-            String otp = IOtpService.generateOtp(email);
-
-            sendOtpToEmail(email, otp);
-
-            responseModel.setMessage("Kiểm tra email của bạn để xác thực mã OTP.");
-            responseModel.setStatus("success");
+        if (email == null || email.isEmpty()) {
+            responseModel.setMessage("Vui lòng điền email để được hỗ trợ");
+            responseModel.setStatus("fail");
             return responseModel;
         }
 
-        @PostMapping("/verifyOtp")
-        public ResponseModel verifyOtp(@RequestParam String otp) {
-
-            ResponseModel responseModel = new ResponseModel();
-
-            if (otp == null || otp.isEmpty()) {
-                responseModel.setMessage("OTP không được bỏ trống");
-                responseModel.setStatus("fail");
-                return responseModel;
-            }
-
-            boolean isOtpValid = IOtpService.validateOtp(otp);
-
-            if (!isOtpValid) {
-                responseModel.setMessage("Mã OTP đã hết hiệu lực");
-                responseModel.setStatus("fail");
-                return responseModel;
-            }
-
-            IOtpService.updateOtpStatusToVerified(otp);
-            responseModel.setMessage("Mã OTP đã được xác thực thành công.");
-            responseModel.setStatus("success");
-
+        if (!checkEmailExists) {
+            responseModel.setMessage("Không tìm thấy email " + email);
+            responseModel.setStatus("fail");
             return responseModel;
         }
 
-        @PostMapping("/changePassword")
-        public ResponseModel changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
-            ResponseModel responseModel = new ResponseModel();
+        String otp = IOtpService.generateOtp(email);
 
-            String otp = changePasswordDTO.getCode();
-            String newPassword = changePasswordDTO.getNewPass();
-            String confirmPassword = changePasswordDTO.getConfirmPass();
+        sendOtpToEmail(email, otp);
 
-            // Regex để kiểm tra mật khẩu
-            String regexPassword = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";
+        responseModel.setMessage("Kiểm tra email của bạn để xác thực mã OTP.");
+        responseModel.setStatus("success");
+        return responseModel;
+    }
 
+    @PostMapping("/verifyOtp")
+    public ResponseModel verifyOtp(@RequestParam String otp) {
 
-            boolean isOtpValid = IOtpService.validateOtp(otp);
+        ResponseModel responseModel = new ResponseModel();
 
-            if (!isOtpValid) {
-                responseModel.setMessage("Mã OTP đã hết hạn");
-                responseModel.setStatus("fail");
-                return responseModel;
-            }
-
-            if (newPassword == null || newPassword.isEmpty()) {
-                responseModel.setMessage("Mật khẩu mới không được bỏ trống");
-                responseModel.setStatus("fail");
-                return responseModel;
-            }
-
-            // Kiểm tra mật khẩu mới có đúng định dạng theo regex hay không
-            if (!newPassword.matches(regexPassword)) {
-                responseModel.setMessage("Mật khẩu mới phải chứa ít nhất 1 chữ số, " +
-                        "1 chữ thường, 1 chữ hoa, 1 ký tự đặc biệt và không được có khoảng trắng, " +
-                        "độ dài từ 8 đến 20 ký tự.");
-                responseModel.setStatus("fail");
-                return responseModel;
-            }
-
-            if (!newPassword.equals(confirmPassword)) {
-                responseModel.setMessage("Mật khẩu mới và xác nhận mật khẩu không khớp");
-                responseModel.setStatus("fail");
-                return responseModel;
-            }
-
-            boolean isPasswordUpdated = IUserService.updatePassword(otp, newPassword);
-
-            if (isPasswordUpdated) {
-                IOtpService.deleteOtp(otp);
-                responseModel.setMessage("Mật khẩu đã được thay đổi thành công.");
-                responseModel.setStatus("success");
-                return responseModel;
-            } else {
-                responseModel.setMessage("Không thể thay đổi mật khẩu. Vui lòng thử lại.");
-                responseModel.setStatus("fail");
-                return responseModel;
-            }
+        if (otp == null || otp.isEmpty()) {
+            responseModel.setMessage("OTP không được bỏ trống");
+            responseModel.setStatus("fail");
+            return responseModel;
         }
+
+        boolean isOtpValid = IOtpService.validateOtp(otp);
+
+        if (!isOtpValid) {
+            responseModel.setMessage("Mã OTP đã hết hiệu lực");
+            responseModel.setStatus("fail");
+            return responseModel;
+        }
+
+        IOtpService.updateOtpStatusToVerified(otp);
+        responseModel.setMessage("Mã OTP đã được xác thực thành công.");
+        responseModel.setStatus("success");
+
+        return responseModel;
+    }
+
+    @PostMapping("/changePassword")
+    public ResponseModel changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+        ResponseModel responseModel = new ResponseModel();
+
+        String otp = changePasswordDTO.getCode();
+        String newPassword = changePasswordDTO.getNewPass();
+        String confirmPassword = changePasswordDTO.getConfirmPass();
+
+        // Regex để kiểm tra mật khẩu
+        String regexPassword = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";
+
+
+        boolean isOtpValid = IOtpService.validateOtp(otp);
+
+        if (!isOtpValid) {
+            responseModel.setMessage("Mã OTP đã hết hạn");
+            responseModel.setStatus("fail");
+            return responseModel;
+        }
+
+        if (newPassword == null || newPassword.isEmpty()) {
+            responseModel.setMessage("Mật khẩu mới không được bỏ trống");
+            responseModel.setStatus("fail");
+            return responseModel;
+        }
+
+        // Kiểm tra mật khẩu mới có đúng định dạng theo regex hay không
+        if (!newPassword.matches(regexPassword)) {
+            responseModel.setMessage("Mật khẩu mới phải chứa ít nhất 1 chữ số, " +
+                    "1 chữ thường, 1 chữ hoa, 1 ký tự đặc biệt và không được có khoảng trắng, " +
+                    "độ dài từ 8 đến 20 ký tự.");
+            responseModel.setStatus("fail");
+            return responseModel;
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            responseModel.setMessage("Mật khẩu mới và xác nhận mật khẩu không khớp");
+            responseModel.setStatus("fail");
+            return responseModel;
+        }
+
+        boolean isPasswordUpdated = IUserService.updatePassword(otp, newPassword);
+
+        if (isPasswordUpdated) {
+            IOtpService.deleteOtp(otp);
+            responseModel.setMessage("Mật khẩu đã được thay đổi thành công.");
+            responseModel.setStatus("success");
+            return responseModel;
+        } else {
+            responseModel.setMessage("Không thể thay đổi mật khẩu. Vui lòng thử lại.");
+            responseModel.setStatus("fail");
+            return responseModel;
+        }
+    }
 
 
     @GetMapping("/forgetPass/confirm")

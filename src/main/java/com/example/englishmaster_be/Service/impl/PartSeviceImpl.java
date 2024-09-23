@@ -7,6 +7,7 @@ import com.example.englishmaster_be.Model.Response.PartResponse;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.IPartService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

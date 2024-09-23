@@ -2,6 +2,7 @@ package com.example.englishmaster_be.DTO;
 
 
 public class UserLoginDTO {
+
     private String email;
     private String password;
 

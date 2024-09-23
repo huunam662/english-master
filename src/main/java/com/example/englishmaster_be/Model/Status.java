@@ -18,8 +18,8 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Status implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", columnDefinition = "BINARY(16)")
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     UUID statusId;
 
     @Column(name = "status_name")
