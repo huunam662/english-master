@@ -9,7 +9,6 @@ import com.example.englishmaster_be.Service.IUserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
 import org.springframework.http.client.MultipartBodyBuilder;
@@ -36,7 +35,7 @@ public class UploadServiceImpl implements IUploadService {
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
-        headers.setBearerAuth(TOKEN);  // Sử dụng Bearer token cho xác thực
+        headers.setBearerAuth(TOKEN);
 
         try {
             // Xây dựng phần tệp tin upload
@@ -67,16 +66,22 @@ public class UploadServiceImpl implements IUploadService {
                 User currentUser = IUserService.currentUser();
                 // Lấy giá trị của "url" trong "responseData"
                 String url = jsonResponse.path("responseData").path("url").asText();
-                Content content = new Content();
-                content.setTopicId(topicId);
-                content.setCode(code);
-                content.setContentType(GetExtension.typeFile(file.getOriginalFilename()));
-                content.setContentData(url);
-                content.setUserUpdate(currentUser);
-                content.setUserCreate(currentUser);
 
-                contentRepository.save(content);
-                return url;  // Trả về URL nếu upload thành công
+                String existsContent = contentRepository.findContentDataByTopicIdAndCode(topicId, code);
+                if (existsContent == null) {
+                    Content content = new Content();
+                    content.setTopicId(topicId);
+                    content.setCode(code);
+                    content.setContentType(GetExtension.typeFile(file.getOriginalFilename()));
+                    content.setContentData(url);
+                    content.setUserUpdate(currentUser);
+                    content.setUserCreate(currentUser);
+                    contentRepository.save(content);
+                    return url;  // Trả về URL nếu upload thành công
+                } else {
+                    String errorMessage = jsonResponse.path("message").asText("Code is exists in topic");
+                    return "Error: " + errorMessage;  // Trả về thông báo lỗi
+                }
             } else {
                 // Nếu không thành công, lấy thông báo lỗi
                 String errorMessage = jsonResponse.path("message").asText("Upload failed");

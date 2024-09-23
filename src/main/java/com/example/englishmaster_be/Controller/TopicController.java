@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Controller;
 
+import com.example.englishmaster_be.Constant.StatusConstant;
 import com.example.englishmaster_be.DTO.Question.CreateQuestionByExcelFileDTO;
 import com.example.englishmaster_be.Exception.CustomException;
 import com.example.englishmaster_be.Exception.Error;
@@ -19,6 +20,8 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.validation.constraints.*;
 import org.json.simple.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.*;
@@ -67,6 +70,8 @@ public class TopicController {
     private IExcelService excelService;
     @Autowired
     private ContentRepository contentRepository;
+
+    Logger loggerFactory = LoggerFactory.getLogger(TopicController.class);
 
     @GetMapping(value = "/{topicId:.+}/inforTopic")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
@@ -165,7 +170,7 @@ public class TopicController {
             topic.setNumberQuestion(createTopicByExcelFileDTO.getNumberQuestion());
             topic.setUserCreate(user);
             topic.setUserUpdate(user);
-            topic.setStatus(statusRepository.findById(UUID.fromString("34b1b787-dae8-4c10-b0a9-cb7beea6f2e9")).orElse(null));
+            topic.setStatus(statusRepository.findByStatusName(StatusConstant.ACTIVE).orElseThrow(() -> new CustomException(Error.STATUS_NOT_FOUND)));
 
             // Tạo topic
             ITopicService.createTopic(topic);
@@ -1011,8 +1016,8 @@ public class TopicController {
             topic.setEnable(enable);
             topic.setUpdateAt(LocalDateTime.now());
 
-            UUID statusId = enable ? UUID.fromString("34b1b787-dae8-4c10-b0a9-cb7beea6f2e9") : UUID.fromString("4211abfc-76f4-48d8-96b9-2f524e82e2b0");
-            topic.setStatus(statusRepository.findById(statusId).orElse(null));
+            String statusName = enable ? StatusConstant.ACTIVE : StatusConstant.DEACTIVATE;
+            topic.setStatus(statusRepository.findByStatusName(statusName).orElseThrow(() -> new CustomException(Error.STATUS_NOT_FOUND)));
 
             ITopicService.createTopic(topic);
 

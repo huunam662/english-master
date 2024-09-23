@@ -19,7 +19,7 @@ public class ImportExcelFileController {
     private IExcelService excelService;
 
     @PostMapping(value = "/importExcel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseModel getCreateTopicByExcelFileDTO(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseModel getCreateTopicByExcelFileDTO(@RequestParam("file") MultipartFile file) {
         ResponseModel responseModel = new ResponseModel();
         if (file.isEmpty()) {
             responseModel.setStatus("error");

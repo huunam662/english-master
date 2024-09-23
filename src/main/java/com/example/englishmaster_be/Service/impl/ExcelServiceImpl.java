@@ -246,7 +246,7 @@ public class ExcelServiceImpl implements IExcelService {
                         // Set các thuộc tính cho câu hỏi
                         question.setQuestionContent(getStringCellValue(row, 1));
                         question.setQuestionScore(getNumericCellValue(row, 7));
-                        question.setPartId(UUID.fromString("57572f04-27cf-4da7-8344-ac484c7d9e08"));
+                        question.setPartId(currentListeningPart.getPartId());
 
 
                         // Xử lý các câu trả lời
@@ -338,7 +338,7 @@ public class ExcelServiceImpl implements IExcelService {
                         // Set các thuộc tính cho câu hỏi
                         question.setQuestionContent(getStringCellValue(row, 1));
                         question.setQuestionScore(getNumericCellValue(row, 7));
-                        question.setPartId(UUID.fromString("57572f04-27cf-4da7-8344-ac484c7d9e08"));
+                        question.setPartId(currentReadingPart.getPartId());
 
 
                         // Xử lý các câu trả lời

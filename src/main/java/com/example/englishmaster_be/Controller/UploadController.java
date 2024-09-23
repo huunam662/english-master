@@ -1,23 +1,12 @@
 package com.example.englishmaster_be.Controller;
 
-import com.example.englishmaster_be.Configuration.jwt.AuthEntryPointJwt;
 import com.example.englishmaster_be.Model.ResponseModel;
 import com.example.englishmaster_be.Service.IUploadService;
-import org.slf4j.ILoggerFactory;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
-import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.util.Objects;
 import java.util.UUID;
 
 @RestController
@@ -49,7 +38,5 @@ public class UploadController {
             responseModel.setResponseData(null);
             return ResponseEntity.badRequest().body(responseModel);
         }
-
     }
-
 }

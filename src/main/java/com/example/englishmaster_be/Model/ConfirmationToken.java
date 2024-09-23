@@ -10,8 +10,8 @@ import java.util.UUID;
 public class ConfirmationToken {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", columnDefinition = "BINARY(16)")
+    @GeneratedValue(strategy = GenerationType.UUID)
+	@Column(name = "id")
     private UUID userConfirmTokenId;
 
     @Temporal(TemporalType.TIMESTAMP)
