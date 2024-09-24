@@ -10,10 +10,6 @@ import com.example.englishmaster_be.Service.*;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ExampleObject;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.validation.constraints.Max;
@@ -194,22 +190,6 @@ public class UserController {
         return responseModel;
     }
 
-//    @Operation(summary = "Login a user",
-//            requestBody = @io.swagger.v3.oas.annotations.parameters.RequestBody(
-//                    required = true,
-//                    content = @Content(
-//                            mediaType = "application/json",
-//                            examples = @ExampleObject(
-//                                    name = "Login Example",
-//                                    value = "{ \"email\": \"admin@meuenglish.com\", \"password\": \"admin123\" }"
-//                            )
-//                    )
-//            ),
-//            responses = {
-//                    @ApiResponse(responseCode = "200", description = "Login successful"),
-//                    @ApiResponse(responseCode = "401", description = "Login failed")
-//            }
-//    )
     @PostMapping("/login")
     public ResponseModel login(@RequestBody UserLoginDTO loginDTO) {
         ResponseModel responseModel = new ResponseModel();
