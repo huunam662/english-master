@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Service.impl;
 
+import com.example.englishmaster_be.Constant.RoleConstant;
 import com.example.englishmaster_be.DTO.UserRegisterDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Repository.*;
@@ -36,7 +37,7 @@ public class UserServiceImpl implements IUserService {
         user.setEmail(userRegisterDTO.getEmail());
         user.setPassword(passwordEncoder.encode(userRegisterDTO.getPassword()));
         user.setName(userRegisterDTO.getName());
-        user.setRole(roleRepository.findByRoleId(UUID.fromString("876e0c22-7c28-47b1-abe8-589260227b07")));
+        user.setRole(roleRepository.findByRoleName(RoleConstant.USER));
 
         return user;
     }
@@ -88,6 +89,7 @@ public class UserServiceImpl implements IUserService {
             SecurityContextHolder.getContext().setAuthentication(null);
         }
     }
+
     @Override
     public boolean existsEmail(String email) {
         return userRepository.existsByEmail(email);
