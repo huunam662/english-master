@@ -14,8 +14,8 @@ import java.util.UUID;
 @Table(name = "part")
 public class Part implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", columnDefinition = "BINARY(16)")
+	@GeneratedValue(strategy = GenerationType.UUID)
+	@Column(name = "id")
     private UUID partId;
 
     @Column(name = "part_name")

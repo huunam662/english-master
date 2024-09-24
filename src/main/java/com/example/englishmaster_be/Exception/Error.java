@@ -25,7 +25,7 @@ public enum Error {
     CAN_NOT_CREATE_PART_6_BY_EXCEL("Can not be create part 6 by excel file", "Can not be create part 6 by excel file", HttpStatus.BAD_REQUEST),
     CAN_NOT_CREATE_PART_7_BY_EXCEL("Can not be create part 7 by excel file", "Can not be create part 7 by excel file", HttpStatus.BAD_REQUEST),
     CONTENT_NOT_FOUND("Content not found", "Content not found", HttpStatus.BAD_REQUEST),
-    FILE_IMPORT_IS_NOT_EXCEL("Please import excel file", "File import is not excel file", HttpStatus.BAD_REQUEST);
+    FILE_IMPORT_IS_NOT_EXCEL("Please import excel file", "File import is not excel file", HttpStatus.BAD_REQUEST), STATUS_NOT_FOUND("Status not found", "Status not found", HttpStatus.BAD_REQUEST);
 
     private final String message;
     private final String violation;

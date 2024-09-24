@@ -18,8 +18,8 @@ import java.util.UUID;
 @Table(name = "mock_test")
 public class MockTest implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", columnDefinition = "BINARY(16)")
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID mockTestId;
 
     @ManyToOne
@@ -75,5 +75,7 @@ public class MockTest implements Serializable {
         createAt = LocalDateTime.now();
         updateAt = LocalDateTime.now();
     }
+
+
 
 }
