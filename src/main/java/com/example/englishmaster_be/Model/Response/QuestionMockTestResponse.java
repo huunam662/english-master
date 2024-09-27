@@ -1,9 +1,10 @@
 package com.example.englishmaster_be.Model.Response;
 
-import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.Model.Answer;
 import com.example.englishmaster_be.Model.Content;
 import com.example.englishmaster_be.Model.Question;
+import lombok.Getter;
+import lombok.Setter;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
@@ -13,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Getter
+@Setter
 @SuppressWarnings("unchecked")
 public class QuestionMockTestResponse {
     private UUID questionId;
@@ -29,13 +32,11 @@ public class QuestionMockTestResponse {
     private UUID answerCorrect;
     private UUID answerChoice;
 
-    public QuestionMockTestResponse(Question question, Answer answerChoice, Answer answerCorrect){
-        String link;
-
+    public QuestionMockTestResponse(Question question, Answer answerChoice, Answer answerCorrect) {
         this.questionId = question.getQuestionId();
         this.questionContent = question.getQuestionContent();
         this.questionScore = question.getQuestionScore();
-        if(answerChoice != null){
+        if (answerChoice != null) {
             this.answerChoice = answerChoice.getAnswerId();
         }
 
@@ -47,9 +48,9 @@ public class QuestionMockTestResponse {
         this.createAt = sdf.format(Timestamp.valueOf(question.getCreateAt()));
         this.updateAt = sdf.format(Timestamp.valueOf(question.getUpdateAt()));
 
-        if(question.getAnswers() != null){
+        if (question.getAnswers() != null) {
             List<AnswerResponse> listAnswerResponse = new ArrayList<>();
-            for(Answer answer: question.getAnswers()){
+            for (Answer answer : question.getAnswers()) {
                 listAnswerResponse.add(new AnswerResponse(answer));
             }
             this.listAnswer = listAnswerResponse;
@@ -57,27 +58,18 @@ public class QuestionMockTestResponse {
 
         contentList = new JSONArray();
 
-        if(question.getContentCollection() != null){
-            for(Content content1 : question.getContentCollection()){
+        if (question.getContentCollection() != null) {
+            for (Content content1 : question.getContentCollection()) {
                 JSONObject content = new JSONObject();
                 content.put("Content Type", content1.getContentType());
-
-                if(content1.getContentData() == null){
-                    content.put("Content Data", content1.getContentData());
-
-                }else {
-                    link = GetExtension.linkName(content1.getContentData());
-                    content.put("Content Data", link + content1.getContentData());
-                }
-
+                content.put("Content Data", content1.getContentData());
                 contentList.add(content);
             }
         }
 
     }
 
-    public QuestionMockTestResponse(Question question){
-        String link;
+    public QuestionMockTestResponse(Question question) {
 
         this.questionId = question.getQuestionId();
         this.questionContent = question.getQuestionContent();
@@ -89,9 +81,9 @@ public class QuestionMockTestResponse {
         this.createAt = sdf.format(Timestamp.valueOf(question.getCreateAt()));
         this.updateAt = sdf.format(Timestamp.valueOf(question.getUpdateAt()));
 
-        if(question.getAnswers() != null){
+        if (question.getAnswers() != null) {
             List<AnswerResponse> listAnswerResponse = new ArrayList<>();
-            for(Answer answer: question.getAnswers()){
+            for (Answer answer : question.getAnswers()) {
                 listAnswerResponse.add(new AnswerResponse(answer));
             }
             this.listAnswer = listAnswerResponse;
@@ -99,110 +91,16 @@ public class QuestionMockTestResponse {
 
         contentList = new JSONArray();
 
-        if(question.getContentCollection() != null){
-            for(Content content1 : question.getContentCollection()){
+        if (question.getContentCollection() != null) {
+            for (Content content1 : question.getContentCollection()) {
                 JSONObject content = new JSONObject();
                 content.put("Content Type", content1.getContentType());
 
-                if(content1.getContentData() == null){
-                    content.put("Content Data", content1.getContentData());
-
-                }else {
-                    link = GetExtension.linkName(content1.getContentData());
-                    content.put("Content Data", link + content1.getContentData());
-                }
+                content.put("Content Data", content1.getContentData());
 
                 contentList.add(content);
             }
         }
-
     }
 
-    public UUID getQuestionId() {
-        return questionId;
-    }
-
-    public void setQuestionId(UUID questionId) {
-        this.questionId = questionId;
-    }
-
-    public String getQuestionContent() {
-        return questionContent;
-    }
-
-    public void setQuestionContent(String questionContent) {
-        this.questionContent = questionContent;
-    }
-
-    public int getQuestionScore() {
-        return questionScore;
-    }
-
-    public void setQuestionScore(int questionScore) {
-        this.questionScore = questionScore;
-    }
-
-    public JSONArray getContentList() {
-        return contentList;
-    }
-
-    public void setContentList(JSONArray contentList) {
-        this.contentList = contentList;
-    }
-
-    public List<QuestionMockTestResponse> getQuestionGroup() {
-        return questionGroup;
-    }
-
-    public void setQuestionGroup(List<QuestionMockTestResponse> questionGroup) {
-        this.questionGroup = questionGroup;
-    }
-
-    public UUID getPartId() {
-        return partId;
-    }
-
-    public void setPartId(UUID partId) {
-        this.partId = partId;
-    }
-
-    public String getCreateAt() {
-        return createAt;
-    }
-
-    public void setCreateAt(String createAt) {
-        this.createAt = createAt;
-    }
-
-    public String getUpdateAt() {
-        return updateAt;
-    }
-
-    public void setUpdateAt(String updateAt) {
-        this.updateAt = updateAt;
-    }
-
-    public List<AnswerResponse> getListAnswer() {
-        return listAnswer;
-    }
-
-    public void setListAnswer(List<AnswerResponse> listAnswer) {
-        this.listAnswer = listAnswer;
-    }
-
-    public UUID getAnswerCorrect() {
-        return answerCorrect;
-    }
-
-    public void setAnswerCorrect(UUID answerCorrect) {
-        this.answerCorrect = answerCorrect;
-    }
-
-    public UUID getAnswerChoice() {
-        return answerChoice;
-    }
-
-    public void setAnswerChoice(UUID answerChoice) {
-        this.answerChoice = answerChoice;
-    }
 }

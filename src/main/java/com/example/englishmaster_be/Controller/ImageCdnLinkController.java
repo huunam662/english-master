@@ -1,11 +1,9 @@
 package com.example.englishmaster_be.Controller;
 
-import com.example.englishmaster_be.Model.Response.ImageCdnLinkResponse;
 import com.example.englishmaster_be.Model.ResponseModel;
 import com.example.englishmaster_be.Repository.ContentRepository;
 import com.example.englishmaster_be.Repository.TopicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
