@@ -17,7 +17,7 @@ public class UploadController {
     private IUploadService IUploadService;
 
 
-    @PostMapping(value = "/image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ResponseModel> uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "dir", defaultValue = "/") String dir,

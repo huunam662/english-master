@@ -1,7 +1,8 @@
 package com.example.englishmaster_be.Model.Response;
 
-import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.Model.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.json.simple.JSONObject;
 
 import java.sql.Timestamp;
@@ -10,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Getter
+@Setter
 public class TopicResponse {
     private UUID topicId;
     private UUID packId;
@@ -47,14 +50,13 @@ public class TopicResponse {
 
     public TopicResponse(Topic topic) {
 
-        String link = GetExtension.linkName(topic.getTopicImage());
 
         this.topicId = topic.getTopicId();
         this.packId = topic.getPack().getPackId();
         this.packName = topic.getPack().getPackName();
         this.topicName = topic.getTopicName();
 
-        this.topicImage = link + topic.getTopicImage();
+        this.topicImage = topic.getTopicImage();
         this.topicDescription = topic.getTopicDescription();
         this.topicType = topic.getTopicType();
         this.numberQuestion = topic.getNumberQuestion();
@@ -91,147 +93,4 @@ public class TopicResponse {
         this.statusId = topic.getStatus().getStatusId();
     }
 
-    public UUID getTopicId() {
-        return topicId;
-    }
-
-    public void setTopicId(UUID topicId) {
-        this.topicId = topicId;
-    }
-
-    public UUID getPackId() {
-        return packId;
-    }
-
-    public void setPackId(UUID packId) {
-        this.packId = packId;
-    }
-
-    public String getPackName() {
-        return packName;
-    }
-
-    public List<UUID> getListPart() {
-        return listPart;
-    }
-
-    public void setListPart(List<UUID> listPart) {
-        this.listPart = listPart;
-    }
-
-    public void setPackName(String packName) {
-        this.packName = packName;
-    }
-
-    public String getTopicName() {
-        return topicName;
-    }
-
-    public void setTopicName(String topicName) {
-        this.topicName = topicName;
-    }
-
-    public String getTopicImage() {
-        return topicImage;
-    }
-
-    public void setTopicImage(String topicImage) {
-        this.topicImage = topicImage;
-    }
-
-    public String getTopicDescription() {
-        return topicDescription;
-    }
-
-    public void setTopicDescription(String topicDescription) {
-        this.topicDescription = topicDescription;
-    }
-
-    public String getTopicType() {
-        return topicType;
-    }
-
-    public void setTopicType(String topicType) {
-        this.topicType = topicType;
-    }
-
-    public String getWorkTime() {
-        return workTime;
-    }
-
-    public void setWorkTime(String workTime) {
-        this.workTime = workTime;
-    }
-
-    public String getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
-    }
-
-    public String getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
-    }
-
-    public String getCreateAt() {
-        return createAt;
-    }
-
-    public void setCreateAt(String createAt) {
-        this.createAt = createAt;
-    }
-
-    public String getUpdateAt() {
-        return updateAt;
-    }
-
-    public void setUpdateAt(String updateAt) {
-        this.updateAt = updateAt;
-    }
-
-    public JSONObject getUserCreate() {
-        return userCreate;
-    }
-
-    public void setUserCreate(JSONObject userCreate) {
-        this.userCreate = userCreate;
-    }
-
-    public JSONObject getUserUpdate() {
-        return userUpdate;
-    }
-
-    public void setUserUpdate(JSONObject userUpdate) {
-        this.userUpdate = userUpdate;
-    }
-
-    public int getNumberQuestion() {
-        return numberQuestion;
-    }
-
-    public void setNumberQuestion(int numberQuestion) {
-        this.numberQuestion = numberQuestion;
-    }
-
-    public boolean isEnable() {
-        return isEnable;
-    }
-
-    public void setEnable(boolean enable) {
-        isEnable = enable;
-    }
-
-    public UUID getStatusId() {
-        return statusId;
-    }
-
-    public void setStatusId(UUID statusId) {
-        this.statusId = statusId;
-    }
 }
