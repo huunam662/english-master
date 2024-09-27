@@ -1,11 +1,15 @@
 package com.example.englishmaster_be.Model.Response;
 
 import com.example.englishmaster_be.Model.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
 
+@Getter
+@Setter
 public class PackResponse {
     private UUID packId;
     private String packName;
@@ -21,35 +25,4 @@ public class PackResponse {
         this.updateAt = sdf.format(Timestamp.valueOf(pack.getUpdateAt()));
     }
 
-    public UUID getPackId() {
-        return packId;
-    }
-
-    public void setPackId(UUID packId) {
-        this.packId = packId;
-    }
-
-    public String getPackName() {
-        return packName;
-    }
-
-    public void setPackName(String packName) {
-        this.packName = packName;
-    }
-
-    public String getCreateAt() {
-        return createAt;
-    }
-
-    public void setCreateAt(String createAt) {
-        this.createAt = createAt;
-    }
-
-    public String getUpdateAt() {
-        return updateAt;
-    }
-
-    public void setUpdateAt(String updateAt) {
-        this.updateAt = updateAt;
-    }
 }

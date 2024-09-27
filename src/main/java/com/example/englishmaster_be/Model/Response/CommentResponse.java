@@ -38,22 +38,21 @@ public class CommentResponse {
 
     private String updateAt;
 
-    public CommentResponse(Comment comment, boolean isCommentParent){
+    public CommentResponse(Comment comment, boolean isCommentParent) {
         this.commentId = comment.getCommentId();
         this.userName = comment.getUserComment().getName();
         this.userId = comment.getUserComment().getUserId();
 
-        if(comment.getUserComment().getAvatar() == null){
+        if (comment.getUserComment().getAvatar() == null) {
             this.avatar = null;
-        }else {
-            String link = GetExtension.linkName(comment.getUserComment().getAvatar());
-            this.avatar = link + comment.getUserComment().getAvatar();
+        } else {
+            this.avatar = comment.getUserComment().getAvatar();
         }
         this.contentComment = comment.getContent();
-        if(comment.getTopic() != null){
+        if (comment.getTopic() != null) {
             this.topicId = comment.getTopic().getTopicId();
         }
-        if(comment.getPost() != null){
+        if (comment.getPost() != null) {
             this.topicId = comment.getPost().getPostId();
         }
         this.isCommentParent = isCommentParent;
