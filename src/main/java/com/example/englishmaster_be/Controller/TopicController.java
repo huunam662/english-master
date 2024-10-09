@@ -62,6 +62,9 @@ public class TopicController {
     private JPAQueryFactory queryFactory;
 
     @Autowired
+    private IUploadService IUploadService;
+
+    @Autowired
     private TopicRepository topicRepository;
     @Autowired
     private StatusRepository statusRepository;
@@ -102,7 +105,7 @@ public class TopicController {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
-            String filename = IFileStorageService.nameFile(createTopicDTO.getTopicImage());
+            String filename = IUploadService.upload(createTopicDTO.getTopicImage(), "/", false, null, null);
             Pack pack = IPackService.findPackById(createTopicDTO.getTopicPack());
 
             Topic topic = new Topic(
@@ -119,10 +122,9 @@ public class TopicController {
             topic.setNumberQuestion(createTopicDTO.getNumberQuestion());
             topic.setUserCreate(user);
             topic.setUserUpdate(user);
-            topic.setStatus(statusRepository.findById(UUID.fromString("34b1b787-dae8-4c10-b0a9-cb7beea6f2e9")).orElse(null));
+            topic.setStatus(statusRepository.findByStatusName(StatusConstant.ACTIVE).orElse(null));
 
             ITopicService.createTopic(topic);
-            IFileStorageService.save(createTopicDTO.getTopicImage(), filename);
 
             createTopicDTO.getListPart().forEach(partId -> ITopicService.addPartToTopic(topic.getTopicId(), partId));
 
@@ -145,45 +147,29 @@ public class TopicController {
     public ResponseEntity<ResponseModel> createTopicByExcelFile(@RequestParam("file") MultipartFile file) {
         ResponseModel responseModel = new ResponseModel();
         try {
-            // Parse Excel file thành DTO
             CreateTopicByExcelFileDTO createTopicByExcelFileDTO = excelService.parseCreateTopicDTO(file);
-
-            // Lấy user hiện tại
             User user = IUserService.currentUser();
-
-            // Tìm pack theo ID
             Pack pack = IPackService.findPackById(createTopicByExcelFileDTO.getTopicPackId());
-
-            // Tạo đối tượng Topic từ DTO
             Topic topic = new Topic(
                     createTopicByExcelFileDTO.getTopicName(),
                     createTopicByExcelFileDTO.getTopicImageName(),
                     createTopicByExcelFileDTO.getTopicDescription(),
                     createTopicByExcelFileDTO.getTopicType(),
                     createTopicByExcelFileDTO.getWorkTime(),
-                    createTopicByExcelFileDTO.getStartTime(),  // startTime có thể là null
-                    createTopicByExcelFileDTO.getEndTime()     // endTime có thể là null
+                    createTopicByExcelFileDTO.getStartTime(),
+                    createTopicByExcelFileDTO.getEndTime()
             );
-
-            // Thiết lập các thuộc tính cho topic
             topic.setPack(pack);
             topic.setNumberQuestion(createTopicByExcelFileDTO.getNumberQuestion());
             topic.setUserCreate(user);
             topic.setUserUpdate(user);
             topic.setStatus(statusRepository.findByStatusName(StatusConstant.ACTIVE).orElseThrow(() -> new CustomException(Error.STATUS_NOT_FOUND)));
-
-            // Tạo topic
             ITopicService.createTopic(topic);
-
-            // Thêm các phần vào topic
             createTopicByExcelFileDTO.getListPart().forEach(partId -> ITopicService.addPartToTopic(topic.getTopicId(), partId));
-
-            // Tạo TopicResponse và trả về kết quả
             TopicResponse topicResponse = new TopicResponse(topic);
             responseModel.setMessage("Create topic successfully");
             responseModel.setResponseData(topicResponse);
             responseModel.setStatus("success");
-
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             responseModel.setMessage("Create topic failed: " + e.getMessage());
@@ -201,15 +187,11 @@ public class TopicController {
         try {
             User user = IUserService.currentUser();
             String filename = null;
-
             MultipartFile image = updateTopicDTO.getTopicImage();
-
             if (image != null && !image.isEmpty()) {
                 filename = IFileStorageService.nameFile(image);
             }
-
             Pack pack = IPackService.findPackById(updateTopicDTO.getTopicPack());
-
             Topic topic = ITopicService.findTopicById(topicId);
             topic.setTopicName(updateTopicDTO.getTopicName());
             topic.setTopicDescription(updateTopicDTO.getTopicDescription());
@@ -223,17 +205,13 @@ public class TopicController {
             topic.setPack(pack);
             topic.setNumberQuestion(updateTopicDTO.getNumberQuestion());
             topic.setUserUpdate(user);
-
             if (filename != null && topic.getTopicImage() != null && IFileStorageService.load(topic.getTopicImage()) != null) {
                 IFileStorageService.delete(topic.getTopicImage());
             }
-
             ITopicService.createTopic(topic);
-
             if (filename != null) {
                 IFileStorageService.save(updateTopicDTO.getTopicImage(), filename);
             }
-
             List<Part> listPart = new ArrayList<>();
             for (UUID partId : updateTopicDTO.getListPart()) {
                 Part part = IPartService.getPartToId(partId);
@@ -241,15 +219,10 @@ public class TopicController {
             }
             topic.setParts(listPart);
             ITopicService.createTopic(topic);
-
             TopicResponse topicResponse = new TopicResponse(topic);
-
             responseModel.setMessage("Update topic successfully");
-
             responseModel.setResponseData(topicResponse);
             responseModel.setStatus("success");
-
-
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             responseModel.setMessage("Update topic fail: " + e.getMessage());
@@ -266,21 +239,15 @@ public class TopicController {
         try {
             User user = IUserService.currentUser();
             Topic topic = ITopicService.findTopicById(topicId);
-
             String filename = IFileStorageService.nameFile(uploadFileDTO.getContentData());
             IFileStorageService.delete(topic.getTopicImage());
-
             topic.setTopicImage(filename);
             topic.setUserUpdate(user);
             topic.setUpdateAt(LocalDateTime.now());
-
             TopicResponse topicResponse = new TopicResponse(topic);
-
             responseModel.setMessage("Update topic successfully");
             responseModel.setResponseData(topicResponse);
             responseModel.setStatus("success");
-
-
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             responseModel.setMessage("Update topic fail: " + e.getMessage());
@@ -293,26 +260,15 @@ public class TopicController {
     @DeleteMapping(value = "/{topicId:.+}/delete")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> deleteTopic(@PathVariable UUID topicId) {
-
         ResponseModel responseModel = new ResponseModel();
-
         try {
-            // Find topic by TopicId and throw an exception if not found
             Topic topic = ITopicService.findTopicById(topicId);
-
-            // Delete topic and related image
             ITopicService.deleteTopic(topic);
             IFileStorageService.delete(topic.getTopicImage());
-
-            // Set success response
             responseModel.setMessage("Delete topic successfully");
             responseModel.setStatus("success");
-
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-
         } catch (IllegalArgumentException e) {
-
-            // Handle exception and return error response
             responseModel.setMessage(e.getMessage());
             responseModel.setStatus("fail");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
@@ -654,7 +610,6 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
     }
-
 
     @PostMapping(value = "/{topicId:.+}/addListQuestion", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('ADMIN')")
