@@ -50,6 +50,7 @@ public class UserController {
 
     @Autowired
     private IFileStorageService IFileStorageService;
+
     @Autowired
     private UserRepository userRepository;
 
@@ -81,6 +82,11 @@ public class UserController {
 
     @Autowired
     private IInvalidTokenService IInvalidTokenService;
+
+    @Autowired
+    private IUploadService IUploadService;
+    @Autowired
+    private ContentRepository contentRepository;
 
     @PostMapping("/register")
     public ResponseModel register(@RequestBody UserRegisterDTO registerDTO) throws IOException, MessagingException {
@@ -426,37 +432,23 @@ public class UserController {
         JSONObject objectResponse = new JSONObject();
         try {
             User user = IUserService.currentUser();
-
-            String filename = null;
-
             MultipartFile image = changeProfileDTO.getAvatar();
-
             if (image != null && !image.isEmpty()) {
-                filename = IFileStorageService.nameFile(image);
+                if (!user.getAvatar().isEmpty() && user.getAvatar().startsWith("https://s3.meu-solutions.com/meuenglish/")) {
+                    contentRepository.deleteByContentData(user.getAvatar());
+                }
+                user.setAvatar(IUploadService.upload(image, "/", false, null, null));
             }
-
             if (!changeProfileDTO.getName().isEmpty()) {
                 user.setName(changeProfileDTO.getName());
             }
-
             if (!changeProfileDTO.getAddress().isEmpty()) {
                 user.setAddress(changeProfileDTO.getAddress());
             }
             if (!changeProfileDTO.getPhone().isEmpty()) {
                 user.setPhone(changeProfileDTO.getPhone());
             }
-
-            if (filename != null) {
-                if (user.getAvatar() != null) {
-                    IFileStorageService.delete(user.getAvatar());
-                }
-                user.setAvatar(filename);
-            }
             IUserService.save(user);
-            if (filename != null) {
-                IFileStorageService.save(changeProfileDTO.getAvatar(), filename);
-            }
-
             UserResponse userResponse = new UserResponse(user);
             if (user.getRole().getRoleName().equals("ROLE_ADMIN")) {
                 objectResponse.put("Role", "ADMIN");
@@ -464,11 +456,9 @@ public class UserController {
                 objectResponse.put("Role", "USER");
             }
             objectResponse.put("User", userResponse);
-
             responseModel.setResponseData(objectResponse);
             responseModel.setMessage("Change profile user successfully");
             responseModel.setStatus("success");
-
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             responseModel.setMessage("Change profile user fail: " + e.getMessage());
