@@ -16,12 +16,13 @@ public class FirebaseConfig {
     private String adminSdkPath;
 
     @Bean
-    public void firebaseInit() throws IOException {
+    public  FirebaseApp firebaseInit() throws IOException{
         FirebaseOptions options = new FirebaseOptions.Builder()
                 .setCredentials(GoogleCredentials
                         .fromStream(new ClassPathResource(adminSdkPath).getInputStream())).build();
         if (FirebaseApp.getApps().isEmpty()) {
             FirebaseApp.initializeApp(options);
         }
+        return FirebaseApp.getInstance();
     }
 }
