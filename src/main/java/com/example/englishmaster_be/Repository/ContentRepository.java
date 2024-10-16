@@ -23,5 +23,6 @@ public interface ContentRepository extends JpaRepository<Content, UUID> {
 
     @Modifying
     @Query("delete from Content c where c.contentData = :contentData")
-    Optional<Content> deleteByContentData(String contentData);
+    int deleteByContentData(String contentData);
+
 }

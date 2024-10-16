@@ -182,21 +182,15 @@ public class PostController {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
-
             Post post = IPostService.findPostById(postId);
-
             if(!post.getUserPost().getUserId().equals(user.getUserId())){
                 responseModel.setMessage("Don't delete post");
                 responseModel.setStatus("fail");
                 return ResponseEntity.status(HttpStatus.OK).body(responseModel);
             }
-
             IPostService.delete(post);
-
             responseModel.setMessage("Delete post successful");
             responseModel.setStatus("success");
-
-
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
             responseModel.setMessage("Delete post fail: " + e.getMessage());
