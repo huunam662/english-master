@@ -17,6 +17,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.apache.poi.ss.usermodel.DateUtil;
 
@@ -38,6 +39,7 @@ public class ExcelServiceImpl implements IExcelService {
     @Autowired
     private ContentRepository contentRepository;
 
+    @Transactional
     @Override
     public CreateTopicByExcelFileDTO parseCreateTopicDTO(MultipartFile file) {
         if (isExcelFile(file)) {
@@ -68,14 +70,17 @@ public class ExcelServiceImpl implements IExcelService {
             } catch (Exception e) {
                 throw new CustomException(Error.CAN_NOT_CREATE_TOPIC_BY_EXCEL);
             }
+        } else {
+            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
         }
-        return null;
     }
 
+    @Transactional
     @Override
     public CreateListQuestionByExcelFileDTO parseListeningPart12DTO(UUID topicId, MultipartFile file, int part) {
         if (isExcelFile(file)) {
             try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+
                 Sheet sheet = workbook.getSheetAt(part);
                 CreateListQuestionByExcelFileDTO resultDTO = new CreateListQuestionByExcelFileDTO();
                 List<CreateQuestionByExcelFileDTO> listQuestionDTO = new ArrayList<>();
@@ -141,17 +146,14 @@ public class ExcelServiceImpl implements IExcelService {
                 resultDTO.setQuestions(listQuestionDTO);
                 return resultDTO;
             } catch (Exception e) {
-                if (part == 1) {
-                    throw new CustomException(Error.CAN_NOT_CREATE_PART_1_BY_EXCEL);
-                } else {
-                    throw new CustomException(Error.CAN_NOT_CREATE_PART_2_BY_EXCEL);
-                }
+                throw new CustomException(part == 1 ? Error.CAN_NOT_CREATE_PART_1_BY_EXCEL : Error.CAN_NOT_CREATE_PART_2_BY_EXCEL);
             }
+        } else {
+            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
         }
-        return null;
     }
 
-
+    @Transactional
     @Override
     public CreateListQuestionByExcelFileDTO parseReadingPart5DTO(UUID topicId, MultipartFile file) {
         if (isExcelFile(file)) {
@@ -193,12 +195,14 @@ public class ExcelServiceImpl implements IExcelService {
                 resultDTO.setQuestions(listQuestionDTO);
                 return resultDTO;
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new CustomException(Error.CAN_NOT_CREATE_PART_5_BY_EXCEL);
             }
+        } else {
+            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
         }
-        return null;
     }
 
+    @Transactional
     @Override
     public CreateListQuestionByExcelFileDTO parseListeningPart34DTO(UUID topicId, MultipartFile file, int part) {
         if (isExcelFile(file)) {
@@ -243,7 +247,7 @@ public class ExcelServiceImpl implements IExcelService {
                         // Set các thuộc tính cho câu hỏi
                         question.setQuestionContent(getStringCellValue(row, 1));
                         question.setQuestionScore(getNumericCellValue(row, 7));
-                        question.setPartId(UUID.fromString("57572f04-27cf-4da7-8344-ac484c7d9e08"));
+                        question.setPartId(currentListeningPart.getPartId());
 
 
                         // Xử lý các câu trả lời
@@ -274,18 +278,20 @@ public class ExcelServiceImpl implements IExcelService {
                 result.setQuestions(listeningParts);
                 return result;
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new CustomException(part == 3 ? Error.CAN_NOT_CREATE_PART_3_BY_EXCEL : Error.CAN_NOT_CREATE_PART_4_BY_EXCEL);
             }
+        } else {
+            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
         }
-        return null;
     }
 
-
+    @Transactional
     @Override
-    public CreateListQuestionByExcelFileDTO parseReadingPart67DTO(UUID topicId, MultipartFile file, int part) throws IOException {
+    public CreateListQuestionByExcelFileDTO parseReadingPart67DTO(UUID topicId, MultipartFile file, int part) {
         if (isExcelFile(file)) {
             // Mở workbook từ file Excel được upload
             try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+
                 // Lấy sheet thứ 7 (index 6) từ workbook
                 Sheet sheet = workbook.getSheetAt(part);
                 // Khởi tạo list để lưu các phần reading
@@ -330,7 +336,7 @@ public class ExcelServiceImpl implements IExcelService {
                         // Set các thuộc tính cho câu hỏi
                         question.setQuestionContent(getStringCellValue(row, 1));
                         question.setQuestionScore(getNumericCellValue(row, 7));
-                        question.setPartId(UUID.fromString("57572f04-27cf-4da7-8344-ac484c7d9e08"));
+                        question.setPartId(currentReadingPart.getPartId());
 
 
                         // Xử lý các câu trả lời
@@ -361,10 +367,12 @@ public class ExcelServiceImpl implements IExcelService {
                 result.setQuestions(readingParts);
                 return result;
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new CustomException(part == 6 ? Error.CAN_NOT_CREATE_PART_6_BY_EXCEL : Error.CAN_NOT_CREATE_PART_7_BY_EXCEL);
+
             }
+        } else {
+            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
         }
-        return null;  // Trả về null nếu có lỗi xảy ra
     }
 
     @Override

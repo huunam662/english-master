@@ -2,11 +2,13 @@ package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.DTO.MockTest.CreateMockTestDTO;
 import com.example.englishmaster_be.DTO.MockTest.CreateResultMockTestDTO;
+import com.example.englishmaster_be.Exception.CustomException;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Repository.MockTestRepository;
 import com.example.englishmaster_be.Repository.ResultMockTestRepository;
 import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.Service.impl.MockTestServiceImpl;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -16,6 +18,8 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -63,6 +67,8 @@ public class MockTestController {
     @Autowired
     private IPartService IPartService;
 
+    Logger logger = LoggerFactory.getLogger(MockTestController.class);
+
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> createMockTest(@RequestBody CreateMockTestDTO createMockTestDTO) {
@@ -95,6 +101,12 @@ public class MockTestController {
         }
     }
 
+    @GetMapping(value = "/getMockTestById")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<ResponseModel> getMockTest(@RequestParam UUID id) {
+        return IMockTestService.findMockTestById(id);
+    }
+
     @GetMapping(value = "/listMockTest")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> listTop10MockTest(@RequestParam int index) {
@@ -107,7 +119,6 @@ public class MockTestController {
                 MockTestResponse mockTestResponse = new MockTestResponse(mockTest);
                 mockTestResponseList.add(mockTestResponse);
             }
-
 
             responseModel.setMessage("Get top 10 mock test successfully");
 
@@ -213,29 +224,25 @@ public class MockTestController {
             User user = IUserService.currentUser();
             MockTest mockTest = IMockTestService.findMockTestToId(mockTestId);
             List<DetailMockTestResponse> detailMockTestList = new ArrayList<>();
-
             int totalCorrect = 0;
             int totalScore = 0;
-
-            // Arrays to store scores and correct answers for each part
             int[] correctAnswers = new int[7];
             int[] scores = new int[7];
-
             List<UUID> partInTopic = new ArrayList<>();
-
+            int i = 1;
             for (UUID answerId : listAnswerId) {
                 Answer answer = IAnswerService.findAnswerToId(answerId);
                 UUID part = answer.getQuestion().getPart().getPartId();
                 if (!partInTopic.contains(part)) {
                     partInTopic.add(part);
                 }
+                logger.warn("STT: {},Answer ID: {}, Part ID: {}", i, answer.getAnswerId(), answer.getQuestion().getPart().getPartId());
+                i++;
                 DetailMockTest detailMockTest = new DetailMockTest(mockTest, answer);
                 detailMockTest.setUserCreate(user);
                 detailMockTest.setUserUpdate(user);
                 IMockTestService.createDetailMockTest(detailMockTest);
-
                 detailMockTestList.add(new DetailMockTestResponse(detailMockTest));
-
                 if (answer.isCorrectAnswer()) {
                     totalCorrect++;
                     int questionScore = answer.getQuestion().getQuestionScore();
@@ -248,26 +255,19 @@ public class MockTestController {
                     }
                 }
             }
-
-            // Save the results for each part that is in the topic
             for (UUID partId : partInTopic) {
                 int partIndex = getPartIndex(partId);
                 if (partIndex != -1) {
                     saveResultMockTest(mockTest, partId, correctAnswers[partIndex], scores[partIndex], user);
                 }
             }
-
             mockTest.setScore(totalScore);
             mockTest.setCorrectAnswers(totalCorrect);
             mockTestRepository.save(mockTest);
-
-            // Pass the arrays to sendResultEmail method
             sendResultEmail(user.getEmail(), mockTest, totalCorrect, correctAnswers, scores, partInTopic);
-
             responseModel.setMessage("Create detail mock test successfully");
             responseModel.setResponseData(detailMockTestList);
             responseModel.setStatus("success");
-
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             responseModel.setMessage("Create detail mock test fail: " + e.getMessage());

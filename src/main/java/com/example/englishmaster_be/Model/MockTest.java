@@ -18,8 +18,8 @@ import java.util.UUID;
 @Table(name = "mock_test")
 public class MockTest implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", columnDefinition = "BINARY(16)")
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID mockTestId;
 
     @ManyToOne
@@ -56,10 +56,10 @@ public class MockTest implements Serializable {
     @JoinColumn(name = "update_by", referencedColumnName = "id")
     private User userUpdate;
 
-    @OneToMany(mappedBy = "mockTest")
+    @OneToMany(mappedBy = "mockTest",cascade = CascadeType.ALL,orphanRemoval = true)
     private Collection<DetailMockTest> detailMockTests;
 
-    @OneToMany(mappedBy = "mockTest")
+    @OneToMany(mappedBy = "mockTest",cascade = CascadeType.ALL,orphanRemoval = true)
     private Collection<ResultMockTest> resultMockTests;
 
 
@@ -75,5 +75,7 @@ public class MockTest implements Serializable {
         createAt = LocalDateTime.now();
         updateAt = LocalDateTime.now();
     }
+
+
 
 }

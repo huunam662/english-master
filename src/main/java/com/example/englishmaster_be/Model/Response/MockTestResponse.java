@@ -1,6 +1,8 @@
 package com.example.englishmaster_be.Model.Response;
 
 import com.example.englishmaster_be.Model.MockTest;
+import lombok.Getter;
+import lombok.Setter;
 import org.json.simple.JSONObject;
 
 import java.sql.Time;
@@ -8,6 +10,8 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+@Getter
+@Setter
 public class MockTestResponse {
     private UUID mockTestID;
     private int score;
@@ -49,83 +53,4 @@ public class MockTestResponse {
         userUpdate.put("User Name", mockTest.getUserUpdate().getName());
     }
 
-    public UUID getMockTestID() {
-        return mockTestID;
-    }
-
-    public void setMockTestID(UUID mockTestID) {
-        this.mockTestID = mockTestID;
-    }
-
-    public int getScore() {
-        return score;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
-    }
-
-    public Time getTime() {
-        return time;
-    }
-
-    public void setTime(Time time) {
-        this.time = time;
-    }
-
-    public UUID getTopicId() {
-        return topicId;
-    }
-
-    public void setTopicId(UUID topicId) {
-        this.topicId = topicId;
-    }
-
-    public String getCreateAt() {
-        return createAt;
-    }
-
-    public void setCreateAt(String createAt) {
-        this.createAt = createAt;
-    }
-
-    public String getUpdateAt() {
-        return updateAt;
-    }
-
-    public void setUpdateAt(String updateAt) {
-        this.updateAt = updateAt;
-    }
-
-    public JSONObject getUserCreate() {
-        return userCreate;
-    }
-
-    public void setUserCreate(JSONObject userCreate) {
-        this.userCreate = userCreate;
-    }
-
-    public JSONObject getUserUpdate() {
-        return userUpdate;
-    }
-
-    public void setUserUpdate(JSONObject userUpdate) {
-        this.userUpdate = userUpdate;
-    }
-
-    public Object getUser() {
-        return user;
-    }
-
-    public void setUser(Object user) {
-        this.user = user;
-    }
-
-    public int getCorrectAnswers() {
-        return correctAnswers;
-    }
-
-    public void setCorrectAnswers(int correctAnswers) {
-        this.correctAnswers = correctAnswers;
-    }
 }

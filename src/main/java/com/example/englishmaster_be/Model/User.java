@@ -14,8 +14,8 @@ import java.util.UUID;
 @Table(name = "users")
 public class User implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", columnDefinition = "BINARY(16)")
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID userId;
     private String email;
     private String password;
@@ -57,7 +57,6 @@ public class User implements Serializable {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Collection<FlashCard> flashCards;
-
 
 
     public User() {

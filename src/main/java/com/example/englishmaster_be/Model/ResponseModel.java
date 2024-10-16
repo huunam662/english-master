@@ -1,20 +1,18 @@
 package com.example.englishmaster_be.Model;
 
 
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 public class ResponseModel {
     private String message;
     private Object responseData;
     private String status;
-    private String timeStamp;
+    private Long timeStamp;
     private String violations;
 
     public ResponseModel() {
-        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
-        timeStamp = sdf.format(Timestamp.valueOf(LocalDateTime.now()));
+        this.timeStamp = System.currentTimeMillis();
     }
 
     public ResponseModel(String message, Object responseData, String status, String violations) {
@@ -23,7 +21,7 @@ public class ResponseModel {
         this.status = status;
         this.violations = violations;
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
-        timeStamp = sdf.format(Timestamp.valueOf(LocalDateTime.now()));
+      	this.timeStamp = System.currentTimeMillis();
     }
 
 	public String getMessage() {
@@ -50,11 +48,11 @@ public class ResponseModel {
 		this.status = status;
 	}
 
-	public String getTimeStamp() {
+	public Long getTimeStamp() {
 		return timeStamp;
 	}
 
-	public void setTimeStamp(String timeStamp) {
+	public void setTimeStamp(Long timeStamp) {
 		this.timeStamp = timeStamp;
 	}
 

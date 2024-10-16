@@ -14,8 +14,8 @@ import java.util.UUID;
 @Table(name = "question")
 public class Question implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", columnDefinition = "BINARY(16)")
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID questionId;
 
     @Column(name = "question_content")
@@ -28,14 +28,14 @@ public class Question implements Serializable {
     @JoinColumn(name = "question_group", referencedColumnName = "id")
     private Question questionGroup;
 
-	@Column(name = "question_explain_en")
-	private String questionExplainEn;
+    @Column(name = "question_explain_en")
+    private String questionExplainEn;
 
-	@Column(name = "question_explain_vn")
-	private String questionExplainVn;
+    @Column(name = "question_explain_vn")
+    private String questionExplainVn;
 
-	@Column(name = "question_numberical")
-	private int questionNumberical;
+    @Column(name = "question_numberical")
+    private int questionNumberical;
 
 
     @ManyToOne
@@ -73,145 +73,145 @@ public class Question implements Serializable {
 
     public Question() {
         createAt = LocalDateTime.now();
-        updateAt= LocalDateTime.now();
+        updateAt = LocalDateTime.now();
     }
 
-    public Question(CreateQuestionDTO createQuestionDTO){
+    public Question(CreateQuestionDTO createQuestionDTO) {
         this.questionContent = createQuestionDTO.getQuestionContent();
         this.questionScore = createQuestionDTO.getQuestionScore();
-		this.questionExplainEn = createQuestionDTO.getQuestionExplainEn();
-		this.questionExplainVn = createQuestionDTO.getQuestionExplainVn();
+        this.questionExplainEn = createQuestionDTO.getQuestionExplainEn();
+        this.questionExplainVn = createQuestionDTO.getQuestionExplainVn();
 
         createAt = LocalDateTime.now();
-        updateAt= LocalDateTime.now();
+        updateAt = LocalDateTime.now();
     }
 
-    public Question(String questionContent, int questionScore){
+    public Question(String questionContent, int questionScore) {
         this.questionContent = questionContent;
         this.questionScore = questionScore;
 
         createAt = LocalDateTime.now();
-        updateAt= LocalDateTime.now();
+        updateAt = LocalDateTime.now();
     }
 
-	public UUID getQuestionId() {
-		return questionId;
-	}
+    public UUID getQuestionId() {
+        return questionId;
+    }
 
-	public void setQuestionId(UUID questionId) {
-		this.questionId = questionId;
-	}
+    public void setQuestionId(UUID questionId) {
+        this.questionId = questionId;
+    }
 
-	public String getQuestionContent() {
-		return questionContent;
-	}
+    public String getQuestionContent() {
+        return questionContent;
+    }
 
-	public void setQuestionContent(String questionContent) {
-		this.questionContent = questionContent;
-	}
+    public void setQuestionContent(String questionContent) {
+        this.questionContent = questionContent;
+    }
 
-	public int getQuestionScore() {
-		return questionScore;
-	}
+    public int getQuestionScore() {
+        return questionScore;
+    }
 
-	public void setQuestionScore(int questionScore) {
-		this.questionScore = questionScore;
-	}
+    public void setQuestionScore(int questionScore) {
+        this.questionScore = questionScore;
+    }
 
-	public Question getQuestionGroup() {
-		return questionGroup;
-	}
+    public Question getQuestionGroup() {
+        return questionGroup;
+    }
 
-	public void setQuestionGroup(Question questionGroup) {
-		this.questionGroup = questionGroup;
-	}
+    public void setQuestionGroup(Question questionGroup) {
+        this.questionGroup = questionGroup;
+    }
 
 
-	public Part getPart() {
-		return part;
-	}
+    public Part getPart() {
+        return part;
+    }
 
-	public void setPart(Part part) {
-		this.part = part;
-	}
+    public void setPart(Part part) {
+        this.part = part;
+    }
 
-	public LocalDateTime getCreateAt() {
-		return createAt;
-	}
+    public LocalDateTime getCreateAt() {
+        return createAt;
+    }
 
-	public void setCreateAt(LocalDateTime createAt) {
-		this.createAt = createAt;
-	}
+    public void setCreateAt(LocalDateTime createAt) {
+        this.createAt = createAt;
+    }
 
-	public User getUserCreate() {
-		return userCreate;
-	}
+    public User getUserCreate() {
+        return userCreate;
+    }
 
-	public void setUserCreate(User userCreate) {
-		this.userCreate = userCreate;
-	}
+    public void setUserCreate(User userCreate) {
+        this.userCreate = userCreate;
+    }
 
-	public LocalDateTime getUpdateAt() {
-		return updateAt;
-	}
+    public LocalDateTime getUpdateAt() {
+        return updateAt;
+    }
 
-	public void setUpdateAt(LocalDateTime updateAt) {
-		this.updateAt = updateAt;
-	}
+    public void setUpdateAt(LocalDateTime updateAt) {
+        this.updateAt = updateAt;
+    }
 
-	public User getUserUpdate() {
-		return userUpdate;
-	}
+    public User getUserUpdate() {
+        return userUpdate;
+    }
 
-	public void setUserUpdate(User userUpdate) {
-		this.userUpdate = userUpdate;
-	}
+    public void setUserUpdate(User userUpdate) {
+        this.userUpdate = userUpdate;
+    }
 
-	public Collection<Topic> getTopics() {
-		return topics;
-	}
+    public Collection<Topic> getTopics() {
+        return topics;
+    }
 
-	public void setTopics(Collection<Topic> topics) {
-		this.topics = topics;
-	}
+    public void setTopics(Collection<Topic> topics) {
+        this.topics = topics;
+    }
 
-	public Collection<Answer> getAnswers() {
-		return answers;
-	}
+    public Collection<Answer> getAnswers() {
+        return answers;
+    }
 
-	public void setAnswers(Collection<Answer> answers) {
-		this.answers = answers;
-	}
+    public void setAnswers(Collection<Answer> answers) {
+        this.answers = answers;
+    }
 
-	public Collection<Content> getContentCollection() {
-		return contentCollection;
-	}
+    public Collection<Content> getContentCollection() {
+        return contentCollection;
+    }
 
-	public void setContentCollection(Collection<Content> contentCollection) {
-		this.contentCollection = contentCollection;
-	}
+    public void setContentCollection(Collection<Content> contentCollection) {
+        this.contentCollection = contentCollection;
+    }
 
-	public int getQuestionNumberical() {
-		return questionNumberical;
-	}
+    public int getQuestionNumberical() {
+        return questionNumberical;
+    }
 
-	public void setQuestionNumberical(int questionNumberical) {
-		this.questionNumberical = questionNumberical;
-	}
+    public void setQuestionNumberical(int questionNumberical) {
+        this.questionNumberical = questionNumberical;
+    }
 
-	public String getQuestionExplainEn() {
-		return questionExplainEn;
-	}
+    public String getQuestionExplainEn() {
+        return questionExplainEn;
+    }
 
-	public void setQuestionExplainEn(String questionExplainEn) {
-		this.questionExplainEn = questionExplainEn;
-	}
+    public void setQuestionExplainEn(String questionExplainEn) {
+        this.questionExplainEn = questionExplainEn;
+    }
 
-	public String getQuestionExplainVn() {
-		return questionExplainVn;
-	}
+    public String getQuestionExplainVn() {
+        return questionExplainVn;
+    }
 
-	public void setQuestionExplainVn(String questionExplainVn) {
-		this.questionExplainVn = questionExplainVn;
-	}
+    public void setQuestionExplainVn(String questionExplainVn) {
+        this.questionExplainVn = questionExplainVn;
+    }
 }

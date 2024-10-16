@@ -3,12 +3,18 @@ package com.example.englishmaster_be.Service.impl;
 import com.example.englishmaster_be.Exception.CustomException;
 import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.Model.Response.MockTestResponse;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.IMockTestService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,6 +26,21 @@ public class MockTestServiceImpl implements IMockTestService {
 
     @Autowired
     private DetailMockTestRepository detailMockTestRepository;
+
+    @Override
+    public ResponseEntity<ResponseModel> findMockTestById(UUID mockTestId) {
+        ResponseModel responseModel = new ResponseModel();
+
+        MockTest mockTest = mockTestRepository.findByMockTestId(mockTestId)
+                .orElseThrow(() -> new CustomException(Error.MOCK_TEST_NOT_FOUND));
+
+        MockTestResponse mockTestResponse = new MockTestResponse(mockTest);
+        responseModel.setMessage("Find MockTest successfully");
+        responseModel.setStatus("success");
+        responseModel.setResponseData(mockTestResponse);
+
+        return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+    }
 
     @Override
     public void createMockTest(MockTest mockTest) {
@@ -50,17 +71,30 @@ public class MockTestServiceImpl implements IMockTestService {
 
     @Override
     public List<DetailMockTest> getTop10DetailToCorrect(int index, boolean isCorrect, MockTest mockTest) {
+        Logger logger = LoggerFactory.getLogger(MockTestServiceImpl.class);
+
         Page<DetailMockTest> detailMockTestPage = detailMockTestRepository.findAllByMockTest(mockTest, PageRequest.of(index, 10, Sort.by(Sort.Order.desc("updateAt"))));
-        for (DetailMockTest detailMockTest : detailMockTestPage.getContent()) {
+
+        logger.info("Repository returned: {}", detailMockTestPage.getContent());
+        List<DetailMockTest> detailMockTests = detailMockTestPage.getContent();
+        Iterator<DetailMockTest> iterator = detailMockTests.iterator();
+
+        // Dùng Iterator để tránh ConcurrentModificationException
+        while (iterator.hasNext()) {
+            DetailMockTest detailMockTest = iterator.next();
             if (detailMockTest.getAnswer().isCorrectAnswer() != isCorrect) {
-                if (detailMockTestPage.getContent().size() == 1) {
-                    return null;
-                }
-                detailMockTestPage.getContent().remove(detailMockTest);
+                iterator.remove();
             }
         }
-        return detailMockTestPage.getContent();
+
+        // Kiểm tra nếu danh sách trống hoặc chỉ có 1 phần tử và cần trả về null
+        if (detailMockTests.isEmpty()) {
+            return null;
+        }
+
+        return detailMockTests;
     }
+
 
     @Override
     public int countCorrectAnswer(UUID mockTestId) {

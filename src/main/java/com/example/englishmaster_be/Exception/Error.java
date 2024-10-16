@@ -24,8 +24,18 @@ public enum Error {
     CAN_NOT_CREATE_PART_5_BY_EXCEL("Can not be create part 5 by excel file", "Can not be create part 5 by excel file", HttpStatus.BAD_REQUEST),
     CAN_NOT_CREATE_PART_6_BY_EXCEL("Can not be create part 6 by excel file", "Can not be create part 6 by excel file", HttpStatus.BAD_REQUEST),
     CAN_NOT_CREATE_PART_7_BY_EXCEL("Can not be create part 7 by excel file", "Can not be create part 7 by excel file", HttpStatus.BAD_REQUEST),
-
-    CONTENT_NOT_FOUND("Content not found", "Content not found", HttpStatus.BAD_REQUEST);
+    CONTENT_NOT_FOUND("Content not found", "Content not found", HttpStatus.BAD_REQUEST),
+    FILE_IMPORT_IS_NOT_EXCEL("Please import excel file", "File import is not excel file", HttpStatus.BAD_REQUEST),
+    STATUS_NOT_FOUND("Status not found", "Status not found", HttpStatus.BAD_REQUEST),
+    SHEET_NOT_FOUND_FOR_PART_3("Sheet not found for part 3", "Sheet not found for part 3", HttpStatus.NOT_FOUND),
+    SHEET_NOT_FOUND_FOR_PART_1("Sheet not found for part 1", "Sheet not found for part 1", HttpStatus.NOT_FOUND),
+    SHEET_NOT_FOUND_FOR_PART_2("Sheet not found for part 2", "Sheet not found for part 2", HttpStatus.NOT_FOUND),
+    SHEET_NOT_FOUND_FOR_PART_7("Sheet not found for part 7", "Sheet not found for part 7", HttpStatus.NOT_FOUND),
+    SHEET_NOT_FOUND_FOR_PART_4("Sheet not found for part 4", "Sheet not found for part 4", HttpStatus.NOT_FOUND),
+    SHEET_NOT_FOUND_FOR_PART_5("Sheet not found for part 5", "Sheet not found for part 5", HttpStatus.NOT_FOUND),
+    SHEET_NOT_FOUND_FOR_PART_6("Sheet not found for part 6", "Sheet not found for part 6", HttpStatus.NOT_FOUND),
+    SHEET_NOT_FOUND_FOR_TOPIC("Sheet not found for topic", "Sheet not found for topic", HttpStatus.NOT_FOUND),
+    UPLOAD_FILE_FAILURE("Server upload has been error", "Upload file failure", HttpStatus.BAD_REQUEST);
 
     private final String message;
     private final String violation;

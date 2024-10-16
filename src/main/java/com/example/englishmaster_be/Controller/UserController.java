@@ -15,6 +15,8 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.*;
@@ -27,6 +29,7 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.core.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,6 +45,7 @@ import java.util.regex.Pattern;
 @RequestMapping("/api")
 @SuppressWarnings("unchecked")
 public class UserController {
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     @Autowired
     private IUserService IUserService;
 
@@ -50,6 +54,7 @@ public class UserController {
 
     @Autowired
     private IFileStorageService IFileStorageService;
+
     @Autowired
     private UserRepository userRepository;
 
@@ -81,6 +86,11 @@ public class UserController {
 
     @Autowired
     private IInvalidTokenService IInvalidTokenService;
+
+    @Autowired
+    private IUploadService IUploadService;
+    @Autowired
+    private ContentRepository contentRepository;
 
     @PostMapping("/register")
     public ResponseModel register(@RequestBody UserRegisterDTO registerDTO) throws IOException, MessagingException {
@@ -222,72 +232,111 @@ public class UserController {
     }
 
     @PostMapping("/forgetPassword")
-    public ResponseEntity<ResponseModel> forgetPassword(@RequestParam("email") String email) throws MessagingException, IOException {
+    public ResponseModel forgetPassword(@RequestParam("email") String email) throws MessagingException, IOException {
+
+        ResponseModel responseModel = new ResponseModel();
 
         boolean checkEmailExists = IUserService.existsEmail(email);
-        ResponseModel responseModel = new ResponseModel();
-        if (!checkEmailExists) {
-            responseModel.setMessage("Email does not exist!");
+
+        if (email == null || email.isEmpty()) {
+            responseModel.setMessage("Vui lòng điền email để được hỗ trợ");
             responseModel.setStatus("fail");
+            return responseModel;
+        }
+
+        if (!checkEmailExists) {
+            responseModel.setMessage("Không tìm thấy email " + email);
+            responseModel.setStatus("fail");
+            return responseModel;
         }
 
         String otp = IOtpService.generateOtp(email);
 
         sendOtpToEmail(email, otp);
 
-        responseModel.setStatus("success");
         responseModel.setMessage("Kiểm tra email của bạn để xác thực mã OTP.");
-
-        return ResponseEntity.ok(responseModel);
+        responseModel.setStatus("success");
+        return responseModel;
     }
 
     @PostMapping("/verifyOtp")
-    public ResponseEntity<String> verifyOtp(@RequestParam String otp) {
+    public ResponseModel verifyOtp(@RequestParam String otp) {
+
+        ResponseModel responseModel = new ResponseModel();
 
         if (otp == null || otp.isEmpty()) {
-            return new ResponseEntity<>("OTP không được bỏ trống", HttpStatus.BAD_REQUEST);
+            responseModel.setMessage("OTP không được bỏ trống");
+            responseModel.setStatus("fail");
+            return responseModel;
         }
-
 
         boolean isOtpValid = IOtpService.validateOtp(otp);
 
         if (!isOtpValid) {
-            return new ResponseEntity<>("Mã OTP đã hết hiệu lực", HttpStatus.BAD_REQUEST);
+            responseModel.setMessage("Mã OTP đã hết hiệu lực");
+            responseModel.setStatus("fail");
+            return responseModel;
         }
 
         IOtpService.updateOtpStatusToVerified(otp);
+        responseModel.setMessage("Mã OTP đã được xác thực thành công.");
+        responseModel.setStatus("success");
 
-        return new ResponseEntity<>("Mã OTP đã được xác thực thành công.", HttpStatus.OK);
+        return responseModel;
     }
 
     @PostMapping("/changePassword")
-    public ResponseEntity changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+    public ResponseModel changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+        ResponseModel responseModel = new ResponseModel();
 
         String otp = changePasswordDTO.getCode();
         String newPassword = changePasswordDTO.getNewPass();
         String confirmPassword = changePasswordDTO.getConfirmPass();
 
-        // Validate OTP
+        // Regex để kiểm tra mật khẩu
+        String regexPassword = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";
+
+
         boolean isOtpValid = IOtpService.validateOtp(otp);
 
         if (!isOtpValid) {
-            return new ResponseEntity<>("Mã OTP đã hết hạn", HttpStatus.BAD_REQUEST);
-        }
-        // Validate new password and confirm password
-        if (newPassword == null || newPassword.isEmpty()) {
-            return new ResponseEntity<>("Mật khẩu mới không được bỏ trống", HttpStatus.BAD_REQUEST);
-        }
-        if (!newPassword.equals(confirmPassword)) {
-            return new ResponseEntity<>("Mật khẩu mới và xác nhận mật khẩu không khớp", HttpStatus.BAD_REQUEST);
+            responseModel.setMessage("Mã OTP đã hết hạn");
+            responseModel.setStatus("fail");
+            return responseModel;
         }
 
-        // Update the user's password
+        if (newPassword == null || newPassword.isEmpty()) {
+            responseModel.setMessage("Mật khẩu mới không được bỏ trống");
+            responseModel.setStatus("fail");
+            return responseModel;
+        }
+
+        // Kiểm tra mật khẩu mới có đúng định dạng theo regex hay không
+        if (!newPassword.matches(regexPassword)) {
+            responseModel.setMessage("Mật khẩu mới phải chứa ít nhất 1 chữ số, " +
+                    "1 chữ thường, 1 chữ hoa, 1 ký tự đặc biệt và không được có khoảng trắng, " +
+                    "độ dài từ 8 đến 20 ký tự.");
+            responseModel.setStatus("fail");
+            return responseModel;
+        }
+
+        if (!newPassword.equals(confirmPassword)) {
+            responseModel.setMessage("Mật khẩu mới và xác nhận mật khẩu không khớp");
+            responseModel.setStatus("fail");
+            return responseModel;
+        }
+
         boolean isPasswordUpdated = IUserService.updatePassword(otp, newPassword);
+
         if (isPasswordUpdated) {
             IOtpService.deleteOtp(otp);
-            return new ResponseEntity<>("Mật khẩu đã được thay đổi thành công.", HttpStatus.OK);
+            responseModel.setMessage("Mật khẩu đã được thay đổi thành công.");
+            responseModel.setStatus("success");
+            return responseModel;
         } else {
-            return new ResponseEntity<>("Không thể thay đổi mật khẩu. Vui lòng thử lại.", HttpStatus.BAD_REQUEST);
+            responseModel.setMessage("Không thể thay đổi mật khẩu. Vui lòng thử lại.");
+            responseModel.setStatus("fail");
+            return responseModel;
         }
     }
 
@@ -380,6 +429,7 @@ public class UserController {
         }
     }
 
+    @Transactional
     @PatchMapping(value = "/changeProfile", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> changeProfile(@ModelAttribute("profileUser") ChangeProfileDTO changeProfileDTO) {
@@ -387,37 +437,23 @@ public class UserController {
         JSONObject objectResponse = new JSONObject();
         try {
             User user = IUserService.currentUser();
-
-            String filename = null;
-
             MultipartFile image = changeProfileDTO.getAvatar();
-
-            if (image != null && !image.isEmpty()) {
-                filename = IFileStorageService.nameFile(image);
+            if (image != null) {
+                if (!user.getAvatar().isEmpty() && user.getAvatar().startsWith("https://s3.meu-solutions.com/")) {
+                    contentRepository.deleteByContentData(user.getAvatar());
+                }
+                user.setAvatar(IUploadService.upload(image, "/", false, null, null));
             }
-
             if (!changeProfileDTO.getName().isEmpty()) {
                 user.setName(changeProfileDTO.getName());
             }
-
             if (!changeProfileDTO.getAddress().isEmpty()) {
                 user.setAddress(changeProfileDTO.getAddress());
             }
             if (!changeProfileDTO.getPhone().isEmpty()) {
                 user.setPhone(changeProfileDTO.getPhone());
             }
-
-            if (filename != null) {
-                if (user.getAvatar() != null) {
-                    IFileStorageService.delete(user.getAvatar());
-                }
-                user.setAvatar(filename);
-            }
             IUserService.save(user);
-            if (filename != null) {
-                IFileStorageService.save(changeProfileDTO.getAvatar(), filename);
-            }
-
             UserResponse userResponse = new UserResponse(user);
             if (user.getRole().getRoleName().equals("ROLE_ADMIN")) {
                 objectResponse.put("Role", "ADMIN");
@@ -425,15 +461,14 @@ public class UserController {
                 objectResponse.put("Role", "USER");
             }
             objectResponse.put("User", userResponse);
-
             responseModel.setResponseData(objectResponse);
             responseModel.setMessage("Change profile user successfully");
             responseModel.setStatus("success");
-
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             responseModel.setMessage("Change profile user fail: " + e.getMessage());
             responseModel.setStatus("fail");
+            log.warn(e.getMessage());
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }

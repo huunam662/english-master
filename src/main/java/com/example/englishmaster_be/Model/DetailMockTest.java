@@ -12,8 +12,8 @@ import java.util.UUID;
 @Table(name = "detail_mocktest")
 public class DetailMockTest implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", columnDefinition = "BINARY(16)")
+	@GeneratedValue(strategy = GenerationType.UUID)
+	@Column(name = "id")
     private UUID detailMockTestId;
 
     @ManyToOne
@@ -110,6 +110,11 @@ public class DetailMockTest implements Serializable {
 	public void setUserUpdate(User userUpdate) {
 		this.userUpdate = userUpdate;
 	};
-    
-    
+
+	@Override
+	public String toString() {
+		return "DetailMockTest{" +
+				"detailMockTestId=" + detailMockTestId +
+				'}';
+	}
 }

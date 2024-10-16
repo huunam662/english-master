@@ -13,8 +13,8 @@ import java.util.UUID;
 @Table(name = "pack_topic")
 public class Pack implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "id", columnDefinition = "BINARY(16)")
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     private UUID packId;
 
     @Column(name = "pack_name")
@@ -43,7 +43,7 @@ public class Pack implements Serializable {
 
     public Pack() {
         createAt = LocalDateTime.now();
-        updateAt= LocalDateTime.now();
+        updateAt = LocalDateTime.now();
     }
 
     public UUID getPackId() {
