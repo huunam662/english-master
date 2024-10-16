@@ -15,6 +15,8 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.*;
@@ -27,6 +29,7 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.core.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -42,6 +45,7 @@ import java.util.regex.Pattern;
 @RequestMapping("/api")
 @SuppressWarnings("unchecked")
 public class UserController {
+    private static final Logger log = LoggerFactory.getLogger(UserController.class);
     @Autowired
     private IUserService IUserService;
 
@@ -425,6 +429,7 @@ public class UserController {
         }
     }
 
+    @Transactional
     @PatchMapping(value = "/changeProfile", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> changeProfile(@ModelAttribute("profileUser") ChangeProfileDTO changeProfileDTO) {
@@ -433,8 +438,8 @@ public class UserController {
         try {
             User user = IUserService.currentUser();
             MultipartFile image = changeProfileDTO.getAvatar();
-            if (image != null && !image.isEmpty()) {
-                if (!user.getAvatar().isEmpty() && user.getAvatar().startsWith("https://s3.meu-solutions.com/meuenglish/")) {
+            if (image != null) {
+                if (!user.getAvatar().isEmpty() && user.getAvatar().startsWith("https://s3.meu-solutions.com/")) {
                     contentRepository.deleteByContentData(user.getAvatar());
                 }
                 user.setAvatar(IUploadService.upload(image, "/", false, null, null));
@@ -463,6 +468,7 @@ public class UserController {
         } catch (Exception e) {
             responseModel.setMessage("Change profile user fail: " + e.getMessage());
             responseModel.setStatus("fail");
+            log.warn(e.getMessage());
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
