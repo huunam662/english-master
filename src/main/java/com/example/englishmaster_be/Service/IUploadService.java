@@ -6,4 +6,6 @@ import java.util.UUID;
 
 public interface IUploadService {
     String upload(MultipartFile file, String dir, boolean isPrivateFile, UUID topicId, String code);
+    
+
 }

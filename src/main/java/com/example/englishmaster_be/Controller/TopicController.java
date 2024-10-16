@@ -137,7 +137,7 @@ public class TopicController {
 
     @PostMapping(value = "/createTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseModel> createTopicByExcelFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<ResponseModel> createTopicByExcelFile(@RequestParam("file") MultipartFile file, @RequestParam("urlImage") String urlImage) {
         ResponseModel responseModel = new ResponseModel();
         try {
             // Parse Excel file thành DTO
@@ -165,6 +165,7 @@ public class TopicController {
             topic.setNumberQuestion(createTopicByExcelFileDTO.getNumberQuestion());
             topic.setUserCreate(user);
             topic.setUserUpdate(user);
+            topic.setTopicImage(urlImage);
             topic.setStatus(statusRepository.findById(UUID.fromString("34b1b787-dae8-4c10-b0a9-cb7beea6f2e9")).orElse(null));
 
             // Tạo topic
