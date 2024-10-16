@@ -15,6 +15,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -115,6 +116,7 @@ public class UploadServiceImpl implements IUploadService {
         }
     }
 
+    @Transactional
     @Override
     public DeleteResponse delete(DeleteRequestDto dto) {
         String path = extractPathFromFilepath(dto.getFilepath());

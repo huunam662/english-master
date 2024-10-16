@@ -57,5 +57,4 @@ public class UploadController {
             return ResponseEntity.badRequest().body(responseModel);
         }
     }
-
 }
