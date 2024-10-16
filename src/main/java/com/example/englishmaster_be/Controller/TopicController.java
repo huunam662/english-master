@@ -40,6 +40,7 @@ import java.util.*;
 @RequestMapping("/api/topic")
 public class TopicController {
 
+    private static final Logger log = LoggerFactory.getLogger(TopicController.class);
     @Autowired
     private IFileStorageService IFileStorageService;
     @Autowired
@@ -74,7 +75,6 @@ public class TopicController {
     @Autowired
     private ContentRepository contentRepository;
 
-    Logger loggerFactory = LoggerFactory.getLogger(TopicController.class);
 
     @GetMapping(value = "/{topicId:.+}/inforTopic")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
@@ -105,7 +105,7 @@ public class TopicController {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
-            String filename = IUploadService.upload(createTopicDTO.getTopicImage(), "/", false, null, null);
+            String filename = IFileStorageService.nameFile(createTopicDTO.getTopicImage());
             Pack pack = IPackService.findPackById(createTopicDTO.getTopicPack());
 
             Topic topic = new Topic(
@@ -125,6 +125,7 @@ public class TopicController {
             topic.setStatus(statusRepository.findByStatusName(StatusConstant.ACTIVE).orElse(null));
 
             ITopicService.createTopic(topic);
+            IFileStorageService.save(createTopicDTO.getTopicImage(), filename);
 
             createTopicDTO.getListPart().forEach(partId -> ITopicService.addPartToTopic(topic.getTopicId(), partId));
 
@@ -144,7 +145,7 @@ public class TopicController {
 
     @PostMapping(value = "/createTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseModel> createTopicByExcelFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<ResponseModel> createTopicByExcelFile(@RequestParam("file") MultipartFile file, @RequestParam("url") String url) {
         ResponseModel responseModel = new ResponseModel();
         try {
             CreateTopicByExcelFileDTO createTopicByExcelFileDTO = excelService.parseCreateTopicDTO(file);
@@ -152,7 +153,7 @@ public class TopicController {
             Pack pack = IPackService.findPackById(createTopicByExcelFileDTO.getTopicPackId());
             Topic topic = new Topic(
                     createTopicByExcelFileDTO.getTopicName(),
-                    createTopicByExcelFileDTO.getTopicImageName(),
+                    null,
                     createTopicByExcelFileDTO.getTopicDescription(),
                     createTopicByExcelFileDTO.getTopicType(),
                     createTopicByExcelFileDTO.getWorkTime(),
@@ -160,6 +161,10 @@ public class TopicController {
                     createTopicByExcelFileDTO.getEndTime()
             );
             topic.setPack(pack);
+            log.warn(createTopicByExcelFileDTO.getTopicImageName());
+            if (createTopicByExcelFileDTO.getTopicImageName() == null || createTopicByExcelFileDTO.getTopicImageName().isEmpty()) {
+                topic.setTopicImage(url);
+            }
             topic.setNumberQuestion(createTopicByExcelFileDTO.getNumberQuestion());
             topic.setUserCreate(user);
             topic.setUserUpdate(user);
