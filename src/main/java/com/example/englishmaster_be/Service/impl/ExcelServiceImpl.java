@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Service.impl;
 
+import com.example.englishmaster_be.Constant.PartConstant;
 import com.example.englishmaster_be.DTO.Answer.CreateListAnswerDTO;
 import com.example.englishmaster_be.DTO.Question.CreateQuestionByExcelFileDTO;
 import com.example.englishmaster_be.DTO.Topic.CreateListQuestionByExcelFileDTO;
@@ -80,52 +81,34 @@ public class ExcelServiceImpl implements IExcelService {
     public CreateListQuestionByExcelFileDTO parseListeningPart12DTO(UUID topicId, MultipartFile file, int part) {
         if (isExcelFile(file)) {
             try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
-
                 Sheet sheet = workbook.getSheetAt(part);
                 CreateListQuestionByExcelFileDTO resultDTO = new CreateListQuestionByExcelFileDTO();
                 List<CreateQuestionByExcelFileDTO> listQuestionDTO = new ArrayList<>();
                 CreateQuestionByExcelFileDTO questionBig = new CreateQuestionByExcelFileDTO();
                 List<CreateQuestionByExcelFileDTO> listQuestionDTOMini = new ArrayList<>();
-
-                // Retrieve audio content
                 Row rowAudio = sheet.getRow(1);
                 String contentAudio = rowAudio != null ? getStringCellValue(rowAudio.getCell(1)) : "";
-                System.out.println(contentAudio);
                 String contentAudioLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentAudio);
-
-                // Retrieve big score
                 Row rowScoreBig = sheet.getRow(2);
                 int scoreBig = rowScoreBig != null ? (int) getNumericCellValue(rowScoreBig.getCell(1)) : 0;
-
                 questionBig.setContentAudio(contentAudioLink);
                 questionBig.setQuestionScore(scoreBig);
-
-                // Set partId for the big question
-                UUID partId = part == 1 ? UUID.fromString("5e051716-1b41-4385-bfe6-3e350d5acb06")
-                        : UUID.fromString("9509bfa5-0403-48db-bee1-1af41cfc73df");
+                UUID partId = part == 1 ? partRepository.findByPartName(PartConstant.PART_1).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId()
+                        : partRepository.findByPartName(PartConstant.PART_2).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId();
                 questionBig.setPartId(partId);
-
-                // Start from row 5 (index 4) for the questions
                 for (int i = 4; i <= sheet.getLastRowNum(); i++) {
                     Row row = sheet.getRow(i);
                     if (row != null) {
                         CreateQuestionByExcelFileDTO question = new CreateQuestionByExcelFileDTO();
                         question.setPartId(partId);
-
                         if (part == 1) {
                             String image = getStringCellValue(row.getCell(3));
                             String imageLink = contentRepository.findContentDataByTopicIdAndCode(topicId, image);
                             question.setContentImage(imageLink);
                         }
-
-                        // Retrieve the correct answer
                         String correctAnswer = getStringCellValue(row.getCell(1));
-
-                        // Retrieve the score for the question
                         int score = (int) getNumericCellValue(row.getCell(2));
                         question.setQuestionScore(score);
-
-                        // Generate answer options
                         List<CreateListAnswerDTO> listAnswerDTO = new ArrayList<>();
                         String[] options = {"A", "B", "C", "D"};
                         for (String option : options) {
@@ -134,15 +117,12 @@ public class ExcelServiceImpl implements IExcelService {
                             answer.setCorrectAnswer(correctAnswer.equalsIgnoreCase(option));
                             listAnswerDTO.add(answer);
                         }
-
                         question.setListAnswer(listAnswerDTO);
                         listQuestionDTOMini.add(question);
                     }
                 }
-
                 questionBig.setListQuestionChild(listQuestionDTOMini);
                 listQuestionDTO.add(questionBig);
-
                 resultDTO.setQuestions(listQuestionDTO);
                 return resultDTO;
             } catch (Exception e) {
@@ -163,21 +143,17 @@ public class ExcelServiceImpl implements IExcelService {
                 List<CreateQuestionByExcelFileDTO> listQuestionDTO = new ArrayList<>();
                 CreateQuestionByExcelFileDTO questionBig = new CreateQuestionByExcelFileDTO();
                 List<CreateQuestionByExcelFileDTO> listQuestionDTOMini = new ArrayList<>();
-
                 int scoreBig = (int) getNumericCellValue(sheet.getRow(1).getCell(1));
                 questionBig.setQuestionScore(scoreBig);
-
-                questionBig.setPartId(UUID.fromString("57572f04-27cf-4da7-8344-ac484c7d9e08"));
-
+                questionBig.setPartId(partRepository.findByPartName(PartConstant.PART_5).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId());
                 for (int i = 3; i <= sheet.getLastRowNum(); i++) {
                     Row row = sheet.getRow(i);
                     if (row != null) {
                         CreateQuestionByExcelFileDTO question = new CreateQuestionByExcelFileDTO();
                         question.setPartId(questionBig.getPartId());
-
+                        question.setQuestionContent(row.getCell(1).getStringCellValue());
                         int score = (int) getNumericCellValue(row.getCell(7));
                         question.setQuestionScore(score);
-
                         List<CreateListAnswerDTO> listAnswerDTO = processAnswers(
                                 getStringCellValue(row, 2),
                                 getStringCellValue(row, 3),
@@ -191,7 +167,6 @@ public class ExcelServiceImpl implements IExcelService {
                 }
                 questionBig.setListQuestionChild(listQuestionDTOMini);
                 listQuestionDTO.add(questionBig);
-
                 resultDTO.setQuestions(listQuestionDTO);
                 return resultDTO;
             } catch (Exception e) {
@@ -210,30 +185,26 @@ public class ExcelServiceImpl implements IExcelService {
                 Sheet sheet = workbook.getSheetAt(part);
                 List<CreateQuestionByExcelFileDTO> listeningParts = new ArrayList<>();
                 CreateQuestionByExcelFileDTO currentListeningPart = null;
-
                 for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                     Row row = sheet.getRow(i);
-                    if (row == null) continue;  // Bỏ qua dòng trống
+                    if (row == null) continue;
                     String firstCellValue = getStringCellValue(row, 0);
                     if (firstCellValue.equalsIgnoreCase("Audio")) {
-                        // Nếu là "Question Content", tạo một phần reading mới
                         if (currentListeningPart != null) {
                             listeningParts.add(currentListeningPart);
                         }
                         currentListeningPart = new CreateQuestionByExcelFileDTO();
-                        currentListeningPart.setPartId(UUID.fromString(part == 3 ? "2496a543-49c3-4580-80b6-c9984e4142e1" : "3b4d6b90-fc31-484e-afe3-3a21162b6454"));
+                        currentListeningPart.setPartId(part == 3 ? partRepository.findByPartName(PartConstant.PART_3).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId() : partRepository.findByPartName(PartConstant.PART_4).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId());
                         String contentAudio = getStringCellValue(row, 1) == null ? null : getStringCellValue(row, 1);
                         if (contentAudio != null) {
                             String contentAudioLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentAudio);
                             currentListeningPart.setContentAudio(contentAudioLink);
                         }
                     } else if (firstCellValue.equalsIgnoreCase("Score")) {
-                        // Nếu là "Score", set điểm cho phần reading hiện tại
                         if (currentListeningPart != null) {
                             currentListeningPart.setQuestionScore(getNumericCellValue(row, 1));
                         }
                     } else if (firstCellValue.equalsIgnoreCase("STT")) {
-                        // Bỏ qua dòng tiêu đề
                         continue;
                     } else if (firstCellValue.equalsIgnoreCase("Image")) {
                         if (currentListeningPart != null) {
@@ -242,15 +213,10 @@ public class ExcelServiceImpl implements IExcelService {
                             currentListeningPart.setContentImage(contentImageLink);
                         }
                     } else if (currentListeningPart != null) {
-                        // Xử lý câu hỏi con
                         CreateQuestionByExcelFileDTO question = new CreateQuestionByExcelFileDTO();
-                        // Set các thuộc tính cho câu hỏi
                         question.setQuestionContent(getStringCellValue(row, 1));
                         question.setQuestionScore(getNumericCellValue(row, 7));
                         question.setPartId(currentListeningPart.getPartId());
-
-
-                        // Xử lý các câu trả lời
                         List<CreateListAnswerDTO> listAnswerDTO = processAnswers(
                                 getStringCellValue(row, 2),
                                 getStringCellValue(row, 3),
@@ -259,21 +225,15 @@ public class ExcelServiceImpl implements IExcelService {
                                 getStringCellValue(row, 6)
                         );
                         question.setListAnswer(listAnswerDTO);
-
-                        // Thêm câu hỏi vào danh sách câu hỏi con của phần reading hiện tại
                         if (currentListeningPart.getListQuestionChild() == null) {
                             currentListeningPart.setListQuestionChild(new ArrayList<>());
                         }
                         currentListeningPart.getListQuestionChild().add(question);
                     }
                 }
-
-                // Thêm phần reading cuối cùng vào danh sách (nếu có)
                 if (currentListeningPart != null) {
                     listeningParts.add(currentListeningPart);
                 }
-
-                // Tạo và trả về kết quả cuối cùng
                 CreateListQuestionByExcelFileDTO result = new CreateListQuestionByExcelFileDTO();
                 result.setQuestions(listeningParts);
                 return result;
@@ -289,32 +249,20 @@ public class ExcelServiceImpl implements IExcelService {
     @Override
     public CreateListQuestionByExcelFileDTO parseReadingPart67DTO(UUID topicId, MultipartFile file, int part) {
         if (isExcelFile(file)) {
-            // Mở workbook từ file Excel được upload
             try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
-
-                // Lấy sheet thứ 7 (index 6) từ workbook
                 Sheet sheet = workbook.getSheetAt(part);
-                // Khởi tạo list để lưu các phần reading
                 List<CreateQuestionByExcelFileDTO> readingParts = new ArrayList<>();
-                // Biến để theo dõi phần reading hiện tại đang xử lý
                 CreateQuestionByExcelFileDTO currentReadingPart = null;
-
-                // Duyệt qua từng dòng trong sheet, bắt đầu từ dòng thứ 2 (index 1)
                 for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                     Row row = sheet.getRow(i);
-                    if (row == null) continue;  // Bỏ qua dòng trống
-
-                    // Lấy giá trị của ô đầu tiên trong dòng
+                    if (row == null) continue;
                     String firstCellValue = getStringCellValue(row, 0);
-
-                    // Xử lý các trường hợp dựa vào giá trị của ô đầu tiên
                     if (firstCellValue.equalsIgnoreCase("Question Content")) {
-                        // Nếu là "Question Content", tạo một phần reading mới
                         if (currentReadingPart != null) {
                             readingParts.add(currentReadingPart);
                         }
                         currentReadingPart = new CreateQuestionByExcelFileDTO();
-                        currentReadingPart.setPartId(UUID.fromString(part == 6 ? "22b25c09-33db-4e3a-b228-37b331b39c96" : "2416aa89-3284-4315-b759-f3f1b1d5ff3f"));
+                        currentReadingPart.setPartId(part == 6 ? partRepository.findByPartName(PartConstant.PART_6).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId() : partRepository.findByPartName(PartConstant.PART_7).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId());
                         currentReadingPart.setQuestionContent(getStringCellValue(row, 1));
                     } else if (firstCellValue.equalsIgnoreCase("Score")) {
                         // Nếu là "Score", set điểm cho phần reading hiện tại
@@ -322,7 +270,6 @@ public class ExcelServiceImpl implements IExcelService {
                             currentReadingPart.setQuestionScore(getNumericCellValue(row, 1));
                         }
                     } else if (firstCellValue.equalsIgnoreCase("STT")) {
-                        // Bỏ qua dòng tiêu đề
                         continue;
                     } else if (firstCellValue.equalsIgnoreCase("Image")) {
                         if (currentReadingPart != null) {
@@ -331,15 +278,10 @@ public class ExcelServiceImpl implements IExcelService {
                             currentReadingPart.setContentImage(contentImageLink);
                         }
                     } else if (currentReadingPart != null) {
-                        // Xử lý câu hỏi con
                         CreateQuestionByExcelFileDTO question = new CreateQuestionByExcelFileDTO();
-                        // Set các thuộc tính cho câu hỏi
                         question.setQuestionContent(getStringCellValue(row, 1));
                         question.setQuestionScore(getNumericCellValue(row, 7));
                         question.setPartId(currentReadingPart.getPartId());
-
-
-                        // Xử lý các câu trả lời
                         List<CreateListAnswerDTO> listAnswerDTO = processAnswers(
                                 getStringCellValue(row, 2),
                                 getStringCellValue(row, 3),
@@ -348,21 +290,15 @@ public class ExcelServiceImpl implements IExcelService {
                                 getStringCellValue(row, 6)
                         );
                         question.setListAnswer(listAnswerDTO);
-
-                        // Thêm câu hỏi vào danh sách câu hỏi con của phần reading hiện tại
                         if (currentReadingPart.getListQuestionChild() == null) {
                             currentReadingPart.setListQuestionChild(new ArrayList<>());
                         }
                         currentReadingPart.getListQuestionChild().add(question);
                     }
                 }
-
-                // Thêm phần reading cuối cùng vào danh sách (nếu có)
                 if (currentReadingPart != null) {
                     readingParts.add(currentReadingPart);
                 }
-
-                // Tạo và trả về kết quả cuối cùng
                 CreateListQuestionByExcelFileDTO result = new CreateListQuestionByExcelFileDTO();
                 result.setQuestions(readingParts);
                 return result;
@@ -378,32 +314,22 @@ public class ExcelServiceImpl implements IExcelService {
     @Override
     public CreateListQuestionByExcelFileDTO parseAllPartsDTO(UUID topicId, MultipartFile file) throws IOException {
         if (isExcelFile(file)) {
-
             CreateListQuestionByExcelFileDTO result = new CreateListQuestionByExcelFileDTO();
             List<CreateQuestionByExcelFileDTO> allQuestions = new ArrayList<>();
-
-            // Parse Listening Part 1 & 2
             for (int part : new int[]{1, 2}) {
                 CreateListQuestionByExcelFileDTO part12DTO = parseListeningPart12DTO(topicId, file, part);
                 allQuestions.addAll(part12DTO.getQuestions());
             }
-
-//             Parse Listening Part 3 & 4
             for (int part : new int[]{3, 4}) {
                 CreateListQuestionByExcelFileDTO part34DTO = parseListeningPart34DTO(topicId, file, part);
                 allQuestions.addAll(part34DTO.getQuestions());
             }
-
-            // Parse Reading Part 5
             CreateListQuestionByExcelFileDTO part5DTO = parseReadingPart5DTO(topicId, file);
             allQuestions.addAll(part5DTO.getQuestions());
-
-            // Parse Reading Part 6 & 7
             for (int part : new int[]{6, 7}) {
                 CreateListQuestionByExcelFileDTO part67DTO = parseReadingPart67DTO(topicId, file, part);
                 allQuestions.addAll(part67DTO.getQuestions());
             }
-
             result.setQuestions(allQuestions);
             return result;
         }
@@ -526,12 +452,10 @@ public class ExcelServiceImpl implements IExcelService {
 
     private List<CreateListAnswerDTO> processAnswers(String optionA, String optionB, String optionC, String optionD, String result) {
         List<CreateListAnswerDTO> listAnswerDTO = new ArrayList<>();
-
         listAnswerDTO.add(createAnswerDTO(optionA, result));
         listAnswerDTO.add(createAnswerDTO(optionB, result));
         listAnswerDTO.add(createAnswerDTO(optionC, result));
         listAnswerDTO.add(createAnswerDTO(optionD, result));
-
         return listAnswerDTO;
     }
 
