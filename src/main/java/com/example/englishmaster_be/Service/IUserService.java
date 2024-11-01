@@ -1,16 +1,19 @@
 package com.example.englishmaster_be.Service;
 
 import com.example.englishmaster_be.DTO.*;
+import com.example.englishmaster_be.Model.Response.UserResponse;
 import com.example.englishmaster_be.Model.User;
+import jakarta.mail.MessagingException;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Service;
 
+
+import java.io.IOException;
 import java.util.UUID;
 
 
 public interface IUserService {
 
-    User createUser(UserRegisterDTO userRegisterDTO);
+    UserResponse createUser(UserRegisterDTO userRegisterDTO);
 
     void save(User user);
 
@@ -22,7 +25,7 @@ public interface IUserService {
 
     User currentUser();
 
-    User findeUserByEmail(String email);
+    User findUserByEmail(String email);
 
     User findUserById(UUID userId);
 
