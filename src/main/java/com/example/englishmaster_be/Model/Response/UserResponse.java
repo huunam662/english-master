@@ -1,18 +1,23 @@
 package com.example.englishmaster_be.Model.Response;
 
 import com.example.englishmaster_be.Model.User;
-import lombok.Getter;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
 
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class UserResponse {
+
     private UUID userId;
-    private String userName;
+    private String name;
     private String email;
     private String phone;
     private String address;
@@ -24,7 +29,7 @@ public class UserResponse {
 
     public UserResponse(User user) {
         this.userId = user.getUserId();
-        this.userName = user.getName();
+        this.name = user.getName();
         this.email = user.getEmail();
         this.phone = user.getPhone();
         this.address = user.getAddress();
