@@ -7,6 +7,7 @@ import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.IAnswerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -19,6 +20,7 @@ public class AnswerServiceImpl implements IAnswerService {
     @Autowired
     private DetailMockTestRepository detailMockTestRepository;
 
+    @Transactional
     @Override
     public void createAnswer(Answer answer) {
         answerRepository.save(answer);
