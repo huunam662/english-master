@@ -1,19 +1,13 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.Answer.CreateListAnswerDTO;
-import com.example.englishmaster_be.DTO.Question.CreateQuestionByExcelFileDTO;
-import com.example.englishmaster_be.DTO.Topic.CreateListQuestionByExcelFileDTO;
-import com.example.englishmaster_be.DTO.Topic.UpdateTopicDTO;
-import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.*;
-import jakarta.persistence.EntityManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -104,6 +98,7 @@ public class TopicServiceImpl implements ITopicService {
         return false;
     }
 
+    @Transactional
     @Override
     public void addQuestionToTopic(Topic topic, Question question) {
         topic.getQuestions().add(question);

@@ -5,6 +5,7 @@ import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.IContentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -13,6 +14,7 @@ public class ContentServiceImpl implements IContentService {
     @Autowired
     private ContentRepository contentRepository;
 
+    @Transactional
     @Override
     public void uploadContent(Content content) {
         contentRepository.save(content);

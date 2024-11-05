@@ -3,17 +3,23 @@ package com.example.englishmaster_be.Controller;
 import com.example.englishmaster_be.Configuration.jwt.JwtUtils;
 import com.example.englishmaster_be.DTO.*;
 import com.example.englishmaster_be.DTO.User.*;
+import com.example.englishmaster_be.Exception.Response.ApiResponse;
+import com.example.englishmaster_be.Exception.Response.ResponseUtil;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.Service.impl.UserServiceImpl;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,8 +50,12 @@ import java.util.regex.Pattern;
 @RestController
 @RequestMapping("/api")
 @SuppressWarnings("unchecked")
+@RequiredArgsConstructor
 public class UserController {
     private static final Logger log = LoggerFactory.getLogger(UserController.class);
+
+    private final UserServiceImpl userService;
+
     @Autowired
     private IUserService IUserService;
 
@@ -93,78 +103,14 @@ public class UserController {
     private ContentRepository contentRepository;
 
     @PostMapping("/register")
-    public ResponseModel register(@RequestBody UserRegisterDTO registerDTO) throws IOException, MessagingException {
-        ResponseModel responseModel = new ResponseModel();
-
-        String regexPassword = "^(?=.*[0-9])"
-                + "(?=.*[a-z])(?=.*[A-Z])"
-                + "(?=.*[@#$%^&+=])"
-                + "(?=\\S+$).{8,20}$";
-
-        String regexEmail = "^(?=.{1,64}@)[A-Za-z0-9_-]+(\\.[A-Za-z0-9_-]+)*@"
-                + "[^-][A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})$";
-
-        Pattern patternPassword = Pattern.compile(regexPassword);
-        Pattern patternEmail = Pattern.compile(regexEmail);
-
-        // Email validation
-        Matcher matcherEmail = patternEmail.matcher(registerDTO.getEmail());
-        if (!matcherEmail.matches()) {
-            responseModel.setMessage("Email is not in correct format");
-            responseModel.setStatus("fail");
-            return responseModel;
-        }
-
-        // Password validation
-        if (registerDTO.getPassword() == null) {
-            responseModel.setMessage("Password is null");
-            responseModel.setStatus("fail");
-            return responseModel;
-        }
-
-        Matcher matcherPassword = patternPassword.matcher(registerDTO.getPassword());
-        if (!matcherPassword.matches()) {
-            responseModel.setMessage("Password must contain at least 1 uppercase, 1 lowercase, 1 numeric, 1 special character, and no spaces");
-            responseModel.setStatus("fail");
-            return responseModel;
-        }
-
-        // Password and confirm password match validation
-        if (!registerDTO.getPassword().equals(registerDTO.getConfirmPassword())) {
-            responseModel.setMessage("Password and confirm password don't match");
-            responseModel.setStatus("fail");
-            return responseModel;
-        }
-
-        // Check if user already exists
-        boolean existingUser = userRepository.existsByEmail(registerDTO.getEmail());
-        if (existingUser) {
-            User userExist = IUserService.findeUserByEmail(registerDTO.getEmail());
-            if (!userExist.isEnabled()) {
-                userRepository.delete(userExist);
-            } else {
-                responseModel.setMessage("This email already exists!");
-                responseModel.setStatus("fail");
-                return responseModel;
-            }
-        }
-
-        // Create and save the user
-        User user = IUserService.createUser(registerDTO);
-        userRepository.save(user);
-
-        // Create and save the confirmation token
-        ConfirmationToken confirmationToken = new ConfirmationToken(user);
-        confirmationToken.setType("ACTIVE");
-        confirmationToken.setCode(UUID.randomUUID().toString());
-        confirmationTokenRepository.save(confirmationToken);
-
-        // Send confirmation email
-        sendConfirmationEmail(user.getEmail(), confirmationToken.getCode());
-
-        responseModel.setMessage("Sent a confirmation mail!");
-        responseModel.setStatus("success");
-        return responseModel;
+    public ResponseEntity<ApiResponse<UserResponse>> register(@Valid @RequestBody UserRegisterDTO registerDTO,
+                                                              HttpServletRequest request){
+        return ResponseEntity.ok(
+                ResponseUtil.success(userService.createUser(registerDTO)
+                ,"Sent a confirmation mail!"
+                        ,request.getRequestURI()
+                )
+        );
     }
 
     @GetMapping("/register/confirm")

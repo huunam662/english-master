@@ -46,7 +46,6 @@ public class ExcelServiceImpl implements IExcelService {
         if (isExcelFile(file)) {
             try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
                 Sheet sheet = workbook.getSheetAt(0);
-
                 String topicName = getCellValueAsString(sheet, 0, 1);
                 String topicImageName = getCellValueAsString(sheet, 1, 1);
                 String topicDescription = getCellValueAsString(sheet, 2, 1);
@@ -55,7 +54,6 @@ public class ExcelServiceImpl implements IExcelService {
                 int numberQuestion = getIntCellValue(sheet, 5, 1);
                 String topicPackName = getCellValueAsString(sheet, 6, 1);
                 List<UUID> parts = parseParts(getCellValueAsString(sheet, 7, 1));
-
                 return CreateTopicByExcelFileDTO.builder()
                         .topicName(topicName)
                         .topicImageName(topicImageName)
@@ -135,7 +133,7 @@ public class ExcelServiceImpl implements IExcelService {
 
     @Transactional
     @Override
-    public CreateListQuestionByExcelFileDTO parseReadingPart5DTO(UUID topicId, MultipartFile file) {
+    public CreateListQuestionByExcelFileDTO parseReadingPart5DTO(UUID topicId, MultipartFile file) throws IOException {
         if (isExcelFile(file)) {
             try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
                 Sheet sheet = workbook.getSheetAt(5);
@@ -170,7 +168,7 @@ public class ExcelServiceImpl implements IExcelService {
                 resultDTO.setQuestions(listQuestionDTO);
                 return resultDTO;
             } catch (Exception e) {
-                throw new CustomException(Error.CAN_NOT_CREATE_PART_5_BY_EXCEL);
+                return null;
             }
         } else {
             throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
@@ -406,13 +404,13 @@ public class ExcelServiceImpl implements IExcelService {
     }
 
     private List<UUID> parseParts(String partsString) {
-        List<String> listPart = Arrays.stream(partsString.split(","))
+        List<String> listPart = Arrays.stream(partsString.split(", "))
                 .map(String::trim)
                 .toList();
 
         List<UUID> uuidList = new ArrayList<>();
         for (String part : listPart) {
-            UUID uuid = partRepository.findByPartName(part).get().getPartId();
+            UUID uuid = partRepository.findByPartName(part).orElseThrow(()-> new CustomException(Error.PART_NOT_FOUND)).getPartId();
             uuidList.add(uuid);
         }
         return uuidList;
