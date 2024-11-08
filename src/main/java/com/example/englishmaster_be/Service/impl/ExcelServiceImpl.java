@@ -16,6 +16,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,7 @@ import java.util.UUID;
 @Service
 public class ExcelServiceImpl implements IExcelService {
 
+    private static final Logger log = LoggerFactory.getLogger(ExcelServiceImpl.class);
     @Autowired
     private PackRepository packRepository;
 
@@ -86,7 +89,7 @@ public class ExcelServiceImpl implements IExcelService {
                 List<CreateQuestionByExcelFileDTO> listQuestionDTOMini = new ArrayList<>();
                 Row rowAudio = sheet.getRow(1);
                 String contentAudio = rowAudio != null ? getStringCellValue(rowAudio.getCell(1)) : "";
-                String contentAudioLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentAudio);
+                String contentAudioLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentAudio).orElseThrow(() -> new CustomException(Error.CONTENT_NOT_FOUND));
                 Row rowScoreBig = sheet.getRow(2);
                 int scoreBig = rowScoreBig != null ? (int) getNumericCellValue(rowScoreBig.getCell(1)) : 0;
                 questionBig.setContentAudio(contentAudioLink);
@@ -101,7 +104,7 @@ public class ExcelServiceImpl implements IExcelService {
                         question.setPartId(partId);
                         if (part == 1) {
                             String image = getStringCellValue(row.getCell(3));
-                            String imageLink = contentRepository.findContentDataByTopicIdAndCode(topicId, image);
+                            String imageLink = contentRepository.findContentDataByTopicIdAndCode(topicId, image).orElseThrow(() -> new CustomException(Error.CONTENT_NOT_FOUND));
                             question.setContentImage(imageLink);
                         }
                         String correctAnswer = getStringCellValue(row.getCell(1));
@@ -124,7 +127,9 @@ public class ExcelServiceImpl implements IExcelService {
                 resultDTO.setQuestions(listQuestionDTO);
                 return resultDTO;
             } catch (Exception e) {
-                throw new CustomException(part == 1 ? Error.CAN_NOT_CREATE_PART_1_BY_EXCEL : Error.CAN_NOT_CREATE_PART_2_BY_EXCEL);
+                log.warn(e.getMessage());
+                return null;
+//                throw new CustomException(part == 1 ? Error.CAN_NOT_CREATE_PART_1_BY_EXCEL : Error.CAN_NOT_CREATE_PART_2_BY_EXCEL);
             }
         } else {
             throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
@@ -195,7 +200,7 @@ public class ExcelServiceImpl implements IExcelService {
                         currentListeningPart.setPartId(part == 3 ? partRepository.findByPartName(PartConstant.PART_3).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId() : partRepository.findByPartName(PartConstant.PART_4).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId());
                         String contentAudio = getStringCellValue(row, 1) == null ? null : getStringCellValue(row, 1);
                         if (contentAudio != null) {
-                            String contentAudioLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentAudio);
+                            String contentAudioLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentAudio).orElseThrow(() -> new CustomException(Error.CONTENT_NOT_FOUND));
                             currentListeningPart.setContentAudio(contentAudioLink);
                         }
                     } else if (firstCellValue.equalsIgnoreCase("Score")) {
@@ -207,7 +212,7 @@ public class ExcelServiceImpl implements IExcelService {
                     } else if (firstCellValue.equalsIgnoreCase("Image")) {
                         if (currentListeningPart != null) {
                             String contentImage = getStringCellValue(row, 1);
-                            String contentImageLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentImage);
+                            String contentImageLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentImage).orElseThrow(() -> new CustomException(Error.CONTENT_NOT_FOUND));
                             currentListeningPart.setContentImage(contentImageLink);
                         }
                     } else if (currentListeningPart != null) {
@@ -272,7 +277,7 @@ public class ExcelServiceImpl implements IExcelService {
                     } else if (firstCellValue.equalsIgnoreCase("Image")) {
                         if (currentReadingPart != null) {
                             String contentImage = getStringCellValue(row, 1);
-                            String contentImageLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentImage);
+                            String contentImageLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentImage).orElseThrow(() -> new CustomException(Error.CONTENT_NOT_FOUND));
                             currentReadingPart.setContentImage(contentImageLink);
                         }
                     } else if (currentReadingPart != null) {

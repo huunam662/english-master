@@ -1,5 +1,7 @@
 package com.example.englishmaster_be.Controller;
 
+import com.example.englishmaster_be.Exception.CustomException;
+import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Model.Content;
 import com.example.englishmaster_be.Model.Response.ContentResponse;
 import com.example.englishmaster_be.Model.ResponseModel;
@@ -47,7 +49,7 @@ public class ContentController {
     @GetMapping("contentData")
     public ResponseEntity<ResponseModel> getContentData(@RequestParam UUID topicId, @RequestParam String code) {
         ResponseModel responseModel = new ResponseModel();
-        String content = contentRepository.findContentDataByTopicIdAndCode(topicId, code);
+        String content = contentRepository.findContentDataByTopicIdAndCode(topicId, code).orElseThrow(()-> new CustomException(Error.CONTENT_NOT_FOUND));
         if (content != null) {
             responseModel.setMessage("Get content successful");
             responseModel.setResponseData(content);
