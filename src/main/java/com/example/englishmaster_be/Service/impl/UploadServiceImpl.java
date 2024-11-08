@@ -102,7 +102,7 @@ public class UploadServiceImpl implements IUploadService {
     private String handleSuccessfulUpload(JsonNode jsonResponse, UUID topicId, String code, MultipartFile file) {
         User currentUser = userService.currentUser();
         String url = jsonResponse.path("responseData").path("url").asText();
-        String existsContent =  contentRepository.findContentDataByTopicIdAndCode(topicId, code).orElseThrow(()-> new CustomException(Error.CONTENT_NOT_FOUND));
+        String existsContent = contentRepository.findByTopicIdAndCode(topicId, code);
         if (existsContent == null) {
             Content content = new Content();
             content.setTopicId(topicId);

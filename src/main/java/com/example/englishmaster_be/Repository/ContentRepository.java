@@ -25,4 +25,7 @@ public interface ContentRepository extends JpaRepository<Content, UUID> {
     @Query("delete from Content c where c.contentData = :contentData")
     int deleteByContentData(String contentData);
 
+    @Query("select c.contentData from Content c where c.topicId = :topicId and c.code like :contentAudio")
+    String findByTopicIdAndCode(UUID topicId, String contentAudio);
+
 }
