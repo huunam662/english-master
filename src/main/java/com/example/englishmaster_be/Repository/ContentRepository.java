@@ -16,7 +16,7 @@ public interface ContentRepository extends JpaRepository<Content, UUID> {
     List<String> findAllContentData();
 
     @Query("select c.contentData from Content c where c.topicId = :topicId and c.code like :contentAudio")
-    String findContentDataByTopicIdAndCode(UUID topicId, String contentAudio);
+    Optional<String> findContentDataByTopicIdAndCode(UUID topicId, String contentAudio);
 
     @Query("select c from Content c where c.contentData like :contentImage")
     Optional<Content> findByContentData(String contentImage);

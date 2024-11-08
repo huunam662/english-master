@@ -35,7 +35,8 @@ public enum Error {
     SHEET_NOT_FOUND_FOR_PART_5("Sheet not found for part 5", "Sheet not found for part 5", HttpStatus.NOT_FOUND),
     SHEET_NOT_FOUND_FOR_PART_6("Sheet not found for part 6", "Sheet not found for part 6", HttpStatus.NOT_FOUND),
     SHEET_NOT_FOUND_FOR_TOPIC("Sheet not found for topic", "Sheet not found for topic", HttpStatus.NOT_FOUND),
-    UPLOAD_FILE_FAILURE("Server upload has been error", "Upload file failure", HttpStatus.BAD_REQUEST);
+    UPLOAD_FILE_FAILURE("Server upload has been error", "Upload file failure", HttpStatus.BAD_REQUEST),
+    CODE_EXISTED_IN_TOPIC("Code existed in topic", "Code existed in topic", HttpStatus.BAD_REQUEST);
 
     private final String message;
     private final String violation;

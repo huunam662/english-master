@@ -1,6 +1,8 @@
 package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.DTO.DeleteRequestDto;
+import com.example.englishmaster_be.Exception.CustomException;
+import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.Model.Content;
 import com.example.englishmaster_be.Model.Response.DeleteResponse;
@@ -100,7 +102,7 @@ public class UploadServiceImpl implements IUploadService {
     private String handleSuccessfulUpload(JsonNode jsonResponse, UUID topicId, String code, MultipartFile file) {
         User currentUser = userService.currentUser();
         String url = jsonResponse.path("responseData").path("url").asText();
-        String existsContent = contentRepository.findContentDataByTopicIdAndCode(topicId, code);
+        String existsContent =  contentRepository.findContentDataByTopicIdAndCode(topicId, code).orElseThrow(()-> new CustomException(Error.CONTENT_NOT_FOUND));
         if (existsContent == null) {
             Content content = new Content();
             content.setTopicId(topicId);
@@ -112,7 +114,7 @@ public class UploadServiceImpl implements IUploadService {
             contentRepository.save(content);
             return url;
         } else {
-            throw new RuntimeException("Code already exists in topic");
+            throw new CustomException(Error.CODE_EXISTED_IN_TOPIC);
         }
     }
 
