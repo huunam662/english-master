@@ -89,7 +89,7 @@ public class ExcelServiceImpl implements IExcelService {
                 List<CreateQuestionByExcelFileDTO> listQuestionDTOMini = new ArrayList<>();
                 Row rowAudio = sheet.getRow(1);
                 String contentAudio = rowAudio != null ? getStringCellValue(rowAudio.getCell(1)) : "";
-                String contentAudioLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentAudio).orElseThrow(() -> new CustomException(Error.CONTENT_NOT_FOUND));
+                String contentAudioLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentAudio);
                 Row rowScoreBig = sheet.getRow(2);
                 int scoreBig = rowScoreBig != null ? (int) getNumericCellValue(rowScoreBig.getCell(1)) : 0;
                 questionBig.setContentAudio(contentAudioLink);
@@ -99,19 +99,22 @@ public class ExcelServiceImpl implements IExcelService {
                 questionBig.setPartId(partId);
                 for (int i = 4; i <= sheet.getLastRowNum(); i++) {
                     Row row = sheet.getRow(i);
+                    String[] options;
                     if (row != null) {
                         CreateQuestionByExcelFileDTO question = new CreateQuestionByExcelFileDTO();
                         question.setPartId(partId);
                         if (part == 1) {
                             String image = getStringCellValue(row.getCell(3));
-                            String imageLink = contentRepository.findContentDataByTopicIdAndCode(topicId, image).orElseThrow(() -> new CustomException(Error.CONTENT_NOT_FOUND));
+                            String imageLink = contentRepository.findContentDataByTopicIdAndCode(topicId, image);
                             question.setContentImage(imageLink);
+                            options = new String[]{"A", "B", "C", "D"};
+                        } else {
+                            options = new String[]{"A", "B", "C"};
                         }
                         String correctAnswer = getStringCellValue(row.getCell(1));
                         int score = (int) getNumericCellValue(row.getCell(2));
                         question.setQuestionScore(score);
                         List<CreateListAnswerDTO> listAnswerDTO = new ArrayList<>();
-                        String[] options = {"A", "B", "C", "D"};
                         for (String option : options) {
                             CreateListAnswerDTO answer = new CreateListAnswerDTO();
                             answer.setContentAnswer(option);
@@ -127,9 +130,7 @@ public class ExcelServiceImpl implements IExcelService {
                 resultDTO.setQuestions(listQuestionDTO);
                 return resultDTO;
             } catch (Exception e) {
-                log.warn(e.getMessage());
-                return null;
-//                throw new CustomException(part == 1 ? Error.CAN_NOT_CREATE_PART_1_BY_EXCEL : Error.CAN_NOT_CREATE_PART_2_BY_EXCEL);
+                throw new CustomException(part == 1 ? Error.CAN_NOT_CREATE_PART_1_BY_EXCEL : Error.CAN_NOT_CREATE_PART_2_BY_EXCEL);
             }
         } else {
             throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
@@ -200,7 +201,7 @@ public class ExcelServiceImpl implements IExcelService {
                         currentListeningPart.setPartId(part == 3 ? partRepository.findByPartName(PartConstant.PART_3).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId() : partRepository.findByPartName(PartConstant.PART_4).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId());
                         String contentAudio = getStringCellValue(row, 1) == null ? null : getStringCellValue(row, 1);
                         if (contentAudio != null) {
-                            String contentAudioLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentAudio).orElseThrow(() -> new CustomException(Error.CONTENT_NOT_FOUND));
+                            String contentAudioLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentAudio);
                             currentListeningPart.setContentAudio(contentAudioLink);
                         }
                     } else if (firstCellValue.equalsIgnoreCase("Score")) {
@@ -212,7 +213,7 @@ public class ExcelServiceImpl implements IExcelService {
                     } else if (firstCellValue.equalsIgnoreCase("Image")) {
                         if (currentListeningPart != null) {
                             String contentImage = getStringCellValue(row, 1);
-                            String contentImageLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentImage).orElseThrow(() -> new CustomException(Error.CONTENT_NOT_FOUND));
+                            String contentImageLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentImage);
                             currentListeningPart.setContentImage(contentImageLink);
                         }
                     } else if (currentListeningPart != null) {
@@ -277,7 +278,7 @@ public class ExcelServiceImpl implements IExcelService {
                     } else if (firstCellValue.equalsIgnoreCase("Image")) {
                         if (currentReadingPart != null) {
                             String contentImage = getStringCellValue(row, 1);
-                            String contentImageLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentImage).orElseThrow(() -> new CustomException(Error.CONTENT_NOT_FOUND));
+                            String contentImageLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentImage);
                             currentReadingPart.setContentImage(contentImageLink);
                         }
                     } else if (currentReadingPart != null) {
@@ -415,7 +416,7 @@ public class ExcelServiceImpl implements IExcelService {
 
         List<UUID> uuidList = new ArrayList<>();
         for (String part : listPart) {
-            UUID uuid = partRepository.findByPartName(part).orElseThrow(()-> new CustomException(Error.PART_NOT_FOUND)).getPartId();
+            UUID uuid = partRepository.findByPartName(part).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId();
             uuidList.add(uuid);
         }
         return uuidList;
