@@ -49,7 +49,7 @@ public class ContentController {
     @GetMapping("contentData")
     public ResponseEntity<ResponseModel> getContentData(@RequestParam UUID topicId, @RequestParam String code) {
         ResponseModel responseModel = new ResponseModel();
-        String content = contentRepository.findContentDataByTopicIdAndCode(topicId, code).orElseThrow(()-> new CustomException(Error.CONTENT_NOT_FOUND));
+        String content = contentRepository.findContentDataByTopicIdAndCode(topicId, code);
         if (content != null) {
             responseModel.setMessage("Get content successful");
             responseModel.setResponseData(content);
