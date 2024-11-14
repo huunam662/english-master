@@ -350,7 +350,6 @@ public class TopicController {
 
             List<Topic> topicList = query.fetch();
 
-
             List<TopicResponse> topicResponseList = new ArrayList<>();
 
             for (Topic topic : topicList) {

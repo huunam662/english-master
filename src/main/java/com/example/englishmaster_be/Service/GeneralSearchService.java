@@ -6,3 +6,4 @@ import java.util.Map;
 public interface GeneralSearchService {
     Map<String, List<Object>> searchAll(String keyword);
 }
+

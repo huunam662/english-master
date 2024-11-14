@@ -32,6 +32,7 @@ public class FlashCardWordServiceImpl implements IFlashCardWordService {
         return flashCardWordRepository.findFlashCartWordByQuery(keyword, PageRequest.of(0, 5, Sort.by(Sort.Order.asc("word").ignoreCase())));
     }
 
+
     @Override
     public FlashCardWord findWordToID(UUID wordId) {
         return flashCardWordRepository.findById(wordId).orElseThrow(() -> new IllegalArgumentException("FlashCard word not found with ID: " + wordId));

@@ -21,5 +21,4 @@ public class GeneralSearchController{
        Map<String, List<Object>> searchResult = generalSearchService.searchAll(keyword);
        return ResponseEntity.ok(searchResult);
    }
-
 }

@@ -13,3 +13,4 @@ public interface FlashCardWordRepository extends JpaRepository<FlashCardWord, UU
     @Query("SELECT f FROM FlashCardWord f WHERE LOWER(f.word) LIKE LOWER(CONCAT('%', :query, '%'))")
     List<FlashCardWord> findFlashCartWordByQuery(@Param("query") String query, Pageable pageable);
 }
+

@@ -47,7 +47,6 @@ public class NewsController {
             JSONObject responseObject = new JSONObject();
             OrderSpecifier<?> orderSpecifier;
 
-
             if(Sort.Direction.DESC.equals(sortDirection)){
                 orderSpecifier = QNews.news.updateAt.desc();
             }else {

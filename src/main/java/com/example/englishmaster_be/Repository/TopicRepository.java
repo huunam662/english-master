@@ -23,3 +23,4 @@ public interface TopicRepository extends JpaRepository<Topic, UUID>, QuerydslPre
     @Query("SELECT t.topicImage FROM Topic t order by t.topicId")
     List<String> findAllTopicImages();
 }
+

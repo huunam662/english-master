@@ -13,3 +13,4 @@ public interface IFlashCardWordService {
     List<FlashCardWord> searchByFlashCardWord(String query);
     FlashCardWord findWordToID(UUID wordId);
 }
+

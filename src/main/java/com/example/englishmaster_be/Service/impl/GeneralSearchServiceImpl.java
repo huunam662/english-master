@@ -30,6 +30,7 @@ public class GeneralSearchServiceImpl implements GeneralSearchService {
         this.newsRepository = newsRepository;
         this.queryFactory = queryFactory;
     }
+
     @Override
     public Map<String, List<Object>> searchAll(String keyword) {
         Map<String, List<Object>> result = new HashMap<>();
