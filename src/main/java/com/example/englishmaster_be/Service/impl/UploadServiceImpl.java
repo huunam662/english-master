@@ -69,6 +69,7 @@ public class UploadServiceImpl implements IUploadService {
         if (file.getContentType() == null) {
             throw new IllegalArgumentException("Invalid file type");
         }
+
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         HttpHeaders headers = createHttpHeaders(MediaType.MULTIPART_FORM_DATA);
         try {
@@ -80,6 +81,7 @@ public class UploadServiceImpl implements IUploadService {
             }, MediaType.parseMediaType(Objects.requireNonNull(file.getContentType())));
             builder.part("dir", dir);
             builder.part("isPrivateFile", isPrivateFile);
+
             HttpEntity<?> entity = new HttpEntity<>(builder.build(), headers);
             ResponseEntity<String> response = restTemplate.exchange(uploadApiUrl, HttpMethod.POST, entity, String.class);
             if (response.getBody() == null) {
@@ -89,7 +91,11 @@ public class UploadServiceImpl implements IUploadService {
             JsonNode jsonResponse = objectMapper.readTree(response.getBody());
             boolean isSuccess = jsonResponse.path("success").asBoolean();
             if (isSuccess) {
-                return handleSuccessfulUpload(jsonResponse, topicId, code, file);
+                String url = jsonResponse.path("responseData").path("url").asText();
+                if (topicId != null && code != null && !code.isEmpty()) {
+                    return handleSuccessfulUpload(jsonResponse, topicId, code, file);
+                }
+                return url;
             } else {
                 String errorMessage = jsonResponse.path("message").asText("Upload failed");
                 throw new RuntimeException("Error: " + errorMessage);
@@ -117,6 +123,7 @@ public class UploadServiceImpl implements IUploadService {
             throw new CustomException(Error.CODE_EXISTED_IN_TOPIC);
         }
     }
+
 
     @Transactional
     @Override
