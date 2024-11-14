@@ -104,11 +104,11 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<UserResponse>> register(@Valid @RequestBody UserRegisterDTO registerDTO,
-                                                              HttpServletRequest request){
+                                                              HttpServletRequest request) {
         return ResponseEntity.ok(
                 ResponseUtil.success(userService.createUser(registerDTO)
-                ,"Sent a confirmation mail!"
-                        ,request.getRequestURI()
+                        , "Sent a confirmation mail!"
+                        , request.getRequestURI()
                 )
         );
     }
@@ -385,27 +385,23 @@ public class UserController {
             User user = IUserService.currentUser();
             MultipartFile image = changeProfileDTO.getAvatar();
             if (image != null) {
-                if (!user.getAvatar().isEmpty() && user.getAvatar().startsWith("https://s3.meu-solutions.com/")) {
-                    contentRepository.deleteByContentData(user.getAvatar());
-                }
+                if (user.getAvatar() != null && !user.getAvatar().isEmpty() && user.getAvatar().startsWith("https://s3.meu-solutions.com/")) {
+                        contentRepository.deleteByContentData(user.getAvatar());
+                    }
                 user.setAvatar(IUploadService.upload(image, "/", false, null, null));
             }
-            if (!changeProfileDTO.getName().isEmpty()) {
+            if (changeProfileDTO.getName() != null && !changeProfileDTO.getName().isEmpty()) {
                 user.setName(changeProfileDTO.getName());
             }
-            if (!changeProfileDTO.getAddress().isEmpty()) {
+            if (changeProfileDTO.getAddress() != null && !changeProfileDTO.getAddress().isEmpty()) {
                 user.setAddress(changeProfileDTO.getAddress());
             }
-            if (!changeProfileDTO.getPhone().isEmpty()) {
+            if (changeProfileDTO.getPhone() != null && !changeProfileDTO.getPhone().isEmpty()) {
                 user.setPhone(changeProfileDTO.getPhone());
             }
             IUserService.save(user);
             UserResponse userResponse = new UserResponse(user);
-            if (user.getRole().getRoleName().equals("ROLE_ADMIN")) {
-                objectResponse.put("Role", "ADMIN");
-            } else {
-                objectResponse.put("Role", "USER");
-            }
+            objectResponse.put("Role", user.getRole().getRoleName().equals("ROLE_ADMIN") ? "ADMIN" : "USER");
             objectResponse.put("User", userResponse);
             responseModel.setResponseData(objectResponse);
             responseModel.setMessage("Change profile user successfully");
@@ -419,6 +415,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
     }
+
 
     @PatchMapping(value = "/changePass")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
