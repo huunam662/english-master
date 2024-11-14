@@ -7,6 +7,7 @@ import com.example.englishmaster_be.Model.Response.ConfirmationTokenResponse;
 import com.example.englishmaster_be.Repository.ConfirmationTokenRepository;
 import com.example.englishmaster_be.Service.IConfirmationTokenService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,9 +16,10 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class ConfirmationTokenServiceImpl implements IConfirmationTokenService {
+    @Autowired
+    private ConfirmationTokenMapper confirmationTokenMapper;
 
     private final ConfirmationTokenRepository confirmationTokenRepository;
-    private final ConfirmationTokenMapper confirmationTokenMapper;
 
     @Override
     public ConfirmationTokenResponse createConfirmationToken(CreateConfirmationTokenDTO createConfirmationTokenDTO) {

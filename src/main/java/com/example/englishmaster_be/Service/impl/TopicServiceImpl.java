@@ -19,8 +19,6 @@ public class TopicServiceImpl implements ITopicService {
     @Autowired
     private QuestionRepository questionRepository;
     @Autowired
-    private IUserService IUserService;
-    @Autowired
     private IQuestionService IQuestionService;
 
 
@@ -66,6 +64,7 @@ public class TopicServiceImpl implements ITopicService {
         Collections.shuffle(listQuestion);
         return listQuestion;
     }
+
 
     @Override
     public void addPartToTopic(UUID topicId, UUID partId) {
@@ -153,6 +152,12 @@ public class TopicServiceImpl implements ITopicService {
             }
         }
         return total;
+    }
+
+
+    @Override
+    public List<Topic> getTopicsByStartTime(Date startTime) {
+        return topicRepository.findTopicsByStartTime(startTime);
     }
 
 }

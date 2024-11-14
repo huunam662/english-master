@@ -28,3 +28,4 @@ public class NewsServiceImpl implements INewsService {
                 .orElseThrow(() -> new IllegalArgumentException("News not found with ID: " + newsId));
     }
 }
+

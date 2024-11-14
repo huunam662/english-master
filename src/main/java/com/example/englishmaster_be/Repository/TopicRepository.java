@@ -16,11 +16,11 @@ public interface TopicRepository extends JpaRepository<Topic, UUID>, QuerydslPre
     @Query("SELECT t FROM Topic t WHERE LOWER(t.topicName) LIKE LOWER(CONCAT('%', :query, '%'))")
     List<Topic> findTopicsByQuery(@Param("query") String query, Pageable pageable);
 
+    @Query("SELECT t FROM Topic t WHERE t.startTime =: startTime")
+    List<Topic> findTopicsByStartTime(@Param("startTime") Date startTime);
     Optional<Topic> findByTopicId(UUID topicId);
 
     @Query("SELECT t.topicImage FROM Topic t order by t.topicId")
     List<String> findAllTopicImages();
-
-
-
 }
+

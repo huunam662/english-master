@@ -1,9 +1,8 @@
 package com.example.englishmaster_be.Service;
 
-import com.example.englishmaster_be.DTO.Topic.CreateListQuestionByExcelFileDTO;
-import com.example.englishmaster_be.DTO.Topic.UpdateTopicDTO;
 import com.example.englishmaster_be.Model.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,4 +22,5 @@ public interface ITopicService {
     boolean existPartInTopic(Topic topic, Part part);
     void deleteTopic(Topic topic);
     int totalQuestion(Part part, UUID topicId);
+    List<Topic> getTopicsByStartTime(Date startTime);
 }
