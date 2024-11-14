@@ -2,14 +2,14 @@ package com.example.englishmaster_be.Model.Response;
 
 import com.example.englishmaster_be.Model.User;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.UUID;
 
+@Getter
+@Setter
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

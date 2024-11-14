@@ -4,6 +4,7 @@ import com.example.englishmaster_be.DTO.FlashCard.CreateFlashCardWordDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.FlashCardWordResponse;
 import com.example.englishmaster_be.Service.*;
+import org.json.simple.JSONArray;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -102,5 +103,30 @@ public class FlashCardWordController {
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
+    }
+
+    @GetMapping("/searchByWord")
+    public ResponseEntity<ResponseModel> searchFlashCardByWord(@RequestParam(value = "query") String query) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            JSONArray responseArray = new JSONArray();
+
+            for (FlashCardWord flashCardWord : IFlashCardWordService.searchByFlashCardWord(query)) {
+                responseArray.add(flashCardWord.getWord());
+            }
+
+            responseModel.setMessage("Show list flashcard word successfully");
+            responseModel.setResponseData(responseArray);
+            responseModel.setStatus("success");
+
+
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Show list flashcard word fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
     }
 }

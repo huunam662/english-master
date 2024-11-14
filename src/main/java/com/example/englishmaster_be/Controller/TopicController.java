@@ -13,8 +13,8 @@ import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Repository.ContentRepository;
 import com.example.englishmaster_be.Repository.StatusRepository;
-import com.example.englishmaster_be.Repository.TopicRepository;
 import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.Service.impl.TopicServiceImpl;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -24,12 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -64,17 +64,14 @@ public class TopicController {
     private JPAQueryFactory queryFactory;
 
     @Autowired
-    private IUploadService IUploadService;
-
-    @Autowired
-    private TopicRepository topicRepository;
-    @Autowired
     private StatusRepository statusRepository;
 
     @Autowired
     private IExcelService excelService;
     @Autowired
     private ContentRepository contentRepository;
+    @Autowired
+    private TopicServiceImpl topicServiceImpl;
 
 
     @GetMapping(value = "/{topicId:.+}/inforTopic")
@@ -352,7 +349,6 @@ public class TopicController {
             responseObject.put("totalRecords", totalRecords);
 
             List<Topic> topicList = query.fetch();
-
 
             List<TopicResponse> topicResponseList = new ArrayList<>();
 
@@ -1002,8 +998,6 @@ public class TopicController {
         try {
             Topic topic = ITopicService.findTopicById(topicId);
             List<Comment> commentList = new ArrayList<>();
-            ;
-
             List<CommentResponse> commentResponseList = new ArrayList<>();
 
             if (topic.getComments() != null && !topic.getComments().stream().toList().isEmpty()) {
@@ -1135,4 +1129,29 @@ public class TopicController {
         }
     }
 
+    @GetMapping("searchByStartTime")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    public ResponseEntity<List<Topic>>getTopicByStartTime(
+            @RequestParam @DateTimeFormat(pattern ="yyyy-MM-dd")Date startDate ){
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            List<Topic> topics = topicServiceImpl.getTopicsByStartTime(startDate);
+            if(topics.isEmpty()){
+                responseModel.setMessage("No topics found for this start date.");
+                responseModel.setStatus("fail");
+                responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            }
+
+            responseModel.setMessage("Topic retrieved successful");
+            responseModel.setStatus("success");
+            responseModel.setResponseData(topics);
+
+            return ResponseEntity.ok(topics);
+        }catch (Exception e) {
+            responseModel.setMessage("Failed to retrieved topics: "+e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body((List<Topic>) responseModel);
+        }
+    }
 }
