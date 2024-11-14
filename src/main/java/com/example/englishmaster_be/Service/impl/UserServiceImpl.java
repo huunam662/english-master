@@ -37,7 +37,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserServiceImpl implements IUserService {
 
-    private final UserMapper userMapper;
+    @Autowired
+    private  UserMapper userMapper;
+
     private final ConfirmationTokenServiceImpl confirmationTokenService;
 
     @Autowired
