@@ -27,8 +27,6 @@ import java.util.UUID;
 @SuppressWarnings("unchecked")
 public class NewsController {
     @Autowired
-    private IUserService IUserService;
-    @Autowired
     private INewsService INewsService;
     @Autowired
     private IFileStorageService IFileStorageService;
@@ -272,4 +270,33 @@ public class NewsController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
     }
+    @GetMapping(value="/searchByTitle")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResponseModel> searchByTitle(@RequestParam("title") String title) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            // Sử dụng queryFactory để tìm kiếm các tin tức có tiêu đề chứa chuỗi "title"
+            List<News> newsList = queryFactory.selectFrom(QNews.news)
+                    .where(QNews.news.title.containsIgnoreCase(title))
+                    .fetch();
+
+            List<NewsResponse> newsResponseList = new ArrayList<>();
+            for (News news : newsList) {
+                NewsResponse newsResponse = new NewsResponse(news);
+                newsResponseList.add(newsResponse);
+            }
+
+            responseModel.setMessage("Search by title successful");
+            responseModel.setResponseData(newsResponseList);
+            responseModel.setStatus("success");
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Search by title fail: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
+
 }
