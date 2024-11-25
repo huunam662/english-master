@@ -33,6 +33,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -989,6 +990,32 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
         }
     }
+    @GetMapping("/searchByStartTime/")
+    public ResponseEntity<ResponseModel> getTopicByStartTime(
+            @RequestParam  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")  LocalDate startDate) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            // Convert LocalDate to LocalDateTime (start of the day)
+            LocalDateTime startDateTime = startDate.atStartOfDay();
+
+            List<Topic> topics = topicServiceImpl.getTopicsByStartTime(startDateTime);
+            if (topics.isEmpty()) {
+                responseModel.setMessage("No topics found for this start date.");
+                responseModel.setStatus("fail");
+                responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            } else {
+                responseModel.setMessage("Topics retrieved successfully.");
+                responseModel.setStatus("success");
+                responseModel.setResponseData(topics);
+            }
+            return ResponseEntity.ok(responseModel);
+        } catch (Exception e) {
+            responseModel.setMessage("Failed to retrieve topics: " + e.getMessage());
+            responseModel.setStatus("fail");
+            responseModel.setViolations(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+        }
+    }
 
 
     @GetMapping(value = "/{topicId:.+}/listComment")
@@ -1016,6 +1043,7 @@ public class TopicController {
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
+            e.printStackTrace();
             responseModel.setMessage("Show list comment fail: " + e.getMessage());
             responseModel.setStatus("fail");
             responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
@@ -1129,29 +1157,4 @@ public class TopicController {
         }
     }
 
-    @GetMapping("searchByStartTime")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<List<Topic>>getTopicByStartTime(
-            @RequestParam @DateTimeFormat(pattern ="yyyy-MM-dd")Date startDate ){
-        ResponseModel responseModel = new ResponseModel();
-        try {
-            List<Topic> topics = topicServiceImpl.getTopicsByStartTime(startDate);
-            if(topics.isEmpty()){
-                responseModel.setMessage("No topics found for this start date.");
-                responseModel.setStatus("fail");
-                responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            }
-
-            responseModel.setMessage("Topic retrieved successful");
-            responseModel.setStatus("success");
-            responseModel.setResponseData(topics);
-
-            return ResponseEntity.ok(topics);
-        }catch (Exception e) {
-            responseModel.setMessage("Failed to retrieved topics: "+e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body((List<Topic>) responseModel);
-        }
-    }
 }
