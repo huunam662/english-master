@@ -1,0 +1,10 @@
+package com.example.englishmaster_be.repository;
+
+import com.example.englishmaster_be.model.*;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
+import java.util.UUID;
+
+public interface NewsRepository extends JpaRepository<News, UUID> {
+    Optional<News> findByNewsId(UUID newsId);
+}

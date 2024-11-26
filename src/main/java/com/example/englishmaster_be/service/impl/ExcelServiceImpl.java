@@ -1,0 +1,472 @@
+package com.example.englishmaster_be.service.impl;
+
+import com.example.englishmaster_be.common.constant.PartConstant;
+import com.example.englishmaster_be.exception.enums.Error;
+import com.example.englishmaster_be.dto.answer.CreateListAnswerDTO;
+import com.example.englishmaster_be.dto.question.CreateQuestionByExcelFileDTO;
+import com.example.englishmaster_be.dto.topic.CreateListQuestionByExcelFileDTO;
+import com.example.englishmaster_be.dto.topic.CreateTopicByExcelFileDTO;
+import com.example.englishmaster_be.exception.custom.CustomException;
+import com.example.englishmaster_be.repository.ContentRepository;
+import com.example.englishmaster_be.repository.PackRepository;
+import com.example.englishmaster_be.repository.PartRepository;
+import com.example.englishmaster_be.service.IExcelService;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+import org.apache.poi.ss.usermodel.DateUtil;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+public class ExcelServiceImpl implements IExcelService {
+
+    private static final Logger log = LoggerFactory.getLogger(ExcelServiceImpl.class);
+    @Autowired
+    private PackRepository packRepository;
+
+    @Autowired
+    private PartRepository partRepository;
+
+    @Autowired
+    private ContentRepository contentRepository;
+
+    @Transactional
+    @Override
+    public CreateTopicByExcelFileDTO parseCreateTopicDTO(MultipartFile file) {
+        if (isExcelFile(file)) {
+            try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+                Sheet sheet = workbook.getSheetAt(0);
+                String topicName = getCellValueAsString(sheet, 0, 1);
+                String topicImageName = getCellValueAsString(sheet, 1, 1);
+                String topicDescription = getCellValueAsString(sheet, 2, 1);
+                String topicType = getCellValueAsString(sheet, 3, 1);
+                String workTime = getCellValueAsString(sheet, 4, 1).replace(".0", "");
+                int numberQuestion = getIntCellValue(sheet, 5, 1);
+                String topicPackName = getCellValueAsString(sheet, 6, 1);
+                List<UUID> parts = parseParts(getCellValueAsString(sheet, 7, 1));
+                return CreateTopicByExcelFileDTO.builder()
+                        .topicName(topicName)
+                        .topicImageName(topicImageName)
+                        .topicDescription(topicDescription)
+                        .topicType(topicType)
+                        .workTime(workTime)
+                        .numberQuestion(numberQuestion)
+                        .topicPackId(packRepository.findByPackName(topicPackName)
+                                .orElseThrow(() -> new IllegalArgumentException("Pack not found: " + topicPackName))
+                                .getPackId())
+                        .listPart(parts)
+                        .build();
+            } catch (Exception e) {
+                throw new CustomException(Error.CAN_NOT_CREATE_TOPIC_BY_EXCEL);
+            }
+        } else {
+            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
+        }
+    }
+
+    @Transactional
+    @Override
+    public CreateListQuestionByExcelFileDTO parseListeningPart12DTO(UUID topicId, MultipartFile file, int part) {
+        if (isExcelFile(file)) {
+            try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+                Sheet sheet = workbook.getSheetAt(part);
+                CreateListQuestionByExcelFileDTO resultDTO = new CreateListQuestionByExcelFileDTO();
+                List<CreateQuestionByExcelFileDTO> listQuestionDTO = new ArrayList<>();
+                CreateQuestionByExcelFileDTO questionBig = new CreateQuestionByExcelFileDTO();
+                List<CreateQuestionByExcelFileDTO> listQuestionDTOMini = new ArrayList<>();
+                Row rowAudio = sheet.getRow(1);
+                String contentAudio = rowAudio != null ? getStringCellValue(rowAudio.getCell(1)) : "";
+                String contentAudioLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentAudio);
+                Row rowScoreBig = sheet.getRow(2);
+                int scoreBig = rowScoreBig != null ? (int) getNumericCellValue(rowScoreBig.getCell(1)) : 0;
+                questionBig.setContentAudio(contentAudioLink);
+                questionBig.setQuestionScore(scoreBig);
+                UUID partId = part == 1 ? partRepository.findByPartName(PartConstant.PART_1).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId()
+                        : partRepository.findByPartName(PartConstant.PART_2).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId();
+                questionBig.setPartId(partId);
+                for (int i = 4; i <= sheet.getLastRowNum(); i++) {
+                    Row row = sheet.getRow(i);
+                    String[] options;
+                    if (row != null) {
+                        CreateQuestionByExcelFileDTO question = new CreateQuestionByExcelFileDTO();
+                        question.setPartId(partId);
+                        if (part == 1) {
+                            String image = getStringCellValue(row.getCell(3));
+                            String imageLink = contentRepository.findContentDataByTopicIdAndCode(topicId, image);
+                            question.setContentImage(imageLink);
+                            options = new String[]{"A", "B", "C", "D"};
+                        } else {
+                            options = new String[]{"A", "B", "C"};
+                        }
+                        String correctAnswer = getStringCellValue(row.getCell(1));
+                        int score = (int) getNumericCellValue(row.getCell(2));
+                        question.setQuestionScore(score);
+                        List<CreateListAnswerDTO> listAnswerDTO = new ArrayList<>();
+                        for (String option : options) {
+                            CreateListAnswerDTO answer = new CreateListAnswerDTO();
+                            answer.setContentAnswer(option);
+                            answer.setCorrectAnswer(correctAnswer.equalsIgnoreCase(option));
+                            listAnswerDTO.add(answer);
+                        }
+                        question.setListAnswer(listAnswerDTO);
+                        listQuestionDTOMini.add(question);
+                    }
+                }
+                questionBig.setListQuestionChild(listQuestionDTOMini);
+                listQuestionDTO.add(questionBig);
+                resultDTO.setQuestions(listQuestionDTO);
+                return resultDTO;
+            } catch (Exception e) {
+                throw new CustomException(part == 1 ? Error.CAN_NOT_CREATE_PART_1_BY_EXCEL : Error.CAN_NOT_CREATE_PART_2_BY_EXCEL);
+            }
+        } else {
+            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
+        }
+    }
+
+    @Transactional
+    @Override
+    public CreateListQuestionByExcelFileDTO parseReadingPart5DTO(UUID topicId, MultipartFile file) throws IOException {
+        if (isExcelFile(file)) {
+            try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+                Sheet sheet = workbook.getSheetAt(5);
+                CreateListQuestionByExcelFileDTO resultDTO = new CreateListQuestionByExcelFileDTO();
+                List<CreateQuestionByExcelFileDTO> listQuestionDTO = new ArrayList<>();
+                CreateQuestionByExcelFileDTO questionBig = new CreateQuestionByExcelFileDTO();
+                List<CreateQuestionByExcelFileDTO> listQuestionDTOMini = new ArrayList<>();
+                int scoreBig = (int) getNumericCellValue(sheet.getRow(1).getCell(1));
+                questionBig.setQuestionScore(scoreBig);
+                questionBig.setPartId(partRepository.findByPartName(PartConstant.PART_5).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId());
+                for (int i = 3; i <= sheet.getLastRowNum(); i++) {
+                    Row row = sheet.getRow(i);
+                    if (row != null) {
+                        CreateQuestionByExcelFileDTO question = new CreateQuestionByExcelFileDTO();
+                        question.setPartId(questionBig.getPartId());
+                        question.setQuestionContent(row.getCell(1).getStringCellValue());
+                        int score = (int) getNumericCellValue(row.getCell(7));
+                        question.setQuestionScore(score);
+                        List<CreateListAnswerDTO> listAnswerDTO = processAnswers(
+                                getStringCellValue(row, 2),
+                                getStringCellValue(row, 3),
+                                getStringCellValue(row, 4),
+                                getStringCellValue(row, 5),
+                                getStringCellValue(row, 6)
+                        );
+                        question.setListAnswer(listAnswerDTO);
+                        listQuestionDTOMini.add(question);
+                    }
+                }
+                questionBig.setListQuestionChild(listQuestionDTOMini);
+                listQuestionDTO.add(questionBig);
+                resultDTO.setQuestions(listQuestionDTO);
+                return resultDTO;
+            } catch (Exception e) {
+                return null;
+            }
+        } else {
+            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
+        }
+    }
+
+    @Transactional
+    @Override
+    public CreateListQuestionByExcelFileDTO parseListeningPart34DTO(UUID topicId, MultipartFile file, int part) {
+        if (isExcelFile(file)) {
+            try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+                Sheet sheet = workbook.getSheetAt(part);
+                List<CreateQuestionByExcelFileDTO> listeningParts = new ArrayList<>();
+                CreateQuestionByExcelFileDTO currentListeningPart = null;
+                for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                    Row row = sheet.getRow(i);
+                    if (row == null) continue;
+                    String firstCellValue = getStringCellValue(row, 0);
+                    if (firstCellValue.equalsIgnoreCase("Audio")) {
+                        if (currentListeningPart != null) {
+                            listeningParts.add(currentListeningPart);
+                        }
+                        currentListeningPart = new CreateQuestionByExcelFileDTO();
+                        currentListeningPart.setPartId(part == 3 ? partRepository.findByPartName(PartConstant.PART_3).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId() : partRepository.findByPartName(PartConstant.PART_4).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId());
+                        String contentAudio = getStringCellValue(row, 1) == null ? null : getStringCellValue(row, 1);
+                        if (contentAudio != null) {
+                            String contentAudioLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentAudio);
+                            currentListeningPart.setContentAudio(contentAudioLink);
+                        }
+                    } else if (firstCellValue.equalsIgnoreCase("Score")) {
+                        if (currentListeningPart != null) {
+                            currentListeningPart.setQuestionScore(getNumericCellValue(row, 1));
+                        }
+                    } else if (firstCellValue.equalsIgnoreCase("STT")) {
+                        continue;
+                    } else if (firstCellValue.equalsIgnoreCase("Image")) {
+                        if (currentListeningPart != null) {
+                            String contentImage = getStringCellValue(row, 1);
+                            String contentImageLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentImage);
+                            currentListeningPart.setContentImage(contentImageLink);
+                        }
+                    } else if (currentListeningPart != null) {
+                        CreateQuestionByExcelFileDTO question = new CreateQuestionByExcelFileDTO();
+                        question.setQuestionContent(getStringCellValue(row, 1));
+                        question.setQuestionScore(getNumericCellValue(row, 7));
+                        question.setPartId(currentListeningPart.getPartId());
+                        List<CreateListAnswerDTO> listAnswerDTO = processAnswers(
+                                getStringCellValue(row, 2),
+                                getStringCellValue(row, 3),
+                                getStringCellValue(row, 4),
+                                getStringCellValue(row, 5),
+                                getStringCellValue(row, 6)
+                        );
+                        question.setListAnswer(listAnswerDTO);
+                        if (currentListeningPart.getListQuestionChild() == null) {
+                            currentListeningPart.setListQuestionChild(new ArrayList<>());
+                        }
+                        currentListeningPart.getListQuestionChild().add(question);
+                    }
+                }
+                if (currentListeningPart != null) {
+                    listeningParts.add(currentListeningPart);
+                }
+                CreateListQuestionByExcelFileDTO result = new CreateListQuestionByExcelFileDTO();
+                result.setQuestions(listeningParts);
+                return result;
+            } catch (Exception e) {
+                throw new CustomException(part == 3 ? Error.CAN_NOT_CREATE_PART_3_BY_EXCEL : Error.CAN_NOT_CREATE_PART_4_BY_EXCEL);
+            }
+        } else {
+            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
+        }
+    }
+
+    @Transactional
+    @Override
+    public CreateListQuestionByExcelFileDTO parseReadingPart67DTO(UUID topicId, MultipartFile file, int part) {
+        if (isExcelFile(file)) {
+            try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+                Sheet sheet = workbook.getSheetAt(part);
+                List<CreateQuestionByExcelFileDTO> readingParts = new ArrayList<>();
+                CreateQuestionByExcelFileDTO currentReadingPart = null;
+                for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                    Row row = sheet.getRow(i);
+                    if (row == null) continue;
+                    String firstCellValue = getStringCellValue(row, 0);
+                    if (firstCellValue.equalsIgnoreCase("question content")) {
+                        if (currentReadingPart != null) {
+                            readingParts.add(currentReadingPart);
+                        }
+                        currentReadingPart = new CreateQuestionByExcelFileDTO();
+                        currentReadingPart.setPartId(part == 6 ? partRepository.findByPartName(PartConstant.PART_6).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId() : partRepository.findByPartName(PartConstant.PART_7).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId());
+                        currentReadingPart.setQuestionContent(getStringCellValue(row, 1));
+                    } else if (firstCellValue.equalsIgnoreCase("Score")) {
+                        // Nếu là "Score", set điểm cho phần reading hiện tại
+                        if (currentReadingPart != null) {
+                            currentReadingPart.setQuestionScore(getNumericCellValue(row, 1));
+                        }
+                    } else if (firstCellValue.equalsIgnoreCase("STT")) {
+                        continue;
+                    } else if (firstCellValue.equalsIgnoreCase("Image")) {
+                        if (currentReadingPart != null) {
+                            String contentImage = getStringCellValue(row, 1);
+                            String contentImageLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentImage);
+                            currentReadingPart.setContentImage(contentImageLink);
+                        }
+                    } else if (currentReadingPart != null) {
+                        CreateQuestionByExcelFileDTO question = new CreateQuestionByExcelFileDTO();
+                        question.setQuestionContent(getStringCellValue(row, 1));
+                        question.setQuestionScore(getNumericCellValue(row, 7));
+                        question.setPartId(currentReadingPart.getPartId());
+                        List<CreateListAnswerDTO> listAnswerDTO = processAnswers(
+                                getStringCellValue(row, 2),
+                                getStringCellValue(row, 3),
+                                getStringCellValue(row, 4),
+                                getStringCellValue(row, 5),
+                                getStringCellValue(row, 6)
+                        );
+                        question.setListAnswer(listAnswerDTO);
+                        if (currentReadingPart.getListQuestionChild() == null) {
+                            currentReadingPart.setListQuestionChild(new ArrayList<>());
+                        }
+                        currentReadingPart.getListQuestionChild().add(question);
+                    }
+                }
+                if (currentReadingPart != null) {
+                    readingParts.add(currentReadingPart);
+                }
+                CreateListQuestionByExcelFileDTO result = new CreateListQuestionByExcelFileDTO();
+                result.setQuestions(readingParts);
+                return result;
+            } catch (Exception e) {
+                throw new CustomException(part == 6 ? Error.CAN_NOT_CREATE_PART_6_BY_EXCEL : Error.CAN_NOT_CREATE_PART_7_BY_EXCEL);
+
+            }
+        } else {
+            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
+        }
+    }
+
+    @Override
+    public CreateListQuestionByExcelFileDTO parseAllPartsDTO(UUID topicId, MultipartFile file) throws IOException {
+        if (isExcelFile(file)) {
+            CreateListQuestionByExcelFileDTO result = new CreateListQuestionByExcelFileDTO();
+            List<CreateQuestionByExcelFileDTO> allQuestions = new ArrayList<>();
+            for (int part : new int[]{1, 2}) {
+                CreateListQuestionByExcelFileDTO part12DTO = parseListeningPart12DTO(topicId, file, part);
+                allQuestions.addAll(part12DTO.getQuestions());
+            }
+            for (int part : new int[]{3, 4}) {
+                CreateListQuestionByExcelFileDTO part34DTO = parseListeningPart34DTO(topicId, file, part);
+                allQuestions.addAll(part34DTO.getQuestions());
+            }
+            CreateListQuestionByExcelFileDTO part5DTO = parseReadingPart5DTO(topicId, file);
+            allQuestions.addAll(part5DTO.getQuestions());
+            for (int part : new int[]{6, 7}) {
+                CreateListQuestionByExcelFileDTO part67DTO = parseReadingPart67DTO(topicId, file, part);
+                allQuestions.addAll(part67DTO.getQuestions());
+            }
+            result.setQuestions(allQuestions);
+            return result;
+        }
+        return null;
+    }
+
+    @Override
+    public boolean isExcelFile(MultipartFile file) {
+        String contentType = file.getContentType();
+        String fileName = file.getOriginalFilename();
+        return contentType != null &&
+                (contentType.equals("application/vnd.ms-excel") ||
+                        contentType.equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) &&
+                (fileName != null && (fileName.endsWith(".xls") || fileName.endsWith(".xlsx")));
+    }
+
+    private String getStringCellValue(Cell cell) {
+        if (cell == null) return "";
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                return String.valueOf(cell.getNumericCellValue());
+            default:
+                return "";
+        }
+    }
+
+    private double getNumericCellValue(Cell cell) {
+        if (cell == null) return 0;
+        switch (cell.getCellType()) {
+            case NUMERIC:
+                return cell.getNumericCellValue();
+            case STRING:
+                try {
+                    return Double.parseDouble(cell.getStringCellValue());
+                } catch (NumberFormatException e) {
+                    return 0;
+                }
+            default:
+                return 0;
+        }
+    }
+
+    private String getCellValueAsString(Sheet sheet, int rowIndex, int cellIndex) {
+        Row row = sheet.getRow(rowIndex);
+        if (row == null) return "";
+        Cell cell = row.getCell(cellIndex);
+        if (cell == null) return "";
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    return cell.getLocalDateTimeCellValue().toString();
+                }
+                return String.valueOf(cell.getNumericCellValue());
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            case FORMULA:
+                return cell.getCellFormula();
+            default:
+                return "";
+        }
+    }
+
+    private int getIntCellValue(Sheet sheet, int rowIndex, int cellIndex) {
+        String value = getCellValueAsString(sheet, rowIndex, cellIndex);
+        try {
+            return (int) Double.parseDouble(value);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Invalid number format at row " + (rowIndex + 1) + ", column " + (cellIndex + 1));
+        }
+    }
+
+    private List<UUID> parseParts(String partsString) {
+        List<String> listPart = Arrays.stream(partsString.split(", "))
+                .map(String::trim)
+                .toList();
+
+        List<UUID> uuidList = new ArrayList<>();
+        for (String part : listPart) {
+            UUID uuid = partRepository.findByPartName(part).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId();
+            uuidList.add(uuid);
+        }
+        return uuidList;
+    }
+
+    private String getStringCellValue(Row row, int cellIndex) {
+        Cell cell = row.getCell(cellIndex);
+        if (cell == null) {
+            return "";
+        }
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    return cell.getDateCellValue().toString();
+                } else {
+                    return String.valueOf(cell.getNumericCellValue());
+                }
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            case FORMULA:
+                try {
+                    return cell.getStringCellValue();
+                } catch (IllegalStateException e) {
+                    return String.valueOf(cell.getNumericCellValue());
+                }
+            default:
+                return "";
+        }
+    }
+
+    private int getNumericCellValue(Row row, int cellIndex) {
+        Cell cell = row.getCell(cellIndex);
+        return (cell != null) ? (int) cell.getNumericCellValue() : 0;
+    }
+
+    private List<CreateListAnswerDTO> processAnswers(String optionA, String optionB, String optionC, String optionD, String result) {
+        List<CreateListAnswerDTO> listAnswerDTO = new ArrayList<>();
+        listAnswerDTO.add(createAnswerDTO(optionA, result));
+        listAnswerDTO.add(createAnswerDTO(optionB, result));
+        listAnswerDTO.add(createAnswerDTO(optionC, result));
+        listAnswerDTO.add(createAnswerDTO(optionD, result));
+        return listAnswerDTO;
+    }
+
+    private CreateListAnswerDTO createAnswerDTO(String option, String result) {
+        CreateListAnswerDTO answerDTO = new CreateListAnswerDTO();
+        answerDTO.setContentAnswer(option);
+        answerDTO.setCorrectAnswer(option != null && option.equalsIgnoreCase(result));
+        return answerDTO;
+    }
+
+}

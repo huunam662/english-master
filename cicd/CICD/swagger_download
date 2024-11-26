@@ -1,0 +1,22 @@
+#! /bin/bash
+
+function download_angular()
+{
+    sourceCheck=$1;
+    if [[ -z $sourceCheck ]]
+    then
+        echo "Source path is empty";
+        exit 1;
+    fi
+    for item in "$sourceCheck"/*
+    do
+        if [[ -d $item ]]
+        then
+            download_angular $item;
+        fi
+	sed -i '/return this.httpClient.request<Blob>/!{p;d;};n;n;n;a\\t\tresponseType: \x27blob\x27 as \x27json\x27,' $item
+	echo $item;
+    done
+}
+
+download_angular $1;

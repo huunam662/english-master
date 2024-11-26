@@ -1,0 +1,28 @@
+package com.example.englishmaster_be.repository;
+
+import com.example.englishmaster_be.model.Content;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+public interface ContentRepository extends JpaRepository<Content, UUID> {
+    Optional<Content> findByContentId(UUID contentUId);
+
+    @Query("select c.contentData from Content c order by c.contentId")
+    List<String> findAllContentData();
+
+    @Query("select c.contentData from Content c where c.topicId = :topicId and c.code like :contentAudio")
+    String findContentDataByTopicIdAndCode(UUID topicId, String contentAudio);
+
+    @Query("select c from Content c where c.contentData like :contentImage")
+    Optional<Content> findByContentData(String contentImage);
+
+    @Modifying
+    @Query("delete from Content c where c.contentData = :contentData")
+    int deleteByContentData(String contentData);
+
+}
