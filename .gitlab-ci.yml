@@ -1,0 +1,76 @@
+stages:
+    - build
+    # - test
+    - deploy
+variables:
+    dist_output_path: build
+
+build:
+    stage: build
+    before_script:
+        - export CI_REGISTRY_PW=$CI_REGISTRY_PW
+        - export CI_REGISTRY_USER=$CI_REGISTRY_USER
+        - export CI_CONFIG_HASH=$CI_CONFIG_HASH
+        - source ./env-param.sh
+        - tag=$(echo $CI_COMMIT_MESSAGE | sed -r 's/.*(\[tag\])//') 
+        - export tag=staging
+        - check=$(echo $CI_COMMIT_MESSAGE | sed -r 's/^.*(\[tag\]).*/\1/')
+        # - md5hash=`md5sum ./app/config/release.json | cut -d " " -f 1`
+        # - echo "$md5hash"
+        - echo "To release new docker image, tagname should be '0.1', your tag is:$tag"
+        - cicd_path=$(pwd)/cicd
+
+    script:
+        - | 
+            if [ "$check" == "[tag]" ] ; then
+                bash $cicd_path/build.sh
+            fi
+
+    only:
+        - release/staging
+    tags:
+        - runner-builder
+
+# test:
+#     stage: test
+#     before_script:
+#         - source ./env-param.sh
+#         - export tag=staging
+#         - cicd_path=$(pwd)/cicd
+
+#     script:
+#         - chmod 777 $cicd_path/test.py
+#         - python $cicd_path/test.py
+
+#     only:
+#         - release/staging
+#     tags:
+#         - runner-builder
+
+deploy: 
+    stage: deploy
+    before_script:
+        - source ./env-param.sh
+        - export CI_REGISTRY_PW=$CI_REGISTRY_PW
+        - export CI_REGISTRY_USER=$CI_REGISTRY_USER
+        - export RUNNER_TOKEN_PROD=$RUNNER_TOKEN_PROD
+        - tag=$(echo $CI_COMMIT_MESSAGE | sed -r 's/.*(\[tag\])//') 
+        - export tag=staging
+        - cicd_path=$(pwd)/cicd
+        - |
+            if [ ! -d $mount_data_folder ]; then
+                sudo mkdir $mount_data_folder
+                sudo chown -R gitlab-runner.gitlab-runner $mount_data_folder
+            fi
+        - |
+            if [ ! -d $mount_data_folder/$project_name ]; then
+                sudo mkdir $mount_data_folder/$project_name
+                sudo chown -R gitlab-runner.gitlab-runner $mount_data_folder/$project_name
+            fi
+    script:
+        - bash $cicd_path/deploy.sh
+    only:
+        - release/staging
+    tags:
+        - runner-242
+        
