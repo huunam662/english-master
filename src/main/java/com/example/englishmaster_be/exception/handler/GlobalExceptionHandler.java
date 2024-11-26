@@ -2,9 +2,11 @@ package com.example.englishmaster_be.exception.handler;
 
 import com.example.englishmaster_be.exception.custom.CustomException;
 import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.exception.template.RefreshTokenException;
 import com.example.englishmaster_be.exception.template.ResourceNotFoundException;
 import com.example.englishmaster_be.common.response.ExceptionResponseModel;
 import com.example.englishmaster_be.exception.enums.Error;
+import com.example.englishmaster_be.model.ResponseModel;
 import com.google.api.Http;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.mail.MessagingException;
@@ -20,8 +22,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.context.request.WebRequest;
 
 import java.rmi.ServerException;
 import java.util.List;
@@ -29,6 +33,17 @@ import java.util.List;
 @RestControllerAdvice
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class GlobalExceptionHandler {
+
+
+    @ExceptionHandler(value = RefreshTokenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ResponseModel handleTokenRefreshException(RefreshTokenException ex, WebRequest request) {
+        return new ResponseModel(
+                ex.getMessage(),
+                null,
+                "false",
+                String.valueOf(HttpStatus.FORBIDDEN.value()));
+    }
 
     @ExceptionHandler(CustomException.class)
     public ExceptionResponseModel handleCustomException(CustomException e) {
