@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.ScheduledTask;
+package com.example.englishmaster_be.scheduledTask;
 
 import com.example.englishmaster_be.model.InvalidToken;
 import com.example.englishmaster_be.model.QInvalidToken;

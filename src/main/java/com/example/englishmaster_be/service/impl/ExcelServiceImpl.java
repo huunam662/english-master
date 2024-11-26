@@ -260,7 +260,7 @@ public class ExcelServiceImpl implements IExcelService {
                     Row row = sheet.getRow(i);
                     if (row == null) continue;
                     String firstCellValue = getStringCellValue(row, 0);
-                    if (firstCellValue.equalsIgnoreCase("Question Content")) {
+                    if (firstCellValue.equalsIgnoreCase("question content")) {
                         if (currentReadingPart != null) {
                             readingParts.add(currentReadingPart);
                         }

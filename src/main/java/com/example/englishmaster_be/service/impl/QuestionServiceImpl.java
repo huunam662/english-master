@@ -35,7 +35,7 @@ public class QuestionServiceImpl implements IQuestionService {
     @Override
     public Question findQuestionById(UUID questionId) {
         return questionRepository.findByQuestionId(questionId)
-                .orElseThrow(() -> new IllegalArgumentException("Question not found with ID: " + questionId));
+                .orElseThrow(() -> new IllegalArgumentException("question not found with ID: " + questionId));
     }
 
     @Override
@@ -46,7 +46,7 @@ public class QuestionServiceImpl implements IQuestionService {
     @Override
     public List<Question> getTop10Question(int index, UUID partId) {
         Part part = partRepository.findByPartId(partId)
-                .orElseThrow(() -> new IllegalArgumentException("Part not found with ID: " + partId));
+                .orElseThrow(() -> new IllegalArgumentException("part not found with ID: " + partId));
 
         Page<Question> questionPage= questionRepository.findAllByQuestionGroupAndPart(null,part,PageRequest.of(index, 10, Sort.by(Sort.Order.desc("updateAt"))));
 

@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.advice;
 
-import com.example.englishmaster_be.Exception.RefreshTokenException;
-import com.example.englishmaster_be.Model.ResponseModel;
+import com.example.englishmaster_be.exception.template.RefreshTokenException;
+import com.example.englishmaster_be.model.ResponseModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;

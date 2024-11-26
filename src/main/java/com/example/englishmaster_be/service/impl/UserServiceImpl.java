@@ -81,7 +81,7 @@ public class UserServiceImpl implements IUserService {
         try {
             userNew = userRepository.save(userNew);
         } catch (DataIntegrityViolationException exception) {
-            throw new ResourceNotFoundException("User already exists");
+            throw new ResourceNotFoundException("user already exists");
         }
 
         ConfirmationTokenResponse confirmationTokenResponse = confirmationTokenService.createConfirmationToken(

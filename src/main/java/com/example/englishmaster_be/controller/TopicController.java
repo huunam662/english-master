@@ -387,7 +387,7 @@ public class TopicController {
         ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
         if (id == null) {
             exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
-            exceptionResponseModel.setMessage("Topic ID is required");
+            exceptionResponseModel.setMessage("topic ID is required");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
         }
 
@@ -397,7 +397,7 @@ public class TopicController {
 
         if (topic == null) {
             exceptionResponseModel.setStatus(HttpStatus.NOT_FOUND);
-            exceptionResponseModel.setMessage("Topic not found");
+            exceptionResponseModel.setMessage("topic not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponseModel);
         }
 
@@ -468,7 +468,7 @@ public class TopicController {
                 responseModel.setMessage("Delete part to topic successful");
 
             } else {
-                exceptionResponseModel.setMessage("Delete part to topic fail: Topic don't have part");
+                exceptionResponseModel.setMessage("Delete part to topic fail: topic don't have part");
                 exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
 
@@ -610,7 +610,7 @@ public class TopicController {
                 responseModel.setResponseData(questionResponse);
                 responseModel.setMessage("Add question to topic successfully");
             } else {
-                responseModel.setMessage("Part of question don't have in topic");
+                responseModel.setMessage("part of question don't have in topic");
             }
 
 
@@ -725,7 +725,7 @@ public class TopicController {
                     ITopicService.addQuestionToTopic(topic, question);
                     responseModel.setMessage("Add question to topic successfully");
                 } else {
-                    responseModel.setMessage("Part of question don't have in topic");
+                    responseModel.setMessage("part of question don't have in topic");
                 }
             }
 
@@ -864,7 +864,7 @@ public class TopicController {
                 ITopicService.deleteQuestionToTopic(topic, question);
                 responseModel.setMessage("Delete question to topic successfully");
             } else {
-                responseModel.setMessage("Question don't have in topic");
+                responseModel.setMessage("question don't have in topic");
             }
 
             JSONObject response = new JSONObject();
@@ -983,7 +983,7 @@ public class TopicController {
 
             if (topic == null) {
 
-                exceptionResponseModel.setMessage("Topic not found");
+                exceptionResponseModel.setMessage("topic not found");
                 exceptionResponseModel.setStatus(HttpStatus.NOT_FOUND);
                 exceptionResponseModel.setViolations(String.valueOf(HttpStatus.NOT_FOUND));
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponseModel);
@@ -997,7 +997,7 @@ public class TopicController {
 
             ITopicService.createTopic(topic);
 
-            responseModel.setMessage(enable ? "Topic enabled successfully" : "Topic disabled successfully");
+            responseModel.setMessage(enable ? "topic enabled successfully" : "topic disabled successfully");
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
@@ -1081,7 +1081,7 @@ public class TopicController {
                 ITopicService.addQuestionToTopic(topic, question);
                 responseModel.setMessage("Add question to topic successfully");
             } else {
-                responseModel.setMessage("Part of question don't have in topic");
+                responseModel.setMessage("part of question don't have in topic");
             }
         }
     }
@@ -1164,7 +1164,7 @@ public class TopicController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponseModel);
             }
 
-            responseModel.setMessage("Topic retrieved successful");
+            responseModel.setMessage("topic retrieved successful");
 
             responseModel.setResponseData(topics);
 

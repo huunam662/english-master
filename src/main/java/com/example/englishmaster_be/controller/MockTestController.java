@@ -238,7 +238,7 @@ public class MockTestController {
                 if (!partInTopic.contains(part)) {
                     partInTopic.add(part);
                 }
-                logger.warn("STT: {},Answer ID: {}, Part ID: {}", i, answer.getAnswerId(), answer.getQuestion().getPart().getPartId());
+                logger.warn("STT: {},answer ID: {}, part ID: {}", i, answer.getAnswerId(), answer.getQuestion().getPart().getPartId());
                 i++;
                 DetailMockTest detailMockTest = new DetailMockTest(mockTest, answer);
                 detailMockTest.setUserCreate(user);
@@ -283,26 +283,26 @@ public class MockTestController {
 
     private int getPartIndex(UUID partId) {
         Map<UUID, Integer> partIdToIndexMap = Map.of(
-                UUID.fromString("5e051716-1b41-4385-bfe6-3e350d5acb06"), 0, // Part 1
-                UUID.fromString("9509bfa5-0403-48db-bee1-1af41cfc73df"), 1, // Part 2
-                UUID.fromString("2496a543-49c3-4580-80b6-c9984e4142e1"), 2, // Part 3
-                UUID.fromString("3b4d6b90-fc31-484e-afe3-3a21162b6454"), 3, // Part 4
-                UUID.fromString("57572f04-27cf-4da7-8344-ac484c7d9e08"), 4, // Part 5
-                UUID.fromString("22b25c09-33db-4e3a-b228-37b331b39c96"), 5, // Part 6
-                UUID.fromString("2416aa89-3284-4315-b759-f3f1b1d5ff3f"), 6  // Part 7
+                UUID.fromString("5e051716-1b41-4385-bfe6-3e350d5acb06"), 0, // part 1
+                UUID.fromString("9509bfa5-0403-48db-bee1-1af41cfc73df"), 1, // part 2
+                UUID.fromString("2496a543-49c3-4580-80b6-c9984e4142e1"), 2, // part 3
+                UUID.fromString("3b4d6b90-fc31-484e-afe3-3a21162b6454"), 3, // part 4
+                UUID.fromString("57572f04-27cf-4da7-8344-ac484c7d9e08"), 4, // part 5
+                UUID.fromString("22b25c09-33db-4e3a-b228-37b331b39c96"), 5, // part 6
+                UUID.fromString("2416aa89-3284-4315-b759-f3f1b1d5ff3f"), 6  // part 7
         );
         return partIdToIndexMap.getOrDefault(partId, -1);
     }
 
     private UUID getPartUUID(int index) {
         List<UUID> partUUIDs = List.of(
-                UUID.fromString("5e051716-1b41-4385-bfe6-3e350d5acb06"), // Part 1
-                UUID.fromString("9509bfa5-0403-48db-bee1-1af41cfc73df"), // Part 2
-                UUID.fromString("2496a543-49c3-4580-80b6-c9984e4142e1"), // Part 3
-                UUID.fromString("3b4d6b90-fc31-484e-afe3-3a21162b6454"), // Part 4
-                UUID.fromString("57572f04-27cf-4da7-8344-ac484c7d9e08"), // Part 5
-                UUID.fromString("22b25c09-33db-4e3a-b228-37b331b39c96"), // Part 6
-                UUID.fromString("2416aa89-3284-4315-b759-f3f1b1d5ff3f")  // Part 7
+                UUID.fromString("5e051716-1b41-4385-bfe6-3e350d5acb06"), // part 1
+                UUID.fromString("9509bfa5-0403-48db-bee1-1af41cfc73df"), // part 2
+                UUID.fromString("2496a543-49c3-4580-80b6-c9984e4142e1"), // part 3
+                UUID.fromString("3b4d6b90-fc31-484e-afe3-3a21162b6454"), // part 4
+                UUID.fromString("57572f04-27cf-4da7-8344-ac484c7d9e08"), // part 5
+                UUID.fromString("22b25c09-33db-4e3a-b228-37b331b39c96"), // part 6
+                UUID.fromString("2416aa89-3284-4315-b759-f3f1b1d5ff3f")  // part 7
         );
         return partUUIDs.get(index);
     }

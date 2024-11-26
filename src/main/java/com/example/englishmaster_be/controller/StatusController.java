@@ -79,7 +79,7 @@ public class StatusController {
         JSONObject responseObject = new JSONObject();
         responseObject.put("statuses", statusResponse);
 
-        responseModel.setMessage("Status successful");
+        responseModel.setMessage("status successful");
         responseModel.setResponseData(responseObject);
 
 

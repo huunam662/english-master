@@ -25,7 +25,7 @@ public class NewsServiceImpl implements INewsService {
     @Override
     public News findNewsById(UUID newsId) {
         return newsRepository.findByNewsId(newsId)
-                .orElseThrow(() -> new IllegalArgumentException("News not found with ID: " + newsId));
+                .orElseThrow(() -> new IllegalArgumentException("news not found with ID: " + newsId));
     }
 }
 

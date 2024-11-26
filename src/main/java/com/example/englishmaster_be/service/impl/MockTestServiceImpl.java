@@ -35,7 +35,7 @@ public class MockTestServiceImpl implements IMockTestService {
                 .orElseThrow(() -> new CustomException(Error.MOCK_TEST_NOT_FOUND));
 
         MockTestResponse mockTestResponse = new MockTestResponse(mockTest);
-        responseModel.setMessage("Find MockTest successfully");
+        responseModel.setMessage("Find mockTest successfully");
         responseModel.setResponseData(mockTestResponse);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseModel);
@@ -74,7 +74,7 @@ public class MockTestServiceImpl implements IMockTestService {
 
         Page<DetailMockTest> detailMockTestPage = detailMockTestRepository.findAllByMockTest(mockTest, PageRequest.of(index, 10, Sort.by(Sort.Order.desc("updateAt"))));
 
-        logger.info("Repository returned: {}", detailMockTestPage.getContent());
+        logger.info("repository returned: {}", detailMockTestPage.getContent());
         List<DetailMockTest> detailMockTests = detailMockTestPage.getContent();
         Iterator<DetailMockTest> iterator = detailMockTests.iterator();
 

@@ -61,7 +61,7 @@ public class TypeController {
         JSONObject responseObject = new JSONObject();
         responseObject.put("type", typeResponse);
 
-        responseModel.setMessage("Type successful");
+        responseModel.setMessage("type successful");
         responseModel.setResponseData(responseObject);
 
 

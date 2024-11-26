@@ -182,9 +182,9 @@ public class FeedbackController {
 
             IFeedbackService.save(Feedback);
             if(enable){
-                responseModel.setMessage("Enable Feedback successful");
+                responseModel.setMessage("Enable feedback successful");
             }else {
-                responseModel.setMessage("Disable Feedback successful");
+                responseModel.setMessage("Disable feedback successful");
             }
 
 
@@ -192,10 +192,10 @@ public class FeedbackController {
         }catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
             if(enable){
-                exceptionResponseModel.setMessage("Enable Feedback fail: " + e.getMessage());
+                exceptionResponseModel.setMessage("Enable feedback fail: " + e.getMessage());
 
             }else {
-                exceptionResponseModel.setMessage("Disable Feedback fail: "+ e.getMessage());
+                exceptionResponseModel.setMessage("Disable feedback fail: "+ e.getMessage());
 
             }
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -238,12 +238,12 @@ public class FeedbackController {
             IFeedbackService.save(feedback);
 
             FeedbackResponse feedbackResponse = new FeedbackResponse(feedback);
-            responseModel.setMessage("Update Feedback successful");
+            responseModel.setMessage("Update feedback successful");
             responseModel.setResponseData(feedbackResponse);
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Update Feedback fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Update feedback fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -262,12 +262,12 @@ public class FeedbackController {
 
             IFeedbackService.delete(feedback);
 
-            responseModel.setMessage("Delete Feedback successful");
+            responseModel.setMessage("Delete feedback successful");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Delete Feedback fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Delete feedback fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);

@@ -1,8 +1,7 @@
-package com.example.englishmaster_be.Model;
+package com.example.englishmaster_be.model;
 
 
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 
 public class ResponseModel {
     private String message;

@@ -80,7 +80,7 @@ public class FileStorageServiceImpl implements IFileStorageService {
 //        Path root = Paths.get(fileSave);
 //        try {
 //            Files.copy(file.getInputStream(), root.resolve(fileName));
-//        } catch (Exception e) {
+//        } catch (exception e) {
 //            if (e instanceof FileAlreadyExistsException) {
 //                throw new RuntimeException("A file of that name already exists.");
 //            }

@@ -218,10 +218,10 @@ public class QuestionController {
         try {
             boolean check = IQuestionService.checkQuestionGroup(IQuestionService.findQuestionById(questionId));
             if (check) {
-                responseModel.setMessage("Question has question group");
+                responseModel.setMessage("question has question group");
 
             } else {
-                exceptionResponseModel.setMessage("Question doesn't have question group");
+                exceptionResponseModel.setMessage("question doesn't have question group");
                 exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
             }

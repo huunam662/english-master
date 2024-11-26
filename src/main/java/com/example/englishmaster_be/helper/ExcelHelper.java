@@ -47,7 +47,7 @@ public class ExcelHelper {
 //                Iterator<Cell> cellsInRow = currentRow.iterator();
 //
 //                int cellIdx = 0;
-//                Question question = new Question();
+//                question question = new question();
 //                while (cellsInRow.hasNext()) {
 //                    Cell currentCell = cellsInRow.next();
 //
@@ -57,28 +57,28 @@ public class ExcelHelper {
 //
 //                        }
 //                        case 2 -> {
-//                            Answer answer = new Answer();
+//                            answer answer = new answer();
 //                            answer.setAnswerContent(currentCell.getStringCellValue());
 //                            answer.setCorrectAnswer( currentRow.getCell(6).getStringCellValue().equalsIgnoreCase("A"));
 //
 //                            answer.setQuestion(question);
 //                        }
 //                        case 3 -> {
-//                            Answer answer = new Answer();
+//                            answer answer = new answer();
 //                            answer.setAnswerContent(currentCell.getStringCellValue());
 //                            answer.setCorrectAnswer( currentRow.getCell(6).getStringCellValue().equalsIgnoreCase("B"));
 //
 //                            answer.setQuestion(question);
 //                        }
 //                        case 4 -> {
-//                            Answer answer = new Answer();
+//                            answer answer = new answer();
 //                            answer.setAnswerContent(currentCell.getStringCellValue());
 //                            answer.setCorrectAnswer( currentRow.getCell(6).getStringCellValue().equalsIgnoreCase("C"));
 //
 //                            answer.setQuestion(question);
 //                        }
 //                        case 5 -> {
-//                            Answer answer = new Answer();
+//                            answer answer = new answer();
 //                            answer.setAnswerContent(currentCell.getStringCellValue());
 //                            answer.setCorrectAnswer( currentRow.getCell(6).getStringCellValue().equalsIgnoreCase("D"));
 //

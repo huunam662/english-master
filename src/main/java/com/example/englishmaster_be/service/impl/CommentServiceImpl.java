@@ -39,6 +39,6 @@ public class CommentServiceImpl implements ICommentService {
 
     @Override
     public Comment findCommentToId(UUID commentID) {
-        return commentRepository.findByCommentId(commentID).orElseThrow(() -> new IllegalArgumentException("Comment not found with ID: " + commentID));
+        return commentRepository.findByCommentId(commentID).orElseThrow(() -> new IllegalArgumentException("comment not found with ID: " + commentID));
     }
 }

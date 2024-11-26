@@ -49,10 +49,10 @@ public class User implements Serializable {
     private Collection<Post> posts;
 
 //    @OneToMany(mappedBy = "userCreate", cascade = CascadeType.ALL)
-//    private Collection<Topic> topicCreate;
+//    private Collection<topic> topicCreate;
 //
 //    @OneToMany(mappedBy = "userUpdate", cascade = CascadeType.ALL)
-//    private Collection<Topic> topicUpdate;
+//    private Collection<topic> topicUpdate;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private Collection<FlashCard> flashCards;

@@ -25,6 +25,6 @@ public class FeedbackServiceImpl implements IFeedbackService {
     @Override
     public Feedback findFeedbackById(UUID feedbackId) {
         return feedbackRepository.findByFeedbackId(feedbackId)
-                .orElseThrow(() -> new IllegalArgumentException("Feedback not found with ID: " + feedbackId));
+                .orElseThrow(() -> new IllegalArgumentException("feedback not found with ID: " + feedbackId));
     }
 }

@@ -26,6 +26,6 @@ public class PostServiceImpl implements IPostService {
     @Override
     public Post findPostById(UUID postId) {
         return postRepository.findByPostId(postId)
-                .orElseThrow(() -> new IllegalArgumentException("Post not found with ID: " + postId));
+                .orElseThrow(() -> new IllegalArgumentException("post not found with ID: " + postId));
     }
 }
