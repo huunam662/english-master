@@ -1,0 +1,33 @@
+{
+    "JWT": {
+        "Secret": "MEU_UTC2_891236785",
+        "refreshTokenSecret": "MEU_UTC2_123121235",
+        "tokenLife": 90000,
+        "refreshTokenLife": 86400
+    },
+    "Port": 3000,
+    "Database": {
+        "DB_DATABASE": "utc2_staging",
+        "DB_USER": "postgres",
+        "DB_PASS": "meu@sds12@!#gh",
+        "DB_HOST": "192.168.0.222",
+        "DB_PORT": 5432
+    },
+    "LoggingService": {
+        "IsEnabled": true,
+        "Mode": "console",
+        "Timeout": 3000,
+        "Url": ""
+    },
+    "smtpOptions": {
+        "service": "gmail",
+        "auth": {
+            "user": "asset.management.meu@gmail.com",
+            "pass": "AM123456#"
+        }
+    },
+    "fontEndHost": "http://localhost:3000",
+    "backEndHost": "gateway.dev.meu-solutions.com/utc2",
+    "MailHomeAddress": "",
+    "DefaultIMG": ""
+}
