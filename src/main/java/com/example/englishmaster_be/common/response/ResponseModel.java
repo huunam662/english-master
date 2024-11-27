@@ -20,19 +20,20 @@ public class ResponseModel {
 
     String message;
 
-    String violations;
-
     String path;
 
     HttpStatusCode status;
 
     int code;
 
-    @Builder.Default
-    @Setter(AccessLevel.NONE)
-    long timestamp = System.currentTimeMillis();
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    String violations;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     Object responseData;
+
+    @Builder.ObtainVia
+    @Setter(AccessLevel.NONE)
+    final long timestamp = System.currentTimeMillis();
 
 }

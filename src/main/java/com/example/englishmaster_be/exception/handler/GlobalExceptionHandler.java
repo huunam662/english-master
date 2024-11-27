@@ -1,14 +1,12 @@
 package com.example.englishmaster_be.exception.handler;
 
+import com.example.englishmaster_be.common.response.ResponseModel;
 import com.example.englishmaster_be.exception.custom.CustomException;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.exception.template.RefreshTokenException;
 import com.example.englishmaster_be.exception.template.ResourceNotFoundException;
 import com.example.englishmaster_be.common.response.ExceptionResponseModel;
 import com.example.englishmaster_be.exception.enums.Error;
-import com.example.englishmaster_be.model.ResponseModel;
-import com.google.api.Http;
-import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -16,7 +14,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
@@ -36,13 +33,14 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler(value = RefreshTokenException.class)
-    @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ResponseModel handleTokenRefreshException(RefreshTokenException ex, WebRequest request) {
-        return new ResponseModel(
-                ex.getMessage(),
-                null,
-                "false",
-                String.valueOf(HttpStatus.FORBIDDEN.value()));
+    public ExceptionResponseModel handleTokenRefreshException(RefreshTokenException ex, WebRequest request) {
+
+        return ExceptionResponseModel.builder()
+                .success(Boolean.FALSE)
+                .message(ex.getMessage())
+                .status(HttpStatus.FORBIDDEN)
+                .code(HttpStatus.FORBIDDEN.value())
+                .build();
     }
 
     @ExceptionHandler(CustomException.class)
