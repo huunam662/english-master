@@ -19,6 +19,8 @@ public class CreateQuestionDTO {
 
     private UUID partId;
 
+	private String questionType;
+
 	private List<CreateListAnswerDTO> listAnswer;
 
 	private List<CreateQuestionDTO> listQuestionChild;
@@ -109,5 +111,13 @@ public class CreateQuestionDTO {
 
 	public void setListQuestionChild(List<CreateQuestionDTO> listQuestionChild) {
 		this.listQuestionChild = listQuestionChild;
+	}
+
+	public String getQuestionType() {
+		return questionType;
+	}
+
+	public void setQuestionType(String questionType) {
+		this.questionType = questionType;
 	}
 }

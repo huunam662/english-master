@@ -8,6 +8,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -156,8 +157,8 @@ public class TopicServiceImpl implements ITopicService {
 
 
     @Override
-    public List<Topic> getTopicsByStartTime(Date startTime) {
-        return topicRepository.findTopicsByStartTime(startTime);
+    public List<Topic> getTopicsByStartTime(LocalDateTime startTime) {
+        return topicRepository.findByStartTime(startTime);
     }
 
 }
