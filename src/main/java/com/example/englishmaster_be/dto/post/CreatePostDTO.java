@@ -1,16 +1,16 @@
 package com.example.englishmaster_be.dto.post;
 
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreatePostDTO {
-    private String content;
 
-    public CreatePostDTO() {
-    }
+    String content;
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
 }

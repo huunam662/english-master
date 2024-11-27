@@ -1,38 +1,22 @@
 package com.example.englishmaster_be.dto.flashCard;
 
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.multipart.MultipartFile;
 
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateFlashCardDTO {
-    private String flashCardTitle;
 
-    private String flashCardDescription;
+    String flashCardTitle;
 
-    private MultipartFile flashCardImage;
+    String flashCardDescription;
 
-    public CreateFlashCardDTO() {
-    }
+    MultipartFile flashCardImage;
 
-    public String getFlashCardTitle() {
-        return flashCardTitle;
-    }
-
-    public void setFlashCardTitle(String flashCardTitle) {
-        this.flashCardTitle = flashCardTitle;
-    }
-
-    public String getFlashCardDescription() {
-        return flashCardDescription;
-    }
-
-    public void setFlashCardDescription(String flashCardDescription) {
-        this.flashCardDescription = flashCardDescription;
-    }
-
-    public MultipartFile getFlashCardImage() {
-        return flashCardImage;
-    }
-
-    public void setFlashCardImage(MultipartFile flashCardImage) {
-        this.flashCardImage = flashCardImage;
-    }
 }

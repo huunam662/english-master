@@ -1,12 +1,15 @@
 package com.example.englishmaster_be.model.response;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
-@Setter
 @Getter
+@Setter
+@Builder
+@NoArgsConstructor
 @AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class DeleteResponse {
-    private String message;
+
+    String message;
 }

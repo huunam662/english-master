@@ -1,36 +1,21 @@
 package com.example.englishmaster_be.dto.news;
 
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.multipart.MultipartFile;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateNewsDTO {
-    private String title;
-    private String content;
-    private MultipartFile image;
 
-    public CreateNewsDTO() {
-    }
+    String title;
 
-    public String getTitle() {
-        return title;
-    }
+    String content;
 
-    public void setTitle(String title) {
-        this.title = title;
-    }
+    MultipartFile image;
 
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
-    public MultipartFile getImage() {
-        return image;
-    }
-
-    public void setImage(MultipartFile image) {
-        this.image = image;
-    }
 }

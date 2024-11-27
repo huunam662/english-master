@@ -1,39 +1,21 @@
 package com.example.englishmaster_be.dto.part;
 
 
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreatePartDTO {
-    private String partName;
-    private String partDiscription;
-    private String partType;
 
-    public CreatePartDTO() {
-    }
+	String partName;
 
-	public String getPartName() {
-		return partName;
-	}
+	String partDiscription;
 
-	public void setPartName(String partName) {
-		this.partName = partName;
-	}
+	String partType;
 
-	public String getPartDiscription() {
-		return partDiscription;
-	}
-
-	public void setPartDiscription(String partDiscription) {
-		this.partDiscription = partDiscription;
-	}
-
-	public String getPartType() {
-		return partType;
-	}
-
-	public void setPartType(String partType) {
-		this.partType = partType;
-	}
-    
-    
 }

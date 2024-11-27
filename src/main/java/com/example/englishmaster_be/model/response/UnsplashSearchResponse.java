@@ -1,16 +1,19 @@
 package com.example.englishmaster_be.model.response;
 
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
 import java.util.List;
 
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UnsplashSearchResponse {
-    private List<UnsplashResult> results;
 
-    public List<UnsplashResult> getResults() {
-        return results;
-    }
+    List<UnsplashResult> results;
 
-    public void setResults(List<UnsplashResult> results) {
-        this.results = results;
-    }
 }
 

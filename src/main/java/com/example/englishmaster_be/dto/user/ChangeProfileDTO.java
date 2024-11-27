@@ -1,47 +1,23 @@
 package com.example.englishmaster_be.dto.user;
 
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.UUID;
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChangeProfileDTO {
-    private String name;
-    private String address;
-    private String phone;
-    private MultipartFile avatar;
 
-    public ChangeProfileDTO() {
-    }
+    String name;
 
-    public String getName() {
-        return name;
-    }
+    String address;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    String phone;
 
-    public String getAddress() {
-        return address;
-    }
+    MultipartFile avatar;
 
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getPhone() {
-        return phone;
-    }
-
-    public void setPhone(String phone) {
-        this.phone = phone;
-    }
-
-    public MultipartFile getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(MultipartFile avatar) {
-        this.avatar = avatar;
-    }
 }

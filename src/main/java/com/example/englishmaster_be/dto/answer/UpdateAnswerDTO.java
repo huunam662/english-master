@@ -1,46 +1,24 @@
 package com.example.englishmaster_be.dto.answer;
 
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
 import java.util.UUID;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateAnswerDTO {
-    private String answerContent;
-    private UUID questionId;
-    private boolean correctAnswer;
-    private String explainDetails;
 
-    public UpdateAnswerDTO() {
-    }
+    UUID questionId;
 
+    String answerContent;
 
-    public String getAnswerContent() {
-        return answerContent;
-    }
+    String explainDetails;
 
-    public void setAnswerContent(String answerContent) {
-        this.answerContent = answerContent;
-    }
+    boolean correctAnswer;
 
-    public UUID getQuestionId() {
-        return questionId;
-    }
-
-    public void setQuestionId(UUID questionId) {
-        this.questionId = questionId;
-    }
-
-    public boolean isCorrectAnswer() {
-        return correctAnswer;
-    }
-
-    public void setCorrectAnswer(boolean correctAnswer) {
-        this.correctAnswer = correctAnswer;
-    }
-
-    public String getExplainDetails() {
-        return explainDetails;
-    }
-
-    public void setExplainDetails(String explainDetails) {
-        this.explainDetails = explainDetails;
-    }
 }

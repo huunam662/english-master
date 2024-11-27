@@ -17,6 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Status implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
@@ -33,5 +34,6 @@ public class Status implements Serializable {
     Type type;
 
     @OneToMany(mappedBy = "status")
-    private List<Topic> topicList;
+    List<Topic> topicList;
+
 }

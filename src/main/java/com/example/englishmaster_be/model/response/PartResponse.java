@@ -1,28 +1,46 @@
 package com.example.englishmaster_be.model.response;
 
 import com.example.englishmaster_be.model.Part;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Objects;
 import java.util.UUID;
+
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class PartResponse {
-    private UUID partId;
-    private String partName;
-    private String partDescription;
-    private String partType;
-    private String contentType;
-    private String contentData;
-    private String createAt;
-    private String updateAt;
-    private int totalQuestion;
+
+    UUID partId;
+
+    String partName;
+
+    String partDescription;
+
+    String partType;
+
+    String contentType;
+
+    String contentData;
+
+    String createAt;
+
+    String updateAt;
+
+    int totalQuestion;
 
 
     public PartResponse(Part part) {
+
+        if(Objects.isNull(part)) return;
+
         this.contentData = part.getContentData();
         this.partId = part.getPartId();
         this.partName = part.getPartName();
@@ -31,11 +49,16 @@ public class PartResponse {
         this.contentType = part.getContentType();
 
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
-        this.createAt = sdf.format(Timestamp.valueOf(part.getCreateAt()));
-        this.updateAt = sdf.format(Timestamp.valueOf(part.getUpdateAt()));
+        if(Objects.nonNull(part.getCreateAt()))
+            this.createAt = sdf.format(Timestamp.valueOf(part.getCreateAt()));
+        if(Objects.nonNull(part.getUpdateAt()))
+            this.updateAt = sdf.format(Timestamp.valueOf(part.getUpdateAt()));
     }
 
     public PartResponse(Part part, int totalQuestion) {
+
+        if(Objects.isNull(part)) return;
+
         this.contentData = part.getContentData();
         this.partId = part.getPartId();
         this.partName = part.getPartName();
@@ -45,8 +68,10 @@ public class PartResponse {
         this.totalQuestion = totalQuestion;
 
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
-        this.createAt = sdf.format(Timestamp.valueOf(part.getCreateAt()));
-        this.updateAt = sdf.format(Timestamp.valueOf(part.getUpdateAt()));
+        if(Objects.nonNull(part.getCreateAt()))
+            this.createAt = sdf.format(Timestamp.valueOf(part.getCreateAt()));
+        if(Objects.nonNull(part.getUpdateAt()))
+            this.updateAt = sdf.format(Timestamp.valueOf(part.getUpdateAt()));
     }
 
 }

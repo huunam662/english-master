@@ -8,26 +8,23 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
 @Table(name = "result_mocktest")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ResultMockTest {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
-    private UUID resultMockTestId;
-
-    @ManyToOne
-    @JoinColumn(name = "mock_test_id", referencedColumnName = "id")
-    private MockTest mockTest;
-
-    @ManyToOne
-    @JoinColumn(name = "part_id", referencedColumnName = "id")
-    private Part part;
+    UUID resultMockTestId;
 
     @JoinColumn(name = "correct_answer")
     int correctAnswer;
@@ -38,30 +35,35 @@ public class ResultMockTest {
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
     @Column(name = "create_at")
-    private LocalDateTime createAt;
-
-    @ManyToOne
-    @JoinColumn(name = "create_by", referencedColumnName = "id")
-    private User userCreate;
+    LocalDateTime createAt = LocalDateTime.now();
 
     @Temporal(TemporalType.TIMESTAMP)
     @UpdateTimestamp
     @Column(name = "update_at")
-    private LocalDateTime updateAt;
+    LocalDateTime updateAt = LocalDateTime.now();
+
+    @ManyToOne
+    @JoinColumn(name = "create_by", referencedColumnName = "id")
+    User userCreate;
 
     @ManyToOne
     @JoinColumn(name = "update_by", referencedColumnName = "id")
-    private User userUpdate;
+    User userUpdate;
+
+    @ManyToOne
+    @JoinColumn(name = "part_id", referencedColumnName = "id")
+    Part part;
+
+    @ManyToOne
+    @JoinColumn(name = "mock_test_id", referencedColumnName = "id")
+    MockTest mockTest;
 
     public ResultMockTest(CreateResultMockTestDTO mockTestDTO) {
-        this.createAt = LocalDateTime.now();
-        this.updateAt = LocalDateTime.now();
+
+        if(Objects.isNull(mockTestDTO)) return;
 
         this.correctAnswer = mockTestDTO.getCorrectAnswer();
         this.score = mockTestDTO.getScore();
     }
 
-    public ResultMockTest() {
-
-    }
 }

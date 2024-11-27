@@ -1,10 +1,7 @@
-package com.example.englishmaster_be.dto.topic;
-
+package com.example.englishmaster_be.dto;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -12,10 +9,8 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TopicAndPartDTO {
+public class DeleteRequestDTO {
 
-	UUID topicId;
-
-	UUID partId;
+    String filepath;
 
 }

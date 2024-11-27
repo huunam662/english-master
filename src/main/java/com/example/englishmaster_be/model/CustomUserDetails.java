@@ -1,19 +1,23 @@
 package com.example.englishmaster_be.model;
 
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.Collection;
 import java.util.Collections;
 
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CustomUserDetails implements UserDetails {
-    User user;
 
-    public CustomUserDetails(User user) {
-        this.user = user;
-    }
+    User user;
 
 
     @Override
@@ -50,17 +54,6 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
-
-	public User getUser() {
-		return user;
-	}
-
-
-	public void setUser(User user) {
-		this.user = user;
-	}
-    
     
 
 }

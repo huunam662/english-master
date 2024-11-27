@@ -1,38 +1,20 @@
 package com.example.englishmaster_be.dto.user;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChangePassDTO {
-    private String oldPass;
-    private String newPass;
-    private String confirmPass;
 
-    public ChangePassDTO() {
-    }
+    String oldPass;
 
-    public String getOldPass() {
-        return oldPass;
-    }
+    String newPass;
 
-    public void setOldPass(String oldPass) {
-        this.oldPass = oldPass;
-    }
+    String confirmPass;
 
-    public String getNewPass() {
-        return newPass;
-    }
-
-    public void setNewPass(String newPass) {
-        this.newPass = newPass;
-    }
-
-    public String getConfirmPass() {
-        return confirmPass;
-    }
-
-    public void setConfirmPass(String confirmPass) {
-        this.confirmPass = confirmPass;
-    }
 }

@@ -1,15 +1,17 @@
 package com.example.englishmaster_be.dto.confirmationToken;
 
 import com.example.englishmaster_be.model.User;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
-@Data
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
 @Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateConfirmationTokenDTO {
-    private User user;
+
+    User user;
+
 }

@@ -1,35 +1,36 @@
 package com.example.englishmaster_be.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
-@Getter
-@Setter
 @Entity
 @Table(name = "roles")
-@AllArgsConstructor
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Role implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
-    private UUID roleId;
+    UUID roleId;
 
     @Column(name = "role_name")
-    private String roleName;
+    String roleName;
 
     @Column(name = "role_description")
-    private String roleDescription;
+    String roleDescription;
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
-    private Collection<User> users;
+    List<User> users;
 
 
 }

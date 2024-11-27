@@ -1,13 +1,21 @@
 package com.example.englishmaster_be.dto;
 
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ChangePasswordDTO {
-    private String code;
-    private String newPass;
-    private String confirmPass;
+
+    String code;
+
+    String newPass;
+
+    String confirmPass;
+
 }

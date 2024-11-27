@@ -1,61 +1,73 @@
 package com.example.englishmaster_be.model.response;
 
 import com.example.englishmaster_be.model.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.json.simple.JSONObject;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class TopicResponse {
-    private UUID topicId;
-    private UUID packId;
-    private String packName;
 
-    private String topicName;
+    UUID topicId;
 
-    private String topicImage;
+    UUID packId;
 
-    private String topicDescription;
+    UUID statusId;
 
-    private String topicType;
+    String packName;
 
-    private List<UUID> listPart;
+    String topicName;
 
-    private int numberQuestion;
+    String topicImage;
 
-    private String workTime;
+    String topicDescription;
 
-    private String startTime;
+    String topicType;
 
-    private String endTime;
+    String workTime;
 
-    private String createAt;
+    String startTime;
 
-    private String updateAt;
+    String endTime;
 
-    private boolean isEnable;
+    String createAt;
 
-    private JSONObject userCreate;
+    String updateAt;
 
-    private JSONObject userUpdate;
+    JSONObject userCreate;
 
-    private UUID statusId;
+    JSONObject userUpdate;
+
+    List<UUID> listPart;
+
+    int numberQuestion;
+
+    boolean isEnable;
+
 
     public TopicResponse(Topic topic) {
 
+        if(Objects.isNull(topic)) return;
+
+        if(Objects.nonNull(topic.getPack())) {
+            this.packId = topic.getPack().getPackId();
+            this.packName = topic.getPack().getPackName();
+        }
 
         this.topicId = topic.getTopicId();
-        this.packId = topic.getPack().getPackId();
-        this.packName = topic.getPack().getPackName();
         this.topicName = topic.getTopicName();
-
         this.topicImage = topic.getTopicImage();
         this.topicDescription = topic.getTopicDescription();
         this.topicType = topic.getTopicType();
@@ -63,34 +75,35 @@ public class TopicResponse {
         this.workTime = topic.getWorkTime();
         this.isEnable = topic.isEnable();
 
-        List<UUID> listPart = new ArrayList<>();
-        for (Part part : topic.getParts()) {
-            listPart.add(part.getPartId());
-        }
-        this.listPart = listPart;
+        this.listPart = Objects.nonNull(topic.getParts())
+                ? topic.getParts().stream().map(Part::getPartId).toList()
+                : new ArrayList<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
 
-        if (topic.getStartTime() != null && topic.getEndTime() != null &&
-                topic.getCreateAt() != null && topic.getUpdateAt() != null) {
-
+        if(Objects.nonNull(topic.getStartTime()))
             this.startTime = sdf.format(Timestamp.valueOf(topic.getStartTime()));
+        if(Objects.nonNull(topic.getEndTime()))
             this.endTime = sdf.format(Timestamp.valueOf(topic.getEndTime()));
-
-        }
-        this.createAt = sdf.format(Timestamp.valueOf(topic.getCreateAt()));
-        this.updateAt = sdf.format(Timestamp.valueOf(topic.getUpdateAt()));
+        if(Objects.nonNull(topic.getCreateAt()))
+            this.createAt = sdf.format(Timestamp.valueOf(topic.getCreateAt()));
+        if(Objects.nonNull(topic.getUpdateAt()))
+            this.updateAt = sdf.format(Timestamp.valueOf(topic.getUpdateAt()));
 
         userCreate = new JSONObject();
         userUpdate = new JSONObject();
 
-        userCreate.put("User Id", topic.getUserCreate().getUserId());
-        userCreate.put("User Name", topic.getUserCreate().getName());
+        if(Objects.nonNull(topic.getUserCreate())){
+            userCreate.put("User Id", topic.getUserCreate().getUserId());
+            userCreate.put("User Name", topic.getUserCreate().getName());
+        }
+        if(Objects.nonNull(topic.getUserUpdate())){
+            userUpdate.put("User Id", topic.getUserUpdate().getUserId());
+            userUpdate.put("User Name", topic.getUserUpdate().getName());
+        }
 
-        userUpdate.put("User Id", topic.getUserUpdate().getUserId());
-        userUpdate.put("User Name", topic.getUserUpdate().getName());
-
-        this.statusId = topic.getStatus().getStatusId();
+        if(Objects.nonNull(topic.getStatus()))
+            this.statusId = topic.getStatus().getStatusId();
     }
 
 }

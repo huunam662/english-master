@@ -1,104 +1,52 @@
 package com.example.englishmaster_be.model;
 
 import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(name = "pack_topic")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Pack implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
-    private UUID packId;
+    UUID packId;
 
     @Column(name = "pack_name")
-    private String packName;
+    String packName;
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
     @Column(name = "create_at")
-    private LocalDateTime createAt;
-
-    @ManyToOne
-    @JoinColumn(name = "create_by", referencedColumnName = "id")
-    private User userCreate;
+    LocalDateTime createAt = LocalDateTime.now();
 
     @Temporal(TemporalType.TIMESTAMP)
     @UpdateTimestamp
     @Column(name = "update_at")
-    private LocalDateTime updateAt;
+    LocalDateTime updateAt = LocalDateTime.now();
+
+    @ManyToOne
+    @JoinColumn(name = "create_by", referencedColumnName = "id")
+    User userCreate;
 
     @ManyToOne
     @JoinColumn(name = "update_by", referencedColumnName = "id")
-    private User userUpdate;
+    User userUpdate;
 
     @OneToMany(mappedBy = "pack", cascade = CascadeType.ALL)
-    private Collection<Topic> topics;
+    List<Topic> topics;
 
-    public Pack() {
-        createAt = LocalDateTime.now();
-        updateAt = LocalDateTime.now();
-    }
-
-    public UUID getPackId() {
-        return packId;
-    }
-
-    public void setPackId(UUID packId) {
-        this.packId = packId;
-    }
-
-    public String getPackName() {
-        return packName;
-    }
-
-    public void setPackName(String packName) {
-        this.packName = packName;
-    }
-
-    public LocalDateTime getCreateAt() {
-        return createAt;
-    }
-
-    public void setCreateAt(LocalDateTime createAt) {
-        this.createAt = createAt;
-    }
-
-    public User getUserCreate() {
-        return userCreate;
-    }
-
-    public void setUserCreate(User userCreate) {
-        this.userCreate = userCreate;
-    }
-
-    public LocalDateTime getUpdateAt() {
-        return updateAt;
-    }
-
-    public void setUpdateAt(LocalDateTime updateAt) {
-        this.updateAt = updateAt;
-    }
-
-    public User getUserUpdate() {
-        return userUpdate;
-    }
-
-    public void setUserUpdate(User userUpdate) {
-        this.userUpdate = userUpdate;
-    }
-
-    public Collection<Topic> getTopics() {
-        return topics;
-    }
-
-    public void setTopics(Collection<Topic> topics) {
-        this.topics = topics;
-    }
 }

@@ -12,9 +12,15 @@ import java.util.UUID;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateResultMockTestDTO {
+
     UUID resultMockTestId;
+
     UUID partId;
-    int correctAnswer;
-    int score;
+
     UUID mockTestId;
+
+    int correctAnswer;
+
+    int score;
+
 }

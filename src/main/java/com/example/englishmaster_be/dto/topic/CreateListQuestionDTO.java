@@ -1,20 +1,20 @@
 package com.example.englishmaster_be.dto.topic;
 
 import com.example.englishmaster_be.dto.question.CreateQuestionDTO;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateListQuestionDTO {
-    private List<CreateQuestionDTO> listQuestion;
 
-    public CreateListQuestionDTO() {
-    }
+    List<CreateQuestionDTO> listQuestion;
 
-    public List<CreateQuestionDTO> getListQuestion() {
-        return listQuestion;
-    }
-
-    public void setListQuestion(List<CreateQuestionDTO> listQuestion) {
-        this.listQuestion = listQuestion;
-    }
 }

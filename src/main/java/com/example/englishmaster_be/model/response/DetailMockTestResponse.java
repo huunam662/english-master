@@ -1,24 +1,43 @@
 package com.example.englishmaster_be.model.response;
 
 import com.example.englishmaster_be.model.DetailMockTest;
-import lombok.Getter;
-import lombok.Setter;
+import com.example.englishmaster_be.model.Question;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class DetailMockTestResponse {
-    private UUID answerId;
-    private String answerContent;
-    private boolean correctAnswer;
-    private int scoreAnswer;
+
+    UUID answerId;
+
+    String answerContent;
+
+    boolean correctAnswer;
+
+    int scoreAnswer;
 
     public DetailMockTestResponse(DetailMockTest detailMockTest) {
+
+        if(Objects.isNull(detailMockTest)) return;
+
         this.answerId = detailMockTest.getDetailMockTestId();
-        this.answerContent = detailMockTest.getAnswer().getAnswerContent();
-        this.correctAnswer = detailMockTest.getAnswer().isCorrectAnswer();
-        this.scoreAnswer = detailMockTest.getAnswer().getQuestion().getQuestionScore();
+
+        if(Objects.nonNull(detailMockTest.getAnswer())) {
+            this.answerContent = detailMockTest.getAnswer().getAnswerContent();
+            this.correctAnswer = detailMockTest.getAnswer().isCorrectAnswer();
+
+            Question question = detailMockTest.getAnswer().getQuestion();
+
+            this.scoreAnswer = Objects.nonNull(question) ? question.getQuestionScore() : 0;
+        }
     }
 
 }

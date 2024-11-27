@@ -1,40 +1,24 @@
 package com.example.englishmaster_be.dto.mockTest;
 
 
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
 import java.sql.Time;
 import java.util.UUID;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateMockTestDTO {
-    private int score;
-    private Time time;
-    private UUID topic_id;
 
-    public CreateMockTestDTO() {
-    }
+    int score;
 
-	public int getScore() {
-		return score;
-	}
+	Time time;
 
-	public void setScore(int score) {
-		this.score = score;
-	}
+	UUID topic_id;
 
-	public Time getTime() {
-		return time;
-	}
-
-	public void setTime(Time time) {
-		this.time = time;
-	}
-
-	public UUID getTopic_id() {
-		return topic_id;
-	}
-
-	public void setTopic_id(UUID topic_id) {
-		this.topic_id = topic_id;
-	}
-    
-    
 }

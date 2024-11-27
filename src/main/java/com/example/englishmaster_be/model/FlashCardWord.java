@@ -1,6 +1,8 @@
 package com.example.englishmaster_be.model;
 
 import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -10,152 +12,53 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "flash_card_word")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class FlashCardWord implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
-    private UUID wordId;
+    UUID wordId;
 
-    @ManyToOne
-    @JoinColumn(name = "flash_card_id", referencedColumnName = "id")
-    private FlashCard flashCard;
+    String word;
 
-    private String word;
+    String image;
 
-    private String image;
+    String type;
 
-    private String type;
-    private String spelling;
-    private String example;
+    String spelling;
 
-    private String note;
+    String example;
 
-    private String define;
+    String note;
+
+    String define;
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
     @Column(name = "create_at")
-    private LocalDateTime createAt;
-
-    @ManyToOne
-    @JoinColumn(name = "create_by", referencedColumnName = "id")
-    private User userCreate;
+    LocalDateTime createAt = LocalDateTime.now();
 
     @Temporal(TemporalType.TIMESTAMP)
     @UpdateTimestamp
     @Column(name = "update_at")
-    private LocalDateTime updateAt;
+    LocalDateTime updateAt = LocalDateTime.now();
+
+    @ManyToOne
+    @JoinColumn(name = "flash_card_id", referencedColumnName = "id")
+    FlashCard flashCard;
+
+    @ManyToOne
+    @JoinColumn(name = "create_by", referencedColumnName = "id")
+    User userCreate;
 
     @ManyToOne
     @JoinColumn(name = "update_by", referencedColumnName = "id")
-    private User userUpdate;
+    User userUpdate;
 
-    public FlashCardWord() {
-        createAt = LocalDateTime.now();
-        updateAt= LocalDateTime.now();
-    }
-
-    public UUID getWordId() {
-        return wordId;
-    }
-
-    public void setWordId(UUID wordId) {
-        this.wordId = wordId;
-    }
-
-    public FlashCard getFlashCard() {
-        return flashCard;
-    }
-
-    public void setFlashCard(FlashCard flashCard) {
-        this.flashCard = flashCard;
-    }
-
-    public String getWord() {
-        return word;
-    }
-
-    public void setWord(String word) {
-        this.word = word;
-    }
-
-    public String getImage() {
-        return image;
-    }
-
-    public void setImage(String image) {
-        this.image = image;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getSpelling() {
-        return spelling;
-    }
-
-    public void setSpelling(String spelling) {
-        this.spelling = spelling;
-    }
-
-    public String getExample() {
-        return example;
-    }
-
-    public void setExample(String example) {
-        this.example = example;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
-
-    public String getDefine() {
-        return define;
-    }
-
-    public void setDefine(String define) {
-        this.define = define;
-    }
-
-    public LocalDateTime getCreateAt() {
-        return createAt;
-    }
-
-    public void setCreateAt(LocalDateTime createAt) {
-        this.createAt = createAt;
-    }
-
-    public User getUserCreate() {
-        return userCreate;
-    }
-
-    public void setUserCreate(User userCreate) {
-        this.userCreate = userCreate;
-    }
-
-    public LocalDateTime getUpdateAt() {
-        return updateAt;
-    }
-
-    public void setUpdateAt(LocalDateTime updateAt) {
-        this.updateAt = updateAt;
-    }
-
-    public User getUserUpdate() {
-        return userUpdate;
-    }
-
-    public void setUserUpdate(User userUpdate) {
-        this.userUpdate = userUpdate;
-    }
 }

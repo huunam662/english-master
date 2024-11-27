@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -16,6 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Type {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
@@ -28,5 +29,6 @@ public class Type {
     String typeName;
 
     @OneToMany(mappedBy = "type", cascade = CascadeType.ALL)
-    Collection<Status> statuses;
+    List<Status> statuses;
+
 }

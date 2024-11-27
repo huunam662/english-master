@@ -1,63 +1,28 @@
 package com.example.englishmaster_be.dto.question;
 
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
 import java.util.UUID;
 
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateGroupQuestionDTO {
-    private String questionContent;
-    private int questionScore;
 
-    private int questionNumberical;
-	private String questionExplainEn;
-	private String questionExplainVn;
+	UUID questionGroupId;
 
-    private UUID questionGroupId;
+	String questionContent;
 
-	public String getQuestionContent() {
-		return questionContent;
-	}
+	String questionExplainEn;
 
-	public void setQuestionContent(String questionContent) {
-		this.questionContent = questionContent;
-	}
+	String questionExplainVn;
 
-	public int getQuestionScore() {
-		return questionScore;
-	}
+	int questionScore;
 
-	public void setQuestionScore(int questionScore) {
-		this.questionScore = questionScore;
-	}
+	int questionNumberical;
 
-	public int getQuestionNumberical() {
-		return questionNumberical;
-	}
-
-	public void setQuestionNumberical(int questionNumberical) {
-		this.questionNumberical = questionNumberical;
-	}
-
-	public UUID getQuestionGroupId() {
-		return questionGroupId;
-	}
-
-	public void setQuestionGroupId(UUID questionGroupId) {
-		this.questionGroupId = questionGroupId;
-	}
-
-	public String getQuestionExplainEn() {
-		return questionExplainEn;
-	}
-
-	public void setQuestionExplainEn(String questionExplainEn) {
-		this.questionExplainEn = questionExplainEn;
-	}
-
-	public String getQuestionExplainVn() {
-		return questionExplainVn;
-	}
-
-	public void setQuestionExplainVn(String questionExplainVn) {
-		this.questionExplainVn = questionExplainVn;
-	}
 }
