@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.Model;
 
 import com.example.englishmaster_be.DTO.Question.*;
+import com.example.englishmaster_be.DTO.Type.QuestionType;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -8,6 +9,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -70,6 +72,9 @@ public class Question implements Serializable {
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     private Collection<Content> contentCollection;
 
+    @Column(name="question_type")
+    @Enumerated(EnumType.STRING)
+    private QuestionType questionType;
 
     public Question() {
         createAt = LocalDateTime.now();
