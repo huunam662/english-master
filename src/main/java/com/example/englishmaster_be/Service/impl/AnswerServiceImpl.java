@@ -32,8 +32,6 @@ public class AnswerServiceImpl implements IAnswerService {
 
     IQuestionService questionService;
 
-    IAnswerService answerService;
-
     @Transactional
     @Override
     public Answer saveAnswer(CreateAnswerDTO createAnswerDTO) {
@@ -71,7 +69,7 @@ public class AnswerServiceImpl implements IAnswerService {
             Answer answer;
 
             if(createAnswerDTO instanceof UpdateAnswerDTO updateAnswerDTO){
-                answer = answerService.findAnswerToId(updateAnswerDTO.getAnswerId());
+                answer = findAnswerToId(updateAnswerDTO.getAnswerId());
                 answer.setAnswerContent(updateAnswerDTO.getContentAnswer());
                 answer.setCorrectAnswer(updateAnswerDTO.isCorrectAnswer());
                 answer.setExplainDetails(updateAnswerDTO.getExplainDetails());
@@ -115,7 +113,7 @@ public class AnswerServiceImpl implements IAnswerService {
     public void deleteAnswer(UUID answerId) {
         try {
 
-            Answer answer = answerService.findAnswerToId(answerId);
+            Answer answer = findAnswerToId(answerId);
 
             answerRepository.delete(answer);
 
