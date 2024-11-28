@@ -8,6 +8,7 @@ import com.example.englishmaster_be.DTO.Question.*;
 import com.example.englishmaster_be.DTO.*;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
+import com.example.englishmaster_be.Repository.AnswerRepository;
 import com.example.englishmaster_be.Service.*;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -34,6 +35,8 @@ public class QuestionController {
     private IContentService IContentService;
     @Autowired
     private IAnswerService IAnswerService;
+
+    AnswerRepository answerRepository;
 
 
     @PostMapping(value = "/create")
@@ -346,7 +349,7 @@ public class QuestionController {
                     answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
                     answer.setUserUpdate(user);
 
-                    IAnswerService.createAnswer(answer);
+                    answerRepository.save(answer);
                 }
             }
 
@@ -364,7 +367,7 @@ public class QuestionController {
                         answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
                         answer.setUserUpdate(user);
 
-                        IAnswerService.createAnswer(answer);
+                        answerRepository.save(answer);
 
                     }
                     IQuestionService.createQuestion(questionChild);

@@ -21,7 +21,6 @@ public class QuestionServiceImpl implements IQuestionService {
     @Autowired
     private QuestionRepository questionRepository;
 
-
     @Autowired
     private PartRepository partRepository;
 
