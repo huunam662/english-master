@@ -1,18 +1,18 @@
-package com.example.englishmaster_be.DTO.Answer;
+package com.example.englishmaster_be.Model.Response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.UUID;
-
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UpdateAnswerDTO extends CreateAnswerDTO {
+public class CheckCorrectAnswerResponse {
 
-    UUID answerId;
+    boolean correctAnswer;
+
+    int scoreAnswer;
 
 }
