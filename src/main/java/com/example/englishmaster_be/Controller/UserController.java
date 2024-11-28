@@ -629,5 +629,4 @@ public class UserController {
         byte[] templateBytes = FileCopyUtils.copyToByteArray(templateResource.getInputStream());
         return new String(templateBytes, StandardCharsets.UTF_8);
     }
-
 }
