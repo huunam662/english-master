@@ -1,0 +1,24 @@
+package com.example.englishmaster_be.Service;
+
+import com.example.englishmaster_be.Model.Part;
+
+import java.util.List;
+import java.util.UUID;
+
+public interface IPartService {
+    boolean createPart(Part part);
+
+    void updatePart(Part part);
+
+    List<Part> getAllPart();
+
+    Part getPartToId(UUID partId);
+
+    Part getPartToName(String partName);
+
+    boolean checkPart(Part part);
+
+    boolean checkFilePart(Part part);
+    void deletePart(Part part);
+
+}
