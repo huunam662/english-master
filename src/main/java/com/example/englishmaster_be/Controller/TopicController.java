@@ -1152,7 +1152,7 @@ public class TopicController {
     @GetMapping("searchByStartTime")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<?>getTopicByStartTime(
-            @RequestParam @DateTimeFormat(pattern ="yyyy-MM-dd")Date startDate ){
+            @RequestParam @DateTimeFormat(pattern ="yyyy-MM-dd") LocalDateTime startDate ){
         ResponseModel responseModel = new ResponseModel();
         ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
         try {

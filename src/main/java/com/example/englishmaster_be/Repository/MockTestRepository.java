@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface MockTestRepository extends JpaRepository<MockTest, UUID> {
+
     Page<MockTest> findAll(Pageable pageable);
 
     List<MockTest> findAllByTopic(Topic topic);
@@ -23,28 +24,28 @@ public interface MockTestRepository extends JpaRepository<MockTest, UUID> {
             "(:year IS NULL OR YEAR(p.createAt) = :year) AND " +
             "(:month IS NULL OR MONTH(p.createAt) = :month) AND " +
             "(:day IS NULL OR DAY(p.createAt) = :day) AND "+
-            "( p.topic = :topic)")
+            "p.topic = :topic")
     List<MockTest> findAllByYearMonthAndDay(
             @Param("year") String year,
             @Param("month") String month,
             @Param("day") String day,
-            @Param("Topic") Topic topic
+            @Param("topic") Topic topic
     );
 
     @Query(value = "SELECT p FROM MockTest p WHERE " +
             "(:year IS NULL OR YEAR(p.createAt) = :year) AND " +
             "(:month IS NULL OR MONTH(p.createAt) = :month) AND " +
-            "( p.topic = :topic)")
+            "p.topic = :topic")
     List<MockTest> findAllByYearMonth(
             @Param("year") String year,
             @Param("month") String month,
-            @Param("Topic") Topic topic);
+            @Param("topic") Topic topic);
 
     @Query(value = "SELECT p FROM MockTest p WHERE " +
             "(:year IS NULL OR YEAR(p.createAt) = :year) AND " +
-            "( p.topic = :topic)")
+            "p.topic = :topic")
     List<MockTest> findAllByYear(
             @Param("year") String year,
-            @Param("Topic") Topic topic
+            @Param("topic") Topic topic
     );
 }
