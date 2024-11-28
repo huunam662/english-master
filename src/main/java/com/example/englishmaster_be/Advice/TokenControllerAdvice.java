@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.advice;
+package com.example.englishmaster_be.Advice;
 
 import com.example.englishmaster_be.Exception.RefreshTokenException;
 import com.example.englishmaster_be.Model.ResponseModel;
