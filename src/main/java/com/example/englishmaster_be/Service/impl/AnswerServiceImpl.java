@@ -110,6 +110,7 @@ public class AnswerServiceImpl implements IAnswerService {
                 .orElseThrow(() -> new CustomException(Error.ANSWER_NOT_FOUND));
     }
 
+    @Transactional
     @Override
     public void deleteAnswer(UUID answerId) {
         try {

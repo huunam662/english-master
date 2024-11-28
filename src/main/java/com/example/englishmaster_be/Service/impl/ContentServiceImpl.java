@@ -31,6 +31,7 @@ public class ContentServiceImpl implements IContentService {
         contentRepository.save(content);
     }
 
+    @Transactional
     @Override
     public void delete(Content content) {
         contentRepository.delete(content);

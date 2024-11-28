@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -44,11 +45,13 @@ public class CommentServiceImpl implements ICommentService {
     IPostService postService;
 
 
+    @Transactional
     @Override
     public void save(Comment comment) {
         commentRepository.save(comment);
     }
 
+    @Transactional
     @Override
     public void deleteComment(Comment comment) {
         commentRepository.delete(comment);
@@ -94,6 +97,7 @@ public class CommentServiceImpl implements ICommentService {
         return commentResponseList;
     }
 
+    @Transactional
     @Override
     public CommentResponse createCommentToTopic(UUID topicId, CreateCommentDTO createCommentDTO) {
 
@@ -116,6 +120,7 @@ public class CommentServiceImpl implements ICommentService {
         return commentResponse;
     }
 
+    @Transactional
     @Override
     public CommentResponse createCommentToPost(UUID postId, CreateCommentDTO createCommentDTO) {
 
@@ -138,6 +143,7 @@ public class CommentServiceImpl implements ICommentService {
         return commentResponse;
     }
 
+    @Transactional
     @Override
     public CommentResponse createCommentToComment(UUID commentId, CreateCommentDTO createCommentDTO) {
 
@@ -166,6 +172,7 @@ public class CommentServiceImpl implements ICommentService {
         return commentResponse;
     }
 
+    @Transactional
     @Override
     public CommentResponse updateComment(UUID commentId, CreateCommentDTO createCommentDTO) {
 
@@ -188,6 +195,7 @@ public class CommentServiceImpl implements ICommentService {
         return commentResponse;
     }
 
+    @Transactional
     @Override
     public void deleteComment(UUID commentId) {
 

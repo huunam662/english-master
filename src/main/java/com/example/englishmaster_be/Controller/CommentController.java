@@ -28,12 +28,6 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CommentController {
 
-    IUserService IUserService;
-
-    ITopicService ITopicService;
-
-    IPostService IPostService;
-
     ICommentService commentService;
 
 

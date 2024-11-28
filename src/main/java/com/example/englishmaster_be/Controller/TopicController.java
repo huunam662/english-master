@@ -13,6 +13,7 @@ import com.example.englishmaster_be.DTO.Topic.*;
 import com.example.englishmaster_be.DTO.UploadFileDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
+import com.example.englishmaster_be.Repository.AnswerRepository;
 import com.example.englishmaster_be.Repository.ContentRepository;
 import com.example.englishmaster_be.Repository.StatusRepository;
 import com.example.englishmaster_be.Service.*;
@@ -74,6 +75,8 @@ public class TopicController {
     private ContentRepository contentRepository;
     @Autowired
     private TopicServiceImpl topicServiceImpl;
+
+    AnswerRepository answerRepository;
 
 
     @GetMapping(value = "/{topicId:.+}/inforTopic")
@@ -512,7 +515,7 @@ public class TopicController {
                     answer.setUserUpdate(user);
                     answer.setUserCreate(user);
 
-                    IAnswerService.createAnswer(answer);
+                    answerRepository.save(answer);
                     if (question.getAnswers() == null) {
                         question.setAnswers(new ArrayList<>());
                     }
@@ -540,7 +543,7 @@ public class TopicController {
                         answer.setUserUpdate(user);
                         answer.setUserCreate(user);
 
-                        IAnswerService.createAnswer(answer);
+                        answerRepository.save(answer);
                         if (questionChild.getAnswers() == null) {
                             questionChild.setAnswers(new ArrayList<>());
                         }
@@ -652,7 +655,7 @@ public class TopicController {
                         answer.setUserUpdate(user);
                         answer.setUserCreate(user);
 
-                        IAnswerService.createAnswer(answer);
+                        answerRepository.save(answer);
                     }
                 }
 
@@ -676,7 +679,7 @@ public class TopicController {
                             answer.setUserUpdate(user);
                             answer.setUserCreate(user);
 
-                            IAnswerService.createAnswer(answer);
+                            answerRepository.save(answer);
                             if (questionChild.getAnswers() == null) {
                                 questionChild.setAnswers(new ArrayList<>());
                             }
@@ -1111,7 +1114,7 @@ public class TopicController {
                 answer.setUserUpdate(user);
                 answer.setUserCreate(user);
 
-                IAnswerService.createAnswer(answer);
+                answerRepository.save(answer);
 
                 if (question.getAnswers() == null) {
                     question.setAnswers(new ArrayList<>());

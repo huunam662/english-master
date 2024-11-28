@@ -18,6 +18,7 @@ public class CloudinaryServiceimpl implements ICloudinaryService {
 		this.cloudinary = cloudinary;
 	}
 
+
 	@SneakyThrows
 	public CloudiaryUploadFileResponse uploadFile(MultipartFile file){
 
