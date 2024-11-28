@@ -82,7 +82,7 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
         if(body instanceof ExceptionResponseModel exceptionResponseModel) {
 
             response.setStatusCode(exceptionResponseModel.getStatus());
-            exceptionResponseModel.setPath(request.getURI().toString());
+            exceptionResponseModel.setPath(request.getURI().getPath());
         }
         else {
 
@@ -92,13 +92,13 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
                 responseModel.setSuccess(true);
                 responseModel.setStatus(HttpStatus.OK);
                 responseModel.setCode(HttpStatus.OK.value());
-                responseModel.setPath(request.getURI().toString());
+                responseModel.setPath(request.getURI().getPath());
             }
             else if(body instanceof ApiResponse<?> apiResponse){
                 apiResponse.setSuccess(true);
                 apiResponse.setStatus(HttpStatus.OK);
                 apiResponse.setCode(HttpStatus.OK.value());
-                apiResponse.setPath(request.getURI().toString());
+                apiResponse.setPath(request.getURI().getPath());
             }
             else if(body instanceof ResponseEntity<?> responseEntity){
                 Object bodyEntity = responseEntity.getBody();
@@ -106,14 +106,14 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
                 if(bodyEntity instanceof ExceptionResponseModel exceptionResponseModel){
                     response.setStatusCode(exceptionResponseModel.getStatus());
                     exceptionResponseModel.setCode(exceptionResponseModel.getStatus().value());
-                    exceptionResponseModel.setPath(request.getURI().toString());
+                    exceptionResponseModel.setPath(request.getURI().getPath());
                     exceptionResponseModel.setSuccess(Boolean.FALSE);
                 }
                 else if(bodyEntity instanceof ResponseModel responseModel){
                     responseModel.setSuccess(true);
                     responseModel.setStatus(HttpStatus.OK);
                     responseModel.setCode(HttpStatus.OK.value());
-                    responseModel.setPath(request.getURI().toString());
+                    responseModel.setPath(request.getURI().getPath());
                 }
 
                 body = bodyEntity;
@@ -123,7 +123,7 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
                     .status(HttpStatus.OK)
                     .code(HttpStatus.OK.value())
                     .message(MessageResponseHolder.getMessage())
-                    .path(request.getURI().toString())
+                    .path(request.getURI().getPath())
                     .responseData(body)
                     .build();
         }
