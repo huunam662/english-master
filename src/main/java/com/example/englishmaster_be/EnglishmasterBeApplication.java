@@ -17,5 +17,4 @@ public class EnglishmasterBeApplication {
         application.setEnvironment(environment);
         application.run(args);
     }
-
 }

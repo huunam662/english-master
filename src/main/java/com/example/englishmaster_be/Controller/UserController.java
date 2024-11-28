@@ -610,7 +610,7 @@ public class UserController {
     private void sendOtpToEmail(String email, String otp) throws MessagingException, IOException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        String otpMessage = "Ma OTP xac thuc la " + otp + ", hieu luc 10 phut";
+        String otpMessage = "Mã OTP xác thực là " + otp + ", hiệu lực 1 phút";
 
         // Nếu bạn vẫn muốn sử dụng template, thay thế nội dung theo cách này:
         String templateContent = readTemplateContent("sendOtpEmail.html");
