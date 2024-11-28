@@ -16,25 +16,40 @@ import java.util.UUID;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateTopicByExcelFileDTO {
-    String topicName;
-    String topicImageName;
-    String topicDescription;
-    String topicType;
-    String workTime;
-    int numberQuestion;
+
     UUID topicPackId;
+
+    String topicName;
+
+    String topicImageName;
+
+    String topicDescription;
+
+    String topicType;
+
+    String workTime;
+
+    int numberQuestion;
 
     List<UUID> listPart;
 
     @Parameter(
             example = "2023-09-06T14:30:00",
-            schema = @Schema(type = "string", format = "date-time", pattern = "yyyy-MM-dd'T'HH:mm:ss")
+            schema = @Schema(
+                    type = "string",
+                    format = "date-time",
+                    pattern = "yyyy-MM-dd'T'HH:mm:ss"
+            )
     )
     LocalDateTime startTime;
 
     @Parameter(
             example = "2023-09-06T14:30:00",
-            schema = @Schema(type = "string", format = "date-time", pattern = "yyyy-MM-dd'T'HH:mm:ss")
+            schema = @Schema(
+                    type = "string",
+                    format = "date-time",
+                    pattern = "yyyy-MM-dd'T'HH:mm:ss"
+            )
     )
     LocalDateTime endTime;
 }

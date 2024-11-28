@@ -9,7 +9,7 @@ import org.springdoc.core.annotations.ParameterObject;
 @Data
 public class SelectPostDto extends PageOptionDto {
 
-    @Parameter(description = "Status of post", in = ParameterIn.QUERY, example = "1", required = false)
+    @Parameter(description = "Status of Post", in = ParameterIn.QUERY, example = "1", required = false)
     private Integer status;
 
     @Parameter(description = "Exclude slug", in = ParameterIn.QUERY, example = "slug", required = false)

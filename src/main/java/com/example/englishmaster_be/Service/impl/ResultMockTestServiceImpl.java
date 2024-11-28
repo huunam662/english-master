@@ -9,7 +9,6 @@ import com.example.englishmaster_be.Service.IPartService;
 import com.example.englishmaster_be.Service.IResultMockTestService;
 import com.example.englishmaster_be.Service.IUserService;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Predicate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

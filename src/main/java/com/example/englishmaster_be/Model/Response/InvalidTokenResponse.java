@@ -5,6 +5,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 @Setter
@@ -13,10 +14,15 @@ import java.time.LocalDateTime;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class InvalidTokenResponse {
+
     String token;
+
     LocalDateTime expireTime;
 
     public InvalidTokenResponse(InvalidToken invalidToken) {
+
+        if(Objects.isNull(invalidToken)) return;
+
         this.token = invalidToken.getToken();
         this.expireTime = invalidToken.getExpireTime();
     }

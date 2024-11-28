@@ -1,5 +1,7 @@
 package com.example.englishmaster_be.Controller;
 
+import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
+import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.DTO.Answer.CreateListAnswerDTO;
 import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.DTO.Question.*;
@@ -51,16 +53,17 @@ public class QuestionController {
 
             QuestionResponse questionResponse = new QuestionResponse(question);
 
-            responseModel.setMessage("Create question successfully");
+            responseModel.setMessage("Create Question successfully");
             responseModel.setResponseData(questionResponse);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Create question fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Create Question fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -88,16 +91,17 @@ public class QuestionController {
             IQuestionService.uploadFileQuestion(question);
 
             QuestionResponse questionResponse = new QuestionResponse(question);
-            responseModel.setMessage("Upload question successfully");
+            responseModel.setMessage("Upload Question successfully");
             responseModel.setResponseData(questionResponse);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Upload file question fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Upload file Question fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -128,16 +132,17 @@ public class QuestionController {
             IFileStorageService.save(uploadFileDTO.getContentData(), filename);
 
             QuestionResponse questionResponse = new QuestionResponse(question);
-            responseModel.setMessage("Update file question successfully");
+            responseModel.setMessage("Update file Question successfully");
             responseModel.setResponseData(questionResponse);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Update file question fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Update file Question fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -162,16 +167,17 @@ public class QuestionController {
 
             QuestionResponse questionResponse = new QuestionResponse(question);
 
-            responseModel.setMessage("Create question successfully");
+            responseModel.setMessage("Create Question successfully");
             responseModel.setResponseData(questionResponse);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Create question fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Create Question fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -190,16 +196,17 @@ public class QuestionController {
                 questionResponseList.add(questionResponse);
             }
 
-            responseModel.setMessage("List top 10 question successfully");
+            responseModel.setMessage("List top 10 Question successfully");
             responseModel.setResponseData(questionResponseList);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("List top 10 question fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("List top 10 Question fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -207,24 +214,24 @@ public class QuestionController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> checkQuestionGroup(@PathVariable UUID questionId) {
         ResponseModel responseModel = new ResponseModel();
+        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
         try {
             boolean check = IQuestionService.checkQuestionGroup(IQuestionService.findQuestionById(questionId));
             if (check) {
-                responseModel.setMessage("Question has question group");
-                responseModel.setResponseData(true);
-                responseModel.setStatus("success");
+                responseModel.setMessage("Question has Question group");
+
             } else {
-                responseModel.setMessage("Question doesn't have question group");
-                responseModel.setResponseData(false);
-                responseModel.setStatus("success");
+                exceptionResponseModel.setMessage("Question doesn't have Question group");
+                exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
             }
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Don't check question " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            exceptionResponseModel.setMessage("Don't check Question " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -246,16 +253,17 @@ public class QuestionController {
                 questionArray.add(questionObject);
             }
 
-            responseModel.setMessage("List question group successfully");
+            responseModel.setMessage("List Question group successfully");
             responseModel.setResponseData(questionArray);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("List question group fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("List Question group fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -276,16 +284,17 @@ public class QuestionController {
 
             }
 
-            responseModel.setMessage("List answer to question successfully");
+            responseModel.setMessage("List Answer to Question successfully");
             responseModel.setResponseData(answerArray);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("List answer to question fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("List Answer to Question fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -300,15 +309,16 @@ public class QuestionController {
                 IFileStorageService.delete(content.getContentData());
             }
 
-            responseModel.setMessage("Delete question successfully");
-            responseModel.setStatus("success");
+            responseModel.setMessage("Delete Question successfully");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Delete question fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Delete Question fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -426,15 +436,16 @@ public class QuestionController {
             }
             responseModel.setResponseData(questionResponse);
 
-            responseModel.setMessage("Update question to topic successfully");
-            responseModel.setStatus("success");
+            responseModel.setMessage("Update Question to Topic successfully");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Update question to topic fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Update Question to Topic fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -448,16 +459,17 @@ public class QuestionController {
 
             QuestionResponse questionResponse = new QuestionResponse(question);
 
-            responseModel.setMessage("Show content question successfully");
+            responseModel.setMessage("Show Content Question successfully");
             responseModel.setResponseData(questionResponse);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Show content question fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Show Content Question fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 

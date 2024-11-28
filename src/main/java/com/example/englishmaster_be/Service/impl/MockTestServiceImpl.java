@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Service.impl;
 
+import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Exception.CustomException;
-import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.MockTestResponse;
 import com.example.englishmaster_be.Repository.*;
@@ -13,7 +13,7 @@ import org.springframework.data.domain.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
+import com.example.englishmaster_be.Exception.Error;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
@@ -36,7 +36,6 @@ public class MockTestServiceImpl implements IMockTestService {
 
         MockTestResponse mockTestResponse = new MockTestResponse(mockTest);
         responseModel.setMessage("Find MockTest successfully");
-        responseModel.setStatus("success");
         responseModel.setResponseData(mockTestResponse);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseModel);

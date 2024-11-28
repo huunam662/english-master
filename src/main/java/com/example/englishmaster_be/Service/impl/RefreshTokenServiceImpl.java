@@ -1,9 +1,12 @@
 package com.example.englishmaster_be.Service.impl;
 
+import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
+import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.IRefreshTokenService;
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -48,12 +51,13 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
 
     @Override
     public ResponseModel verifyExpiration(ResponseModel responseModel, ConfirmationToken token) {
+        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
         if(token.getCreateAt().plusSeconds(refreshTokenDurationMs/1000).isBefore(LocalDateTime.now())){
             confirmationTokenRepository.delete(token);
-            responseModel.setStatus("fail");
-            responseModel.setMessage("Refresh token was expired. Please make a new signin request");
+            responseModel.setStatus(HttpStatus.BAD_REQUEST);
+            exceptionResponseModel.setMessage("Refresh token was expired. Please make a new signin request");
         }
-        return responseModel;
+        return exceptionResponseModel;
     }
 
     @Override

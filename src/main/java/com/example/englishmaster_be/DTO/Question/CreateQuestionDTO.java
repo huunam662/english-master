@@ -1,123 +1,40 @@
 package com.example.englishmaster_be.DTO.Question;
 
 import com.example.englishmaster_be.DTO.Answer.CreateListAnswerDTO;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
 import java.util.UUID;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateQuestionDTO {
 
-	private UUID questionId;
-    private String questionContent;
+	UUID questionId;
 
-    private int questionScore;
+    String questionContent;
 
-	private MultipartFile contentImage;
+    int questionScore;
 
-	private MultipartFile contentAudio;
+	MultipartFile contentImage;
 
-    private UUID partId;
+	MultipartFile contentAudio;
 
-	private String questionType;
+    UUID partId;
 
-	private List<CreateListAnswerDTO> listAnswer;
+	String questionType;
 
-	private List<CreateQuestionDTO> listQuestionChild;
+	List<CreateListAnswerDTO> listAnswer;
 
-	private String questionExplainEn;
-	private String questionExplainVn;
+	List<CreateQuestionDTO> listQuestionChild;
 
+	String questionExplainEn;
 
-	public CreateQuestionDTO() {
-		super();
-	}
+	String questionExplainVn;
 
-	public UUID getQuestionId() {
-		return questionId;
-	}
-
-	public void setQuestionId(UUID questionId) {
-		this.questionId = questionId;
-	}
-
-	public String getQuestionContent() {
-		return questionContent;
-	}
-
-	public void setQuestionContent(String questionContent) {
-		this.questionContent = questionContent;
-	}
-
-	public int getQuestionScore() {
-		return questionScore;
-	}
-
-	public void setQuestionScore(int questionScore) {
-		this.questionScore = questionScore;
-	}
-
-	public UUID getPartId() {
-		return partId;
-	}
-
-	public void setPartId(UUID partId) {
-		this.partId = partId;
-	}
-
-	public String getQuestionExplainEn() {
-		return questionExplainEn;
-	}
-
-	public void setQuestionExplainEn(String questionExplainEn) {
-		this.questionExplainEn = questionExplainEn;
-	}
-
-	public String getQuestionExplainVn() {
-		return questionExplainVn;
-	}
-
-	public void setQuestionExplainVn(String questionExplainVn) {
-		this.questionExplainVn = questionExplainVn;
-	}
-
-	public List<CreateListAnswerDTO> getListAnswer() {
-		return listAnswer;
-	}
-
-	public void setListAnswer(List<CreateListAnswerDTO> listAnswer) {
-		this.listAnswer = listAnswer;
-	}
-
-	public MultipartFile getContentImage() {
-		return contentImage;
-	}
-
-	public void setContentImage(MultipartFile contentImage) {
-		this.contentImage = contentImage;
-	}
-
-	public MultipartFile getContentAudio() {
-		return contentAudio;
-	}
-
-	public void setContentAudio(MultipartFile contentAudio) {
-		this.contentAudio = contentAudio;
-	}
-
-	public List<CreateQuestionDTO> getListQuestionChild() {
-		return listQuestionChild;
-	}
-
-	public void setListQuestionChild(List<CreateQuestionDTO> listQuestionChild) {
-		this.listQuestionChild = listQuestionChild;
-	}
-
-	public String getQuestionType() {
-		return questionType;
-	}
-
-	public void setQuestionType(String questionType) {
-		this.questionType = questionType;
-	}
 }

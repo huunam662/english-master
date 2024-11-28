@@ -1,81 +1,29 @@
 package com.example.englishmaster_be.DTO.FlashCard;
 
-import jakarta.validation.constraints.NotNull;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.multipart.MultipartFile;
 
-
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateFlashCardWordDTO {
 
+    String word;
 
-    private String word;
+    String define;
 
-    private String define;
+    String type;
 
-    private MultipartFile image;
+    String spelling;
 
-    private String type;
-    private String spelling;
-    private String example;
+    String example;
 
-    private String note;
+    String note;
 
-    public CreateFlashCardWordDTO() {
-    }
+    MultipartFile image;
 
-
-    public String getWord() {
-        return word;
-    }
-
-    public void setWord(String word) {
-        this.word = word;
-    }
-
-    public String getDefine() {
-        return define;
-    }
-
-    public void setDefine(String define) {
-        this.define = define;
-    }
-
-    public MultipartFile getImage() {
-        return image;
-    }
-
-    public void setImage(MultipartFile image) {
-        this.image = image;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public String getSpelling() {
-        return spelling;
-    }
-
-    public void setSpelling(String spelling) {
-        this.spelling = spelling;
-    }
-
-    public String getExample() {
-        return example;
-    }
-
-    public void setExample(String example) {
-        this.example = example;
-    }
-
-    public String getNote() {
-        return note;
-    }
-
-    public void setNote(String note) {
-        this.note = note;
-    }
 }

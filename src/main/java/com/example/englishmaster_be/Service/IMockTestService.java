@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Service;
 
+import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Model.*;
-import com.example.englishmaster_be.Model.Response.MockTestResponse;
 import org.springframework.http.ResponseEntity;
 
 import java.util.List;

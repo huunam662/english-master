@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.Controller;
 
-import com.example.englishmaster_be.Model.ResponseModel;
+import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
+import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Service.IFileStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -31,11 +32,11 @@ public class FileController {
     public ResponseEntity<?> showImage(@PathVariable String filename) {
         Resource file = IFileStorageService.load(filename);
         if (file == null) {
-            ResponseModel responseModel = new ResponseModel();
-            responseModel.setStatus("fail");
-            responseModel.setMessage("Image not found");
-            responseModel.setViolations("404");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setStatus(HttpStatus.NOT_FOUND);
+            exceptionResponseModel.setMessage("Image not found");
+            exceptionResponseModel.setViolations("404");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponseModel);
         }
         return ResponseEntity.ok()
                 .contentType(MediaType.IMAGE_JPEG).body(file);
@@ -61,14 +62,15 @@ public class FileController {
         try {
             String fileName = IFileStorageService.nameFile(file);
             IFileStorageService.save(file, fileName);
-            responseModel.setStatus("success");
+
             responseModel.setMessage("Save file sucessfully");
             responseModel.setResponseData(fileName);
             return ResponseEntity.ok().body(responseModel);
         } catch (Exception e) {
-            responseModel.setStatus("failed");
-            responseModel.setMessage("Save file failed");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setMessage("Save file failed");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -77,14 +79,15 @@ public class FileController {
         ResponseModel responseModel = new ResponseModel();
         try {
             IFileStorageService.delete(fileName);
-            responseModel.setStatus("success");
+
             responseModel.setMessage("Delete file sucessfully");
             responseModel.setResponseData(fileName);
             return ResponseEntity.ok().body(responseModel);
         } catch (Exception e) {
-            responseModel.setStatus("failed");
-            responseModel.setMessage("Delete file failed");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setMessage("Delete file failed");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 }

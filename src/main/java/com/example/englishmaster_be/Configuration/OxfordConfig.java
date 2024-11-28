@@ -1,39 +1,25 @@
 package com.example.englishmaster_be.Configuration;
 
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
+
+@Getter
+@Setter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Configuration
 @ConfigurationProperties(prefix = "oxford.api")
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class OxfordConfig {
-    private String appId;
-    private String appKey;
-    private String baseUrl;
 
-    public OxfordConfig() {
-    }
+    String appId;
 
-    public String getAppId() {
-        return appId;
-    }
+    String appKey;
 
-    public void setAppId(String appId) {
-        this.appId = appId;
-    }
+    String baseUrl;
 
-    public String getAppKey() {
-        return appKey;
-    }
-
-    public void setAppKey(String appKey) {
-        this.appKey = appKey;
-    }
-
-    public String getBaseUrl() {
-        return baseUrl;
-    }
-
-    public void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
-    }
 }

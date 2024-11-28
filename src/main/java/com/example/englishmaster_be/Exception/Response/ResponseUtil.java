@@ -1,6 +1,5 @@
 package com.example.englishmaster_be.Exception.Response;
 
-import lombok.Builder;
 import org.springframework.http.HttpStatus;
 import java.util.Arrays;
 import java.util.List;

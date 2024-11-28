@@ -1,222 +1,96 @@
 package com.example.englishmaster_be.Model;
 
 import com.example.englishmaster_be.DTO.Question.*;
-import com.example.englishmaster_be.DTO.Type.QuestionType;
 import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-@Table(name = "question")
+@Table(name = "Question")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class Question implements Serializable {
+
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
-    private UUID questionId;
+    UUID questionId;
 
     @Column(name = "question_content")
-    private String questionContent;
+    String questionContent;
 
     @Column(name = "question_score")
-    private int questionScore;
-
-    @ManyToOne
-    @JoinColumn(name = "question_group", referencedColumnName = "id")
-    private Question questionGroup;
+    int questionScore;
 
     @Column(name = "question_explain_en")
-    private String questionExplainEn;
+    String questionExplainEn;
 
     @Column(name = "question_explain_vn")
-    private String questionExplainVn;
+    String questionExplainVn;
 
     @Column(name = "question_numberical")
-    private int questionNumberical;
-
-
-    @ManyToOne
-    @JoinColumn(name = "part_id", referencedColumnName = "id")
-    private Part part;
-
+    int questionNumberical;
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
     @Column(name = "create_at")
-    private LocalDateTime createAt;
-
-    @ManyToOne
-    @JoinColumn(name = "create_by", referencedColumnName = "id")
-    private User userCreate;
+    LocalDateTime createAt = LocalDateTime.now();
 
     @Temporal(TemporalType.TIMESTAMP)
     @UpdateTimestamp
     @Column(name = "update_at")
-    private LocalDateTime updateAt;
+    LocalDateTime updateAt = LocalDateTime.now();
+
+    @ManyToOne
+    @JoinColumn(name = "create_by", referencedColumnName = "id")
+    User userCreate;
 
     @ManyToOne
     @JoinColumn(name = "update_by", referencedColumnName = "id")
-    private User userUpdate;
+    User userUpdate;
+
+    @ManyToOne
+    @JoinColumn(name = "part_id", referencedColumnName = "id")
+    Part part;
+
+    @ManyToOne
+    @JoinColumn(name = "question_group", referencedColumnName = "id")
+    Question questionGroup;
 
     @ManyToMany(mappedBy = "questions")
-    private Collection<Topic> topics;
+    List<Topic> topics;
 
     @OneToMany(mappedBy = "question")
-    private Collection<Answer> answers;
+    List<Answer> answers;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-    private Collection<Content> contentCollection;
+    List<Content> contentCollection;
 
-    @Column(name="question_type")
-    @Enumerated(EnumType.STRING)
-    private QuestionType questionType;
-
-    public Question() {
-        createAt = LocalDateTime.now();
-        updateAt = LocalDateTime.now();
-    }
 
     public Question(CreateQuestionDTO createQuestionDTO) {
+
+        if(Objects.isNull(createQuestionDTO)) return;
+
         this.questionContent = createQuestionDTO.getQuestionContent();
         this.questionScore = createQuestionDTO.getQuestionScore();
         this.questionExplainEn = createQuestionDTO.getQuestionExplainEn();
         this.questionExplainVn = createQuestionDTO.getQuestionExplainVn();
-
-        createAt = LocalDateTime.now();
-        updateAt = LocalDateTime.now();
     }
 
     public Question(String questionContent, int questionScore) {
         this.questionContent = questionContent;
         this.questionScore = questionScore;
-
-        createAt = LocalDateTime.now();
-        updateAt = LocalDateTime.now();
     }
 
-    public UUID getQuestionId() {
-        return questionId;
-    }
-
-    public void setQuestionId(UUID questionId) {
-        this.questionId = questionId;
-    }
-
-    public String getQuestionContent() {
-        return questionContent;
-    }
-
-    public void setQuestionContent(String questionContent) {
-        this.questionContent = questionContent;
-    }
-
-    public int getQuestionScore() {
-        return questionScore;
-    }
-
-    public void setQuestionScore(int questionScore) {
-        this.questionScore = questionScore;
-    }
-
-    public Question getQuestionGroup() {
-        return questionGroup;
-    }
-
-    public void setQuestionGroup(Question questionGroup) {
-        this.questionGroup = questionGroup;
-    }
-
-
-    public Part getPart() {
-        return part;
-    }
-
-    public void setPart(Part part) {
-        this.part = part;
-    }
-
-    public LocalDateTime getCreateAt() {
-        return createAt;
-    }
-
-    public void setCreateAt(LocalDateTime createAt) {
-        this.createAt = createAt;
-    }
-
-    public User getUserCreate() {
-        return userCreate;
-    }
-
-    public void setUserCreate(User userCreate) {
-        this.userCreate = userCreate;
-    }
-
-    public LocalDateTime getUpdateAt() {
-        return updateAt;
-    }
-
-    public void setUpdateAt(LocalDateTime updateAt) {
-        this.updateAt = updateAt;
-    }
-
-    public User getUserUpdate() {
-        return userUpdate;
-    }
-
-    public void setUserUpdate(User userUpdate) {
-        this.userUpdate = userUpdate;
-    }
-
-    public Collection<Topic> getTopics() {
-        return topics;
-    }
-
-    public void setTopics(Collection<Topic> topics) {
-        this.topics = topics;
-    }
-
-    public Collection<Answer> getAnswers() {
-        return answers;
-    }
-
-    public void setAnswers(Collection<Answer> answers) {
-        this.answers = answers;
-    }
-
-    public Collection<Content> getContentCollection() {
-        return contentCollection;
-    }
-
-    public void setContentCollection(Collection<Content> contentCollection) {
-        this.contentCollection = contentCollection;
-    }
-
-    public int getQuestionNumberical() {
-        return questionNumberical;
-    }
-
-    public void setQuestionNumberical(int questionNumberical) {
-        this.questionNumberical = questionNumberical;
-    }
-
-    public String getQuestionExplainEn() {
-        return questionExplainEn;
-    }
-
-    public void setQuestionExplainEn(String questionExplainEn) {
-        this.questionExplainEn = questionExplainEn;
-    }
-
-    public String getQuestionExplainVn() {
-        return questionExplainVn;
-    }
-
-    public void setQuestionExplainVn(String questionExplainVn) {
-        this.questionExplainVn = questionExplainVn;
-    }
 }

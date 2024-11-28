@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Advice;
 
 import com.example.englishmaster_be.Exception.RefreshTokenException;
-import com.example.englishmaster_be.Model.ResponseModel;
+import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -14,11 +14,12 @@ public class TokenControllerAdvice {
 
     @ExceptionHandler(value = RefreshTokenException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
-    public ResponseModel handleTokenRefreshException(RefreshTokenException ex, WebRequest request) {
-        return new ResponseModel(
-                ex.getMessage(),
-                null,
-                "false",
-                String.valueOf(HttpStatus.FORBIDDEN.value()));
+    public ExceptionResponseModel handleTokenRefreshException(RefreshTokenException ex, WebRequest request) {
+        return ExceptionResponseModel.builder()
+                .success(Boolean.FALSE)
+                .message(ex.getMessage())
+                .status(HttpStatus.FORBIDDEN)
+                .code(HttpStatus.FORBIDDEN.value())
+                .build();
     }
 }

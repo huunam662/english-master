@@ -1,20 +1,16 @@
 package com.example.englishmaster_be.DTO;
 
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class RefreshTokenDTO {
-    private String requestRefresh;
 
-    public RefreshTokenDTO() {
-    }
-
-	public String getRequestRefresh() {
-		return requestRefresh;
-	}
-
-	public void setRequestRefresh(String requestRefresh) {
-		this.requestRefresh = requestRefresh;
-	}
-    
-    
+    String requestRefresh;
 
 }

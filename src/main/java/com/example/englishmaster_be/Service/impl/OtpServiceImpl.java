@@ -4,7 +4,6 @@ import com.example.englishmaster_be.Model.Otp;
 import com.example.englishmaster_be.Repository.OtpRepository;
 import com.example.englishmaster_be.Service.IOtpService;
 import lombok.AllArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;

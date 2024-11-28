@@ -1,37 +1,22 @@
 package com.example.englishmaster_be.DTO.Answer;
 
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
 import java.util.UUID;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateListAnswerDTO {
-    private UUID idAnswer;
-    private String contentAnswer;
-    private boolean correctAnswer;
 
-    public CreateListAnswerDTO(){
+    UUID idAnswer;
 
-    }
+    String contentAnswer;
 
-    public UUID getIdAnswer() {
-        return idAnswer;
-    }
+    boolean correctAnswer;
 
-    public void setIdAnswer(UUID idAnswer) {
-        this.idAnswer = idAnswer;
-    }
-
-    public String getContentAnswer() {
-        return contentAnswer;
-    }
-
-    public void setContentAnswer(String contentAnswer) {
-        this.contentAnswer = contentAnswer;
-    }
-
-    public boolean isCorrectAnswer() {
-        return correctAnswer;
-    }
-
-    public void setCorrectAnswer(boolean correctAnswer) {
-        this.correctAnswer = correctAnswer;
-    }
 }

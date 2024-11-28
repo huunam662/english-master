@@ -1,45 +1,23 @@
 package com.example.englishmaster_be.DTO.Feedback;
 
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.springframework.web.multipart.MultipartFile;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateFeedbackDTO {
-    private String name;
-    private String description;
-    private MultipartFile avatar;
-    private String content;
 
-    public CreateFeedbackDTO() {
-    }
+    String name;
 
-    public String getName() {
-        return name;
-    }
+    String description;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    String content;
 
-    public String getDescription() {
-        return description;
-    }
+    MultipartFile avatar;
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public MultipartFile getAvatar() {
-        return avatar;
-    }
-
-    public void setAvatar(MultipartFile avatar) {
-        this.avatar = avatar;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
 }

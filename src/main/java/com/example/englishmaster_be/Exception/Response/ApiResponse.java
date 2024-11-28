@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.http.HttpStatusCode;
+
 import java.util.List;
 
 @Data
@@ -14,9 +16,16 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_EMPTY)
 public class ApiResponse<T>{
 
+    boolean success;
+
     private Integer httpStatus;
-    private boolean success;
-    private String message;
+
+    HttpStatusCode status;
+
+    String message;
+
+    int code;
+
     private T data;
     private List<String> errors;
     private String path;

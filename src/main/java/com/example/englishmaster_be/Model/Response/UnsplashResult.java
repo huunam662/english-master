@@ -1,13 +1,16 @@
 package com.example.englishmaster_be.Model.Response;
 
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+@Getter
+@Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UnsplashResult {
-    private String urls;
 
-    public String getUrls() {
-        return urls;
-    }
+    String urls;
 
-    public void setUrls(String urls) {
-        this.urls = urls;
-    }
 }

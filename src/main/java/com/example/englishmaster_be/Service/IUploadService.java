@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Service;
 
-import com.example.englishmaster_be.DTO.DeleteRequestDto;
+import com.example.englishmaster_be.DTO.DeleteRequestDTO;
 import com.example.englishmaster_be.Model.Response.DeleteResponse;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,6 +11,6 @@ public interface IUploadService {
 
     String upload(MultipartFile file, String dir, boolean isPrivateFile, UUID topicId, String code);
 
-    DeleteResponse delete(DeleteRequestDto dto) throws FileNotFoundException;
+    DeleteResponse delete(DeleteRequestDTO dto) throws FileNotFoundException;
 
 }

@@ -1,33 +1,21 @@
 package com.example.englishmaster_be.DTO;
 
-
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserLoginDTO {
 
-	@Schema(description = "Email of the user", example = "admin@meuenglish.com")
-    private String email;
-	@Schema(description = "Password of the user", example = "admin@123")
-    private String password;
+    @Schema(description = "Email of the User", example = "admin@meuenglish.com")
+    String email;
 
-    public UserLoginDTO() {
-    }
+    @Schema(description = "Password of the User", example = "admin@123")
+    String password;
 
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-    
 }

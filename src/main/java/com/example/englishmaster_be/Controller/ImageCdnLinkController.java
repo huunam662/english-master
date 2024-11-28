@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Controller;
 
-import com.example.englishmaster_be.Model.ResponseModel;
+import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Repository.ContentRepository;
 import com.example.englishmaster_be.Repository.TopicRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ public class ImageCdnLinkController {
             }
         }
         responseModel.setMessage("Found " + responseList.size() + " links");
-        responseModel.setStatus("success");
+
         responseModel.setResponseData(responseList);
         return ResponseEntity.ok(responseModel);
     }
@@ -54,7 +54,7 @@ public class ImageCdnLinkController {
             }
         }
         responseModel.setMessage("Found " + responseList.size() + " links");
-        responseModel.setStatus("success");
+
         responseModel.setResponseData(responseList);
         return ResponseEntity.ok(responseModel);
     }

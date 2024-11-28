@@ -1,11 +1,9 @@
 package com.example.englishmaster_be.Configuration.jwt;
 
 import com.example.englishmaster_be.Model.CustomUserDetails;
-import com.example.englishmaster_be.Service.IInvalidTokenService;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +20,6 @@ public class JwtUtils {
 
     @Value("${masterE.jwtExpiration}")
     private int jwtExpirationMs;
-
 
 
     public String generateJwtToken(CustomUserDetails userPrincipal) {

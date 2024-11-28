@@ -1,14 +1,13 @@
 package com.example.englishmaster_be.Controller;
 
+import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
+import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.DTO.MockTest.CreateMockTestDTO;
-import com.example.englishmaster_be.DTO.MockTest.CreateResultMockTestDTO;
-import com.example.englishmaster_be.Exception.CustomException;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Repository.MockTestRepository;
 import com.example.englishmaster_be.Repository.ResultMockTestRepository;
 import com.example.englishmaster_be.Service.*;
-import com.example.englishmaster_be.Service.impl.MockTestServiceImpl;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -71,7 +70,7 @@ public class MockTestController {
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<ResponseModel> createMockTest(@RequestBody CreateMockTestDTO createMockTestDTO) {
+    public ResponseEntity<?> createMockTest(@RequestBody CreateMockTestDTO createMockTestDTO) {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
@@ -89,15 +88,16 @@ public class MockTestController {
             responseModel.setMessage("Create mock test successfully");
 
             responseModel.setResponseData(mockTestResponse);
-            responseModel.setStatus("success");
+
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Create mock test fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Create mock test fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -123,15 +123,15 @@ public class MockTestController {
             responseModel.setMessage("Get top 10 mock test successfully");
 
             responseModel.setResponseData(mockTestResponseList);
-            responseModel.setStatus("success");
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Get top 10 mock test fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Get top 10 mock test fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -175,14 +175,15 @@ public class MockTestController {
             responseObject.put("listMockTest", mockTestResponseList);
             responseModel.setMessage("List mock test successful");
             responseModel.setResponseData(responseObject);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("List mock test fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("List mock test fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -202,17 +203,18 @@ public class MockTestController {
             }
 
 
-            responseModel.setMessage("Get top 10 mock test of user successfully");
+            responseModel.setMessage("Get top 10 mock test of User successfully");
             responseModel.setResponseData(mockTestResponseList);
-            responseModel.setStatus("success");
+
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Get top 10 mock test of user fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Get top 10 mock test of User fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -267,13 +269,14 @@ public class MockTestController {
             sendResultEmail(user.getEmail(), mockTest, totalCorrect, correctAnswers, scores, partInTopic);
             responseModel.setMessage("Create detail mock test successfully");
             responseModel.setResponseData(detailMockTestList);
-            responseModel.setStatus("success");
+
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Create detail mock test fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Create detail mock test fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -337,18 +340,19 @@ public class MockTestController {
             }
 
             if (isCorrect) {
-                responseModel.setMessage("Get top 10 answer correct successfully");
+                responseModel.setMessage("Get top 10 Answer correct successfully");
             } else {
-                responseModel.setMessage("Get top 10 answer wrong successfully");
+                responseModel.setMessage("Get top 10 Answer wrong successfully");
             }
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Get top 10 mock test of user fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Get top 10 mock test of User fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -377,14 +381,15 @@ public class MockTestController {
             sendResultEmail(user.getEmail(), mockTest, correctAnswer, corrects, scores, listPartId);
 
             responseModel.setMessage("Send email successfully");
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Send email fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Send email fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -392,15 +397,16 @@ public class MockTestController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> getPartToMockTest(@PathVariable UUID mockTestId) {
         ResponseModel responseModel = new ResponseModel();
+        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
         try {
             User currentUser = IUserService.currentUser();
 
             MockTest mockTest = IMockTestService.findMockTestToId(mockTestId);
 
             if (!currentUser.equals(mockTest.getUser())) {
-                responseModel.setMessage("You cannot view other people's tests");
-                responseModel.setStatus("fail");
-                return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+                exceptionResponseModel.setMessage("You cannot view other people's tests");
+                exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
             }
 
             List<Part> partList = mockTest.getTopic().getParts().stream().sorted(Comparator.comparing(Part::getCreateAt)).toList();
@@ -420,17 +426,17 @@ public class MockTestController {
             }
 
             responseObject.put("Part", responseArray);
-            responseModel.setMessage("Show part to mock test successfully");
+            responseModel.setMessage("Show Part to mock test successfully");
 
             responseModel.setResponseData(responseObject);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Show part to mock test fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            exceptionResponseModel.setMessage("Show Part to mock test fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -438,15 +444,16 @@ public class MockTestController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> getQuestionOfToMockTest(@PathVariable UUID mockTestId, @RequestParam UUID partId) {
         ResponseModel responseModel = new ResponseModel();
+        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
         try {
             User currentUser = IUserService.currentUser();
 
             MockTest mockTest = IMockTestService.findMockTestToId(mockTestId);
 
             if (!currentUser.equals(mockTest.getUser())) {
-                responseModel.setMessage("You cannot view other people's tests");
-                responseModel.setStatus("fail");
-                return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+                exceptionResponseModel.setMessage("You cannot view other people's tests");
+                exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
             }
 
             List<Question> questionList = ITopicService.getQuestionOfPartToTopic(mockTest.getTopic().getTopicId(), partId);
@@ -476,16 +483,16 @@ public class MockTestController {
                 }
             }
 
-            responseModel.setMessage("Show question of part to mock test successfully");
+            responseModel.setMessage("Show Question of Part to mock test successfully");
             responseModel.setResponseData(questionMockTestResponseList);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Show question of part to mock test fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            exceptionResponseModel.setMessage("Show Question of Part to mock test fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -505,7 +512,7 @@ public class MockTestController {
 
         for (int i = 0; i < 7; i++) {
             if (listPartId.contains(getPartUUID(i))) {
-                String partHtml = "<p>Số câu đúng part " + (i + 1) + ": " + corrects[i] + "<br>Số điểm part " + (i + 1) + ": " + scores[i] + "</p>";
+                String partHtml = "<p>Số câu đúng Part " + (i + 1) + ": " + corrects[i] + "<br>Số điểm Part " + (i + 1) + ": " + scores[i] + "</p>";
                 partsHtml.append(partHtml);
             }
         }

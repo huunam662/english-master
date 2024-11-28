@@ -1,24 +1,19 @@
 package com.example.englishmaster_be.DTO;
 
 
-import java.util.UUID;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UploadTextDTO {
-    private String contentType;
-    private String contentData;
 
-	public String getContentType() {
-		return contentType;
-	}
-	public void setContentType(String contentType) {
-		this.contentType = contentType;
-	}
-	public String getContentData() {
-		return contentData;
-	}
-	public void setContentData(String contentData) {
-		this.contentData = contentData;
-	}
-    
-    
+    String contentType;
+
+	String contentData;
+
 }

@@ -1,16 +1,16 @@
 package com.example.englishmaster_be.DTO.Comment;
 
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateCommentDTO {
-    private String commentContent;
 
-    public CreateCommentDTO() {
-    }
+    String commentContent;
 
-    public String getCommentContent() {
-        return commentContent;
-    }
-
-    public void setCommentContent(String commentContent) {
-        this.commentContent = commentContent;
-    }
 }

@@ -1,22 +1,23 @@
 package com.example.englishmaster_be.Configuration.jwt;
 
 import com.example.englishmaster_be.Exception.Error;
-import com.example.englishmaster_be.Model.ResponseModel;
+import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 
-@Configuration(proxyBeanMethods = true)
+@Configuration
 public class AuthEntryPointJwt implements AuthenticationEntryPoint {
+
     private static final Logger logger = LoggerFactory.getLogger(AuthEntryPointJwt.class);
 
     @Override
@@ -29,7 +30,7 @@ public class AuthEntryPointJwt implements AuthenticationEntryPoint {
 
         ResponseModel responseModel = new ResponseModel();
         responseModel.setMessage(error.getMessage());
-        responseModel.setStatus("fail");
+        responseModel.setStatus(HttpStatus.UNAUTHORIZED);
         responseModel.setViolations(error.getViolation());
 
         final ObjectMapper mapper = new ObjectMapper();

@@ -1,68 +1,85 @@
 package com.example.englishmaster_be.Model.Response;
 
 import com.example.englishmaster_be.Model.Answer;
-import com.example.englishmaster_be.Model.Content;
 import com.example.englishmaster_be.Model.Question;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @SuppressWarnings("unchecked")
 public class QuestionAdminResponse {
-    private UUID questionId;
-    private String questionContent;
-    private int questionScore;
-    private JSONArray contentList;
-    private List<QuestionResponse> questionGroup;
 
-    private UUID partId;
-    private String createAt;
-    private String updateAt;
+    UUID questionId;
 
-    private List<AnswerResponse> listAnswer;
-    private UUID answerCorrect;
+    UUID answerCorrect;
+
+    UUID partId;
+
+    String questionContent;
+
+    String createAt;
+
+    String updateAt;
+
+    List<AnswerResponse> listAnswer;
+
+    List<QuestionResponse> questionGroup;
+
+    int questionScore;
+
+    JSONArray contentList;
 
     public QuestionAdminResponse(Question question, Answer answerCorrect) {
 
-        this.questionId = question.getQuestionId();
-        this.questionContent = question.getQuestionContent();
-        this.questionScore = question.getQuestionScore();
+        if(Objects.nonNull(answerCorrect))
+            this.answerCorrect = answerCorrect.getAnswerId();
 
-        this.answerCorrect = answerCorrect.getAnswerId();
+        if(Objects.nonNull(question)) {
 
-        this.partId = question.getPart().getPartId();
+            this.questionId = question.getQuestionId();
+            this.questionContent = question.getQuestionContent();
+            this.questionScore = question.getQuestionScore();
+            this.partId = question.getPart().getPartId();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
-        this.createAt = sdf.format(Timestamp.valueOf(question.getCreateAt()));
-        this.updateAt = sdf.format(Timestamp.valueOf(question.getUpdateAt()));
+            SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
+            if(Objects.nonNull(question.getCreateAt()))
+                this.createAt = sdf.format(Timestamp.valueOf(question.getCreateAt()));
+            if(Objects.nonNull(question.getUpdateAt()))
+                this.updateAt = sdf.format(Timestamp.valueOf(question.getUpdateAt()));
 
-        if (question.getAnswers() != null) {
-            List<AnswerResponse> listAnswerResponse = new ArrayList<>();
-            for (Answer answer : question.getAnswers()) {
-                listAnswerResponse.add(new AnswerResponse(answer));
+            if (Objects.nonNull(question.getAnswers())) {
+                this.listAnswer = question.getAnswers().stream().map(
+                        AnswerResponse::new
+                ).toList();
             }
-            this.listAnswer = listAnswerResponse;
-        }
 
-        contentList = new JSONArray();
+            this.contentList = new JSONArray();
 
-        if (question.getContentCollection() != null) {
-            for (Content content1 : question.getContentCollection()) {
-                JSONObject content = new JSONObject();
-                content.put("Content Type", content1.getContentType());
+            if (Objects.nonNull(question.getContentCollection())) {
 
-                content.put("Content Data", content1.getContentData());
+                question.getContentCollection().forEach(
+                        contentItem -> {
 
-                contentList.add(content);
+                            JSONObject content = new JSONObject();
+                            content.put("Content Type", contentItem.getContentType());
+                            content.put("Content Data", contentItem.getContentData());
+
+                            this.contentList.add(content);
+                        }
+                );
             }
         }
     }

@@ -1,6 +1,8 @@
 package com.example.englishmaster_be.Controller;
 
 
+import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
+import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Service.*;
@@ -23,9 +25,9 @@ public class PackController {
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public ResponseEntity<ResponseModel> createPack(@RequestParam String packName ){
+    public ResponseEntity<?> createPack(@RequestParam String packName ){
         ResponseModel responseModel = new ResponseModel();
-
+        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
         try {
             User user = IUserService.currentUser();
 
@@ -41,19 +43,21 @@ public class PackController {
             if (checkPack){
                 responseModel.setMessage("Create pack successfully");
                 responseModel.setResponseData(packResponse);
-                responseModel.setStatus("success");
+
             }
             else {
-                responseModel.setMessage("Create pack fail: The pack name is already exist");
-                responseModel.setStatus("fail");
+                exceptionResponseModel.setMessage("Create pack fail: The pack name is already exist");
+                exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
             }
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }
-        catch (Exception e){responseModel.setMessage("Create pack fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
+        catch (Exception e){
+            exceptionResponseModel.setMessage("Create pack fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);}
     }
 
     @GetMapping(value = "/listPack")
@@ -69,13 +73,15 @@ public class PackController {
             }
             responseModel.setMessage("Show list pack successfully");
             responseModel.setResponseData(packResponseList);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }
-        catch (Exception e){responseModel.setMessage("Show list pack fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
+        catch (Exception e){
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Show list pack fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);}
     }
 }

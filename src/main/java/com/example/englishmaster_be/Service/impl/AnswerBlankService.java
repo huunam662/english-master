@@ -25,7 +25,7 @@ public class AnswerBlankService {
     public Object getAnswerWithQuestionBlank(UUID questionId){
         Question question=questionRepository.findByQuestionId(questionId)
                 .orElseThrow(
-                        ()-> new ResponseNotFoundException("Not found question with"+ questionId)
+                        ()-> new ResponseNotFoundException("Not found Question with"+ questionId)
                 );
 
         List<AnswerBlank> questionBlanks=repository.findByQuestion(question);

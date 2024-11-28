@@ -1,6 +1,8 @@
 package com.example.englishmaster_be.Controller;
 
-import com.example.englishmaster_be.DTO.News.*;
+import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
+import com.example.englishmaster_be.Model.Response.ResponseModel;
+import com.example.englishmaster_be.DTO.News.CreateNewsDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Service.*;
@@ -17,7 +19,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -36,7 +37,7 @@ public class NewsController {
 
     @GetMapping(value = "/listNewsAdmin")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseModel> listNewsOfAdmin(@RequestParam(value = "page", defaultValue = "0") @Min(0) Integer page,
+    public ResponseEntity<?> listNewsOfAdmin(@RequestParam(value = "page", defaultValue = "0") @Min(0) Integer page,
                                                   @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
                                                   @RequestParam(value = "sortBy", defaultValue = "updateAt") String sortBy,
                                                   @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction sortDirection,
@@ -83,16 +84,17 @@ public class NewsController {
             }
 
             responseObject.put("listNews", newsResponseList);
-            responseModel.setMessage("List news successful");
+            responseModel.setMessage("List News successful");
             responseModel.setResponseData(responseObject);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
-            responseModel.setMessage("List news fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("List News fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -117,16 +119,17 @@ public class NewsController {
                 newsResponseList.add(newsResponse);
             }
 
-            responseModel.setMessage("List news successful");
+            responseModel.setMessage("List News successful");
             responseModel.setResponseData(newsResponseList);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
-            responseModel.setMessage("List news fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("List News fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -154,16 +157,17 @@ public class NewsController {
                 IFileStorageService.save(createNewsDTO.getImage(), fileNameImage);
             }
             NewsResponse newsResponse = new NewsResponse(news);
-            responseModel.setMessage("Create news successful");
+            responseModel.setMessage("Create News successful");
             responseModel.setResponseData(newsResponse);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
-            responseModel.setMessage("Create news fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Create News fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -178,26 +182,27 @@ public class NewsController {
 
             INewsService.save(news);
             if(enable){
-                responseModel.setMessage("Enable news successful");
-                responseModel.setStatus("success");
+                responseModel.setMessage("Enable News successful");
+
             }else {
-                responseModel.setMessage("Disable news successful");
-                responseModel.setStatus("success");
+                responseModel.setMessage("Disable News successful");
             }
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
             if(enable){
-                responseModel.setMessage("Enable news fail: " + e.getMessage());
-                responseModel.setStatus("fail");
+                exceptionResponseModel.setMessage("Enable News fail: " + e.getMessage());
+
             }else {
-                responseModel.setMessage("Disable news fail: "+ e.getMessage());
-                responseModel.setStatus("fail");
+                exceptionResponseModel.setMessage("Disable News fail: "+ e.getMessage());
+
             }
 
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -234,15 +239,16 @@ public class NewsController {
             INewsService.save(news);
 
             NewsResponse newsResponse = new NewsResponse(news);
-            responseModel.setMessage("Update news successful");
+            responseModel.setMessage("Update News successful");
             responseModel.setResponseData(newsResponse);
-            responseModel.setStatus("success");
+
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
-            responseModel.setMessage("Update news fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Update News fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -258,15 +264,16 @@ public class NewsController {
 
             INewsService.delete(news);
 
-            responseModel.setMessage("Delete news successful");
-            responseModel.setStatus("success");
+            responseModel.setMessage("Delete News successful");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
-            responseModel.setMessage("Delete news fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Delete News fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
     @GetMapping(value="/searchByTitle")
@@ -287,14 +294,15 @@ public class NewsController {
 
             responseModel.setMessage("Search by title successful");
             responseModel.setResponseData(newsResponseList);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Search by title fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Search by title fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 

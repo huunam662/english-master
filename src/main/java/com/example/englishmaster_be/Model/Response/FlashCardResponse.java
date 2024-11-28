@@ -1,39 +1,47 @@
 package com.example.englishmaster_be.Model.Response;
 
 import com.example.englishmaster_be.Model.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.json.simple.JSONObject;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Objects;
 import java.util.UUID;
+
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class FlashCardResponse {
 
-    private UUID flashCardId;
+    UUID flashCardId;
 
-    private JSONObject user;
+    String flashCardTitle;
 
-    private String flashCardTitle;
+    String flashCardImage;
 
-    private String flashCardImage;
+    String flashCardDescription;
 
-    private String flashCardDescription;
+    String createAt;
 
-    private String createAt;
+    String updateAt;
 
-    private String updateAt;
+    JSONObject user;
 
-    private JSONObject userCreate;
+    JSONObject userCreate;
 
-    private JSONObject userUpdate;
+    JSONObject userUpdate;
 
     public FlashCardResponse(FlashCard flashCard) {
-        this.flashCardImage = flashCard.getFlashCardImage();
 
+        if(Objects.isNull(flashCard)) return;
+
+        this.flashCardImage = flashCard.getFlashCardImage();
         this.flashCardId = flashCard.getFlashCardId();
         this.flashCardTitle = flashCard.getFlashCardTitle();
         this.flashCardDescription = flashCard.getFlashCardDescription();

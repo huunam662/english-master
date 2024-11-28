@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Controller;
 
-import com.example.englishmaster_be.Model.ResponseModel;
+import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Service.impl.UserAnswerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,21 +20,25 @@ public class UserAnswerController {
 
     @GetMapping("/check-blank")
     public ResponseEntity<ResponseModel> checkAnswer(@RequestParam(value = "user_id") UUID userId, @RequestParam(value = "question_id") UUID questionId){
-        ResponseModel responseModel=new ResponseModel();
-        boolean check=service.checkCorrectAnswerBlank(questionId,userId);
-        responseModel.setMessage("Answer Checking");
-        responseModel.setStatus("success");
-        responseModel.setResponseData(check);
+
+        service.checkCorrectAnswerBlank(questionId,userId);
+
+        ResponseModel responseModel = ResponseModel.builder()
+                .message("Answer Checking")
+                .build();
+
         return ResponseEntity.status(HttpStatus.OK).body(responseModel);
     }
 
     @GetMapping("/check-multiple-choice")
     public ResponseEntity<ResponseModel> checkAnswer1(@RequestParam(value = "user_id") UUID userId, @RequestParam(value = "question_id") UUID questionId){
-        ResponseModel responseModel=new ResponseModel();
-        boolean check= service.checkCorrectAnswerMultipleChoice(questionId,userId);
-        responseModel.setResponseData(check);
-        responseModel.setStatus("success");
-        responseModel.setMessage("Answer Checking");
+
+        service.checkCorrectAnswerMultipleChoice(questionId,userId);
+
+        ResponseModel responseModel = ResponseModel.builder()
+                .message("Answer Checking")
+                .build();
+
         return ResponseEntity.status(HttpStatus.OK).body(responseModel);
     }
 

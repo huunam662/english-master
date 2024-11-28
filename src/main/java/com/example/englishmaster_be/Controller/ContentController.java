@@ -1,20 +1,19 @@
 package com.example.englishmaster_be.Controller;
 
-import com.example.englishmaster_be.Exception.CustomException;
-import com.example.englishmaster_be.Exception.Error;
+import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
 import com.example.englishmaster_be.Model.Content;
 import com.example.englishmaster_be.Model.Response.ContentResponse;
-import com.example.englishmaster_be.Model.ResponseModel;
+import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Repository.ContentRepository;
 import com.example.englishmaster_be.Service.CloudinaryService2;
 import com.example.englishmaster_be.Service.IContentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -35,15 +34,17 @@ public class ContentController {
         ContentResponse contentResponse = new ContentResponse(content);
         System.out.println(contentResponse);
         if (content != null) {
-            responseModel.setMessage("Get content successful");
+            responseModel.setMessage("Get Content successful");
             responseModel.setResponseData(contentResponse);
-            responseModel.setStatus("success");
             return ResponseEntity.ok(responseModel);
         }
-        responseModel.setMessage("Get content failed");
-        responseModel.setResponseData(null);
-        responseModel.setStatus("failed");
-        return ResponseEntity.ok(responseModel);
+
+        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+
+        exceptionResponseModel.setMessage("Get Content failed");
+        exceptionResponseModel.setResponseData(null);
+        exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
     }
 
     @GetMapping("contentData")
@@ -51,15 +52,16 @@ public class ContentController {
         ResponseModel responseModel = new ResponseModel();
         String content = contentRepository.findContentDataByTopicIdAndCode(topicId, code);
         if (content != null) {
-            responseModel.setMessage("Get content successful");
+            responseModel.setMessage("Get Content successful");
             responseModel.setResponseData(content);
-            responseModel.setStatus("success");
             return ResponseEntity.ok(responseModel);
         }
-        responseModel.setMessage("Get content failed");
-        responseModel.setResponseData(null);
-        responseModel.setStatus("failed");
-        return ResponseEntity.ok(responseModel);
+        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+
+        exceptionResponseModel.setMessage("Get Content failed");
+        exceptionResponseModel.setResponseData(null);
+        exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
     }
 
     @GetMapping("content")
@@ -68,15 +70,16 @@ public class ContentController {
         Content content = contentRepository.findByContentData(contentData).orElse(null);
         ContentResponse contentResponse = new ContentResponse(content);
         if (content != null) {
-            responseModel.setMessage("Get content successful");
+            responseModel.setMessage("Get Content successful");
             responseModel.setResponseData(contentResponse);
-            responseModel.setStatus("success");
             return ResponseEntity.ok(responseModel);
         }
-        responseModel.setMessage("Get content failed");
-        responseModel.setResponseData(null);
-        responseModel.setStatus("failed");
-        return ResponseEntity.ok(responseModel);
+        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+
+        exceptionResponseModel.setMessage("Get Content failed");
+        exceptionResponseModel.setResponseData(null);
+        exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
     }
 
     @PutMapping("update-content")
@@ -88,14 +91,15 @@ public class ContentController {
         contentRepository.save(content);
         ContentResponse contentResponse = new ContentResponse(content);
         if (content != null) {
-            responseModel.setMessage("Get content successful");
+            responseModel.setMessage("Get Content successful");
             responseModel.setResponseData(contentResponse);
-            responseModel.setStatus("success");
             return ResponseEntity.ok(responseModel);
         }
-        responseModel.setMessage("Get content failed");
-        responseModel.setResponseData(null);
-        responseModel.setStatus("failed");
-        return ResponseEntity.ok(responseModel);
+        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+
+        exceptionResponseModel.setMessage("Get Content failed");
+        exceptionResponseModel.setResponseData(null);
+        exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
     }
 }

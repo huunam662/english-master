@@ -1,6 +1,5 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.Model.Answer;
 import com.example.englishmaster_be.Model.Part;
 import com.example.englishmaster_be.Model.Question;
 import com.example.englishmaster_be.Repository.PartRepository;

@@ -1,16 +1,25 @@
 package com.example.englishmaster_be.DTO.Content;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.util.UUID;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateContentDTO {
-    private UUID contentId;
-    private String contentType;
-    private String contentData;
-    private UUID topicId;
-    private String code;
+
+    UUID contentId;
+
+    UUID topicId;
+
+    String contentType;
+
+    String contentData;
+
+    String code;
 }

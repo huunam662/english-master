@@ -1,112 +1,124 @@
 package com.example.englishmaster_be.Model.Response;
 
 import com.example.englishmaster_be.Model.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 @SuppressWarnings("unchecked")
 public class QuestionResponse {
-    private UUID questionId;
-    private String questionContent;
-    private int questionScore;
-    private JSONArray contentList;
-    private List<QuestionResponse> questionGroup;
 
-    private UUID partId;
-    private String createAt;
-    private String updateAt;
+    UUID questionId;
 
-    private List<AnswerResponse> listAnswer;
-    private UUID answerCorrect;
+    UUID partId;
+
+    UUID answerCorrect;
+
+    String questionContent;
+
+    String createAt;
+
+    String updateAt;
+
+    List<QuestionResponse> questionGroup;
+
+    List<AnswerResponse> listAnswer;
+
+    int questionScore;
+
+    JSONArray contentList;
+
 
     public QuestionResponse(Question question) {
 
         this.questionId = question.getQuestionId();
         this.questionContent = question.getQuestionContent();
         this.questionScore = question.getQuestionScore();
-
-
         this.partId = question.getPart().getPartId();
 
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
         this.createAt = sdf.format(Timestamp.valueOf(question.getCreateAt()));
         this.updateAt = sdf.format(Timestamp.valueOf(question.getUpdateAt()));
 
-        if (question.getAnswers() != null) {
-            List<AnswerResponse> listAnswerResponse = new ArrayList<>();
-            for (Answer answer : question.getAnswers()) {
-                listAnswerResponse.add(new AnswerResponse(answer));
-            }
-            this.listAnswer = listAnswerResponse;
+        if (Objects.nonNull(question.getAnswers())) {
+            this.listAnswer = question.getAnswers().stream().map(
+                    AnswerResponse::new
+            ).toList();
         }
 
-        contentList = new JSONArray();
-        if (!question.getContentCollection().isEmpty()) {
-            for (Content content1 : question.getContentCollection()) {
-                JSONObject content = new JSONObject();
-                content.put("Content Type", content1.getContentType());
+        this.contentList = new JSONArray();
 
-                if (content1.getContentData() == null) {
-                    content.put("Content Data", null);
+        if (Objects.nonNull(question.getContentCollection())) {
 
-                } else {
-                    content.put("Content Data", content1.getContentData());
-                }
+                question.getContentCollection().forEach(
+                contentItem -> {
+                        JSONObject content = new JSONObject();
 
-                contentList.add(content);
-            }
+                        content.put("Content Type", contentItem.getContentType());
+
+                        content.put("Content Data", contentItem.getContentData());
+
+                        this.contentList.add(content);
+                    }
+                );
+            
         }
 
     }
 
     public QuestionResponse(Question question, Answer answerCorrect) {
+
+        if(Objects.nonNull(answerCorrect))
+            this.answerCorrect = answerCorrect.getAnswerId();
+
         this.questionId = question.getQuestionId();
         this.questionContent = question.getQuestionContent();
         this.questionScore = question.getQuestionScore();
-        this.answerCorrect = answerCorrect.getAnswerId();
         this.partId = question.getPart().getPartId();
 
         // Định dạng ngày tạo và ngày cập nhật
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
-        this.createAt = question.getCreateAt() != null ? sdf.format(Timestamp.valueOf(question.getCreateAt())) : null;
-        this.updateAt = question.getUpdateAt() != null ? sdf.format(Timestamp.valueOf(question.getUpdateAt())) : null;
+        if(Objects.nonNull(question.getCreateAt()))
+            this.createAt = sdf.format(Timestamp.valueOf(question.getCreateAt()));
+        if(Objects.nonNull(question.getUpdateAt()))
+            this.updateAt = sdf.format(Timestamp.valueOf(question.getUpdateAt()));
 
         // Xử lý danh sách câu trả lời
-        if (question.getAnswers() != null && !question.getAnswers().isEmpty()) {
+        if (Objects.nonNull(question.getAnswers())) {
             this.listAnswer = question.getAnswers()
                     .stream()
                     .map(AnswerResponse::new)  // Chuyển đổi sang AnswerResponse
                     .sorted(Comparator.comparing(AnswerResponse::getAnswerId))  // Sắp xếp theo AnswerId
-                    .collect(Collectors.toList());
+                    .toList();
         }
 
-        // Xử lý content
+        // Xử lý Content
         this.contentList = new JSONArray();
-        if (question.getContentCollection() != null && !question.getContentCollection().isEmpty()) {
-            for (Content content1 : question.getContentCollection()) {
-                JSONObject contentJson = new JSONObject();
-                contentJson.put("Content Type", content1.getContentType());
 
-                if (content1.getContentData() != null) {
-                    if (content1.getContentData().startsWith("https")) {
-                        contentJson.put("Content Data", content1.getContentData());
-                    } else {
-                        contentJson.put("Content Data", content1.getContentData());
-                    }
-                } else {
-                    contentJson.put("Content Data", "");
+        if (Objects.nonNull(question.getContentCollection())) {
+            question.getContentCollection().forEach(
+                contentItem -> {
+                    JSONObject contentJson = new JSONObject();
+                    contentJson.put("Content Type", contentItem.getContentType());
+
+                    if(Objects.nonNull(contentItem.getContentData()))
+                        contentJson.put("Content Data", contentItem.getContentData());
+                    else contentJson.put("Content Data", "");
+
+                    this.contentList.add(contentJson);
                 }
-                this.contentList.add(contentJson);
-            }
+            );
         }
     }
 

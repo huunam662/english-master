@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.Model.Response;
 
 import com.example.englishmaster_be.Model.MockTest;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 import org.json.simple.JSONObject;
 
 import java.sql.Time;
@@ -10,24 +10,39 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class MockTestResponse {
-    private UUID mockTestID;
-    private int score;
-    private Time time;
-    private UUID topicId;
-    private Object user;
-    private int correctAnswers;
 
-    private String createAt;
-    private String updateAt;
+    UUID mockTestID;
 
-    private JSONObject userCreate;
+    UUID topicId;
 
-    private JSONObject userUpdate;
+    String createAt;
+
+    String updateAt;
+
+    JSONObject userCreate;
+
+    JSONObject userUpdate;
+
+    int correctAnswers;
+
+    int score;
+
+    Time time;
+
+    Object user;
 
     public MockTestResponse(MockTest mockTest) {
+
+        if(Objects.isNull(mockTest)) return;
+
         this.mockTestID = mockTest.getMockTestId();
         this.score = mockTest.getScore();
         this.time = mockTest.getTime();
@@ -40,8 +55,10 @@ public class MockTestResponse {
         this.user = userObj;
 
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
-        this.createAt = sdf.format(Timestamp.valueOf(mockTest.getCreateAt()));
-        this.updateAt = sdf.format(Timestamp.valueOf(mockTest.getUpdateAt()));
+        if(Objects.nonNull(mockTest.getCreateAt()))
+            this.createAt = sdf.format(Timestamp.valueOf(mockTest.getCreateAt()));
+        if(Objects.nonNull(mockTest.getUpdateAt()))
+            this.updateAt = sdf.format(Timestamp.valueOf(mockTest.getUpdateAt()));
 
         userCreate = new JSONObject();
         userUpdate = new JSONObject();

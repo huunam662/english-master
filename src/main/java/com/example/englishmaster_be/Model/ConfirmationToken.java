@@ -1,39 +1,45 @@
 package com.example.englishmaster_be.Model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Data
-@NoArgsConstructor
 @Table(name="user_confirm_token")
+@Getter
+@Setter
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
+@NoArgsConstructor
 public class ConfirmationToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "id")
-    private UUID userConfirmTokenId;
+    UUID userConfirmTokenId;
+
+    @Column(name = "Type")
+    String type;
+
+    @Column(name = "code")
+    String code;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_at")
-    private LocalDateTime createAt;
+    @CreationTimestamp
+    LocalDateTime createAt = LocalDateTime.now();
 
-    @Column(name = "type")
-    private String type;
-
-    @Column(name = "code")
-    private String code;
-
-    @ManyToOne()
+    @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+    User user;
 
     public ConfirmationToken(User user){
+
         this.user = user;
-        createAt = LocalDateTime.now();
 	}
 }

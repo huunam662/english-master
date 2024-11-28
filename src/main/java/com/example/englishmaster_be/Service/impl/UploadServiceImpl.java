@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.DeleteRequestDto;
+import com.example.englishmaster_be.DTO.DeleteRequestDTO;
 import com.example.englishmaster_be.Exception.CustomException;
 import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Helper.GetExtension;
@@ -67,7 +67,7 @@ public class UploadServiceImpl implements IUploadService {
             throw new IllegalArgumentException("File is null or empty");
         }
         if (file.getContentType() == null) {
-            throw new IllegalArgumentException("Invalid file type");
+            throw new IllegalArgumentException("Invalid file Type");
         }
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
@@ -85,7 +85,7 @@ public class UploadServiceImpl implements IUploadService {
             HttpEntity<?> entity = new HttpEntity<>(builder.build(), headers);
             ResponseEntity<String> response = restTemplate.exchange(uploadApiUrl, HttpMethod.POST, entity, String.class);
             if (response.getBody() == null) {
-                throw new RuntimeException("Server response is empty");
+                throw new RuntimeException("Server Response is empty");
             }
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonResponse = objectMapper.readTree(response.getBody());
@@ -127,7 +127,7 @@ public class UploadServiceImpl implements IUploadService {
 
     @Transactional
     @Override
-    public DeleteResponse delete(DeleteRequestDto dto) {
+    public DeleteResponse delete(DeleteRequestDTO dto) {
         String path = extractPathFromFilepath(dto.getFilepath());
         String encodedPath = Base64.getEncoder().encodeToString(path.getBytes(StandardCharsets.UTF_8));
         String url = deleteApiUrl + encodedPath;

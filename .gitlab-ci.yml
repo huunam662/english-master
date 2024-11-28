@@ -15,7 +15,7 @@ build:
         - tag=$(echo $CI_COMMIT_MESSAGE | sed -r 's/.*(\[tag\])//') 
         - export tag=staging
         - check=$(echo $CI_COMMIT_MESSAGE | sed -r 's/^.*(\[tag\]).*/\1/')
-        # - md5hash=`md5sum ./app/config/release.json | cut -d " " -f 1`
+        # - md5hash=`md5sum ./app/Configuration/release.json | cut -d " " -f 1`
         # - echo "$md5hash"
         - echo "To release new docker image, tagname should be '0.1', your tag is:$tag"
         - cicd_path=$(pwd)/cicd

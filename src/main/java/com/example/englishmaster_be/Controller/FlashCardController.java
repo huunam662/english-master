@@ -1,9 +1,11 @@
 package com.example.englishmaster_be.Controller;
 
-import com.example.englishmaster_be.DTO.FlashCard.*;
+import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
+import com.example.englishmaster_be.DTO.FlashCard.CreateFlashCardDTO;
+import com.example.englishmaster_be.DTO.FlashCard.CreateFlashCardWordDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
-import com.example.englishmaster_be.Model.ResponseModel;
+import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Service.*;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,14 +55,16 @@ public class FlashCardController {
             flashCardWordObject.put("flashCardWord", flashCardWordResponseList);
             responseModel.setMessage("Show list flashcard word successfully");
             responseModel.setResponseData(flashCardWordObject);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }
-        catch (Exception e){responseModel.setMessage("Show list flashcard word fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
+        catch (Exception e){
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Show list flashcard word fail: " + e.getMessage());
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);}
     }
 
 
@@ -83,14 +87,15 @@ public class FlashCardController {
 
             responseModel.setMessage("Show list flashcard successfully");
             responseModel.setResponseData(flashCardResponseList);
-            responseModel.setStatus("success");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }
-        catch (Exception e){responseModel.setMessage("Show list flashcard fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
+        catch (Exception e){
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Show list flashcard fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);}
     }
 
 
@@ -120,14 +125,16 @@ public class FlashCardController {
 
             responseModel.setMessage("Create flashcard successfully");
             responseModel.setResponseData(flashCardResponse);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }
-        catch (Exception e){responseModel.setMessage("Create flashcard fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
+        catch (Exception e){
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Create flashcard fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);}
     }
 
     @PostMapping(value = "/{flashCardId:.+}/addWordToFlashCard", consumes = {"multipart/form-data"})
@@ -148,7 +155,7 @@ public class FlashCardController {
 
             if(!flashCard.getUser().getUserId().equals(user.getUserId())){
                 responseModel.setMessage("You don't add word to flash card ");
-                responseModel.setStatus("success");
+
                 return ResponseEntity.status(HttpStatus.OK).body(responseModel);
             }
 
@@ -189,14 +196,16 @@ public class FlashCardController {
 
             responseModel.setMessage("Create word for flashcard successfully");
             responseModel.setResponseData(flashCardWordResponse);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }
-        catch (Exception e){responseModel.setMessage("Create word for flashcard fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
+        catch (Exception e){
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Create word for flashcard fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);}
     }
 
     @DeleteMapping(value = "/{flashCardId:.+}/removeFlashCard")
@@ -213,14 +222,16 @@ public class FlashCardController {
 
             IFlashCardService.delete(flashCard);
             responseModel.setMessage("Delete flashcard successfully");
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }
-        catch (Exception e){responseModel.setMessage("Delete flashcard fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
+        catch (Exception e){
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Delete flashcard fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);}
     }
 
 
@@ -255,13 +266,15 @@ public class FlashCardController {
             FlashCardResponse flashCardResponse = new FlashCardResponse(flashCard);
             responseModel.setMessage("Update flashcard successfully");
             responseModel.setResponseData(flashCardResponse);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }
-        catch (Exception e){responseModel.setMessage("Update flashcard fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
+        catch (Exception e){
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Update flashcard fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);}
     }
 }

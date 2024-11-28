@@ -1,14 +1,22 @@
 package com.example.englishmaster_be.DTO.Status;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
 
 import java.util.UUID;
 
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateStatusDTO {
-    String statusName;
+
     UUID typeId;
+
+    String statusName;
+
     boolean flag;
+
 }

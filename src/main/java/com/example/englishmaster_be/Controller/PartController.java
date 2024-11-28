@@ -1,7 +1,10 @@
 package com.example.englishmaster_be.Controller;
 
+import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
+import com.example.englishmaster_be.Model.Response.ResponseModel;
+import com.example.englishmaster_be.DTO.Part.CreatePartDTO;
+import com.example.englishmaster_be.DTO.Part.UpdatePartDTO;
 import com.example.englishmaster_be.Helper.GetExtension;
-import com.example.englishmaster_be.DTO.Part.*;
 import com.example.englishmaster_be.DTO.*;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.PartResponse;
@@ -34,7 +37,7 @@ public class PartController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> createPart(@RequestBody CreatePartDTO createpartDTO) {
         ResponseModel responseModel = new ResponseModel();
-
+        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
         try {
             User user = IUserService.currentUser();
 
@@ -48,20 +51,21 @@ public class PartController {
             PartResponse partResponse = new PartResponse(part);
 
             if (checkPart) {
-                responseModel.setMessage("Create part successfully");
+                responseModel.setMessage("Create Part successfully");
                 responseModel.setResponseData(partResponse);
-                responseModel.setStatus("success");
+
             } else {
-                responseModel.setMessage("Create part fail: The part name is already exist");
-                responseModel.setStatus("fail");
+                exceptionResponseModel.setMessage("Create Part fail: The Part name is already exist");
+                exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
             }
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Create part fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            exceptionResponseModel.setMessage("Create Part fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -91,16 +95,16 @@ public class PartController {
 
             PartResponse partResponse = new PartResponse(part);
 
-            responseModel.setMessage("Upload file part successfully");
+            responseModel.setMessage("Upload file Part successfully");
             responseModel.setResponseData(partResponse);
-            responseModel.setStatus("success");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Create part fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Create Part fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -123,16 +127,17 @@ public class PartController {
 
             PartResponse partResponse = new PartResponse(part);
 
-            responseModel.setMessage("Upload file part successfully");
+            responseModel.setMessage("Upload file Part successfully");
             responseModel.setResponseData(partResponse);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Upload file part fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Upload file Part fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -150,16 +155,17 @@ public class PartController {
                 partResponseList.add(partResponse);
             }
 
-            responseModel.setMessage("Show part successfully");
+            responseModel.setMessage("Show Part successfully");
             responseModel.setResponseData(partResponseList);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Show all part: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Show all Part: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -178,15 +184,16 @@ public class PartController {
 
             IPartService.deletePart(part);
 
-            responseModel.setMessage("Delete part successfully");
-            responseModel.setStatus("success");
+            responseModel.setMessage("Delete Part successfully");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Delete part: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Delete Part: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -194,7 +201,7 @@ public class PartController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> updatePart(@PathVariable UUID partId, @RequestBody UpdatePartDTO updatePartDTO) {
         ResponseModel responseModel = new ResponseModel();
-
+        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
         try {
             User user = IUserService.currentUser();
 
@@ -218,20 +225,21 @@ public class PartController {
             if (checkPart) {
                 IPartService.updatePart(part);
 
-                responseModel.setMessage("Update part successfully");
+                responseModel.setMessage("Update Part successfully");
                 responseModel.setResponseData(partResponse);
-                responseModel.setStatus("success");
+
             } else {
-                responseModel.setMessage("Create part fail: The part name is already exist");
-                responseModel.setStatus("fail");
+                exceptionResponseModel.setMessage("Create Part fail: The Part name is already exist");
+                exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
             }
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Create part fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            exceptionResponseModel.setMessage("Create Part fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -247,16 +255,17 @@ public class PartController {
             partResponse.put("partType", part.getPartType());
             partResponse.put("partDescription", part.getPartDescription());
 
-            responseModel.setMessage("Show information part successfully");
+            responseModel.setMessage("Show information Part successfully");
             responseModel.setResponseData(partResponse);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Show information part: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Show information Part: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 }

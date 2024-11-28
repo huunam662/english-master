@@ -1,8 +1,9 @@
 package com.example.englishmaster_be.Controller;
 
 
+import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
 import com.example.englishmaster_be.Helper.EnglishWordDictionary;
-import com.example.englishmaster_be.Model.ResponseModel;
+import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.fasterxml.jackson.databind.*;
 import org.apache.http.Header;
 import org.apache.http.client.methods.*;
@@ -59,20 +60,25 @@ public class DictionaryController {
                 JsonNode jsonResponse = objectMapper.readTree(responseBody);
 
                 responseModel.setMessage("Search successful");
-                responseModel.setStatus("successful");
                 responseModel.setResponseData(jsonResponse);
-            } else {
-                responseModel.setResponseData("Don't search");
-                responseModel.setStatus("fail");
-                responseModel.setViolations(String.valueOf(statusCode));
-            }
 
-            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+                return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+            } else {
+                ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+
+                exceptionResponseModel.setResponseData("Don't search");
+                exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+                exceptionResponseModel.setViolations(String.valueOf(statusCode));
+
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
+            }
         } catch (IOException e) {
-            responseModel.setMessage("Don't search: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+
+            exceptionResponseModel.setMessage("Don't search: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
 
     }
@@ -90,13 +96,13 @@ public class DictionaryController {
 
             responseModel.setResponseData(newSet);
             responseModel.setMessage("Show word successful");
-            responseModel.setStatus("success");
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Don't show word: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Don't show word: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -137,19 +143,19 @@ public class DictionaryController {
                         }
 
                         responseModel.setMessage("show image to word successful");
-                        responseModel.setStatus("successful");
                     } else {
-                        responseModel.setResponseData("Don't search image to word");
+                        responseModel.setMessage("Don't search image to word");
                         responseModel.setViolations(String.valueOf(statusCode));
                     }
                 }
             }
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Don't show image: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Don't show image: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 

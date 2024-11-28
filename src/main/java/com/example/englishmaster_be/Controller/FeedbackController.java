@@ -1,6 +1,8 @@
 package com.example.englishmaster_be.Controller;
 
-import com.example.englishmaster_be.DTO.Feedback.*;
+import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
+import com.example.englishmaster_be.Model.Response.ResponseModel;
+import com.example.englishmaster_be.DTO.Feedback.CreateFeedbackDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Service.*;
@@ -83,16 +85,16 @@ public class FeedbackController {
             }
 
             responseObject.put("listFeedback", feedbackResponseList);
-            responseModel.setMessage("List feedback successful");
+            responseModel.setMessage("List Feedback successful");
             responseModel.setResponseData(responseObject);
-            responseModel.setStatus("success");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
-            responseModel.setMessage("List feedback fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("List Feedback fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -117,16 +119,17 @@ public class FeedbackController {
                 feedbackResponseList.add(feedbackResponse);
             }
 
-            responseModel.setMessage("List feedback successful");
+            responseModel.setMessage("List Feedback successful");
             responseModel.setResponseData(feedbackResponseList);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
-            responseModel.setMessage("List feedback fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("List Feedback fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -155,16 +158,16 @@ public class FeedbackController {
                 IFileStorageService.save(createFeedbackDTO.getAvatar(), fileNameImage);
             }
             FeedbackResponse feedbackResponse = new FeedbackResponse(feedback);
-            responseModel.setMessage("Create feedback successful");
+            responseModel.setMessage("Create Feedback successful");
             responseModel.setResponseData(feedbackResponse);
-            responseModel.setStatus("success");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
-            responseModel.setMessage("Create feedback fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Create Feedback fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -180,25 +183,24 @@ public class FeedbackController {
             IFeedbackService.save(Feedback);
             if(enable){
                 responseModel.setMessage("Enable Feedback successful");
-                responseModel.setStatus("success");
             }else {
                 responseModel.setMessage("Disable Feedback successful");
-                responseModel.setStatus("success");
             }
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
             if(enable){
-                responseModel.setMessage("Enable Feedback fail: " + e.getMessage());
-                responseModel.setStatus("fail");
-            }else {
-                responseModel.setMessage("Disable Feedback fail: "+ e.getMessage());
-                responseModel.setStatus("fail");
-            }
+                exceptionResponseModel.setMessage("Enable Feedback fail: " + e.getMessage());
 
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            }else {
+                exceptionResponseModel.setMessage("Disable Feedback fail: "+ e.getMessage());
+
+            }
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -238,13 +240,13 @@ public class FeedbackController {
             FeedbackResponse feedbackResponse = new FeedbackResponse(feedback);
             responseModel.setMessage("Update Feedback successful");
             responseModel.setResponseData(feedbackResponse);
-            responseModel.setStatus("success");
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
-            responseModel.setMessage("Update Feedback fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Update Feedback fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -261,14 +263,14 @@ public class FeedbackController {
             IFeedbackService.delete(feedback);
 
             responseModel.setMessage("Delete Feedback successful");
-            responseModel.setStatus("success");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
-            responseModel.setMessage("Delete Feedback fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Delete Feedback fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 }

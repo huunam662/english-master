@@ -2,18 +2,27 @@ package com.example.englishmaster_be.Model.Response;
 
 import com.example.englishmaster_be.Model.User;
 import lombok.*;
-
+import lombok.experimental.FieldDefaults;
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+
 @Getter
 @Setter
-@Data
-@AllArgsConstructor
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ConfirmationTokenResponse {
-    private UUID userConfirmTokenId;
-    private LocalDateTime createAt;
-    private String type;
-    private String code;
-    private User user;
+
+    UUID userConfirmTokenId;
+
+    String type;
+
+    String code;
+
+    User user;
+
+    LocalDateTime createAt;
+
 }

@@ -1,5 +1,7 @@
 package com.example.englishmaster_be.Controller;
 
+import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
+import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.DTO.FlashCard.CreateFlashCardWordDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.FlashCardWordResponse;
@@ -36,14 +38,16 @@ public class FlashCardWordController {
 
             IFlashCardWordService.delete(flashCardWord);
             responseModel.setMessage("Delete flashcard word successfully");
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }
-        catch (Exception e){responseModel.setMessage("Delete flashcard word fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
+        catch (Exception e){
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Delete flashcard word fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);}
     }
 
     @PutMapping(value = "/{flashCardWordId:.+}/updateWord", consumes = {"multipart/form-data"})
@@ -95,14 +99,17 @@ public class FlashCardWordController {
             FlashCardWordResponse flashCardWordResponse = new FlashCardWordResponse(flashCardWord);
             responseModel.setMessage("Update flashcard word successfully");
             responseModel.setResponseData(flashCardWordResponse);
-            responseModel.setStatus("success");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }
-        catch (Exception e){responseModel.setMessage("Update flashcard word fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);}
+        catch (Exception e){
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Update flashcard word fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
+        }
     }
 
     @GetMapping("/searchByWord")
@@ -117,16 +124,16 @@ public class FlashCardWordController {
 
             responseModel.setMessage("Show list flashcard word successfully");
             responseModel.setResponseData(responseArray);
-            responseModel.setStatus("success");
 
 
             return ResponseEntity.status(HttpStatus.OK)
                     .body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Show list flashcard word fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Show list flashcard word fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 }

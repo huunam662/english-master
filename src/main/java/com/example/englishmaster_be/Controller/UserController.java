@@ -1,12 +1,16 @@
 package com.example.englishmaster_be.Controller;
 
+import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
+import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Configuration.jwt.JwtUtils;
 import com.example.englishmaster_be.DTO.*;
-import com.example.englishmaster_be.DTO.User.*;
+import com.example.englishmaster_be.DTO.User.ChangePassDTO;
+import com.example.englishmaster_be.DTO.User.ChangeProfileDTO;
 import com.example.englishmaster_be.Exception.Response.ApiResponse;
 import com.example.englishmaster_be.Exception.Response.ResponseUtil;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
+import com.example.englishmaster_be.Model.Response.AuthResponse;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.*;
 import com.example.englishmaster_be.Service.impl.UserServiceImpl;
@@ -118,22 +122,24 @@ public class UserController {
 
         ResponseModel responseModel = new ResponseModel();
         ConfirmationToken confirmToken = confirmationTokenRepository.findByCodeAndType(confirmationToken, "ACTIVE");
+
+        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
         if (confirmToken == null) {
-            responseModel.setMessage("Invalid verification code!");
-            responseModel.setStatus("fail");
-            return responseModel;
+            exceptionResponseModel.setMessage("Invalid verification code!");
+            exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+            return exceptionResponseModel;
         }
 
         if (confirmToken.getUser().isEnabled()) {
-            responseModel.setMessage("Account has been verified!");
-            responseModel.setStatus("fail");
-            return responseModel;
+            exceptionResponseModel.setMessage("Account has been verified!");
+            exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+            return exceptionResponseModel;
         }
 
         if ((confirmToken.getCreateAt().plusMinutes(5)).isBefore(LocalDateTime.now())) {
-            responseModel.setMessage("Verification code has expired, Please register again!");
-            responseModel.setStatus("fail");
-            return responseModel;
+            exceptionResponseModel.setMessage("Verification code has expired, Please register again!");
+            exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+            return exceptionResponseModel;
         }
 
         User user = confirmToken.getUser();
@@ -142,7 +148,6 @@ public class UserController {
         userRepository.save(user);
 
         responseModel.setMessage("Account has been successfully verified!");
-        responseModel.setStatus("success");
         return responseModel;
     }
 
@@ -167,13 +172,13 @@ public class UserController {
             AuthResponse authResponse = new AuthResponse(jwt, refreshToken.getCode());
 
             responseModel.setMessage("login successful");
-            responseModel.setStatus("success");
             responseModel.setResponseData(authResponse);
             return responseModel;
         } catch (AuthenticationException e) {
-            responseModel.setMessage("login fail");
-            responseModel.setStatus("fail");
-            return responseModel;
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("login fail");
+            exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+            return exceptionResponseModel;
         }
     }
 
@@ -184,16 +189,18 @@ public class UserController {
 
         boolean checkEmailExists = IUserService.existsEmail(email);
 
+        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+
         if (email == null || email.isEmpty()) {
-            responseModel.setMessage("Vui lòng điền email để được hỗ trợ");
-            responseModel.setStatus("fail");
-            return responseModel;
+            exceptionResponseModel.setMessage("Vui lòng điền email để được hỗ trợ");
+            exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+            return exceptionResponseModel;
         }
 
         if (!checkEmailExists) {
-            responseModel.setMessage("Không tìm thấy email " + email);
-            responseModel.setStatus("fail");
-            return responseModel;
+            exceptionResponseModel.setMessage("Không tìm thấy email " + email);
+            exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+            return exceptionResponseModel;
         }
 
         String otp = IOtpService.generateOtp(email);
@@ -201,7 +208,7 @@ public class UserController {
         sendOtpToEmail(email, otp);
 
         responseModel.setMessage("Kiểm tra email của bạn để xác thực mã OTP.");
-        responseModel.setStatus("success");
+
         return responseModel;
     }
 
@@ -210,23 +217,25 @@ public class UserController {
 
         ResponseModel responseModel = new ResponseModel();
 
+        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+
         if (otp == null || otp.isEmpty()) {
-            responseModel.setMessage("OTP không được bỏ trống");
-            responseModel.setStatus("fail");
-            return responseModel;
+            exceptionResponseModel.setMessage("OTP không được bỏ trống");
+            exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+            return exceptionResponseModel;
         }
 
         boolean isOtpValid = IOtpService.validateOtp(otp);
 
         if (!isOtpValid) {
-            responseModel.setMessage("Mã OTP đã hết hiệu lực");
-            responseModel.setStatus("fail");
-            return responseModel;
+            exceptionResponseModel.setMessage("Mã OTP đã hết hiệu lực");
+            exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+            return exceptionResponseModel;
         }
 
         IOtpService.updateOtpStatusToVerified(otp);
         responseModel.setMessage("Mã OTP đã được xác thực thành công.");
-        responseModel.setStatus("success");
+
 
         return responseModel;
     }
@@ -242,34 +251,34 @@ public class UserController {
         // Regex để kiểm tra mật khẩu
         String regexPassword = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";
 
-
+        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
         boolean isOtpValid = IOtpService.validateOtp(otp);
 
         if (!isOtpValid) {
-            responseModel.setMessage("Mã OTP đã hết hạn");
-            responseModel.setStatus("fail");
-            return responseModel;
+            exceptionResponseModel.setMessage("Mã OTP đã hết hạn");
+            exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+            return exceptionResponseModel;
         }
 
         if (newPassword == null || newPassword.isEmpty()) {
-            responseModel.setMessage("Mật khẩu mới không được bỏ trống");
-            responseModel.setStatus("fail");
-            return responseModel;
+            exceptionResponseModel.setMessage("Mật khẩu mới không được bỏ trống");
+            exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+            return exceptionResponseModel;
         }
 
         // Kiểm tra mật khẩu mới có đúng định dạng theo regex hay không
         if (!newPassword.matches(regexPassword)) {
-            responseModel.setMessage("Mật khẩu mới phải chứa ít nhất 1 chữ số, " +
+            exceptionResponseModel.setMessage("Mật khẩu mới phải chứa ít nhất 1 chữ số, " +
                     "1 chữ thường, 1 chữ hoa, 1 ký tự đặc biệt và không được có khoảng trắng, " +
                     "độ dài từ 8 đến 20 ký tự.");
-            responseModel.setStatus("fail");
-            return responseModel;
+            exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+            return exceptionResponseModel;
         }
 
         if (!newPassword.equals(confirmPassword)) {
-            responseModel.setMessage("Mật khẩu mới và xác nhận mật khẩu không khớp");
-            responseModel.setStatus("fail");
-            return responseModel;
+            exceptionResponseModel.setMessage("Mật khẩu mới và xác nhận mật khẩu không khớp");
+            exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+            return exceptionResponseModel;
         }
 
         boolean isPasswordUpdated = IUserService.updatePassword(otp, newPassword);
@@ -277,11 +286,11 @@ public class UserController {
         if (isPasswordUpdated) {
             IOtpService.deleteOtp(otp);
             responseModel.setMessage("Mật khẩu đã được thay đổi thành công.");
-            responseModel.setStatus("success");
+
             return responseModel;
         } else {
             responseModel.setMessage("Không thể thay đổi mật khẩu. Vui lòng thử lại.");
-            responseModel.setStatus("fail");
+
             return responseModel;
         }
     }
@@ -292,20 +301,20 @@ public class UserController {
         ResponseModel responseModel = new ResponseModel();
 
         ConfirmationToken confirmToken = confirmationTokenRepository.findByCodeAndType(token, "RESET_PASSWORD");
-
+        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
         if (confirmToken == null) {
-            responseModel.setMessage("Invalid reset code!");
-            responseModel.setStatus("fail");
-            return responseModel;
+            exceptionResponseModel.setMessage("Invalid reset code!");
+            exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+            return exceptionResponseModel;
         }
 
         if (confirmToken.getCreateAt().plusMinutes(5).isBefore(LocalDateTime.now())) {
-            responseModel.setMessage("Reset code has expired!");
-            responseModel.setStatus("fail");
-            return responseModel;
+            exceptionResponseModel.setMessage("Reset code has expired!");
+            exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+            return exceptionResponseModel;
         }
 
-        responseModel.setStatus("success");
+
         responseModel.setMessage("Successful!");
         responseModel.setResponseData(token);
 
@@ -320,10 +329,12 @@ public class UserController {
 
         ConfirmationToken token = IRefreshTokenService.findByToken(refresh);
 
+        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+
         if (token == null) {
-            responseModel.setMessage("Refresh token isn't in database!");
-            responseModel.setStatus("fail");
-            return responseModel;
+            exceptionResponseModel.setMessage("Refresh token isn't in database!");
+            exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+            return exceptionResponseModel;
         }
 
         responseModel = IRefreshTokenService.verifyExpiration(responseModel, token);
@@ -338,7 +349,6 @@ public class UserController {
 
         obj.put("accessToken", newToken);
 
-        responseModel.setStatus("success");
         responseModel.setMessage("Created new access token");
         responseModel.setResponseData(obj);
 
@@ -363,15 +373,16 @@ public class UserController {
             objectResponse.put("User", userResponse);
 
             responseModel.setResponseData(objectResponse);
-            responseModel.setMessage("Information user successfully");
-            responseModel.setStatus("success");
+            responseModel.setMessage("Information User successfully");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Information user fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Information User fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -404,15 +415,16 @@ public class UserController {
             objectResponse.put("Role", user.getRole().getRoleName().equals("ROLE_ADMIN") ? "ADMIN" : "USER");
             objectResponse.put("User", userResponse);
             responseModel.setResponseData(objectResponse);
-            responseModel.setMessage("Change profile user successfully");
-            responseModel.setStatus("success");
+            responseModel.setMessage("Change profile User successfully");
+
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Change profile user fail: " + e.getMessage());
-            responseModel.setStatus("fail");
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Change profile User fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             log.warn(e.getMessage());
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -421,6 +433,7 @@ public class UserController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> changePass(@RequestBody ChangePassDTO changePassDTO) {
         ResponseModel responseModel = new ResponseModel();
+        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
         try {
             User user = IUserService.currentUser();
 
@@ -432,43 +445,43 @@ public class UserController {
             Pattern p = Pattern.compile(regex);
 
             if (!changePassDTO.getConfirmPass().equals(changePassDTO.getNewPass())) {
-                responseModel.setMessage("Password and confirm password don't match");
-                responseModel.setStatus("fail");
-                return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+                exceptionResponseModel.setMessage("Password and confirm password don't match");
+                exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
             }
 
             Matcher m = p.matcher(changePassDTO.getNewPass());
             if (!m.matches()) {
-                responseModel.setMessage("Password must contain at least 1 uppercase, 1 lowercase, 1 numeric, 1 special character and no spaces");
-                responseModel.setStatus("fail");
-                return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+                exceptionResponseModel.setMessage("Password must contain at least 1 uppercase, 1 lowercase, 1 numeric, 1 special character and no spaces");
+                exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
             }
 
 
             if (!passwordEncoder.matches(changePassDTO.getOldPass(), user.getPassword())) {
-                responseModel.setMessage("Old password don't correct");
-                responseModel.setStatus("fail");
-                return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+                exceptionResponseModel.setMessage("Old password don't correct");
+                exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
             }
 
             if (passwordEncoder.matches(changePassDTO.getNewPass(), user.getPassword())) {
-                responseModel.setMessage("New password can't be the same as the old one");
-                responseModel.setStatus("fail");
-                return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+                exceptionResponseModel.setMessage("New password can't be the same as the old one");
+                exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+                return ResponseEntity.status(HttpStatus.OK).body(exceptionResponseModel);
             }
 
             user.setPassword(passwordEncoder.encode(changePassDTO.getNewPass()));
             IUserService.save(user);
 
-            responseModel.setMessage("Change pass user successfully");
-            responseModel.setStatus("success");
+            responseModel.setMessage("Change pass User successfully");
+
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Change pass user fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            exceptionResponseModel.setMessage("Change pass User fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -552,16 +565,16 @@ public class UserController {
 
             responseModel.setMessage("Show list mock test result successfully");
             responseModel.setResponseData(responseObject);
-            responseModel.setStatus("success");
 
 
             return ResponseEntity.status(HttpStatus.OK)
                     .body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Show list mock test result fail: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Show list mock test result fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
@@ -581,13 +594,13 @@ public class UserController {
             IRefreshTokenService.deleteRefreshToken(refreshToken);
 
             responseModel.setMessage("Logout successful");
-            responseModel.setStatus("success");
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            responseModel.setMessage("Logout failed: " + e.getMessage());
-            responseModel.setStatus("fail");
-            responseModel.setViolations(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseModel);
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Logout failed: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
 
