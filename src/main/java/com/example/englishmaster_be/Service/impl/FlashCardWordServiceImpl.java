@@ -35,7 +35,7 @@ public class FlashCardWordServiceImpl implements IFlashCardWordService {
 
     @Override
     public FlashCardWord findWordToID(UUID wordId) {
-        return flashCardWordRepository.findById(wordId).orElseThrow(() -> new IllegalArgumentException("flashCard word not found with ID: " + wordId));
+        return flashCardWordRepository.findById(wordId).orElseThrow(() -> new IllegalArgumentException("FlashCard word not found with ID: " + wordId));
     }
 
 }

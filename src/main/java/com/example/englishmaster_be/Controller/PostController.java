@@ -2,7 +2,7 @@ package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
-import com.example.englishmaster_be.DTO.post.CreatePostDTO;
+import com.example.englishmaster_be.DTO.Post.CreatePostDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Service.*;
@@ -69,7 +69,7 @@ public class PostController {
                 postResponseList.add(postResponse);
             }
 
-            responseModel.setMessage("List post successful");
+            responseModel.setMessage("List Post successful");
             responseModel.setResponseData(postResponseList);
 
 
@@ -77,7 +77,7 @@ public class PostController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("List post fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("List Post fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -98,7 +98,7 @@ public class PostController {
             IPostService.save(post);
 
             PostResponse postResponse = new PostResponse(post);
-            responseModel.setMessage("Create post successful");
+            responseModel.setMessage("Create Post successful");
             responseModel.setResponseData(postResponse);
 
 
@@ -106,7 +106,7 @@ public class PostController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Create post fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Create Post fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -124,7 +124,7 @@ public class PostController {
             Post post = IPostService.findPostById(postId);
 
             if(!post.getUserPost().getUserId().equals(user.getUserId())){
-                exceptionResponseModel.setMessage("Don't update post");
+                exceptionResponseModel.setMessage("Don't update Post");
                 exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
             }
@@ -135,14 +135,14 @@ public class PostController {
             IPostService.save(post);
 
             PostResponse postResponse = new PostResponse(post);
-            responseModel.setMessage("Update post successful");
+            responseModel.setMessage("Update Post successful");
             responseModel.setResponseData(postResponse);
 
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
-            exceptionResponseModel.setMessage("Update post fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Update Post fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -167,7 +167,7 @@ public class PostController {
                 }
             }
 
-            responseModel.setMessage("Show list comment successful");
+            responseModel.setMessage("Show list Comment successful");
             responseModel.setResponseData(commentResponseList);
 
 
@@ -175,7 +175,7 @@ public class PostController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Show list comment fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Show list Comment fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -191,16 +191,16 @@ public class PostController {
             User user = IUserService.currentUser();
             Post post = IPostService.findPostById(postId);
             if(!post.getUserPost().getUserId().equals(user.getUserId())){
-                exceptionResponseModel.setMessage("Don't delete post");
+                exceptionResponseModel.setMessage("Don't delete Post");
                 exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
             }
             IPostService.delete(post);
-            responseModel.setMessage("Delete post successful");
+            responseModel.setMessage("Delete Post successful");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
-            exceptionResponseModel.setMessage("Delete post fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Delete Post fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);

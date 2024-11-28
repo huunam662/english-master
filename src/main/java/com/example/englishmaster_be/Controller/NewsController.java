@@ -2,7 +2,7 @@ package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
-import com.example.englishmaster_be.DTO.news.CreateNewsDTO;
+import com.example.englishmaster_be.DTO.News.CreateNewsDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Service.*;
@@ -84,14 +84,14 @@ public class NewsController {
             }
 
             responseObject.put("listNews", newsResponseList);
-            responseModel.setMessage("List news successful");
+            responseModel.setMessage("List News successful");
             responseModel.setResponseData(responseObject);
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("List news fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("List News fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -119,14 +119,14 @@ public class NewsController {
                 newsResponseList.add(newsResponse);
             }
 
-            responseModel.setMessage("List news successful");
+            responseModel.setMessage("List News successful");
             responseModel.setResponseData(newsResponseList);
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("List news fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("List News fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -157,14 +157,14 @@ public class NewsController {
                 IFileStorageService.save(createNewsDTO.getImage(), fileNameImage);
             }
             NewsResponse newsResponse = new NewsResponse(news);
-            responseModel.setMessage("Create news successful");
+            responseModel.setMessage("Create News successful");
             responseModel.setResponseData(newsResponse);
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Create news fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Create News fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -182,10 +182,10 @@ public class NewsController {
 
             INewsService.save(news);
             if(enable){
-                responseModel.setMessage("Enable news successful");
+                responseModel.setMessage("Enable News successful");
 
             }else {
-                responseModel.setMessage("Disable news successful");
+                responseModel.setMessage("Disable News successful");
             }
 
 
@@ -193,10 +193,10 @@ public class NewsController {
         }catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
             if(enable){
-                exceptionResponseModel.setMessage("Enable news fail: " + e.getMessage());
+                exceptionResponseModel.setMessage("Enable News fail: " + e.getMessage());
 
             }else {
-                exceptionResponseModel.setMessage("Disable news fail: "+ e.getMessage());
+                exceptionResponseModel.setMessage("Disable News fail: "+ e.getMessage());
 
             }
 
@@ -239,13 +239,13 @@ public class NewsController {
             INewsService.save(news);
 
             NewsResponse newsResponse = new NewsResponse(news);
-            responseModel.setMessage("Update news successful");
+            responseModel.setMessage("Update News successful");
             responseModel.setResponseData(newsResponse);
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Update news fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Update News fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -264,13 +264,13 @@ public class NewsController {
 
             INewsService.delete(news);
 
-            responseModel.setMessage("Delete news successful");
+            responseModel.setMessage("Delete News successful");
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Delete news fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Delete News fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);

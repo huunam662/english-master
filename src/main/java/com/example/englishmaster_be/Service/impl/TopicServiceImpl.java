@@ -8,6 +8,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -31,7 +32,7 @@ public class TopicServiceImpl implements ITopicService {
     @Override
     public Topic findTopicById(UUID topicId) {
         return topicRepository.findByTopicId(topicId)
-                .orElseThrow(() -> new IllegalArgumentException("topic not found with ID: " + topicId));
+                .orElseThrow(() -> new IllegalArgumentException("Topic not found with ID: " + topicId));
     }
 
     @Override
@@ -49,7 +50,7 @@ public class TopicServiceImpl implements ITopicService {
     @Override
     public List<Part> getPartToTopic(UUID topicId) {
         Topic topic = topicRepository.findByTopicId(topicId)
-                .orElseThrow(() -> new IllegalArgumentException("topic not found with ID: " + topicId));
+                .orElseThrow(() -> new IllegalArgumentException("Topic not found with ID: " + topicId));
         Page<Part> page = partRepository.findByTopics(topic, PageRequest.of(0, 7, Sort.by(Sort.Order.asc("partName"))));
         return page.getContent();
     }
@@ -57,9 +58,9 @@ public class TopicServiceImpl implements ITopicService {
     @Override
     public List<Question> getQuestionOfPartToTopic(UUID topicId, UUID partId) {
         Topic topic = topicRepository.findByTopicId(topicId)
-                .orElseThrow(() -> new IllegalArgumentException("topic not found with ID: " + topicId));
+                .orElseThrow(() -> new IllegalArgumentException("Topic not found with ID: " + topicId));
         Part part = partRepository.findByPartId(partId)
-                .orElseThrow(() -> new IllegalArgumentException("part not found with ID: " + partId));
+                .orElseThrow(() -> new IllegalArgumentException("Part not found with ID: " + partId));
         List<Question> listQuestion = questionRepository.findByTopicsAndPart(topic, part);
         Collections.shuffle(listQuestion);
         return listQuestion;
@@ -69,9 +70,9 @@ public class TopicServiceImpl implements ITopicService {
     @Override
     public void addPartToTopic(UUID topicId, UUID partId) {
         Topic topic = topicRepository.findByTopicId(topicId)
-                .orElseThrow(() -> new IllegalArgumentException("topic not found with ID: " + topicId));
+                .orElseThrow(() -> new IllegalArgumentException("Topic not found with ID: " + topicId));
         Part part = partRepository.findByPartId(partId)
-                .orElseThrow(() -> new IllegalArgumentException("part not found with ID: " + partId));
+                .orElseThrow(() -> new IllegalArgumentException("Part not found with ID: " + partId));
 
         if (topic.getParts() == null) {
             topic.setParts(new ArrayList<>());
@@ -83,9 +84,9 @@ public class TopicServiceImpl implements ITopicService {
     @Override
     public boolean deletePartToTopic(UUID topicId, UUID partId) {
         Topic topic = topicRepository.findByTopicId(topicId)
-                .orElseThrow(() -> new IllegalArgumentException("topic not found with ID: " + topicId));
+                .orElseThrow(() -> new IllegalArgumentException("Topic not found with ID: " + topicId));
         Part part = partRepository.findByPartId(partId)
-                .orElseThrow(() -> new IllegalArgumentException("part not found with ID: " + partId));
+                .orElseThrow(() -> new IllegalArgumentException("Part not found with ID: " + partId));
 
         for (Part partTopic : topic.getParts()) {
             if (partTopic.equals(part)) {
@@ -139,7 +140,7 @@ public class TopicServiceImpl implements ITopicService {
     public int totalQuestion(Part part, UUID topicId) {
         int total = 0;
         Topic topic = topicRepository.findByTopicId(topicId)
-                .orElseThrow(() -> new IllegalArgumentException("topic not found with ID: " + topicId));
+                .orElseThrow(() -> new IllegalArgumentException("Topic not found with ID: " + topicId));
 
         for (Question question : topic.getQuestions()) {
             if (question.getPart().getPartId() == part.getPartId()) {
@@ -156,8 +157,8 @@ public class TopicServiceImpl implements ITopicService {
 
 
     @Override
-    public List<Topic> getTopicsByStartTime(Date startTime) {
-        return topicRepository.findTopicsByStartTime(startTime);
+    public List<Topic> getTopicsByStartTime(LocalDateTime startTime) {
+        return topicRepository.findByStartTime(startTime);
     }
 
 }

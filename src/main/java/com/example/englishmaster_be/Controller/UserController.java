@@ -4,8 +4,8 @@ import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Configuration.jwt.JwtUtils;
 import com.example.englishmaster_be.DTO.*;
-import com.example.englishmaster_be.DTO.user.ChangePassDTO;
-import com.example.englishmaster_be.DTO.user.ChangeProfileDTO;
+import com.example.englishmaster_be.DTO.User.ChangePassDTO;
+import com.example.englishmaster_be.DTO.User.ChangeProfileDTO;
 import com.example.englishmaster_be.Exception.Response.ApiResponse;
 import com.example.englishmaster_be.Exception.Response.ResponseUtil;
 import com.example.englishmaster_be.Model.*;
@@ -373,13 +373,13 @@ public class UserController {
             objectResponse.put("User", userResponse);
 
             responseModel.setResponseData(objectResponse);
-            responseModel.setMessage("Information user successfully");
+            responseModel.setMessage("Information User successfully");
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Information user fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Information User fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -415,12 +415,12 @@ public class UserController {
             objectResponse.put("Role", user.getRole().getRoleName().equals("ROLE_ADMIN") ? "ADMIN" : "USER");
             objectResponse.put("User", userResponse);
             responseModel.setResponseData(objectResponse);
-            responseModel.setMessage("Change profile user successfully");
+            responseModel.setMessage("Change profile User successfully");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Change profile user fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Change profile User fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             log.warn(e.getMessage());
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
@@ -473,12 +473,12 @@ public class UserController {
             user.setPassword(passwordEncoder.encode(changePassDTO.getNewPass()));
             IUserService.save(user);
 
-            responseModel.setMessage("Change pass user successfully");
+            responseModel.setMessage("Change pass User successfully");
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            exceptionResponseModel.setMessage("Change pass user fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Change pass User fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -623,7 +623,7 @@ public class UserController {
     private void sendOtpToEmail(String email, String otp) throws MessagingException, IOException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        String otpMessage = "Ma OTP xac thuc la " + otp + ", hieu luc 10 phut";
+        String otpMessage = "Mã OTP xác thực là " + otp + ", hiệu lực 1 phút";
 
         // Nếu bạn vẫn muốn sử dụng template, thay thế nội dung theo cách này:
         String templateContent = readTemplateContent("sendOtpEmail.html");

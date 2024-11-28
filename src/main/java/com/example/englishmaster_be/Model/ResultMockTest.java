@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Model;
 
-import com.example.englishmaster_be.DTO.mockTest.CreateResultMockTestDTO;
+import com.example.englishmaster_be.DTO.MockTest.CreateResultMockTestDTO;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

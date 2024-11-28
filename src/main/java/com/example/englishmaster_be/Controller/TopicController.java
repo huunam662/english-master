@@ -4,12 +4,12 @@ import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Constant.StatusConstant;
 import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
-import com.example.englishmaster_be.DTO.question.CreateQuestionByExcelFileDTO;
+import com.example.englishmaster_be.DTO.Question.CreateQuestionByExcelFileDTO;
 import com.example.englishmaster_be.Exception.CustomException;
 import com.example.englishmaster_be.Helper.GetExtension;
-import com.example.englishmaster_be.DTO.answer.CreateListAnswerDTO;
-import com.example.englishmaster_be.DTO.question.CreateQuestionDTO;
-import com.example.englishmaster_be.DTO.topic.*;
+import com.example.englishmaster_be.DTO.Answer.CreateListAnswerDTO;
+import com.example.englishmaster_be.DTO.Question.CreateQuestionDTO;
+import com.example.englishmaster_be.DTO.Topic.*;
 import com.example.englishmaster_be.DTO.UploadFileDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
@@ -84,14 +84,14 @@ public class TopicController {
         try {
             Topic topic = ITopicService.findTopicById(topicId);
 
-            responseModel.setMessage("Show list topic successfully");
+            responseModel.setMessage("Show list Topic successfully");
             responseModel.setResponseData(new TopicResponse(topic));
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Show list topic fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Show list Topic fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -129,13 +129,13 @@ public class TopicController {
             createTopicDTO.getListPart().forEach(partId -> ITopicService.addPartToTopic(topic.getTopicId(), partId));
 
             TopicResponse topicResponse = new TopicResponse(topic);
-            responseModel.setMessage("Create topic successfully");
+            responseModel.setMessage("Create Topic successfully");
             responseModel.setResponseData(topicResponse);
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Create topic failed: " + e.getMessage());
+            exceptionResponseModel.setMessage("Create Topic failed: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -171,13 +171,13 @@ public class TopicController {
             ITopicService.createTopic(topic);
             createTopicByExcelFileDTO.getListPart().forEach(partId -> ITopicService.addPartToTopic(topic.getTopicId(), partId));
             TopicResponse topicResponse = new TopicResponse(topic);
-            responseModel.setMessage("Create topic successfully");
+            responseModel.setMessage("Create Topic successfully");
             responseModel.setResponseData(topicResponse);
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Create topic failed: " + e.getMessage());
+            exceptionResponseModel.setMessage("Create Topic failed: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -225,13 +225,13 @@ public class TopicController {
             topic.setParts(listPart);
             ITopicService.createTopic(topic);
             TopicResponse topicResponse = new TopicResponse(topic);
-            responseModel.setMessage("Update topic successfully");
+            responseModel.setMessage("Update Topic successfully");
             responseModel.setResponseData(topicResponse);
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Update topic fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Update Topic fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -251,13 +251,13 @@ public class TopicController {
             topic.setUserUpdate(user);
             topic.setUpdateAt(LocalDateTime.now());
             TopicResponse topicResponse = new TopicResponse(topic);
-            responseModel.setMessage("Update topic successfully");
+            responseModel.setMessage("Update Topic successfully");
             responseModel.setResponseData(topicResponse);
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Update topic fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Update Topic fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -272,7 +272,7 @@ public class TopicController {
             Topic topic = ITopicService.findTopicById(topicId);
             ITopicService.deleteTopic(topic);
             IFileStorageService.delete(topic.getTopicImage());
-            responseModel.setMessage("Delete topic successfully");
+            responseModel.setMessage("Delete Topic successfully");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (IllegalArgumentException e) {
@@ -365,7 +365,7 @@ public class TopicController {
 
             responseObject.put("listTopic", topicResponseList);
 
-            responseModel.setMessage("Show list topic successfully");
+            responseModel.setMessage("Show list Topic successfully");
             responseModel.setResponseData(responseObject);
 
 
@@ -374,7 +374,7 @@ public class TopicController {
                     .body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Show list topic fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Show list Topic fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -387,7 +387,7 @@ public class TopicController {
         ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
         if (id == null) {
             exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
-            exceptionResponseModel.setMessage("topic ID is required");
+            exceptionResponseModel.setMessage("Topic ID is required");
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
         }
 
@@ -397,7 +397,7 @@ public class TopicController {
 
         if (topic == null) {
             exceptionResponseModel.setStatus(HttpStatus.NOT_FOUND);
-            exceptionResponseModel.setMessage("topic not found");
+            exceptionResponseModel.setMessage("Topic not found");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponseModel);
         }
 
@@ -419,7 +419,7 @@ public class TopicController {
                 responseArray.add(topic.getTopicName());
             }
 
-            responseModel.setMessage("Show list 5 topic name successfully");
+            responseModel.setMessage("Show list 5 Topic name successfully");
             responseModel.setResponseData(responseArray);
 
 
@@ -428,7 +428,7 @@ public class TopicController {
                     .body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Show list 5 topic name fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Show list 5 Topic name fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -443,13 +443,13 @@ public class TopicController {
         try {
             ITopicService.addPartToTopic(topicId, partId);
 
-            responseModel.setMessage("Add part to topic successful");
+            responseModel.setMessage("Add Part to Topic successful");
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Add part to topic fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Add Part to Topic fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -465,10 +465,10 @@ public class TopicController {
             boolean check = ITopicService.deletePartToTopic(topicId, partId);
 
             if (check) {
-                responseModel.setMessage("Delete part to topic successful");
+                responseModel.setMessage("Delete Part to Topic successful");
 
             } else {
-                exceptionResponseModel.setMessage("Delete part to topic fail: topic don't have part");
+                exceptionResponseModel.setMessage("Delete Part to Topic fail: Topic don't have Part");
                 exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
 
@@ -477,7 +477,7 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
 
         } catch (Exception e) {
-            exceptionResponseModel.setMessage("Delete part to topic fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Delete Part to Topic fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -608,16 +608,16 @@ public class TopicController {
                     questionResponse.setAnswerCorrect(answerCorrect.getAnswerId());
                 }
                 responseModel.setResponseData(questionResponse);
-                responseModel.setMessage("Add question to topic successfully");
+                responseModel.setMessage("Add Question to Topic successfully");
             } else {
-                responseModel.setMessage("part of question don't have in topic");
+                responseModel.setMessage("Part of Question don't have in Topic");
             }
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Add question to topic fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Add Question to Topic fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -723,9 +723,9 @@ public class TopicController {
                     topic.setUserUpdate(user);
                     topic.setUpdateAt(LocalDateTime.now());
                     ITopicService.addQuestionToTopic(topic, question);
-                    responseModel.setMessage("Add question to topic successfully");
+                    responseModel.setMessage("Add Question to Topic successfully");
                 } else {
-                    responseModel.setMessage("part of question don't have in topic");
+                    responseModel.setMessage("Part of Question don't have in Topic");
                 }
             }
 
@@ -733,7 +733,7 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Add question to topic fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Add Question to Topic fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -755,7 +755,7 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Add question to topic fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Add Question to Topic fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -776,7 +776,7 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Add question to topic fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Add Question to Topic fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -797,7 +797,7 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Add question to topic fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Add Question to Topic fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -818,7 +818,7 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Add question to topic fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Add Question to Topic fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -839,7 +839,7 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Add question to topic fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Add Question to Topic fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -862,9 +862,9 @@ public class TopicController {
                 topic.setUpdateAt(LocalDateTime.now());
 
                 ITopicService.deleteQuestionToTopic(topic, question);
-                responseModel.setMessage("Delete question to topic successfully");
+                responseModel.setMessage("Delete Question to Topic successfully");
             } else {
-                responseModel.setMessage("question don't have in topic");
+                responseModel.setMessage("Question don't have in Topic");
             }
 
             JSONObject response = new JSONObject();
@@ -877,7 +877,7 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Delete question to topic fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Delete Question to Topic fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -902,7 +902,7 @@ public class TopicController {
                 responseArray.add(partResponse);
             }
 
-            responseModel.setMessage("Show part to topic successfully");
+            responseModel.setMessage("Show Part to Topic successfully");
 
             responseModel.setResponseData(responseArray);
 
@@ -910,7 +910,7 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Show part to topic fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Show Part to Topic fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -957,14 +957,14 @@ public class TopicController {
                 }
             }
 
-            responseModel.setMessage("Show question of part to topic successfully");
+            responseModel.setMessage("Show Question of Part to Topic successfully");
             responseModel.setResponseData(questionResponseList);
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Show question of part to topic fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Show Question of Part to Topic fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -983,7 +983,7 @@ public class TopicController {
 
             if (topic == null) {
 
-                exceptionResponseModel.setMessage("topic not found");
+                exceptionResponseModel.setMessage("Topic not found");
                 exceptionResponseModel.setStatus(HttpStatus.NOT_FOUND);
                 exceptionResponseModel.setViolations(String.valueOf(HttpStatus.NOT_FOUND));
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponseModel);
@@ -997,12 +997,12 @@ public class TopicController {
 
             ITopicService.createTopic(topic);
 
-            responseModel.setMessage(enable ? "topic enabled successfully" : "topic disabled successfully");
+            responseModel.setMessage(enable ? "Topic enabled successfully" : "Topic disabled successfully");
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
-            exceptionResponseModel.setMessage("Failed to enable/disable topic: " + e.getMessage());
+            exceptionResponseModel.setMessage("Failed to enable/disable Topic: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -1028,7 +1028,7 @@ public class TopicController {
                     }
                 }
             }
-            responseModel.setMessage("Show list comment successful");
+            responseModel.setMessage("Show list Comment successful");
             responseModel.setResponseData(commentResponseList);
 
 
@@ -1036,7 +1036,7 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Show list comment fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Show list Comment fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -1065,13 +1065,13 @@ public class TopicController {
                 }
             }
 
-            // Xử lý content
+            // Xử lý Content
             processContent(createQuestionDTO.getContentImage(), createQuestionDTO.getContentAudio(), question, user);
 
-            // Lưu câu hỏi đã cập nhật với content
+            // Lưu câu hỏi đã cập nhật với Content
             IQuestionService.createQuestion(question);
 
-            // Xử lý topic
+            // Xử lý Topic
             Topic topic = ITopicService.findTopicById(topicId);
             Part part = question.getPart();
 
@@ -1079,9 +1079,9 @@ public class TopicController {
                 topic.setUserUpdate(user);
                 topic.setUpdateAt(LocalDateTime.now());
                 ITopicService.addQuestionToTopic(topic, question);
-                responseModel.setMessage("Add question to topic successfully");
+                responseModel.setMessage("Add Question to Topic successfully");
             } else {
-                responseModel.setMessage("part of question don't have in topic");
+                responseModel.setMessage("Part of Question don't have in Topic");
             }
         }
     }
@@ -1164,7 +1164,7 @@ public class TopicController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponseModel);
             }
 
-            responseModel.setMessage("topic retrieved successful");
+            responseModel.setMessage("Topic retrieved successful");
 
             responseModel.setResponseData(topics);
 

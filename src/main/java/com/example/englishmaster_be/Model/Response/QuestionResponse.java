@@ -103,7 +103,7 @@ public class QuestionResponse {
                     .toList();
         }
 
-        // Xử lý content
+        // Xử lý Content
         this.contentList = new JSONArray();
 
         if (Objects.nonNull(question.getContentCollection())) {

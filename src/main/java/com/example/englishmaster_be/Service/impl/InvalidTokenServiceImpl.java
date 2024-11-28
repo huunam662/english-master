@@ -33,7 +33,7 @@ public class InvalidTokenServiceImpl implements IInvalidTokenService {
                 throw new IllegalArgumentException("Token không hợp lệ hoặc đã hết hạn.");
             }
 
-            // Tạo đối tượng invalidToken và lưu vào cơ sở dữ liệu
+            // Tạo đối tượng InvalidToken và lưu vào cơ sở dữ liệu
             InvalidToken invalidToken = InvalidToken.builder()
                     .expireTime(dateExpire)
                     .token(token)

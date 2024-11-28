@@ -67,7 +67,7 @@ public class UploadServiceImpl implements IUploadService {
             throw new IllegalArgumentException("File is null or empty");
         }
         if (file.getContentType() == null) {
-            throw new IllegalArgumentException("Invalid file type");
+            throw new IllegalArgumentException("Invalid file Type");
         }
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();

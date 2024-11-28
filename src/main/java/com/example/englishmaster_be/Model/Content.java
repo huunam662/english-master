@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Model;
 
-import com.example.englishmaster_be.DTO.content.CreateContentDTO;
+import com.example.englishmaster_be.DTO.Content.CreateContentDTO;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-@Table(name = "content")
+@Table(name = "Content")
 @Getter
 @Setter
 @Builder

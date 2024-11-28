@@ -35,7 +35,7 @@ public class MockTestServiceImpl implements IMockTestService {
                 .orElseThrow(() -> new CustomException(Error.MOCK_TEST_NOT_FOUND));
 
         MockTestResponse mockTestResponse = new MockTestResponse(mockTest);
-        responseModel.setMessage("Find mockTest successfully");
+        responseModel.setMessage("Find MockTest successfully");
         responseModel.setResponseData(mockTestResponse);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseModel);

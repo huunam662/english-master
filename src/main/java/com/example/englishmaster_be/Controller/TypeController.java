@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
-import com.example.englishmaster_be.DTO.type.CreateTypeDTO;
+import com.example.englishmaster_be.DTO.Type.CreateTypeDTO;
 import com.example.englishmaster_be.Model.Response.TypeResponse;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Service.ITypeService;
@@ -40,7 +40,7 @@ public class TypeController {
         JSONObject responseObject = new JSONObject();
         responseObject.put("typeList", typeList);
 
-        responseModel.setMessage("List type successful");
+        responseModel.setMessage("List Type successful");
         responseModel.setResponseData(responseObject);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseModel);
@@ -53,7 +53,7 @@ public class TypeController {
         ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
         TypeResponse typeResponse = typeService.getTypeById(id);
         if (typeResponse == null) {
-            exceptionResponseModel.setMessage("No type found");
+            exceptionResponseModel.setMessage("No Type found");
             exceptionResponseModel.setStatus(HttpStatus.NOT_FOUND);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponseModel);
@@ -61,7 +61,7 @@ public class TypeController {
         JSONObject responseObject = new JSONObject();
         responseObject.put("type", typeResponse);
 
-        responseModel.setMessage("type successful");
+        responseModel.setMessage("Type successful");
         responseModel.setResponseData(responseObject);
 
 
@@ -75,7 +75,7 @@ public class TypeController {
         TypeResponse typeResponse = typeService.createType(createTypeDTO);
         if (typeResponse == null) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Create type failed");
+            exceptionResponseModel.setMessage("Create Type failed");
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -83,7 +83,7 @@ public class TypeController {
         JSONObject responseObject = new JSONObject();
         responseObject.put("type", typeResponse);
 
-        responseModel.setMessage("Create type successful");
+        responseModel.setMessage("Create Type successful");
         responseModel.setResponseData(responseObject);
 
 
@@ -97,13 +97,13 @@ public class TypeController {
         TypeResponse typeResponse = typeService.getTypeById(id);
         if (typeResponse == null) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("No type found");
+            exceptionResponseModel.setMessage("No Type found");
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
         typeService.deleteTypeById(id);
-        responseModel.setMessage("Delete account of user successful");
+        responseModel.setMessage("Delete account of User successful");
 
 
         return ResponseEntity.status(HttpStatus.OK).body(responseModel);

@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Model;
 
-import com.example.englishmaster_be.DTO.question.*;
+import com.example.englishmaster_be.DTO.Question.*;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-@Table(name = "question")
+@Table(name = "Question")
 @Getter
 @Setter
 @NoArgsConstructor

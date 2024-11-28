@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
-import com.example.englishmaster_be.DTO.topic.CreateListQuestionByExcelFileDTO;
-import com.example.englishmaster_be.DTO.topic.CreateTopicByExcelFileDTO;
+import com.example.englishmaster_be.DTO.Topic.CreateListQuestionByExcelFileDTO;
+import com.example.englishmaster_be.DTO.Topic.CreateTopicByExcelFileDTO;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Service.IExcelService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +52,10 @@ public class ImportExcelFileController {
             return errorResponseModel;
         }
 
-        // Validate that part is either 6 or 7
+        // Validate that Part is either 6 or 7
         if (part != 6 && part != 7) {
             errorResponseModel.setStatus(HttpStatus.BAD_REQUEST);
-            errorResponseModel.setMessage("Invalid part value. It must be either 6 or 7.");
+            errorResponseModel.setMessage("Invalid Part value. It must be either 6 or 7.");
             return errorResponseModel;
         }
 
@@ -104,10 +104,10 @@ public class ImportExcelFileController {
             return errorResponseModel;
         }
 
-        // Validate that part is either 1 or 2
+        // Validate that Part is either 1 or 2
         if (part != 1 && part != 2) {
             errorResponseModel.setStatus(HttpStatus.BAD_REQUEST);
-            errorResponseModel.setMessage("Invalid part value. It must be either 1 or 2.");
+            errorResponseModel.setMessage("Invalid Part value. It must be either 1 or 2.");
             return errorResponseModel;
         }
 
@@ -135,10 +135,10 @@ public class ImportExcelFileController {
             return errorResponseModel;
         }
 
-        // Validate that part is either 3 or 4
+        // Validate that Part is either 3 or 4
         if (part != 3 && part != 4) {
             errorResponseModel.setStatus(HttpStatus.BAD_REQUEST);
-            errorResponseModel.setMessage("Invalid part value. It must be either 3 or 4.");
+            errorResponseModel.setMessage("Invalid Part value. It must be either 3 or 4.");
             return errorResponseModel;
         }
 

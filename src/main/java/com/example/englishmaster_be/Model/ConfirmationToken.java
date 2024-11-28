@@ -23,7 +23,7 @@ public class ConfirmationToken {
 	@Column(name = "id")
     UUID userConfirmTokenId;
 
-    @Column(name = "type")
+    @Column(name = "Type")
     String type;
 
     @Column(name = "code")

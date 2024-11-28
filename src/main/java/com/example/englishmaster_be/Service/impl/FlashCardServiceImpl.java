@@ -18,7 +18,7 @@ public class FlashCardServiceImpl implements IFlashCardService {
     private FlashCardRepository flashCardRepository;
     @Override
     public FlashCard findFlashCardToId(UUID flashCardId) {
-        return flashCardRepository.findByFlashCardId(flashCardId).orElseThrow(() -> new IllegalArgumentException("flashCard not found with ID: " + flashCardId));
+        return flashCardRepository.findByFlashCardId(flashCardId).orElseThrow(() -> new IllegalArgumentException("FlashCard not found with ID: " + flashCardId));
     }
 
     @Override

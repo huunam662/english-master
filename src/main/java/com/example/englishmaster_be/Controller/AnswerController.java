@@ -2,7 +2,7 @@ package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
-import com.example.englishmaster_be.DTO.answer.*;
+import com.example.englishmaster_be.DTO.Answer.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Service.*;
@@ -50,16 +50,16 @@ public class AnswerController {
 
                 AnswerResponse answerResponse = new AnswerResponse(answer);
 
-                responseModel.setMessage("Create answer successfully");
+                responseModel.setMessage("Create Answer successfully");
                 responseModel.setResponseData(answerResponse);
             } else {
-                responseModel.setMessage("Had correct answer");
+                responseModel.setMessage("Had correct Answer");
             }
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel errorResponseModel = new ExceptionResponseModel();
-            errorResponseModel.setMessage("Create answer fail: " + e.getMessage());
+            errorResponseModel.setMessage("Create Answer fail: " + e.getMessage());
             errorResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             errorResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponseModel);
@@ -93,16 +93,16 @@ public class AnswerController {
 
                 AnswerResponse answerResponse = new AnswerResponse(answer);
 
-                responseModel.setMessage("Update answer successfully");
+                responseModel.setMessage("Update Answer successfully");
                 responseModel.setResponseData(answerResponse);
             } else {
-                responseModel.setMessage("Had correct answer");
+                responseModel.setMessage("Had correct Answer");
             }
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel errorResponseModel = new ExceptionResponseModel();
-            errorResponseModel.setMessage("Update answer fail: " + e.getMessage());
+            errorResponseModel.setMessage("Update Answer fail: " + e.getMessage());
             errorResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             errorResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponseModel);
@@ -117,12 +117,12 @@ public class AnswerController {
             Answer answer = IAnswerService.findAnswerToId(answerId);
             IAnswerService.deleteAnswer(answer);
 
-            responseModel.setMessage("Delete answer successfully");
+            responseModel.setMessage("Delete Answer successfully");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel errorResponseModel = new ExceptionResponseModel();
-            errorResponseModel.setMessage("Delete answer fail: " + e.getMessage());
+            errorResponseModel.setMessage("Delete Answer fail: " + e.getMessage());
             errorResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             errorResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponseModel);
@@ -139,14 +139,14 @@ public class AnswerController {
 
             AnswerResponse answerResponse = new AnswerResponse(answer);
 
-            responseModel.setMessage("Detail answer successfully");
+            responseModel.setMessage("Detail Answer successfully");
             responseModel.setResponseData(answerResponse);
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel errorResponseModel = new ExceptionResponseModel();
-            errorResponseModel.setMessage("Detail answer fail: " + e.getMessage());
+            errorResponseModel.setMessage("Detail Answer fail: " + e.getMessage());
             errorResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             errorResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponseModel);
@@ -165,13 +165,13 @@ public class AnswerController {
             responseObject.put("correctAnswer", check);
             responseObject.put("scoreAnswer", score);
 
-            responseModel.setMessage("Check answer successfully");
+            responseModel.setMessage("Check Answer successfully");
             responseModel.setResponseData(responseObject);
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel errorResponseModel = new ExceptionResponseModel();
-            errorResponseModel.setMessage("Check answer fail: " + e.getMessage());
+            errorResponseModel.setMessage("Check Answer fail: " + e.getMessage());
             errorResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             errorResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponseModel);

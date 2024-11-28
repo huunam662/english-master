@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "comment")
+@Table(name = "Comment")
 @Getter
 @Setter
 @Builder
@@ -25,7 +25,7 @@ public class Comment implements Serializable {
     @Column(name = "id")
     UUID commentId;
 
-    @Column(name = "content")
+    @Column(name = "Content")
     String content;
 
     @Temporal(TemporalType.TIMESTAMP)

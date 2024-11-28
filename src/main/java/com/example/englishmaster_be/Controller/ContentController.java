@@ -34,14 +34,14 @@ public class ContentController {
         ContentResponse contentResponse = new ContentResponse(content);
         System.out.println(contentResponse);
         if (content != null) {
-            responseModel.setMessage("Get content successful");
+            responseModel.setMessage("Get Content successful");
             responseModel.setResponseData(contentResponse);
             return ResponseEntity.ok(responseModel);
         }
 
         ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
 
-        exceptionResponseModel.setMessage("Get content failed");
+        exceptionResponseModel.setMessage("Get Content failed");
         exceptionResponseModel.setResponseData(null);
         exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
@@ -52,13 +52,13 @@ public class ContentController {
         ResponseModel responseModel = new ResponseModel();
         String content = contentRepository.findContentDataByTopicIdAndCode(topicId, code);
         if (content != null) {
-            responseModel.setMessage("Get content successful");
+            responseModel.setMessage("Get Content successful");
             responseModel.setResponseData(content);
             return ResponseEntity.ok(responseModel);
         }
         ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
 
-        exceptionResponseModel.setMessage("Get content failed");
+        exceptionResponseModel.setMessage("Get Content failed");
         exceptionResponseModel.setResponseData(null);
         exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
@@ -70,13 +70,13 @@ public class ContentController {
         Content content = contentRepository.findByContentData(contentData).orElse(null);
         ContentResponse contentResponse = new ContentResponse(content);
         if (content != null) {
-            responseModel.setMessage("Get content successful");
+            responseModel.setMessage("Get Content successful");
             responseModel.setResponseData(contentResponse);
             return ResponseEntity.ok(responseModel);
         }
         ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
 
-        exceptionResponseModel.setMessage("Get content failed");
+        exceptionResponseModel.setMessage("Get Content failed");
         exceptionResponseModel.setResponseData(null);
         exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
@@ -91,13 +91,13 @@ public class ContentController {
         contentRepository.save(content);
         ContentResponse contentResponse = new ContentResponse(content);
         if (content != null) {
-            responseModel.setMessage("Get content successful");
+            responseModel.setMessage("Get Content successful");
             responseModel.setResponseData(contentResponse);
             return ResponseEntity.ok(responseModel);
         }
         ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
 
-        exceptionResponseModel.setMessage("Get content failed");
+        exceptionResponseModel.setMessage("Get Content failed");
         exceptionResponseModel.setResponseData(null);
         exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);

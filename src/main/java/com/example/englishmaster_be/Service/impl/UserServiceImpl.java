@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Constant.RoleConstant;
-import com.example.englishmaster_be.DTO.confirmationToken.CreateConfirmationTokenDTO;
+import com.example.englishmaster_be.DTO.ConfirmationToken.CreateConfirmationTokenDTO;
 import com.example.englishmaster_be.DTO.UserRegisterDTO;
 import com.example.englishmaster_be.Exception.Response.ResourceNotFoundException;
 import com.example.englishmaster_be.Exception.Response.ResponseNotFoundException;
@@ -81,7 +81,7 @@ public class UserServiceImpl implements IUserService {
         try {
             userNew = userRepository.save(userNew);
         } catch (DataIntegrityViolationException exception) {
-            throw new ResourceNotFoundException("user already exists");
+            throw new ResourceNotFoundException("User already exists");
         }
 
         ConfirmationTokenResponse confirmationTokenResponse = confirmationTokenService.createConfirmationToken(

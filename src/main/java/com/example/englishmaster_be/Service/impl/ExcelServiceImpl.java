@@ -2,10 +2,10 @@ package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Constant.PartConstant;
 import com.example.englishmaster_be.Exception.Error;
-import com.example.englishmaster_be.DTO.answer.CreateListAnswerDTO;
-import com.example.englishmaster_be.DTO.question.CreateQuestionByExcelFileDTO;
-import com.example.englishmaster_be.DTO.topic.CreateListQuestionByExcelFileDTO;
-import com.example.englishmaster_be.DTO.topic.CreateTopicByExcelFileDTO;
+import com.example.englishmaster_be.DTO.Answer.CreateListAnswerDTO;
+import com.example.englishmaster_be.DTO.Question.CreateQuestionByExcelFileDTO;
+import com.example.englishmaster_be.DTO.Topic.CreateListQuestionByExcelFileDTO;
+import com.example.englishmaster_be.DTO.Topic.CreateTopicByExcelFileDTO;
 import com.example.englishmaster_be.Exception.CustomException;
 import com.example.englishmaster_be.Repository.ContentRepository;
 import com.example.englishmaster_be.Repository.PackRepository;
@@ -260,7 +260,7 @@ public class ExcelServiceImpl implements IExcelService {
                     Row row = sheet.getRow(i);
                     if (row == null) continue;
                     String firstCellValue = getStringCellValue(row, 0);
-                    if (firstCellValue.equalsIgnoreCase("question content")) {
+                    if (firstCellValue.equalsIgnoreCase("Question Content")) {
                         if (currentReadingPart != null) {
                             readingParts.add(currentReadingPart);
                         }

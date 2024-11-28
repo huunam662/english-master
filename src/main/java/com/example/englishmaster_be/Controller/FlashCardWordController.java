@@ -2,7 +2,7 @@ package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
-import com.example.englishmaster_be.DTO.flashCard.CreateFlashCardWordDTO;
+import com.example.englishmaster_be.DTO.FlashCard.CreateFlashCardWordDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.FlashCardWordResponse;
 import com.example.englishmaster_be.Service.*;

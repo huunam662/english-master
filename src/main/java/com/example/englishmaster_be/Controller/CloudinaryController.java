@@ -31,16 +31,16 @@ public class CloudinaryController {
 			// Upload file lên Cloudinary và lấy kết quả
 			Map<String, Object> data = cloudinaryService.uploadFile(file);
 
-			// Lấy url và type từ kết quả
+			// Lấy url và Type từ kết quả
 			String imageUrl = (String) data.get("url");
 			String fileType = (String) data.get("type");
 
-			// Tạo một Map chỉ chứa url và type
+			// Tạo một Map chỉ chứa url và Type
 			Map<String, Object> responseData = new HashMap<>();
 			responseData.put("url", imageUrl);
 			responseData.put("type", fileType);
 
-			// Thiết lập message, responseData và status
+			// Thiết lập message, responseData và Status
 			responseModel.setMessage("File uploaded successfully");
 			responseModel.setResponseData(responseData);
 
@@ -48,7 +48,7 @@ public class CloudinaryController {
 			return ResponseEntity.ok(responseModel);
 		} catch (Exception e) {
 			ExceptionResponseModel errorResponseModel = new ExceptionResponseModel();
-			// Thiết lập message và status cho lỗi chung
+			// Thiết lập message và Status cho lỗi chung
 			errorResponseModel.setMessage("File upload failed: " + e.getMessage());
 			errorResponseModel.setResponseData(null);
 			errorResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);

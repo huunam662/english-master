@@ -27,17 +27,6 @@ import java.util.List;
 public class GlobalExceptionHandler {
 
 
-    @ExceptionHandler(value = RefreshTokenException.class)
-    public ExceptionResponseModel handleTokenRefreshException(RefreshTokenException ex, WebRequest request) {
-
-        return ExceptionResponseModel.builder()
-                .success(Boolean.FALSE)
-                .message(ex.getMessage())
-                .status(HttpStatus.FORBIDDEN)
-                .code(HttpStatus.FORBIDDEN.value())
-                .build();
-    }
-
     @ExceptionHandler(CustomException.class)
     public ExceptionResponseModel handleCustomException(CustomException e) {
 

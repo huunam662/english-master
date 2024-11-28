@@ -2,7 +2,7 @@ package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
-import com.example.englishmaster_be.DTO.comment.*;
+import com.example.englishmaster_be.DTO.Comment.*;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Service.*;
@@ -48,13 +48,13 @@ public class CommentController {
                 }
             }
 
-            responseModel.setMessage("Show list comment child successful");
+            responseModel.setMessage("Show list Comment child successful");
             responseModel.setResponseData(commentResponseList);
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Show list comment child fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Show list Comment child fail: " + e.getMessage());
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -78,16 +78,16 @@ public class CommentController {
             ICommentService.save(comment);
 
             CommentResponse commentResponse = new CommentResponse(comment, ICommentService.checkCommentParent(comment));
-            messagingTemplate.convertAndSend("/comment/topic/"+topicId, commentResponse);
+            messagingTemplate.convertAndSend("/Comment/Topic/"+topicId, commentResponse);
 
-            responseModel.setMessage("Create comment successful");
+            responseModel.setMessage("Create Comment successful");
             responseModel.setResponseData(commentResponse);
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Create comment fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Create Comment fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -111,16 +111,16 @@ public class CommentController {
             ICommentService.save(comment);
 
             CommentResponse commentResponse = new CommentResponse(comment, ICommentService.checkCommentParent(comment));
-            messagingTemplate.convertAndSend("/comment/post/"+postId, commentResponse);
+            messagingTemplate.convertAndSend("/Comment/Post/"+postId, commentResponse);
 
-            responseModel.setMessage("Create comment successful");
+            responseModel.setMessage("Create Comment successful");
             responseModel.setResponseData(commentResponse);
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Create comment fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Create Comment fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -151,16 +151,16 @@ public class CommentController {
             ICommentService.save(comment);
 
             CommentResponse commentResponse = new CommentResponse(comment, ICommentService.checkCommentParent(comment));
-            messagingTemplate.convertAndSend("/comment/commentParent/"+commentId, commentResponse);
+            messagingTemplate.convertAndSend("/Comment/commentParent/"+commentId, commentResponse);
 
-            responseModel.setMessage("Create comment successful");
+            responseModel.setMessage("Create Comment successful");
             responseModel.setResponseData(commentResponse);
 
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Create comment fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Create Comment fail: " + e.getMessage());
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -177,7 +177,7 @@ public class CommentController {
             Comment comment = ICommentService.findCommentToId(commentId);
 
             if(!comment.getUserComment().getUserId().equals(user.getUserId())){
-                responseModel.setMessage("Don't update comment");
+                responseModel.setMessage("Don't update Comment");
                 return ResponseEntity.status(HttpStatus.OK).body(responseModel);
             }
 
@@ -187,14 +187,14 @@ public class CommentController {
             ICommentService.save(comment);
 
             CommentResponse commentResponse = new CommentResponse(comment, ICommentService.checkCommentParent(comment));
-            responseModel.setMessage("Update comment successful");
+            responseModel.setMessage("Update Comment successful");
             responseModel.setResponseData(commentResponse);
-            messagingTemplate.convertAndSend("/comment/updateComment/"+commentId, commentResponse);
+            messagingTemplate.convertAndSend("/Comment/updateComment/"+commentId, commentResponse);
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Update comment fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Update Comment fail: " + e.getMessage());
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -211,20 +211,20 @@ public class CommentController {
             Comment comment = ICommentService.findCommentToId(commentId);
 
             if(!comment.getUserComment().getUserId().equals(user.getUserId())){
-                responseModel.setMessage("Don't update comment");
+                responseModel.setMessage("Don't update Comment");
                 return ResponseEntity.status(HttpStatus.OK).body(responseModel);
             }
 
             ICommentService.deleteComment(comment);
 
-            responseModel.setMessage("Delete comment successful");
+            responseModel.setMessage("Delete Comment successful");
 
-            messagingTemplate.convertAndSend("/comment/deleteComment/"+commentId, commentId);
+            messagingTemplate.convertAndSend("/Comment/deleteComment/"+commentId, commentId);
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         }catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Delete comment fail: " + e.getMessage());
+            exceptionResponseModel.setMessage("Delete Comment fail: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);

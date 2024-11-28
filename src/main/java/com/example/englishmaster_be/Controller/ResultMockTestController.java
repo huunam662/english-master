@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
-import com.example.englishmaster_be.DTO.mockTest.CreateResultMockTestDTO;
+import com.example.englishmaster_be.DTO.MockTest.CreateResultMockTestDTO;
 import com.example.englishmaster_be.Model.Response.ResultMockTestResponse;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Service.IResultMockTestService;

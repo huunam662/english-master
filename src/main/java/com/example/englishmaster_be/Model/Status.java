@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "status")
+@Table(name = "Status")
 @Getter
 @Setter
 @Builder
@@ -30,7 +30,7 @@ public class Status implements Serializable {
     boolean flag;
 
     @ManyToOne
-    @JoinColumn(name = "type", referencedColumnName = "id")
+    @JoinColumn(name = "Type", referencedColumnName = "id")
     Type type;
 
     @OneToMany(mappedBy = "status")

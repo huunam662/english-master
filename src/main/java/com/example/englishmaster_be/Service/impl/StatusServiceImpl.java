@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.status.CreateStatusDTO;
-import com.example.englishmaster_be.DTO.status.UpdateStatusDTO;
+import com.example.englishmaster_be.DTO.Status.CreateStatusDTO;
+import com.example.englishmaster_be.DTO.Status.UpdateStatusDTO;
 import com.example.englishmaster_be.Model.QStatus;
 import com.example.englishmaster_be.Model.Response.StatusResponse;
 import com.example.englishmaster_be.Model.Status;

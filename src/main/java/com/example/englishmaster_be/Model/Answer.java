@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Model;
 
-import com.example.englishmaster_be.DTO.answer.CreateAnswerDTO;
+import com.example.englishmaster_be.DTO.Answer.CreateAnswerDTO;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -13,7 +13,7 @@ import java.util.Objects;
 import java.util.UUID;
 
 @Entity
-@Table(name = "answer")
+@Table(name = "Answer")
 @Getter
 @Setter
 @Builder
@@ -27,7 +27,7 @@ public class Answer implements Serializable {
     @Column(name = "id")
     UUID answerId;
 
-    @Column(name = "content")
+    @Column(name = "Content")
     String answerContent;
 
     @Column(name = "explain_details")

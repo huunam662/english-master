@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "post")
+@Table(name = "Post")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -25,7 +25,7 @@ public class Post implements Serializable {
     @Column(name = "id")
     UUID postId;
 
-    @Column(name = "content")
+    @Column(name = "Content")
     String content;
 
     @Temporal(TemporalType.TIMESTAMP)

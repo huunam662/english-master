@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "type")
+@Table(name = "Type")
 @Getter
 @Setter
 @Builder

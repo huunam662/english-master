@@ -89,7 +89,7 @@ public class AdminController {
 
             responseObject.put("listUser", userResponseList);
 
-            responseModel.setMessage("List user successful");
+            responseModel.setMessage("List User successful");
             responseModel.setResponseData(responseObject);
 
 
@@ -97,7 +97,7 @@ public class AdminController {
         } catch (Exception e) {
             ExceptionResponseModel errorResponseModel = new ExceptionResponseModel();
 
-            errorResponseModel.setMessage("List user fail: " + e.getMessage());
+            errorResponseModel.setMessage("List User fail: " + e.getMessage());
             errorResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             errorResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponseModel);
@@ -115,9 +115,9 @@ public class AdminController {
             IUserService.save(user);
 
             if (enable) {
-                responseModel.setMessage("Enable account of user successful");
+                responseModel.setMessage("Enable account of User successful");
             } else {
-                responseModel.setMessage("Disable account of user successful");
+                responseModel.setMessage("Disable account of User successful");
             }
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
@@ -125,9 +125,9 @@ public class AdminController {
             ExceptionResponseModel errorResponseModel = new ExceptionResponseModel();
 
             if (enable) {
-                errorResponseModel.setMessage("Enable account of user fail" + e.getMessage());
+                errorResponseModel.setMessage("Enable account of User fail" + e.getMessage());
             } else {
-                errorResponseModel.setMessage("Disable account of user fail" + e.getMessage());
+                errorResponseModel.setMessage("Disable account of User fail" + e.getMessage());
             }
             errorResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             errorResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
@@ -144,13 +144,13 @@ public class AdminController {
 
             IUserService.delete(user);
 
-            responseModel.setMessage("Delete account of user successful");
+            responseModel.setMessage("Delete account of User successful");
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel errorResponseModel = new ExceptionResponseModel();
 
-            errorResponseModel.setMessage("Delete account of user fail" + e.getMessage());
+            errorResponseModel.setMessage("Delete account of User fail" + e.getMessage());
 
             errorResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             errorResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -195,13 +195,13 @@ public class AdminController {
             }
 
 
-            responseModel.setMessage("List topic and count mock test successful");
+            responseModel.setMessage("List Topic and count mock test successful");
             responseModel.setResponseData(responseArray);
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel errorResponseModel = new ExceptionResponseModel();
-            errorResponseModel.setMessage("List topic and count mock test fail: " + e.getMessage());
+            errorResponseModel.setMessage("List Topic and count mock test fail: " + e.getMessage());
             errorResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             errorResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponseModel);

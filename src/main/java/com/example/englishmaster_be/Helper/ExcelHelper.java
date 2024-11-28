@@ -36,45 +36,45 @@ public class ExcelHelper {
 //                Iterator<Cell> cellsInRow = currentRow.iterator();
 //
 //                int cellIdx = 0;
-//                question question = new question();
+//                Question Question = new Question();
 //                while (cellsInRow.hasNext()) {
 //                    Cell currentCell = cellsInRow.next();
 //
 //                    switch (cellIdx) {
 //                        case 1 -> {
-//                            question.setQuestionContent(currentCell.getStringCellValue());
+//                            Question.setQuestionContent(currentCell.getStringCellValue());
 //
 //                        }
 //                        case 2 -> {
-//                            answer answer = new answer();
-//                            answer.setAnswerContent(currentCell.getStringCellValue());
-//                            answer.setCorrectAnswer( currentRow.getCell(6).getStringCellValue().equalsIgnoreCase("A"));
+//                            Answer Answer = new Answer();
+//                            Answer.setAnswerContent(currentCell.getStringCellValue());
+//                            Answer.setCorrectAnswer( currentRow.getCell(6).getStringCellValue().equalsIgnoreCase("A"));
 //
-//                            answer.setQuestion(question);
+//                            Answer.setQuestion(Question);
 //                        }
 //                        case 3 -> {
-//                            answer answer = new answer();
-//                            answer.setAnswerContent(currentCell.getStringCellValue());
-//                            answer.setCorrectAnswer( currentRow.getCell(6).getStringCellValue().equalsIgnoreCase("B"));
+//                            Answer Answer = new Answer();
+//                            Answer.setAnswerContent(currentCell.getStringCellValue());
+//                            Answer.setCorrectAnswer( currentRow.getCell(6).getStringCellValue().equalsIgnoreCase("B"));
 //
-//                            answer.setQuestion(question);
+//                            Answer.setQuestion(Question);
 //                        }
 //                        case 4 -> {
-//                            answer answer = new answer();
-//                            answer.setAnswerContent(currentCell.getStringCellValue());
-//                            answer.setCorrectAnswer( currentRow.getCell(6).getStringCellValue().equalsIgnoreCase("C"));
+//                            Answer Answer = new Answer();
+//                            Answer.setAnswerContent(currentCell.getStringCellValue());
+//                            Answer.setCorrectAnswer( currentRow.getCell(6).getStringCellValue().equalsIgnoreCase("C"));
 //
-//                            answer.setQuestion(question);
+//                            Answer.setQuestion(Question);
 //                        }
 //                        case 5 -> {
-//                            answer answer = new answer();
-//                            answer.setAnswerContent(currentCell.getStringCellValue());
-//                            answer.setCorrectAnswer( currentRow.getCell(6).getStringCellValue().equalsIgnoreCase("D"));
+//                            Answer Answer = new Answer();
+//                            Answer.setAnswerContent(currentCell.getStringCellValue());
+//                            Answer.setCorrectAnswer( currentRow.getCell(6).getStringCellValue().equalsIgnoreCase("D"));
 //
-//                            answer.setQuestion(question);
+//                            Answer.setQuestion(Question);
 //                        }
 //                        case 6 -> {
-////                            question.setQuestionScore((int) currentCell.getNumericCellValue());
+////                            Question.setQuestionScore((int) currentCell.getNumericCellValue());
 //                        }
 //                        default -> {
 //                        }
@@ -82,7 +82,7 @@ public class ExcelHelper {
 //
 //                    cellIdx++;
 //                    }
-////              System.out.println(question.getPart());
+////              System.out.println(Question.getPart());
 //            }
 //            workbook.close();
 //

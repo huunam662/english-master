@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.type.CreateTypeDTO;
+import com.example.englishmaster_be.DTO.Type.CreateTypeDTO;
 import com.example.englishmaster_be.Model.QType;
 import com.example.englishmaster_be.Model.Response.TypeResponse;
 import com.example.englishmaster_be.Model.Type;

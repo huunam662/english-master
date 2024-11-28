@@ -28,7 +28,7 @@ public interface MockTestRepository extends JpaRepository<MockTest, UUID> {
             @Param("year") String year,
             @Param("month") String month,
             @Param("day") String day,
-            @Param("topic") Topic topic
+            @Param("Topic") Topic topic
     );
 
     @Query(value = "SELECT p FROM MockTest p WHERE " +
@@ -38,13 +38,13 @@ public interface MockTestRepository extends JpaRepository<MockTest, UUID> {
     List<MockTest> findAllByYearMonth(
             @Param("year") String year,
             @Param("month") String month,
-            @Param("topic") Topic topic);
+            @Param("Topic") Topic topic);
 
     @Query(value = "SELECT p FROM MockTest p WHERE " +
             "(:year IS NULL OR YEAR(p.createAt) = :year) AND " +
             "( p.topic = :topic)")
     List<MockTest> findAllByYear(
             @Param("year") String year,
-            @Param("topic") Topic topic
+            @Param("Topic") Topic topic
     );
 }

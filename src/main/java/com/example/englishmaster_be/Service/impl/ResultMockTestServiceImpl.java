@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.mockTest.CreateResultMockTestDTO;
+import com.example.englishmaster_be.DTO.MockTest.CreateResultMockTestDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.ResultMockTestResponse;
 import com.example.englishmaster_be.Repository.ResultMockTestRepository;

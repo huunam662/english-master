@@ -12,7 +12,7 @@ import java.util.UUID;
 
 
 @Entity
-@Table(name = "feedback")
+@Table(name = "Feedback")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -29,7 +29,7 @@ public class Feedback implements Serializable {
     @Column(name = "name")
     String name;
 
-    @Column(name = "content")
+    @Column(name = "Content")
     String content;
 
     @Column(name = "description")

@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Service;
 
-import com.example.englishmaster_be.DTO.mockTest.CreateResultMockTestDTO;
+import com.example.englishmaster_be.DTO.MockTest.CreateResultMockTestDTO;
 import com.example.englishmaster_be.Model.Response.ResultMockTestResponse;
 import org.springframework.stereotype.Service;
 

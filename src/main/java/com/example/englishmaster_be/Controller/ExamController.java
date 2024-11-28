@@ -17,6 +17,6 @@ public class ExamController {
     public String userAccess() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        return "user content." + username;
+        return "User Content." + username;
     }
 }

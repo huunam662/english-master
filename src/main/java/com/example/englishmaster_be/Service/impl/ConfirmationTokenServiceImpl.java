@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.confirmationToken.CreateConfirmationTokenDTO;
+import com.example.englishmaster_be.DTO.ConfirmationToken.CreateConfirmationTokenDTO;
 import com.example.englishmaster_be.Mapper.ConfirmationTokenMapper;
 import com.example.englishmaster_be.Model.ConfirmationToken;
 import com.example.englishmaster_be.Model.Response.ConfirmationTokenResponse;

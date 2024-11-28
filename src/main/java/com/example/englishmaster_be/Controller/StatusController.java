@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
-import com.example.englishmaster_be.DTO.status.CreateStatusDTO;
-import com.example.englishmaster_be.DTO.status.UpdateStatusDTO;
+import com.example.englishmaster_be.DTO.Status.CreateStatusDTO;
+import com.example.englishmaster_be.DTO.Status.UpdateStatusDTO;
 import com.example.englishmaster_be.Model.Response.StatusResponse;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Service.IStatusService;
@@ -29,7 +29,7 @@ public class StatusController {
         StatusResponse statusResponse = statusService.createStatus(createStatusDTO);
         if (statusResponse == null) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Create status failed");
+            exceptionResponseModel.setMessage("Create Status failed");
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -37,7 +37,7 @@ public class StatusController {
         JSONObject responseObject = new JSONObject();
         responseObject.put("status", statusResponse);
 
-        responseModel.setMessage("Create status successful");
+        responseModel.setMessage("Create Status successful");
         responseModel.setResponseData(responseObject);
 
 
@@ -50,7 +50,7 @@ public class StatusController {
         List<StatusResponse> statusResponse = statusService.getAllStatusByType(id);
         if (statusResponse.isEmpty()) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("No status found");
+            exceptionResponseModel.setMessage("No Status found");
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -58,7 +58,7 @@ public class StatusController {
         JSONObject responseObject = new JSONObject();
         responseObject.put("statuses", statusResponse);
 
-        responseModel.setMessage("List status successful");
+        responseModel.setMessage("List Status successful");
         responseModel.setResponseData(responseObject);
 
 
@@ -71,7 +71,7 @@ public class StatusController {
         StatusResponse statusResponse = statusService.getStatusById(id);
         if (statusResponse == null) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("No status found");
+            exceptionResponseModel.setMessage("No Status found");
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
@@ -79,7 +79,7 @@ public class StatusController {
         JSONObject responseObject = new JSONObject();
         responseObject.put("statuses", statusResponse);
 
-        responseModel.setMessage("status successful");
+        responseModel.setMessage("Status successful");
         responseModel.setResponseData(responseObject);
 
 
@@ -92,14 +92,14 @@ public class StatusController {
         StatusResponse statusResponse = statusService.updateStatus(updateStatusDTO);
         if (statusResponse == null) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Update status failed");
+            exceptionResponseModel.setMessage("Update Status failed");
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
             exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
         JSONObject responseObject = new JSONObject();
         responseObject.put("status", statusResponse);
-        responseModel.setMessage("Update status successful");
+        responseModel.setMessage("Update Status successful");
         responseModel.setResponseData(responseObject);
 
         return ResponseEntity.status(HttpStatus.OK).body(responseModel);

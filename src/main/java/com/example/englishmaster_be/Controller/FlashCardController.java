@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
-import com.example.englishmaster_be.DTO.flashCard.CreateFlashCardDTO;
-import com.example.englishmaster_be.DTO.flashCard.CreateFlashCardWordDTO;
+import com.example.englishmaster_be.DTO.FlashCard.CreateFlashCardDTO;
+import com.example.englishmaster_be.DTO.FlashCard.CreateFlashCardWordDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Model.Response.ResponseModel;

@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Mapper;
 
-import com.example.englishmaster_be.DTO.confirmationToken.CreateConfirmationTokenDTO;
+import com.example.englishmaster_be.DTO.ConfirmationToken.CreateConfirmationTokenDTO;
 import com.example.englishmaster_be.Model.ConfirmationToken;
 import com.example.englishmaster_be.Model.Response.ConfirmationTokenResponse;
 import org.mapstruct.Mapper;

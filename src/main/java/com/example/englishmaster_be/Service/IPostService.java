@@ -7,6 +7,5 @@ import java.util.UUID;
 public interface IPostService {
     void save(Post post);
     void delete(Post post);
-
     Post findPostById(UUID postId);
 }
