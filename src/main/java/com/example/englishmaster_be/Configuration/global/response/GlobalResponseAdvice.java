@@ -18,6 +18,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
@@ -51,7 +52,7 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
                 && !packageName.contains("org.springdoc.webmvc.ui")
                 && !declaringClass.getPackageName().contains("org.springdoc.webmvc.api")
                 && (
-                    returnType.getMethodAnnotation(MessageResponse.class) != null
+                    returnType.getMethodAnnotation(RestController.class) != null
                     ||
                     returnType.getParameterType().equals(ResponseModel.class)
                     ||
@@ -89,13 +90,13 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
             response.setStatusCode(HttpStatus.OK);
 
             if(body instanceof ResponseModel responseModel){
-                responseModel.setSuccess(true);
+                responseModel.setSuccess(Boolean.TRUE);
                 responseModel.setStatus(HttpStatus.OK);
                 responseModel.setCode(HttpStatus.OK.value());
                 responseModel.setPath(request.getURI().getPath());
             }
             else if(body instanceof ApiResponse<?> apiResponse){
-                apiResponse.setSuccess(true);
+                apiResponse.setSuccess(Boolean.TRUE);
                 apiResponse.setStatus(HttpStatus.OK);
                 apiResponse.setCode(HttpStatus.OK.value());
                 apiResponse.setPath(request.getURI().getPath());
@@ -110,7 +111,7 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
                     exceptionResponseModel.setSuccess(Boolean.FALSE);
                 }
                 else if(bodyEntity instanceof ResponseModel responseModel){
-                    responseModel.setSuccess(true);
+                    responseModel.setSuccess(Boolean.TRUE);
                     responseModel.setStatus(HttpStatus.OK);
                     responseModel.setCode(HttpStatus.OK.value());
                     responseModel.setPath(request.getURI().getPath());
@@ -119,7 +120,7 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
                 body = bodyEntity;
             }
             else body = ResponseModel.builder()
-                    .success(true)
+                    .success(Boolean.TRUE)
                     .status(HttpStatus.OK)
                     .code(HttpStatus.OK.value())
                     .message(MessageResponseHolder.getMessage())

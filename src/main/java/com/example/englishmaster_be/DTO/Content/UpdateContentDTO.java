@@ -1,10 +1,14 @@
 package com.example.englishmaster_be.DTO.Content;
 
+
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
+
 
 @Getter
 @Setter
@@ -12,15 +16,12 @@ import java.util.UUID;
 @AllArgsConstructor
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreateContentDTO {
+public class UpdateContentDTO extends CreateContentDTO{
 
-    UUID contentId;
 
-    UUID topicId;
+    UUID questionId;
 
-    String contentType;
+    @Schema(hidden = true)
+    MultipartFile file;
 
-    String contentData;
-
-    String code;
 }
