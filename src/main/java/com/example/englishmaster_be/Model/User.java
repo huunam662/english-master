@@ -51,7 +51,7 @@ public class User implements Serializable {
     @Column(name = "update_at")
     LocalDateTime updateAt = LocalDateTime.now();
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "role", referencedColumnName = "id")
     Role role;
 
