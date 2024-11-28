@@ -4,6 +4,7 @@ import com.example.englishmaster_be.Exception.Response.ApiResponse;
 import com.example.englishmaster_be.Exception.Response.ResourceNotFoundException;
 import com.example.englishmaster_be.Exception.Response.ResponseUtil;
 import com.example.englishmaster_be.Model.ResponseModel;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -63,13 +64,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(HttpClientErrorException.class)
     ResponseEntity<ResponseModel> handleHttpClientErrorException(HttpClientErrorException exception) {
-        Error error = Error.UPLOAD_FILE_FAILURE;
         ResponseModel responseModel = new ResponseModel();
         responseModel.setStatus("fail");
-        responseModel.setMessage(error.getMessage());
-        responseModel.setViolations(error.getViolation());
+        responseModel.setMessage(exception.getMessage());
+        responseModel.setViolations(exception.getMessage());
         responseModel.setResponseData(null);
-        return ResponseEntity.status(error.getStatusCode()).body(responseModel);
+        return ResponseEntity.status(exception.getStatusCode()).body(responseModel);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -80,6 +80,16 @@ public class GlobalExceptionHandler {
         responseModel.setViolations(exception.getMessage());
         responseModel.setResponseData(null);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseModel);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    ResponseEntity<ResponseModel> handleEntityNotFoundException(EntityNotFoundException e) {
+        ResponseModel responseModel = new ResponseModel();
+        responseModel.setStatus("fail");
+        responseModel.setMessage(e.getMessage());
+        responseModel.setViolations(e.getMessage());
+        responseModel.setResponseData(null);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(responseModel);
     }
 
 }
