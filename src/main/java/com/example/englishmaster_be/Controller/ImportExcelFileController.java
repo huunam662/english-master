@@ -55,7 +55,7 @@ public class ImportExcelFileController {
         // Validate that Part is either 6 or 7
         if (part != 6 && part != 7) {
             errorResponseModel.setStatus(HttpStatus.BAD_REQUEST);
-            errorResponseModel.setMessage("Invalid Part value. It must be either 6 or 7.");
+            errorResponseModel.setMessage("Invalid Part Value. It must be either 6 or 7.");
             return errorResponseModel;
         }
 
@@ -107,7 +107,7 @@ public class ImportExcelFileController {
         // Validate that Part is either 1 or 2
         if (part != 1 && part != 2) {
             errorResponseModel.setStatus(HttpStatus.BAD_REQUEST);
-            errorResponseModel.setMessage("Invalid Part value. It must be either 1 or 2.");
+            errorResponseModel.setMessage("Invalid Part Value. It must be either 1 or 2.");
             return errorResponseModel;
         }
 
@@ -138,7 +138,7 @@ public class ImportExcelFileController {
         // Validate that Part is either 3 or 4
         if (part != 3 && part != 4) {
             errorResponseModel.setStatus(HttpStatus.BAD_REQUEST);
-            errorResponseModel.setMessage("Invalid Part value. It must be either 3 or 4.");
+            errorResponseModel.setMessage("Invalid Part Value. It must be either 3 or 4.");
             return errorResponseModel;
         }
 
