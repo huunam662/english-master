@@ -1,11 +1,13 @@
 package com.example.englishmaster_be.Service.impl;
 
+import com.example.englishmaster_be.DTO.Answer.UserAnswerRequest;
 import com.example.englishmaster_be.Exception.Response.ResponseNotFoundException;
 import com.example.englishmaster_be.Model.AnswerBlank;
 import com.example.englishmaster_be.Model.Question;
 import com.example.englishmaster_be.Repository.AnswerBlankRepository;
 import com.example.englishmaster_be.Repository.QuestionRepository;
 import com.google.gson.JsonObject;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -38,6 +40,20 @@ public class AnswerBlankService {
             jsonArray.add(map);
         }
         return jsonArray;
+
+    }
+
+    @Transactional
+    public void createAnswerBlank(UserAnswerRequest request) {
+        Question question=questionRepository.findByQuestionId(request.getQuestionId())
+                .orElseThrow(
+                        ()-> new ResponseNotFoundException("Not found question with"+ request.getQuestionId())
+                );
+        AnswerBlank answerBlank=new AnswerBlank();
+        answerBlank.setQuestion(question);
+        answerBlank.setPosition(request.getPosition());
+        answerBlank.setAnswer(request.getContent());
+        repository.save(answerBlank);
 
     }
 }
