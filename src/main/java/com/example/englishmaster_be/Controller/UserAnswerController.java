@@ -51,15 +51,7 @@ public class UserAnswerController {
         return ResponseEntity.status(HttpStatus.OK).body(responseModel);
     }
 
-    @GetMapping("/check-correct")
-    public ResponseEntity<ResponseModel> checkCorrectAnswer(@RequestParam(value = "user_id") UUID userId, @RequestParam(value = "question_id") UUID questionId) {
-        Map<String, Integer> score =service.scoreAnswer(questionId,userId);
-        ResponseModel responseModel= new ResponseModel();
-        responseModel.setStatus("success");
-        responseModel.setMessage("Check answer successfully");
-        responseModel.setResponseData(score);
-        return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-    }
+
 
 
 
