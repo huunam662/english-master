@@ -3,7 +3,7 @@ package com.example.englishmaster_be.Service.impl;
 import com.example.englishmaster_be.Helper.EnglishWordDictionary;
 import com.example.englishmaster_be.Model.Response.DictionarySuggestionResponse;
 import com.example.englishmaster_be.Service.IDictionaryService;
-import com.example.englishmaster_be.value.DictionaryValue;
+import com.example.englishmaster_be.Value.DictionaryValue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
@@ -30,6 +30,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DictionaryServiceImpl implements IDictionaryService {
 
+    DictionaryValue dictionaryValue;
+
     CloseableHttpClient httpClient;
 
     ObjectMapper objectMapper;
@@ -43,7 +45,7 @@ public class DictionaryServiceImpl implements IDictionaryService {
         String encodedWord = URLEncoder.encode(word, StandardCharsets.UTF_8)
                 .replace("+", "%20");
 
-        String apiUrl = String.format("%s/%s", DictionaryValue.dictionaryApi, encodedWord);
+        String apiUrl = String.format("%s/%s", dictionaryValue.getDictionaryApi(), encodedWord);
 
         HttpGet httpGet = new HttpGet(apiUrl);
 
@@ -77,7 +79,7 @@ public class DictionaryServiceImpl implements IDictionaryService {
 
         HttpHeaders headers = new HttpHeaders();
 
-        headers.set("Authorization", "Client-ID " + DictionaryValue.unsplashApiKey);
+        headers.set("Authorization", "Client-ID " + dictionaryValue.getUnsplashApiKey());
 
         Header[] httpHeaders = headers
                 .entrySet()
