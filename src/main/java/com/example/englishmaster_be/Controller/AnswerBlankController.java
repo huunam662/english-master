@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.DTO.Answer.UserAnswerRequest;
-import com.example.englishmaster_be.Model.ResponseModel;
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
 import com.example.englishmaster_be.DTO.Answer.UserAnswerRequest;
 import com.example.englishmaster_be.Model.Response.QuestionBlankResponse;
