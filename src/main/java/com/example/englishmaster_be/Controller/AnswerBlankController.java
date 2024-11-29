@@ -9,10 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.apache.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -30,6 +27,11 @@ public class AnswerBlankController {
     public List<QuestionBlankResponse> getAnswer(@PathVariable UUID questionId){
 
         return service.getAnswerWithQuestionBlank(questionId);
+    }
+
+    @PostMapping("/create-answer-blank")
+    public void createAnswer(@RequestBody UserAnswerRequest request){
+        service.createAnswerBlank(request);
     }
 
 }
