@@ -30,8 +30,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DictionaryServiceImpl implements IDictionaryService {
 
-    DictionaryValue dictionaryValue;
-
     CloseableHttpClient httpClient;
 
     ObjectMapper objectMapper;
@@ -45,7 +43,7 @@ public class DictionaryServiceImpl implements IDictionaryService {
         String encodedWord = URLEncoder.encode(word, StandardCharsets.UTF_8)
                 .replace("+", "%20");
 
-        String apiUrl = String.format("%s/%s", dictionaryValue.getDictionaryApi(), encodedWord);
+        String apiUrl = String.format("%s/%s", DictionaryValue.dictionaryApi, encodedWord);
 
         HttpGet httpGet = new HttpGet(apiUrl);
 
@@ -79,7 +77,7 @@ public class DictionaryServiceImpl implements IDictionaryService {
 
         HttpHeaders headers = new HttpHeaders();
 
-        headers.set("Authorization", "Client-ID " + dictionaryValue.getUnsplashApiKey());
+        headers.set("Authorization", "Client-ID " + DictionaryValue.unsplashApiKey);
 
         Header[] httpHeaders = headers
                 .entrySet()
