@@ -2,6 +2,7 @@ package com.example.englishmaster_be.DTO.Answer;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 
 import java.util.UUID;
 
@@ -9,16 +10,10 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UpdateAnswerDTO {
+public class UpdateAnswerDTO extends CreateAnswerDTO {
 
-    UUID questionId;
-
-    String answerContent;
-
-    String explainDetails;
-
-    boolean correctAnswer;
+    UUID answerId;
 
 }

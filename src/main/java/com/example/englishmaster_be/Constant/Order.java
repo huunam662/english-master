@@ -20,6 +20,6 @@ public enum Order {
                 return order;
             }
         }
-        throw new IllegalArgumentException("Invalid Order value: " + value);
+        throw new IllegalArgumentException("Invalid Order Value: " + value);
     }
 }

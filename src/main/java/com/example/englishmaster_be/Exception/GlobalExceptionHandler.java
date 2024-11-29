@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
         Error error = e.getError();
 
         return ExceptionResponseModel.builder()
-                .success(false)
+                .success(Boolean.FALSE)
                 .status(error.getStatusCode())
                 .code(error.getStatusCode().value())
                 .message(error.getMessage())
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
         String message = "Resource not found";
 
         return ExceptionResponseModel.builder()
-                .success(false)
+                .success(Boolean.FALSE)
                 .status(HttpStatus.NOT_FOUND)
                 .code(HttpStatus.NOT_FOUND.value())
                 .message(message)
@@ -69,7 +69,7 @@ public class GlobalExceptionHandler {
                 .toList();
 
         return ExceptionResponseModel.builder()
-                .success(false)
+                .success(Boolean.FALSE)
                 .status(HttpStatus.BAD_REQUEST)
                 .code(HttpStatus.BAD_REQUEST.value())
                 .message(message)
@@ -87,7 +87,7 @@ public class GlobalExceptionHandler {
         String message = "Wrong username or password";
 
         return ExceptionResponseModel.builder()
-                .success(false)
+                .success(Boolean.FALSE)
                 .status(HttpStatus.UNAUTHORIZED)
                 .code(HttpStatus.UNAUTHORIZED.value())
                 .message(message)
@@ -102,7 +102,7 @@ public class GlobalExceptionHandler {
         Error error = Error.UNAUTHORIZED;
 
         return ExceptionResponseModel.builder()
-                .success(false)
+                .success(Boolean.FALSE)
                 .status(error.getStatusCode())
                 .code(error.getStatusCode().value())
                 .message(error.getMessage())
@@ -117,7 +117,7 @@ public class GlobalExceptionHandler {
         Error error = Error.UPLOAD_FILE_FAILURE;
 
         return ExceptionResponseModel.builder()
-                .success(false)
+                .success(Boolean.FALSE)
                 .status(error.getStatusCode())
                 .code(error.getStatusCode().value())
                 .message(error.getMessage())
@@ -134,7 +134,7 @@ public class GlobalExceptionHandler {
     public ExceptionResponseModel handleIllegalArgumentException(Exception exception) {
 
         return ExceptionResponseModel.builder()
-                .success(false)
+                .success(Boolean.FALSE)
                 .status(HttpStatus.BAD_REQUEST)
                 .code(HttpStatus.BAD_REQUEST.value())
                 .message(exception.getMessage())
@@ -146,7 +146,7 @@ public class GlobalExceptionHandler {
     public ExceptionResponseModel handleConflictException(Exception exception) {
 
         return ExceptionResponseModel.builder()
-                .success(false)
+                .success(Boolean.FALSE)
                 .status(HttpStatus.CONFLICT)
                 .code(HttpStatus.CONFLICT.value())
                 .message(exception.getMessage())
@@ -162,7 +162,7 @@ public class GlobalExceptionHandler {
     public ExceptionResponseModel handleInternalException(Exception exception) {
 
         return ExceptionResponseModel.builder()
-                .success(false)
+                .success(Boolean.FALSE)
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .message(exception.getMessage())
