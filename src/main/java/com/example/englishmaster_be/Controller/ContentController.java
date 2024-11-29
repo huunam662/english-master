@@ -5,6 +5,7 @@ import com.example.englishmaster_be.DTO.Content.UpdateContentDTO;
 import com.example.englishmaster_be.Model.Content;
 import com.example.englishmaster_be.Model.Response.ContentResponse;
 import com.example.englishmaster_be.Service.IContentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
+@Tag(name = "Content")
 @RestController
 @RequestMapping("/api/content")
 @RequiredArgsConstructor

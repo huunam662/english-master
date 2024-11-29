@@ -6,6 +6,7 @@ import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.firebase.cloud.StorageClient;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.*;
 import org.springframework.stereotype.Service;
@@ -89,16 +90,17 @@ public class FileStorageServiceImpl implements IFileStorageService {
 //
 //    }
 
+    @SneakyThrows
     @Override
-    public void save(MultipartFile file, String fileName) {
+    public Blob save(MultipartFile file, String fileName) {
         try {
             String bucketName = "connect-student-nodejs.appspot.com";
             Bucket bucket = StorageClient.getInstance().bucket(bucketName);
 
-            bucket.create(fileName, file.getBytes(), file.getContentType());
+            return bucket.create(fileName, file.getBytes(), file.getContentType());
         } catch (Exception e) {
             if (e instanceof FileAlreadyExistsException) {
-                throw new RuntimeException("A file of that name already exists.");
+                throw new FileAlreadyExistsException("A file of that name already exists.");
             }
             throw new RuntimeException(e.getMessage());
         }

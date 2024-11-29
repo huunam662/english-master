@@ -48,7 +48,7 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
         // -> end (1)
 
         // -> Cho phép beforeBodyWrite nhận xử lý nếu thỏa điều kiện dưới đây
-        return !requestURI.contains("/api-docs")
+        return !requestURI.contains("/v3/api-docs")
                 && !packageName.contains("org.springdoc.webmvc.ui")
                 && !declaringClass.getPackageName().contains("org.springdoc.webmvc.api")
                 && (

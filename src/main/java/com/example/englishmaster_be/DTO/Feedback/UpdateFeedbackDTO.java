@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.DTO.Answer;
+package com.example.englishmaster_be.DTO.Feedback;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
@@ -13,9 +13,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UpdateAnswerDTO extends CreateAnswerDTO {
+public class UpdateFeedbackDTO extends CreateFeedbackDTO{
 
     @Schema(hidden = true)
-    UUID answerId;
+    UUID FeedbackID;
 
 }

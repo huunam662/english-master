@@ -1,4 +1,5 @@
-package com.example.englishmaster_be.DTO.Comment;
+package com.example.englishmaster_be.Common.DTO.Request;
+
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -10,8 +11,10 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreateCommentDTO {
+public class FilterRequest {
 
-    String commentContent;
+    int page;
+
+    String search;
 
 }

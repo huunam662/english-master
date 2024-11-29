@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.Service;
 
 import com.example.englishmaster_be.DTO.Comment.CreateCommentDTO;
+import com.example.englishmaster_be.DTO.Comment.UpdateCommentDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.CommentResponse;
 
@@ -27,7 +28,7 @@ public interface ICommentService {
 
     CommentResponse createCommentToComment(UUID commentId, CreateCommentDTO createCommentDTO);
 
-    CommentResponse updateComment(UUID commentId, CreateCommentDTO createCommentDTO);
+    CommentResponse updateComment(UpdateCommentDTO updateCommentDTO);
 
     void deleteComment(UUID commentId);
 }

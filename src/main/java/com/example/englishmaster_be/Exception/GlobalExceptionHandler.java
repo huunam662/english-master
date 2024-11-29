@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.context.request.WebRequest;
 
+import java.nio.file.FileAlreadyExistsException;
 import java.rmi.ServerException;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestControllerAdvice
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -42,10 +44,16 @@ public class GlobalExceptionHandler {
     }
 
 
-    @ExceptionHandler(ResourceNotFoundException.class)
+    @ExceptionHandler({
+            ResourceNotFoundException.class,
+            NoSuchElementException.class
+    })
     public ExceptionResponseModel handlingResourceNotFoundException(ResourceNotFoundException ignored){
 
         String message = "Resource not found";
+
+        if(ignored.getMessage() != null || ignored.getMessage().isEmpty())
+            message = ignored.getMessage();
 
         return ExceptionResponseModel.builder()
                 .success(Boolean.FALSE)
@@ -73,7 +81,6 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .code(HttpStatus.BAD_REQUEST.value())
                 .message(message)
-                .violations("")
                 .errors(errors)
                 .build();
     }
@@ -96,21 +103,6 @@ public class GlobalExceptionHandler {
     }
 
 
-    @ExceptionHandler(AccessDeniedException.class)
-    public ExceptionResponseModel handlingAccessDeniedException(AccessDeniedException ignored) {
-
-        Error error = Error.UNAUTHORIZED;
-
-        return ExceptionResponseModel.builder()
-                .success(Boolean.FALSE)
-                .status(error.getStatusCode())
-                .code(error.getStatusCode().value())
-                .message(error.getMessage())
-                .violations(error.getViolation())
-                .build();
-    }
-
-
     @ExceptionHandler(HttpClientErrorException.class)
     public ExceptionResponseModel handleHttpClientErrorException(HttpClientErrorException ignored) {
 
@@ -129,7 +121,8 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({
         MessagingException.class,
         BadRequestException.class,
-        IllegalArgumentException.class
+        IllegalArgumentException.class,
+        FileAlreadyExistsException.class
     })
     public ExceptionResponseModel handleIllegalArgumentException(Exception exception) {
 
@@ -138,7 +131,6 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.BAD_REQUEST)
                 .code(HttpStatus.BAD_REQUEST.value())
                 .message(exception.getMessage())
-                .violations("")
                 .build();
     }
 

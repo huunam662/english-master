@@ -4,6 +4,7 @@ import com.example.englishmaster_be.Configuration.global.annotation.MessageRespo
 import com.example.englishmaster_be.Model.Response.QuestionBlankResponse;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Service.impl.AnswerBlankService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Answer Blank")
 @RestController
 @RequestMapping("/api/answer-blank")
 @RequiredArgsConstructor
@@ -25,7 +27,7 @@ public class AnswerBlankController {
 
     AnswerBlankService service;
 
-    @GetMapping("get-list-answer/{questionId}")
+    @GetMapping("/get-list-answer/{questionId}")
     @MessageResponse("List Answer to Question successfully")
     public List<QuestionBlankResponse> getAnswer(@PathVariable UUID questionId){
 
