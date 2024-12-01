@@ -1,9 +1,10 @@
 package com.example.englishmaster_be.Service;
 
-import java.util.List;
-import java.util.Map;
+import com.example.englishmaster_be.Model.Response.GeneralSearchAllResponse;
 
 public interface GeneralSearchService {
-    Map<String, List<Object>> searchAll(String keyword);
+
+    GeneralSearchAllResponse searchAll(String keyword);
+
 }
 

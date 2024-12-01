@@ -3,6 +3,7 @@ package com.example.englishmaster_be.DTO.Content;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -14,7 +15,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateContentDTO {
 
-    UUID contentId;
+    UUID questionId;
 
     UUID topicId;
 
@@ -23,4 +24,6 @@ public class CreateContentDTO {
     String contentData;
 
     String code;
+
+    MultipartFile file;
 }

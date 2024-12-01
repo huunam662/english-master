@@ -8,6 +8,7 @@ import com.example.englishmaster_be.Helper.EnglishWordDictionary;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Service.IDictionaryService;
 import com.fasterxml.jackson.databind.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -23,6 +24,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Tag(name = "Dictionary")
 @RestController
 @RequestMapping("/api/dictionary")
 @RequiredArgsConstructor

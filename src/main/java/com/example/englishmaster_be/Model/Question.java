@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.Model;
 
 import com.example.englishmaster_be.DTO.Question.*;
+import com.example.englishmaster_be.DTO.Type.QuestionType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -77,6 +78,9 @@ public class Question implements Serializable {
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     List<Content> contentCollection;
 
+    @Column(name="question_type")
+    @Enumerated(EnumType.STRING)
+    private QuestionType questionType;
 
     public Question(CreateQuestionDTO createQuestionDTO) {
 

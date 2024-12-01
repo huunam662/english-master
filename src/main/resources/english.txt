@@ -7799,7 +7799,7 @@ bioengineer
 bioengineering
 bioethanol
 bioethics
-biofeedback
+bioFeedback
 biofilm
 bioflavonoid
 biofortification
@@ -27818,7 +27818,7 @@ feeble
 feeble-minded
 feebly
 feed
-feedback
+Feedback
 feed back
 feedbag
 feed box
@@ -30131,7 +30131,7 @@ forced landing
 forced march
 force down
 force-feed
-force feedback
+force Feedback
 force field
 forceful
 forcefully
@@ -57484,7 +57484,7 @@ negation
 negative
 negative equity
 negative evidence
-negative feedback
+negative Feedback
 negative gearing
 negative geotropism
 negative income tax
@@ -57773,7 +57773,7 @@ neurodiversity
 neuroeconomics
 neuroendocrine
 neuroepithelium
-neurofeedback
+neuroFeedback
 neurofibril
 neurofibroma
 neurofibromatosis
@@ -68689,7 +68689,7 @@ positioner
 position paper
 positive
 positive discrimination
-positive feedback
+positive Feedback
 positive geotropism
 positive law
 positive logic
@@ -167107,7 +167107,7 @@ neuro-divergence
 neuro-divergent
 neuro-diverse
 neuro-diversity
-neuro-feedback
+neuro-Feedback
 neurofibrils
 neurofibromata
 neurofibromas

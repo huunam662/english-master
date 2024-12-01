@@ -1,14 +1,16 @@
 package com.example.englishmaster_be.DTO.Feedback;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CreateFeedbackDTO {
 
@@ -18,6 +20,7 @@ public class CreateFeedbackDTO {
 
     String content;
 
+    @Schema(hidden = true)
     MultipartFile avatar;
 
 }

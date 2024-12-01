@@ -7,6 +7,7 @@ import com.example.englishmaster_be.DTO.Comment.*;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Service.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Comment")
 @RestController
 @RequestMapping("/api/comment")
 @RequiredArgsConstructor
@@ -77,10 +79,12 @@ public class CommentController {
     @MessageResponse("Update Comment successfully")
     public CommentResponse updateComment(
             @PathVariable UUID commentId,
-            @RequestBody CreateCommentDTO createCommentDTO
+            @RequestBody UpdateCommentDTO updateCommentDTO
     ){
 
-        return commentService.updateComment(commentId, createCommentDTO);
+        updateCommentDTO.setCommentId(commentId);
+
+        return commentService.updateComment(updateCommentDTO);
     }
 
     @DeleteMapping(value = "/{commentId:.+}/deleteComment")

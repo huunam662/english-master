@@ -1,11 +1,16 @@
 package com.example.englishmaster_be.Service.impl;
 
 
+import com.example.englishmaster_be.Exception.Response.BadRequestException;
+import com.example.englishmaster_be.Exception.Response.ResourceNotFoundException;
 import com.example.englishmaster_be.Service.IFileStorageService;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.firebase.cloud.StorageClient;
+import lombok.AccessLevel;
+import lombok.SneakyThrows;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.*;
 import org.springframework.stereotype.Service;
@@ -19,10 +24,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class FileStorageServiceImpl implements IFileStorageService {
 
+    final String bucketName = "connect-student-nodejs.appspot.com";
+
     @Value("${masterE.fileSave}")
-    private String fileSave;
+    String fileSave;
 //    private final Path root = Paths.get("D:\\Workplace\\FileEnglishMaster");
 //    private final Path root = Paths.get(fileSave);
 
@@ -57,22 +65,18 @@ public class FileStorageServiceImpl implements IFileStorageService {
 
     @Override
     public Resource load(String filename) {
-        try {
-            String bucketName = "connect-student-nodejs.appspot.com";
-            Bucket bucket = StorageClient.getInstance().bucket(bucketName);
-            Storage storage = bucket.getStorage();
-            Blob blob = storage.get(bucketName, filename);
 
-            if (blob != null) {
-                byte[] content = blob.getContent();
-                return new ByteArrayResource(content);
-            } else {
-                return null;
-            }
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
+        Bucket bucket = StorageClient.getInstance().bucket(bucketName);
 
+        Storage storage = bucket.getStorage();
+
+        Blob blob = storage.get(bucketName, filename);
+
+        if(blob == null) throw new ResourceNotFoundException("Image not found");
+
+        byte[] content = blob.getContent();
+
+        return new ByteArrayResource(content);
     }
 
 //    @Override
@@ -89,18 +93,22 @@ public class FileStorageServiceImpl implements IFileStorageService {
 //
 //    }
 
+    @SneakyThrows
     @Override
-    public void save(MultipartFile file, String fileName) {
+    public Blob save(MultipartFile file) {
         try {
-            String bucketName = "connect-student-nodejs.appspot.com";
+
+            String fileName = nameFile(file);
+
             Bucket bucket = StorageClient.getInstance().bucket(bucketName);
 
-            bucket.create(fileName, file.getBytes(), file.getContentType());
+            return bucket.create(fileName, file.getBytes(), file.getContentType());
+
         } catch (Exception e) {
             if (e instanceof FileAlreadyExistsException) {
-                throw new RuntimeException("A file of that name already exists.");
+                throw new FileAlreadyExistsException("A file of that name already exists.");
             }
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException("Save file failed");
         }
     }
 
@@ -108,17 +116,17 @@ public class FileStorageServiceImpl implements IFileStorageService {
     public List<String> loadAll() {
         List<String> fileNames = new ArrayList<>();
         try {
-            String bucketName = "connect-student-nodejs.appspot.com";
+
             Bucket bucket = StorageClient.getInstance().bucket(bucketName);
 
-            for (Blob blob : bucket.list().iterateAll()) {
-                if (blob != null) {
-                    fileNames.add(blob.getName());
-                }
-            }
+            bucket.list().iterateAll().forEach(blob -> {
+                if (blob != null) fileNames.add(blob.getName());
+            });
+
         } catch (Exception e) {
             throw new RuntimeException("Could not load the files!", e);
         }
+
         return fileNames;
     }
 
@@ -134,23 +142,43 @@ public class FileStorageServiceImpl implements IFileStorageService {
 //        }
 //    }
 
+
     @Override
     public boolean delete(String filename) {
-        String bucketName = "connect-student-nodejs.appspot.com";
+
         Bucket bucket = StorageClient.getInstance().bucket(bucketName);
-        return bucket.get(filename).delete();
+
+        Blob blob = bucket.get(filename);
+
+        if(blob == null) return false;
+
+        return blob.delete();
+    }
+
+    @Override
+    public boolean isExistingFile(String filename) {
+
+        Bucket bucket = StorageClient.getInstance().bucket(bucketName);
+
+        Blob blob = bucket.get(filename);
+
+        return blob != null;
     }
 
     @Override
     public String nameFile(MultipartFile file) {
+
         String originalFilename = file.getOriginalFilename();
+
         String extension = getExtension(originalFilename);
+
         String fileNameDelete = deleteExtension(originalFilename);
 
         LocalDateTime currentTime = LocalDateTime.now();
 
         // Định dạng thời gian hiện tại thành chuỗi
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+
         String timestamp = currentTime.format(formatter);
 
         // Tạo tên tệp tin mới bằng cách kết hợp tên gốc và thời gian hiện tại

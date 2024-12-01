@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Controller;
 
+import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
 import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.DTO.MockTest.CreateMockTestDTO;
@@ -11,10 +12,14 @@ import com.example.englishmaster_be.Service.*;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -36,40 +41,40 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Tag(name = "Mock test")
 @RestController
 @RequestMapping("/api/mockTest")
-@SuppressWarnings("unchecked")
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MockTestController {
-    @Autowired
-    private MockTestRepository mockTestRepository;
-    @Autowired
-    private IUserService IUserService;
-    @Autowired
-    private ITopicService ITopicService;
-    @Autowired
-    private IQuestionService IQuestionService;
-    @Autowired
-    private IMockTestService IMockTestService;
-    @Autowired
-    private IAnswerService IAnswerService;
-    @Autowired
-    private JavaMailSender mailSender;
-    @Autowired
-    private ResourceLoader resourceLoader;
 
-    @Autowired
-    private JPAQueryFactory queryFactory;
+    MockTestRepository mockTestRepository;
 
-    @Autowired
-    private ResultMockTestRepository resultMockTestRepository;
+    IUserService IUserService;
 
-    @Autowired
-    private IPartService IPartService;
+    ITopicService ITopicService;
 
-    Logger logger = LoggerFactory.getLogger(MockTestController.class);
+    IQuestionService IQuestionService;
+
+    IMockTestService IMockTestService;
+
+    IAnswerService IAnswerService;
+
+    JavaMailSender mailSender;
+
+    ResourceLoader resourceLoader;
+
+    JPAQueryFactory queryFactory;
+
+    ResultMockTestRepository resultMockTestRepository;
+
+    IPartService IPartService;
+
+    static final Logger logger = LoggerFactory.getLogger(MockTestController.class);
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @MessageResponse("Create mock test successfully")
     public ResponseEntity<?> createMockTest(@RequestBody CreateMockTestDTO createMockTestDTO) {
         ResponseModel responseModel = new ResponseModel();
         try {

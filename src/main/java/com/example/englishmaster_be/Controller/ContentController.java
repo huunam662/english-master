@@ -1,18 +1,22 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
+import com.example.englishmaster_be.DTO.Content.CreateContentDTO;
 import com.example.englishmaster_be.DTO.Content.UpdateContentDTO;
 import com.example.englishmaster_be.Model.Content;
 import com.example.englishmaster_be.Model.Response.ContentResponse;
 import com.example.englishmaster_be.Service.IContentService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
+@Tag(name = "Content")
 @RestController
 @RequestMapping("/api/content")
 @RequiredArgsConstructor
@@ -22,7 +26,7 @@ public class ContentController {
     IContentService contentService;
 
     @GetMapping
-    @MessageResponse("Get Content successfully")
+    @MessageResponse("Get content successfully")
     public ContentResponse getContentById(@RequestParam UUID id) {
 
         Content content = contentService.getContentToContentId(id);
@@ -31,7 +35,7 @@ public class ContentController {
     }
 
     @GetMapping("/contentData")
-    @MessageResponse("Get Content successfully")
+    @MessageResponse("Get content successfully")
     public ContentResponse getContentData(@RequestParam UUID topicId, @RequestParam String code) {
 
         Content content = contentService.getContentByTopicIdAndCode(topicId, code);
@@ -40,7 +44,7 @@ public class ContentController {
     }
 
     @GetMapping("/content")
-    @MessageResponse("Get Content successfully")
+    @MessageResponse("Get content successfully")
     public ContentResponse getContent(@RequestParam String contentData) {
 
         Content content = contentService.getContentByContentData(contentData);;
@@ -48,17 +52,27 @@ public class ContentController {
         return new ContentResponse(content);
     }
 
-    @PutMapping("/update-content")
-    @MessageResponse("Get Content successfully")
-    public ContentResponse updateContent(
-            @RequestBody UpdateContentDTO updateContentDTO,
-            @RequestParam MultipartFile file
+    @PostMapping(value = "/create-content", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @MessageResponse("Create content successfully")
+    public ContentResponse createContent(
+            @ModelAttribute CreateContentDTO createContentDTO
     ) {
 
-        updateContentDTO.setFile(file);
+        Content content = contentService.saveContent(createContentDTO);
+
+        return new ContentResponse(content);
+    }
+
+    @PutMapping(value = "/update-content", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @MessageResponse("Update content successfully")
+    public ContentResponse updateContent(
+            @ModelAttribute UpdateContentDTO updateContentDTO
+    ) {
 
         Content content = contentService.saveContent(updateContentDTO);
 
         return new ContentResponse(content);
     }
+
+
 }

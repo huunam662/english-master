@@ -21,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -99,7 +100,8 @@ public class DictionaryServiceImpl implements IDictionaryService {
 
         JsonNode results = jsonResponse.get("results");
 
-        if (results == null || results.isEmpty()) return null;
+        if (results == null || results.isEmpty())
+            throw new NoSuchElementException("The urls is empty or not found");
 
         JsonNode firstResult = results.get(0);
 

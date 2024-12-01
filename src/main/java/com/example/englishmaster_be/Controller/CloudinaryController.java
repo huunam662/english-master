@@ -4,13 +4,14 @@ import com.example.englishmaster_be.Configuration.global.annotation.MessageRespo
 import com.example.englishmaster_be.Model.Response.CloudiaryUploadFileResponse;
 import com.example.englishmaster_be.Service.ICloudinaryService;
 import com.example.englishmaster_be.Service.impl.CloudinaryServiceimpl;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-
+@Tag(name = "Cloudinary")
 @RestController
 @RequestMapping("/cloudinary/upload")
 @RequiredArgsConstructor

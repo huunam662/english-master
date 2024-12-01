@@ -1,8 +1,17 @@
 package com.example.englishmaster_be.Controller;
 
+import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
 import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
+import com.example.englishmaster_be.Model.Response.FileResponse;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Service.IFileStorageService;
+import com.example.englishmaster_be.Util.ServletUtil;
+import com.google.cloud.storage.Blob;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -14,80 +23,79 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+@Tag(name = "File")
 @RestController
 @RequestMapping("/api/file")
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FileController {
 
-    @Autowired
-    private IFileStorageService IFileStorageService;
+    IFileStorageService fileStorageService;
 
     @GetMapping("/{filename:.+}")
-    public ResponseEntity<Resource> getFile(@PathVariable String filename) {
-        Resource file = IFileStorageService.load(filename);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"").body(file);
+    @MessageResponse("Load file successfully")
+    public Resource getFile(@PathVariable String filename) {
+
+        Resource file = fileStorageService.load(filename);
+
+        HttpServletResponse httpServletResponse = ServletUtil.getResponse();
+
+        httpServletResponse.setHeader(
+                HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\""
+        );
+
+        return file;
     }
 
     @GetMapping("/showImage/{filename:.+}")
-    public ResponseEntity<?> showImage(@PathVariable String filename) {
-        Resource file = IFileStorageService.load(filename);
-        if (file == null) {
-            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setStatus(HttpStatus.NOT_FOUND);
-            exceptionResponseModel.setMessage("Image not found");
-            exceptionResponseModel.setViolations("404");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponseModel);
-        }
-        return ResponseEntity.ok()
-                .contentType(MediaType.IMAGE_JPEG).body(file);
+    @MessageResponse("Load file successfully")
+    public Resource showImage(@PathVariable String filename) {
+
+        Resource file = fileStorageService.load(filename);
+
+        HttpServletResponse httpServletResponse = ServletUtil.getResponse();
+
+        httpServletResponse.setContentType(MediaType.IMAGE_JPEG_VALUE);
+
+        return file;
     }
 
 
     @GetMapping("/showAudio/{filename:.+}")
-    public ResponseEntity<Resource> showAudio(@PathVariable String filename) {
-        Resource file = IFileStorageService.load(filename);
-        return ResponseEntity.ok()
-                .contentType(MediaType.valueOf("audio/mpeg")).body(file);
+    @MessageResponse("Load file successfully")
+    public Resource showAudio(@PathVariable String filename) {
+
+        Resource file = fileStorageService.load(filename);
+
+        HttpServletResponse httpServletResponse = ServletUtil.getResponse();
+
+        httpServletResponse.setContentType(MediaType.valueOf("audio/mpeg").toString());
+
+        return file;
     }
 
     @GetMapping("/getImageName")
-    public ResponseEntity<List<String>> showImages() {
-        List<String> files = IFileStorageService.loadAll();
-        return ResponseEntity.ok().body(files);
+    @MessageResponse("Load file names successfully")
+    public List<String> showImages() {
+
+        return fileStorageService.loadAll();
     }
 
     @PostMapping(value = "/saveImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseModel> saveImage(@RequestParam("file") MultipartFile file) {
-        ResponseModel responseModel = new ResponseModel();
-        try {
-            String fileName = IFileStorageService.nameFile(file);
-            IFileStorageService.save(file, fileName);
+    @MessageResponse("Save file successfully")
+    public FileResponse saveImage(@RequestParam("file") MultipartFile file) {
 
-            responseModel.setMessage("Save file sucessfully");
-            responseModel.setResponseData(fileName);
-            return ResponseEntity.ok().body(responseModel);
-        } catch (Exception e) {
-            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            exceptionResponseModel.setMessage("Save file failed");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
-        }
+        Blob blob = fileStorageService.save(file);
+
+        return FileResponse.builder()
+                .fileName(blob.getName())
+                .build();
     }
 
     @DeleteMapping("/deleteImage/{fileName}")
-    public ResponseEntity<ResponseModel> deleteImage(@PathVariable("fileName") String fileName) {
-        ResponseModel responseModel = new ResponseModel();
-        try {
-            IFileStorageService.delete(fileName);
+    @MessageResponse("Delete file successfully")
+    public void deleteImage(@PathVariable("fileName") String fileName) {
 
-            responseModel.setMessage("Delete file sucessfully");
-            responseModel.setResponseData(fileName);
-            return ResponseEntity.ok().body(responseModel);
-        } catch (Exception e) {
-            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            exceptionResponseModel.setMessage("Delete file failed");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
-        }
+        fileStorageService.delete(fileName);
     }
 }

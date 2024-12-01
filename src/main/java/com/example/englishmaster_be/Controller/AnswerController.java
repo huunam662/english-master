@@ -7,6 +7,7 @@ import com.example.englishmaster_be.DTO.Answer.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Service.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Tag(name = "Answer")
 @RestController
 @RequestMapping("/api/answer")
 @RequiredArgsConstructor
