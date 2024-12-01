@@ -1,23 +1,17 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
 import com.example.englishmaster_be.Model.Response.FileResponse;
-import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Service.IFileStorageService;
-import com.example.englishmaster_be.Util.ServletUtil;
 import com.google.cloud.storage.Blob;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,14 +28,16 @@ public class FileController {
 
     @GetMapping("/{filename:.+}")
     @MessageResponse("Load file successfully")
-    public Resource getFile(@PathVariable String filename) {
+    public Resource getFile(
+            HttpServletResponse response,
+            @PathVariable String filename
+    ) {
 
         Resource file = fileStorageService.load(filename);
 
-        HttpServletResponse httpServletResponse = ServletUtil.getResponse();
-
-        httpServletResponse.setHeader(
-                HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\""
+        response.setHeader(
+                HttpHeaders.CONTENT_DISPOSITION,
+                "attachment; filename=\"" + file.getFilename() + "\""
         );
 
         return file;
@@ -49,13 +45,14 @@ public class FileController {
 
     @GetMapping("/showImage/{filename:.+}")
     @MessageResponse("Load file successfully")
-    public Resource showImage(@PathVariable String filename) {
+    public Resource showImage(
+            HttpServletResponse response,
+            @PathVariable String filename
+    ) {
 
         Resource file = fileStorageService.load(filename);
 
-        HttpServletResponse httpServletResponse = ServletUtil.getResponse();
-
-        httpServletResponse.setContentType(MediaType.IMAGE_JPEG_VALUE);
+        response.setContentType(MediaType.IMAGE_JPEG_VALUE);
 
         return file;
     }
@@ -63,13 +60,14 @@ public class FileController {
 
     @GetMapping("/showAudio/{filename:.+}")
     @MessageResponse("Load file successfully")
-    public Resource showAudio(@PathVariable String filename) {
+    public Resource showAudio(
+            HttpServletResponse response,
+            @PathVariable String filename
+    ) {
 
         Resource file = fileStorageService.load(filename);
 
-        HttpServletResponse httpServletResponse = ServletUtil.getResponse();
-
-        httpServletResponse.setContentType(MediaType.valueOf("audio/mpeg").toString());
+        response.setContentType(MediaType.valueOf("audio/mpeg").toString());
 
         return file;
     }
