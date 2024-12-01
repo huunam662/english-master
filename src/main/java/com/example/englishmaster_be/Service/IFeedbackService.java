@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Service;
 
-import com.example.englishmaster_be.Common.DTO.Response.FilterResponse;
+import com.example.englishmaster_be.Common.dto.response.FilterResponse;
 import com.example.englishmaster_be.DTO.Feedback.CreateFeedbackDTO;
 import com.example.englishmaster_be.DTO.Feedback.FeedbackFilterRequest;
 import com.example.englishmaster_be.Model.*;

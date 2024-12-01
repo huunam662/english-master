@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.DTO.Answer;
+package com.example.englishmaster_be.Model.Response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -11,15 +11,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserAnswerRequest {
+public class UserBasicResponse {
 
     UUID userId;
 
-    UUID questionId;
+    String name;
 
-    UUID answerId;
-
-    String content;
-
-    int position;
 }

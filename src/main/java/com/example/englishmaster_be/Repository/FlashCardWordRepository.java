@@ -11,6 +11,6 @@ import java.util.UUID;
 
 public interface FlashCardWordRepository extends JpaRepository<FlashCardWord, UUID> {
     @Query("SELECT f FROM FlashCardWord f WHERE LOWER(f.word) LIKE LOWER(CONCAT('%', :query, '%'))")
-    List<FlashCardWord> findFlashCartWordByQuery(@Param("query") String query, Pageable pageable);
+    List<FlashCardWord> findFlashCartWordByQuery(Pageable pageable, @Param("query") String query);
 }
 

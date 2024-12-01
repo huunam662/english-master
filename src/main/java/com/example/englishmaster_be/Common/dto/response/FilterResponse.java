@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Common.DTO.Response;
+package com.example.englishmaster_be.Common.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

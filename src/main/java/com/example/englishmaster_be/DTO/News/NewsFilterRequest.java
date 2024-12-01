@@ -1,9 +1,12 @@
 package com.example.englishmaster_be.DTO.News;
 
+
+import com.example.englishmaster_be.Common.dto.request.FilterRequest;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.data.domain.Sort;
+
 
 @Getter
 @Setter
@@ -11,12 +14,14 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreateNewsDTO {
+public class NewsFilterRequest extends FilterRequest {
 
-    String title;
+    int size;
 
-    String content;
+    String sortBy;
 
-    MultipartFile image;
+    Sort.Direction sortDirection;
+
+    Boolean isEnable;
 
 }

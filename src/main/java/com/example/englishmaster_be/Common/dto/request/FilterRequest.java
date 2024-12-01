@@ -1,9 +1,9 @@
-package com.example.englishmaster_be.DTO.News;
+package com.example.englishmaster_be.Common.dto.request;
+
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Setter
@@ -11,12 +11,10 @@ import org.springframework.web.multipart.MultipartFile;
 @AllArgsConstructor
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreateNewsDTO {
+public class FilterRequest {
 
-    String title;
+    int page;
 
-    String content;
-
-    MultipartFile image;
+    String search;
 
 }

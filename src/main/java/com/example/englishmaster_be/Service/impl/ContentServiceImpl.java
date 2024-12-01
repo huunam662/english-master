@@ -1,19 +1,27 @@
 package com.example.englishmaster_be.Service.impl;
 
+import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
 import com.example.englishmaster_be.DTO.Content.CreateContentDTO;
 import com.example.englishmaster_be.DTO.Content.UpdateContentDTO;
 import com.example.englishmaster_be.Exception.Response.BadRequestException;
 import com.example.englishmaster_be.Model.Content;
 import com.example.englishmaster_be.Model.Response.CloudiaryUploadFileResponse;
+import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.ICloudinaryService;
 import com.example.englishmaster_be.Service.IContentService;
+import com.example.englishmaster_be.Service.IQuestionService;
+import com.example.englishmaster_be.Service.ITopicService;
+import com.example.englishmaster_be.Util.LinkUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -24,6 +32,8 @@ public class ContentServiceImpl implements IContentService {
     ContentRepository contentRepository;
 
     ICloudinaryService cloudinaryService;
+
+    IQuestionService questionService;
 
     @Transactional
     @Override
@@ -43,29 +53,6 @@ public class ContentServiceImpl implements IContentService {
                 .orElseThrow(() -> new IllegalArgumentException("Content not found with ID: " + contentId));
     }
 
-
-    @Transactional
-    @Override
-    public Content saveContent(CreateContentDTO createContentDTO) {
-
-        if(createContentDTO instanceof UpdateContentDTO updateContentDTO) {
-
-            Content content = new Content(updateContentDTO);
-
-            if(updateContentDTO.getFile() != null){
-
-                CloudiaryUploadFileResponse cloudiaryUploadFileResponse = cloudinaryService.uploadFile(updateContentDTO.getFile());
-
-                content.setContentData(cloudiaryUploadFileResponse.getUrl());
-
-            }
-
-            return contentRepository.save(content);
-
-        }
-        else return null;
-    }
-
     @Override
     public Content getContentByContentData(String contentData) {
 
@@ -81,4 +68,52 @@ public class ContentServiceImpl implements IContentService {
                 () -> new BadRequestException("Get Content failed, content not found")
         );
     }
+
+
+    @Transactional
+    @Override
+    public Content saveContent(CreateContentDTO createContentDTO) {
+
+        Content content;
+
+        if(createContentDTO instanceof UpdateContentDTO updateContentDTO) {
+
+            content = getContentToContentId(updateContentDTO.getContentId());
+            content.setContentType(updateContentDTO.getContentType());
+            content.setCode(updateContentDTO.getCode());
+            content.setTopicId(updateContentDTO.getTopicId());
+        }
+        else content = Content.builder()
+                .contentType(createContentDTO.getContentType())
+                .code(createContentDTO.getCode())
+                .topicId(createContentDTO.getTopicId())
+                .build();
+
+        content.setQuestion(questionService.findQuestionById(createContentDTO.getQuestionId()));
+
+        if(createContentDTO.getFile() != null){
+
+            CloudiaryUploadFileResponse cloudiaryUploadFileResponse = cloudinaryService.uploadFile(createContentDTO.getFile());
+
+            content.setContentData(cloudiaryUploadFileResponse.getUrl());
+
+        }
+
+        return contentRepository.save(content);
+    }
+
+    @Override
+    public List<String> getImageCdnLink() {
+
+        List<String> listLinkCdn = contentRepository.findAllContentData();
+
+        MessageResponseHolder.setMessage("Found " + listLinkCdn.size() + " links");
+
+        return listLinkCdn.stream()
+                .filter(linkCdn -> linkCdn != null && !linkCdn.isEmpty())
+                .map(linkCdn -> LinkUtil.linkFileShowImageBE + linkCdn)
+                .toList();
+    }
+
+
 }

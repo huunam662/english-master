@@ -81,21 +81,18 @@ public class CommentServiceImpl implements ICommentService {
 
     @Override
     public List<CommentResponse> getListCommentByCommentId(UUID commentId) {
+
         Comment comment = findCommentToId(commentId);
 
         List<Comment> commentList = findAllByCommentParent(comment);
 
-        List<CommentResponse> commentResponseList = new ArrayList<>();
+        if(commentList == null) commentList = new ArrayList<>();
 
-        if(commentList != null && !commentList.isEmpty()){
-            for(Comment commentChild: commentList){
-                commentResponseList.add(
-                        new CommentResponse(commentChild, checkCommentParent(commentChild))
-                );
-            }
-        }
-
-        return commentResponseList;
+        return commentList.stream().map(
+                commentItem -> new CommentResponse(
+                        commentItem, checkCommentParent(commentItem)
+                )
+        ).toList();
     }
 
     @Transactional

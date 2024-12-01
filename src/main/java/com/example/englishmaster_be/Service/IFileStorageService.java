@@ -13,11 +13,14 @@ public interface IFileStorageService {
 
     Resource load(String filename);
 
-    Blob save(MultipartFile file, String fileName);
+    Blob save(MultipartFile file);
 
     String nameFile(MultipartFile file);
 
     List<String> loadAll();
 
     boolean delete(String filename);
+
+    boolean isExistingFile(String filename);
+
 }

@@ -8,9 +8,11 @@ import java.util.List;
 import java.util.UUID;
 
 public interface IMockTestService {
+
     void createMockTest(MockTest mockTest);
 
     void createDetailMockTest(DetailMockTest detailMockTest);
+
     List<MockTest> getTop10MockTest(int index);
 
     List<MockTest> getTop10MockTestToUser(int index, User user);
@@ -24,5 +26,6 @@ public interface IMockTestService {
     int countCorrectAnswer(UUID mockTestId);
 
     List<MockTest> getAllMockTestByYearMonthAndDay(Topic topic, String year, String month, String day);
+
     List<MockTest> getAllMockTestToTopic(Topic topic);
 }

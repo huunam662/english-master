@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.DTO.Question;
+package com.example.englishmaster_be.Model.Response.excel;
 
 import com.example.englishmaster_be.DTO.Answer.CreateListAnswerDTO;
 import lombok.*;
@@ -13,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreateQuestionByExcelFileDTO {
+public class CreateQuestionByExcelFileResponse {
 
     UUID questionId;
 
@@ -33,7 +33,7 @@ public class CreateQuestionByExcelFileDTO {
 
     List<CreateListAnswerDTO> listAnswer;
 
-    List<CreateQuestionByExcelFileDTO> listQuestionChild;
+    List<CreateQuestionByExcelFileResponse> listQuestionChild;
 
 
     @Override

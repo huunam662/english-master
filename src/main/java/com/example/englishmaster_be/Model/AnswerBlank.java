@@ -1,19 +1,17 @@
 package com.example.englishmaster_be.Model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.UUID;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
+@Builder
 @Entity
 @Table(name = "anwser_blanks")
+@NoArgsConstructor
+@AllArgsConstructor
 public class AnswerBlank {
 
     @Id

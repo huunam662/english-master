@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.Common.DTO.Response.FilterResponse;
-import com.example.englishmaster_be.Common.Enums.SortByFeedbackFieldsEnum;
+import com.example.englishmaster_be.Common.dto.response.FilterResponse;
+import com.example.englishmaster_be.Common.enums.SortByFeedbackFieldsEnum;
 import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
 import com.example.englishmaster_be.DTO.Feedback.CreateFeedbackDTO;
 import com.example.englishmaster_be.DTO.Feedback.FeedbackFilterRequest;
@@ -69,7 +69,6 @@ public class FeedbackServiceImpl implements IFeedbackService {
                             .pageNumber(filterRequest.getPage())
                             .pageSize(filterRequest.getSize())
                             .offset((long) (filterRequest.getPage() - 1) * filterRequest.getSize())
-                            .content(new ArrayList<>())
                         .build();
 
         JPAQuery<Feedback> query = queryFactory.selectFrom(QFeedback.feedback);
@@ -83,10 +82,10 @@ public class FeedbackServiceImpl implements IFeedbackService {
 
         if (filterRequest.getSearch() != null && !filterRequest.getSearch().isEmpty()) {
 
-            String likeExpression = "%" + filterRequest.getSearch().toLowerCase().replace(" ", "%") + "%";
+            String likeExpression = "%" + filterRequest.getSearch().trim().toLowerCase().replaceAll("\\s+", "%") + "%";
 
             query.where(
-                    QFeedback.feedback.content.lower().like(likeExpression)
+                    QFeedback.feedback.content.likeIgnoreCase(likeExpression)
             );
         }
 
@@ -103,13 +102,11 @@ public class FeedbackServiceImpl implements IFeedbackService {
         query.offset(filterResponse.getOffset())
                 .limit(filterResponse.getPageSize());
 
-        query.fetch().forEach(Feedback -> {
-
-            filterResponse.getContent().add(new FeedbackResponse(Feedback));
-        });
+        filterResponse.setContent(
+                query.fetch().stream().map(FeedbackResponse::new).toList()
+        );
 
         return filterResponse;
-
     }
 
     @Override
@@ -120,14 +117,13 @@ public class FeedbackServiceImpl implements IFeedbackService {
                     .pageNumber(filterRequest.getPage())
                     .pageSize(filterRequest.getSize())
                     .offset((long) (filterRequest.getPage() - 1) * filterRequest.getSize())
-                    .content(new ArrayList<>())
                 .build();
 
         OrderSpecifier<?> orderSpecifier = QFeedback.feedback.updateAt.desc();
 
-        JPAQuery<Feedback> query = queryFactory.selectFrom(QFeedback.feedback)
-                .where(QFeedback.feedback.enable.eq(Boolean.TRUE))
-                .orderBy(orderSpecifier);
+        JPAQuery<Feedback> query = queryFactory.selectFrom(QFeedback.feedback);
+
+        query.where(QFeedback.feedback.enable.eq(Boolean.TRUE));
 
         long totalElements = Optional.ofNullable(query.select(QFeedback.feedback.count()).fetchOne()).orElse(0L);
         long totalPages = (long) Math.ceil((float) totalElements / filterResponse.getPageSize());
@@ -135,13 +131,13 @@ public class FeedbackServiceImpl implements IFeedbackService {
         filterResponse.setTotalPages(totalPages);
         filterResponse.withPreviousAndNextPage();
 
-        query.offset(filterResponse.getOffset())
-                .limit(filterResponse.getPageSize());
+        query.orderBy(orderSpecifier)
+            .offset(filterResponse.getOffset())
+            .limit(filterResponse.getPageSize());
 
-        query.fetch().forEach(Feedback -> {
-
-            filterResponse.getContent().add(new FeedbackResponse(Feedback));
-        });
+        filterResponse.setContent(
+                query.fetch().stream().map(FeedbackResponse::new).toList()
+        );
 
         return filterResponse;
     }
@@ -167,9 +163,7 @@ public class FeedbackServiceImpl implements IFeedbackService {
 
         if (feedbackDTO.getAvatar() != null && !feedbackDTO.getAvatar().isEmpty()) {
 
-            String fileName = fileStorageService.nameFile(feedbackDTO.getAvatar());
-
-            Blob blobResultResponse = fileStorageService.save(feedbackDTO.getAvatar(), fileName);
+            Blob blobResultResponse = fileStorageService.save(feedbackDTO.getAvatar());
 
             feedback.setAvatar(blobResultResponse.getName());
 

@@ -85,7 +85,7 @@ public class UploadServiceImpl implements IUploadService {
             HttpEntity<?> entity = new HttpEntity<>(builder.build(), headers);
             ResponseEntity<String> response = restTemplate.exchange(uploadApiUrl, HttpMethod.POST, entity, String.class);
             if (response.getBody() == null) {
-                throw new RuntimeException("Server Response is empty");
+                throw new RuntimeException("Server response is empty");
             }
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonResponse = objectMapper.readTree(response.getBody());

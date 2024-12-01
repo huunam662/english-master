@@ -1,9 +1,11 @@
-package com.example.englishmaster_be.Common.DTO.Request;
+package com.example.englishmaster_be.DTO.News;
 
-
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -11,10 +13,9 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class FilterRequest {
+public class UpdateNewsDTO extends CreateNewsDTO{
 
-    int page;
-
-    String search;
+    @Schema(hidden = true)
+    UUID newsId;
 
 }

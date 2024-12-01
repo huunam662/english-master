@@ -1,6 +1,5 @@
-package com.example.englishmaster_be.DTO.Topic;
+package com.example.englishmaster_be.Model.Response.excel;
 
-import com.example.englishmaster_be.DTO.Question.CreateQuestionByExcelFileDTO;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -12,9 +11,9 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreateListQuestionByExcelFileDTO {
+public class CreateListQuestionByExcelFileResponse {
 
-    List<CreateQuestionByExcelFileDTO> questions;
+    List<CreateQuestionByExcelFileResponse> questions;
 
     @Override
     public String toString() {

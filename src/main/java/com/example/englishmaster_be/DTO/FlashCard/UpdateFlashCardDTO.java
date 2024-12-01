@@ -1,14 +1,11 @@
-package com.example.englishmaster_be.DTO.Content;
-
+package com.example.englishmaster_be.DTO.FlashCard;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
-
 
 @Getter
 @Setter
@@ -16,8 +13,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UpdateContentDTO extends CreateContentDTO{
+public class UpdateFlashCardDTO extends CreateFlashCardDTO {
 
-    UUID contentId;
+    @Schema(hidden = true)
+    UUID flashCardId;
 
 }

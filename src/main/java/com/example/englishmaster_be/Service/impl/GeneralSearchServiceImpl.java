@@ -3,6 +3,7 @@ package com.example.englishmaster_be.Service.impl;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.FlashCardWordResponse;
 import com.example.englishmaster_be.Model.Response.NewsResponse;
+import com.example.englishmaster_be.Model.Response.GeneralSearchAllResponse;
 import com.example.englishmaster_be.Model.Response.TopicResponse;
 import com.example.englishmaster_be.Repository.FlashCardWordRepository;
 import com.example.englishmaster_be.Repository.NewsRepository;
@@ -11,10 +12,7 @@ import com.example.englishmaster_be.Service.GeneralSearchService;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class GeneralSearchServiceImpl implements GeneralSearchService {
@@ -32,35 +30,34 @@ public class GeneralSearchServiceImpl implements GeneralSearchService {
     }
 
     @Override
-    public Map<String, List<Object>> searchAll(String keyword) {
-        Map<String, List<Object>> result = new HashMap<>();
+    public GeneralSearchAllResponse searchAll(String keyword) {
 
         QTopic qTopic = QTopic.topic;
+
         List<Topic> topics = queryFactory.selectFrom(qTopic).where(qTopic.topicName.containsIgnoreCase(keyword)).fetch();
-        List<TopicResponse> topicResponseList = new ArrayList<>();
-        for (Topic topic : topics) {
-            TopicResponse topicResponse = new TopicResponse(topic);
-            topicResponseList.add(topicResponse);
-        }
-        result.put("topics", (List<Object>) (Object) topicResponseList);
+
+        GeneralSearchAllResponse searchAllResponse = new GeneralSearchAllResponse();
+
+        searchAllResponse.setTopics(
+                topics.stream().map(TopicResponse::new).toList()
+        );
 
         QFlashCardWord qFlashCardWord = QFlashCardWord.flashCardWord;
+
         List<FlashCardWord> flashCardWords = queryFactory.selectFrom(qFlashCardWord).where(qFlashCardWord.word.containsIgnoreCase(keyword)).fetch();
-        List<FlashCardWordResponse> flashCardWordResponseList = new ArrayList<>();
-        for (FlashCardWord flashCardWord : flashCardWords) {
-            FlashCardWordResponse flashCardWordResponse = new FlashCardWordResponse(flashCardWord);
-            flashCardWordResponseList.add(flashCardWordResponse);
-        }
-        result.put("flashCardWords", (List<Object>) (Object) flashCardWordResponseList);
+
+        searchAllResponse.setFlashCardWords(
+                flashCardWords.stream().map(FlashCardWordResponse::new).toList()
+        );
 
         QNews qNews = QNews.news;
+
         List<News> newsList = queryFactory.selectFrom(qNews).where(qNews.title.containsIgnoreCase(keyword)).fetch();
-        List<NewsResponse> newsResponseList = new ArrayList<>();
-        for (News news : newsList) {
-            NewsResponse newsResponse = new NewsResponse(news);
-            newsResponseList.add(newsResponse);
-        }
-        result.put("newsList", (List<Object>) (Object) newsResponseList);
-        return result;
+
+        searchAllResponse.setNewsList(
+                newsList.stream().map(NewsResponse::new).toList()
+        );
+
+        return searchAllResponse;
     }
 }

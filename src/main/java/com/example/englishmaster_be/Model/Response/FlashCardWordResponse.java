@@ -3,7 +3,6 @@ package com.example.englishmaster_be.Model.Response;
 import com.example.englishmaster_be.Model.FlashCardWord;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.json.simple.JSONObject;
 
 
 import java.sql.Timestamp;
@@ -41,9 +40,9 @@ public class FlashCardWordResponse {
 
     String updateAt;
 
-    JSONObject userCreate;
+    UserBasicResponse userCreate;
 
-    JSONObject userUpdate;
+    UserBasicResponse userUpdate;
 
     public FlashCardWordResponse(FlashCardWord flashCardWord) {
 
@@ -63,14 +62,16 @@ public class FlashCardWordResponse {
         this.createAt = sdf.format(Timestamp.valueOf(flashCardWord.getCreateAt()));
         this.updateAt = sdf.format(Timestamp.valueOf(flashCardWord.getUpdateAt()));
 
-        userCreate = new JSONObject();
-        userUpdate = new JSONObject();
+        userCreate = UserBasicResponse.builder()
+                .userId(flashCardWord.getUserCreate().getUserId())
+                .name(flashCardWord.getUserCreate().getName())
+                .build();
 
-        userCreate.put("User Id", flashCardWord.getUserCreate().getUserId());
-        userCreate.put("User Name", flashCardWord.getUserCreate().getName());
+        userUpdate = UserBasicResponse.builder()
+                .userId(flashCardWord.getUserUpdate().getUserId())
+                .name(flashCardWord.getUserUpdate().getName())
+                .build();
 
-        userUpdate.put("User Id", flashCardWord.getUserUpdate().getUserId());
-        userUpdate.put("User Name", flashCardWord.getUserUpdate().getName());
     }
 
 }

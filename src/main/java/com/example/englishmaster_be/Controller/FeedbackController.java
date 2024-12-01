@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Controller;
 
-import com.example.englishmaster_be.Common.DTO.Response.FilterResponse;
-import com.example.englishmaster_be.Common.Enums.SortByFeedbackFieldsEnum;
+import com.example.englishmaster_be.Common.dto.response.FilterResponse;
+import com.example.englishmaster_be.Common.enums.SortByFeedbackFieldsEnum;
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
 import com.example.englishmaster_be.DTO.Feedback.FeedbackFilterRequest;
 import com.example.englishmaster_be.DTO.Feedback.UpdateFeedbackDTO;
@@ -79,11 +79,8 @@ public class FeedbackController {
     @PreAuthorize("hasRole('ADMIN')")
     @MessageResponse("Create Feedback successfully")
     public FeedbackResponse createFeedback(
-            @ModelAttribute("contentFeedback") CreateFeedbackDTO createFeedbackDTO,
-            @RequestParam(value = "avatar", required = false) MultipartFile avatar
+            @ModelAttribute("contentFeedback") CreateFeedbackDTO createFeedbackDTO
     ){
-
-        createFeedbackDTO.setAvatar(avatar);
 
         return feedbackService.saveFeedback(createFeedbackDTO);
     }
@@ -103,12 +100,10 @@ public class FeedbackController {
     @MessageResponse("Update Feedback successfully")
     public FeedbackResponse updateFeedback(
             @PathVariable UUID FeedbackId,
-            @ModelAttribute("contentFeedback") UpdateFeedbackDTO updateFeedbackDTO,
-            @RequestParam(value = "avatar", required = false) MultipartFile avatar
+            @ModelAttribute("contentFeedback") UpdateFeedbackDTO updateFeedbackDTO
     ){
 
         updateFeedbackDTO.setFeedbackID(FeedbackId);
-        updateFeedbackDTO.setAvatar(avatar);
 
         return feedbackService.saveFeedback(updateFeedbackDTO);
     }

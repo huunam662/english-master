@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.DTO.Feedback;
 
-import com.example.englishmaster_be.Common.DTO.Request.FilterRequest;
-import com.example.englishmaster_be.Common.Enums.SortByFeedbackFieldsEnum;
+import com.example.englishmaster_be.Common.dto.request.FilterRequest;
+import com.example.englishmaster_be.Common.enums.SortByFeedbackFieldsEnum;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
