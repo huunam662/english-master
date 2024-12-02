@@ -18,6 +18,7 @@ import com.example.englishmaster_be.Model.Response.excel.CreateTopicByExcelFileR
 import com.example.englishmaster_be.Repository.AnswerRepository;
 import com.example.englishmaster_be.Repository.ContentRepository;
 import com.example.englishmaster_be.Repository.StatusRepository;
+import com.example.englishmaster_be.Repository.UserRepository;
 import com.example.englishmaster_be.Service.*;
 import com.example.englishmaster_be.Service.impl.TopicServiceImpl;
 import com.querydsl.core.types.OrderSpecifier;
@@ -68,6 +69,8 @@ public class TopicController {
     @Autowired
     private JPAQueryFactory queryFactory;
 
+    @Autowired
+    private UserRepository userRepository;
     @Autowired
     private StatusRepository statusRepository;
 
@@ -152,9 +155,18 @@ public class TopicController {
     public ResponseEntity<ResponseModel> createTopicByExcelFile(@RequestParam("file") MultipartFile file, @RequestParam("url") String url) {
         ResponseModel responseModel = new ResponseModel();
         try {
+            // Parse dữ liệu từ file
             CreateTopicByExcelFileResponse createTopicByExcelFileDTO = excelService.parseCreateTopicDTO(file);
+
             User user = IUserService.currentUser();
+
+            // Tìm pack dựa trên ID từ DTO
             Pack pack = IPackService.findPackById(createTopicByExcelFileDTO.getTopicPackId());
+            if (pack == null) {
+                throw new Exception("Pack not found with ID: " + createTopicByExcelFileDTO.getTopicPackId());
+            }
+
+            // Tạo đối tượng Topic
             Topic topic = new Topic(
                     createTopicByExcelFileDTO.getTopicName(),
                     null,
@@ -164,23 +176,42 @@ public class TopicController {
                     createTopicByExcelFileDTO.getStartTime(),
                     createTopicByExcelFileDTO.getEndTime()
             );
+
             topic.setPack(pack);
-            log.warn(createTopicByExcelFileDTO.getTopicImageName());
+
+            // Xử lý ảnh chủ đề
             if (createTopicByExcelFileDTO.getTopicImageName() == null || createTopicByExcelFileDTO.getTopicImageName().isEmpty()) {
                 topic.setTopicImage(url);
             }
+
+            // Cập nhật các thông tin liên quan đến số lượng câu hỏi, người tạo và trạng thái
             topic.setNumberQuestion(createTopicByExcelFileDTO.getNumberQuestion());
-            topic.setUserCreate(user);
-            topic.setUserUpdate(user);
-            topic.setStatus(statusRepository.findByStatusName(StatusConstant.ACTIVE).orElseThrow(() -> new CustomException(Error.STATUS_NOT_FOUND)));
+            topic.setUserCreate(user);  // Gán người tạo
+            topic.setUserUpdate(user);  // Gán người cập nhật
+            topic.setStatus(statusRepository.findByStatusName(StatusConstant.ACTIVE)
+                    .orElseThrow(() -> new CustomException(Error.STATUS_NOT_FOUND)));
+
+            // Lưu topic vào cơ sở dữ liệu
             ITopicService.createTopic(topic);
+
+            // Thêm các phần vào topic
             createTopicByExcelFileDTO.getListPart().forEach(partId -> ITopicService.addPartToTopic(topic.getTopicId(), partId));
+
+            // Tạo response với thông tin của topic
             TopicResponse topicResponse = new TopicResponse(topic);
             responseModel.setMessage("Create Topic successfully");
             responseModel.setResponseData(topicResponse);
 
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (CustomException ce) {
+            // Xử lý lỗi do người dùng không hợp lệ hoặc các lỗi tùy chỉnh khác
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Create Topic failed: " + ce.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.BAD_REQUEST));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
         } catch (Exception e) {
+            // Xử lý các lỗi không mong muốn
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
             exceptionResponseModel.setMessage("Create Topic failed: " + e.getMessage());
             exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
@@ -188,6 +219,7 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
+
 
 
     @PutMapping(value = "/{topicId:.+}/updateTopic", consumes = {"multipart/form-data"})
