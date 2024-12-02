@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Configuration;
 
-import com.example.englishmaster_be.Configuration.jwt.AuthEntryPointJwt;
+import com.example.englishmaster_be.Configuration.jwt.FilterExceptionHandler;
 import com.example.englishmaster_be.Configuration.jwt.AuthTokenFilter;
 import com.example.englishmaster_be.Service.impl.UserDetailsServiceImpl;
 import lombok.AccessLevel;
@@ -35,7 +35,7 @@ public class WebSecurityConfig {
 
     UserDetailsServiceImpl userDetailsService;
 
-    AuthEntryPointJwt unauthorizedHandler;
+    FilterExceptionHandler filterExceptionHandler;
 
     AuthTokenFilter authTokenFilter;
 
@@ -61,7 +61,10 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+                .exceptionHandling(exception -> {
+                    exception.authenticationEntryPoint(filterExceptionHandler);
+                    exception.accessDeniedHandler(filterExceptionHandler);
+                })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/api/**", "/ws/**").permitAll()

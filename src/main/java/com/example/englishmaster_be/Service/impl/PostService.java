@@ -75,7 +75,7 @@ public class PostService implements IPostsService {
                 }
         );
         if (response.getBody() == null) {
-            throw new RuntimeException("Response body is null");
+            throw new RuntimeException("response body is null");
         }
         return response.getBody();
     }

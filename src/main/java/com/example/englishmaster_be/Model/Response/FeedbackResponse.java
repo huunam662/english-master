@@ -17,7 +17,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FeedbackResponse {
 
-    UUID feedbackId;
+    UUID FeedbackId;
 
     String name;
 
@@ -33,23 +33,23 @@ public class FeedbackResponse {
 
     boolean isEnable;
 
-    public FeedbackResponse(Feedback feedback) {
+    public FeedbackResponse(Feedback Feedback) {
 
-        if(Objects.isNull(feedback)) return;
+        if(Objects.isNull(Feedback)) return;
 
-        this.feedbackId = feedback.getFeedbackId();
-        this.name = feedback.getName();
-        this.content = feedback.getContent();
-        this.description = feedback.getDescription();
-        this.avatar = feedback.getAvatar();
-        this.isEnable = feedback.isEnable();
+        this.FeedbackId = Feedback.getId();
+        this.name = Feedback.getName();
+        this.content = Feedback.getContent();
+        this.description = Feedback.getDescription();
+        this.avatar = Feedback.getAvatar();
+        this.isEnable = Feedback.isEnable();
 
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
 
-        if(Objects.nonNull(feedback.getCreateAt()))
-            this.createAt = sdf.format(Timestamp.valueOf(feedback.getCreateAt()));
-        if(Objects.nonNull(feedback.getUpdateAt()))
-            this.updateAt = sdf.format(Timestamp.valueOf(feedback.getUpdateAt()));
+        if(Objects.nonNull(Feedback.getCreateAt()))
+            this.createAt = sdf.format(Timestamp.valueOf(Feedback.getCreateAt()));
+        if(Objects.nonNull(Feedback.getUpdateAt()))
+            this.updateAt = sdf.format(Timestamp.valueOf(Feedback.getUpdateAt()));
 
     }
 

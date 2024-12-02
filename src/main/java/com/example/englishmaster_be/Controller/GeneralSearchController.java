@@ -1,7 +1,12 @@
 package com.example.englishmaster_be.Controller;
 
+import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
+import com.example.englishmaster_be.Model.Response.GeneralSearchAllResponse;
 import com.example.englishmaster_be.Service.GeneralSearchService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,14 +16,19 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
+@Tag(name = "General search")
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/api/search")
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class GeneralSearchController{
-    private final GeneralSearchService generalSearchService;
+
+    GeneralSearchService generalSearchService;
+
     @GetMapping("/searchAll")
-   public ResponseEntity<Map<String, List<Object>>>searchAll(@RequestParam("keyword")String keyword){
-       Map<String, List<Object>> searchResult = generalSearchService.searchAll(keyword);
-       return ResponseEntity.ok(searchResult);
-   }
+    @MessageResponse("Search successfully")
+    public GeneralSearchAllResponse searchAll(@RequestParam("keyword") String keyword){
+
+       return generalSearchService.searchAll(keyword);
+    }
 }

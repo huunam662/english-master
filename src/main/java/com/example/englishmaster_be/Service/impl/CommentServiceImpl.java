@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.DTO.Comment.CreateCommentDTO;
+import com.example.englishmaster_be.DTO.Comment.UpdateCommentDTO;
 import com.example.englishmaster_be.Exception.Response.BadRequestException;
 import com.example.englishmaster_be.Model.Comment;
 import com.example.englishmaster_be.Model.Post;
@@ -80,21 +81,18 @@ public class CommentServiceImpl implements ICommentService {
 
     @Override
     public List<CommentResponse> getListCommentByCommentId(UUID commentId) {
+
         Comment comment = findCommentToId(commentId);
 
         List<Comment> commentList = findAllByCommentParent(comment);
 
-        List<CommentResponse> commentResponseList = new ArrayList<>();
+        if(commentList == null) commentList = new ArrayList<>();
 
-        if(commentList != null && !commentList.isEmpty()){
-            for(Comment commentChild: commentList){
-                commentResponseList.add(
-                        new CommentResponse(commentChild, checkCommentParent(commentChild))
-                );
-            }
-        }
-
-        return commentResponseList;
+        return commentList.stream().map(
+                commentItem -> new CommentResponse(
+                        commentItem, checkCommentParent(commentItem)
+                )
+        ).toList();
     }
 
     @Transactional
@@ -174,23 +172,23 @@ public class CommentServiceImpl implements ICommentService {
 
     @Transactional
     @Override
-    public CommentResponse updateComment(UUID commentId, CreateCommentDTO createCommentDTO) {
+    public CommentResponse updateComment(UpdateCommentDTO updateCommentDTO) {
 
         User user = userService.currentUser();
 
-        Comment comment = findCommentToId(commentId);
+        Comment comment = findCommentToId(updateCommentDTO.getCommentId());
 
         if(!comment.getUserComment().getUserId().equals(user.getUserId()))
             throw new BadRequestException("Don't update Comment");
 
-        comment.setContent(createCommentDTO.getCommentContent());
+        comment.setContent(updateCommentDTO.getCommentContent());
         comment.setUpdateAt(LocalDateTime.now());
 
         comment  = commentRepository.save(comment);
 
         CommentResponse commentResponse = new CommentResponse(comment, checkCommentParent(comment));
 
-        messagingTemplate.convertAndSend("/Comment/updateComment/"+commentId, commentResponse);
+        messagingTemplate.convertAndSend("/Comment/updateComment/"+commentResponse.getCommentId(), commentResponse);
 
         return commentResponse;
     }

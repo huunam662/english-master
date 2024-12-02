@@ -4,7 +4,7 @@ import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Constant.StatusConstant;
 import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
-import com.example.englishmaster_be.DTO.Question.CreateQuestionByExcelFileDTO;
+import com.example.englishmaster_be.Model.Response.excel.CreateQuestionByExcelFileResponse;
 import com.example.englishmaster_be.Exception.CustomException;
 import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.DTO.Answer.CreateListAnswerDTO;
@@ -13,6 +13,8 @@ import com.example.englishmaster_be.DTO.Topic.*;
 import com.example.englishmaster_be.DTO.UploadFileDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
+import com.example.englishmaster_be.Model.Response.excel.CreateListQuestionByExcelFileResponse;
+import com.example.englishmaster_be.Model.Response.excel.CreateTopicByExcelFileResponse;
 import com.example.englishmaster_be.Repository.AnswerRepository;
 import com.example.englishmaster_be.Repository.ContentRepository;
 import com.example.englishmaster_be.Repository.StatusRepository;
@@ -127,7 +129,7 @@ public class TopicController {
             topic.setStatus(statusRepository.findByStatusName(StatusConstant.ACTIVE).orElse(null));
 
             ITopicService.createTopic(topic);
-            IFileStorageService.save(createTopicDTO.getTopicImage(), filename);
+            IFileStorageService.save(createTopicDTO.getTopicImage());
 
             createTopicDTO.getListPart().forEach(partId -> ITopicService.addPartToTopic(topic.getTopicId(), partId));
 
@@ -150,7 +152,7 @@ public class TopicController {
     public ResponseEntity<ResponseModel> createTopicByExcelFile(@RequestParam("file") MultipartFile file, @RequestParam("url") String url) {
         ResponseModel responseModel = new ResponseModel();
         try {
-            CreateTopicByExcelFileDTO createTopicByExcelFileDTO = excelService.parseCreateTopicDTO(file);
+            CreateTopicByExcelFileResponse createTopicByExcelFileDTO = excelService.parseCreateTopicDTO(file);
             User user = IUserService.currentUser();
             Pack pack = IPackService.findPackById(createTopicByExcelFileDTO.getTopicPackId());
             Topic topic = new Topic(
@@ -218,7 +220,7 @@ public class TopicController {
             }
             ITopicService.createTopic(topic);
             if (filename != null) {
-                IFileStorageService.save(updateTopicDTO.getTopicImage(), filename);
+                IFileStorageService.save(updateTopicDTO.getTopicImage());
             }
             List<Part> listPart = new ArrayList<>();
             for (UUID partId : updateTopicDTO.getListPart()) {
@@ -566,7 +568,7 @@ public class TopicController {
                 }
                 question.getContentCollection().add(content);
                 IContentService.uploadContent(content);
-                IFileStorageService.save(createQuestionDTO.getContentImage(), filename);
+                IFileStorageService.save(createQuestionDTO.getContentImage());
             }
             if (createQuestionDTO.getContentAudio() != null && !createQuestionDTO.getContentAudio().isEmpty()) {
                 String filename = IFileStorageService.nameFile(createQuestionDTO.getContentAudio());
@@ -579,7 +581,7 @@ public class TopicController {
                 }
                 question.getContentCollection().add(content);
                 IContentService.uploadContent(content);
-                IFileStorageService.save(createQuestionDTO.getContentAudio(), filename);
+                IFileStorageService.save(createQuestionDTO.getContentAudio());
             }
 
             IQuestionService.createQuestion(question);
@@ -702,7 +704,7 @@ public class TopicController {
                     }
                     question.getContentCollection().add(content);
                     IContentService.uploadContent(content);
-                    IFileStorageService.save(createQuestionDTO.getContentImage(), filename);
+                    IFileStorageService.save(createQuestionDTO.getContentImage());
                 }
                 if (createQuestionDTO.getContentAudio() != null && !createQuestionDTO.getContentAudio().isEmpty()) {
                     String filename = IFileStorageService.nameFile(createQuestionDTO.getContentAudio());
@@ -715,7 +717,7 @@ public class TopicController {
                     }
                     question.getContentCollection().add(content);
                     IContentService.uploadContent(content);
-                    IFileStorageService.save(createQuestionDTO.getContentAudio(), filename);
+                    IFileStorageService.save(createQuestionDTO.getContentAudio());
                 }
 
                 IQuestionService.createQuestion(question);
@@ -749,7 +751,7 @@ public class TopicController {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
-            CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseListeningPart12DTO(topicId, file, partName);
+            CreateListQuestionByExcelFileResponse excelFileDTO = excelService.parseListeningPart12DTO(topicId, file, partName);
 
             processQuestions(excelFileDTO, topicId, user, responseModel);
 
@@ -771,7 +773,7 @@ public class TopicController {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
-            CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseListeningPart34DTO(topicId, file, partName);
+            CreateListQuestionByExcelFileResponse excelFileDTO = excelService.parseListeningPart34DTO(topicId, file, partName);
 
             processQuestions(excelFileDTO, topicId, user, responseModel);
 
@@ -792,7 +794,7 @@ public class TopicController {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
-            CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseReadingPart5DTO(topicId, file);
+            CreateListQuestionByExcelFileResponse excelFileDTO = excelService.parseReadingPart5DTO(topicId, file);
 
             processQuestions(excelFileDTO, topicId, user, responseModel);
 
@@ -813,7 +815,7 @@ public class TopicController {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
-            CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseReadingPart67DTO(topicId, file, partName);
+            CreateListQuestionByExcelFileResponse excelFileDTO = excelService.parseReadingPart67DTO(topicId, file, partName);
 
             processQuestions(excelFileDTO, topicId, user, responseModel);
 
@@ -835,7 +837,7 @@ public class TopicController {
         try {
             User user = IUserService.currentUser();
 
-            CreateListQuestionByExcelFileDTO excelFileDTO = excelService.parseAllPartsDTO(topicId, file);
+            CreateListQuestionByExcelFileResponse excelFileDTO = excelService.parseAllPartsDTO(topicId, file);
 
             processQuestions(excelFileDTO, topicId, user, responseModel);
 
@@ -1046,8 +1048,8 @@ public class TopicController {
         }
     }
 
-    private void processQuestions(CreateListQuestionByExcelFileDTO excelFileDTO, UUID topicId, User user, ResponseModel responseModel) {
-        for (CreateQuestionByExcelFileDTO createQuestionDTO : excelFileDTO.getQuestions()) {
+    private void processQuestions(CreateListQuestionByExcelFileResponse excelFileDTO, UUID topicId, User user, ResponseModel responseModel) {
+        for (CreateQuestionByExcelFileResponse createQuestionDTO : excelFileDTO.getQuestions()) {
             // Tạo câu hỏi và lưu nó trước khi xử lý câu trả lời
             Question question = createQuestion(createQuestionDTO, user);
             IQuestionService.createQuestion(question); // Lưu câu hỏi trước
@@ -1057,7 +1059,7 @@ public class TopicController {
 
             // Tương tự cho questionChild
             if (createQuestionDTO.getListQuestionChild() != null && !createQuestionDTO.getListQuestionChild().isEmpty()) {
-                for (CreateQuestionByExcelFileDTO createQuestionChildDTO : createQuestionDTO.getListQuestionChild()) {
+                for (CreateQuestionByExcelFileResponse createQuestionChildDTO : createQuestionDTO.getListQuestionChild()) {
                     Question questionChild = createQuestion(createQuestionChildDTO, user);
                     questionChild.setQuestionGroup(question);
 
@@ -1089,7 +1091,7 @@ public class TopicController {
         }
     }
 
-    private Question createQuestion(CreateQuestionByExcelFileDTO createQuestionDTO, User user) {
+    private Question createQuestion(CreateQuestionByExcelFileResponse createQuestionDTO, User user) {
         Question question = new Question();
         question.setQuestionContent(createQuestionDTO.getQuestionContent());
         question.setQuestionScore(createQuestionDTO.getQuestionScore());

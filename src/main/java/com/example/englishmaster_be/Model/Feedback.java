@@ -24,7 +24,7 @@ public class Feedback implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
-    UUID feedbackId;
+    UUID id;
 
     @Column(name = "name")
     String name;

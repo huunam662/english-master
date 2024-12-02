@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.DTO.Topic;
+package com.example.englishmaster_be.Model.Response.excel;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CreateTopicByExcelFileDTO {
+public class CreateTopicByExcelFileResponse {
 
     UUID topicPackId;
 

@@ -1,10 +1,14 @@
 package com.example.englishmaster_be.Service.impl;
 
+import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
 import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.Util.LinkUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -161,4 +165,17 @@ public class TopicServiceImpl implements ITopicService {
         return topicRepository.findByStartTime(startTime);
     }
 
+
+    @Override
+    public List<String> getImageCdnLinkTopic() {
+
+        List<String> listLinkCdn = topicRepository.findAllTopicImages();
+
+        MessageResponseHolder.setMessage("Found " + listLinkCdn.size() + " links");
+
+        return listLinkCdn.stream()
+                .filter(linkCdn -> linkCdn != null && !linkCdn.isEmpty())
+                .map(linkCdn -> LinkUtil.linkFileShowImageBE + linkCdn)
+                .toList();
+    }
 }

@@ -88,7 +88,7 @@ public class PartController {
 
                 part.setUserUpdate(user);
                 part.setUpdateAt(LocalDateTime.now());
-                IFileStorageService.save(file, filename);
+                IFileStorageService.save(file);
             });
 
             IPartService.updatePart(part);

@@ -7,6 +7,7 @@ import java.util.UUID;
 
 
 public interface IQuestionService {
+
     void createQuestion(Question question);
 
     Question findQuestionById(UUID questionId);

@@ -12,6 +12,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.core.MethodParameter;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +36,7 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
             @NonNull Class<? extends HttpMessageConverter<?>> converterType
     ) {
 
-        // (1) -> Nhận biết hướng đi của request và vị trí của Response handler
+        // (1) -> Nhận biết hướng đi của request và vị trí của handler response
         String requestURI = httpServletRequest.getRequestURI();
         String packageName = returnType.getContainingClass().getPackageName();
         Class<?> declaringClass = returnType.getDeclaringClass();
@@ -44,15 +45,16 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
         System.out.println("requestURI: " + requestURI);
         System.out.println("packageName: " + packageName);
         System.out.println("declaringClass: " + declaringClass);
+        System.out.println("annotation declaringClass" + declaringClass.getAnnotation(RestController.class));
         System.out.println("------- supports ResponseBodyAdvice -----------");
         // -> end (1)
 
         // -> Cho phép beforeBodyWrite nhận xử lý nếu thỏa điều kiện dưới đây
-        return !requestURI.contains("/api-docs")
+        return !requestURI.contains("/v3/api-docs")
                 && !packageName.contains("org.springdoc.webmvc.ui")
                 && !declaringClass.getPackageName().contains("org.springdoc.webmvc.api")
                 && (
-                    returnType.getMethodAnnotation(RestController.class) != null
+                    declaringClass.getAnnotation(RestController.class) != null
                     ||
                     returnType.getParameterType().equals(ResponseModel.class)
                     ||
@@ -85,7 +87,7 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
             response.setStatusCode(exceptionResponseModel.getStatus());
             exceptionResponseModel.setPath(request.getURI().getPath());
         }
-        else {
+        else if(!(body instanceof Resource)) {
 
             response.setStatusCode(HttpStatus.OK);
 
@@ -102,6 +104,7 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
                 apiResponse.setPath(request.getURI().getPath());
             }
             else if(body instanceof ResponseEntity<?> responseEntity){
+
                 Object bodyEntity = responseEntity.getBody();
 
                 if(bodyEntity instanceof ExceptionResponseModel exceptionResponseModel){
@@ -128,6 +131,7 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
                     .responseData(body)
                     .build();
         }
+
         return body;
     }
 }

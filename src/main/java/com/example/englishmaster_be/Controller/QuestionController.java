@@ -88,7 +88,7 @@ public class QuestionController {
                 question.setUserUpdate(user);
                 question.getContentCollection().add(content);
                 IContentService.uploadContent(content);
-                IFileStorageService.save(file, filename);
+                IFileStorageService.save(file);
             });
 
             IQuestionService.uploadFileQuestion(question);
@@ -132,7 +132,7 @@ public class QuestionController {
             question.setUserUpdate(user);
 
             IQuestionService.uploadFileQuestion(question);
-            IFileStorageService.save(uploadFileDTO.getContentData(), filename);
+            IFileStorageService.save(uploadFileDTO.getContentData());
 
             QuestionResponse questionResponse = new QuestionResponse(question);
             responseModel.setMessage("Update file Question successfully");
@@ -393,7 +393,7 @@ public class QuestionController {
                 }
                 question.getContentCollection().add(content);
                 IContentService.uploadContent(content);
-                IFileStorageService.save(createQuestionDTO.getContentImage(), filename);
+                IFileStorageService.save(createQuestionDTO.getContentImage());
             }
             if (createQuestionDTO.getContentAudio() != null && !createQuestionDTO.getContentAudio().isEmpty()) {
                 for (Content content : question.getContentCollection()) {
@@ -413,7 +413,7 @@ public class QuestionController {
                 }
                 question.getContentCollection().add(content);
                 IContentService.uploadContent(content);
-                IFileStorageService.save(createQuestionDTO.getContentAudio(), filename);
+                IFileStorageService.save(createQuestionDTO.getContentAudio());
             }
 
             IQuestionService.createQuestion(question);

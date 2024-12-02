@@ -1,13 +1,25 @@
 package com.example.englishmaster_be.Service;
 
+import com.example.englishmaster_be.Common.dto.response.FilterResponse;
+import com.example.englishmaster_be.DTO.Feedback.CreateFeedbackDTO;
+import com.example.englishmaster_be.DTO.Feedback.FeedbackFilterRequest;
 import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.Model.Response.FeedbackResponse;
 
 import java.util.UUID;
 
 public interface IFeedbackService {
-    void save(Feedback feedback);
 
-    void delete(Feedback feedback);
+    Feedback getFeedbackById(UUID feedbackId);
 
-    Feedback findFeedbackById(UUID feedbackId);
+    FilterResponse<?> getListFeedbackOfAdmin(FeedbackFilterRequest filterRequest);
+
+    FilterResponse<?> getListFeedbackOfUser(FeedbackFilterRequest filterRequest);
+
+    FeedbackResponse saveFeedback(CreateFeedbackDTO createFeedbackDTO);
+
+    void enableFeedback(UUID feedbackId, boolean enable);
+
+    void deleteFeedback(UUID feedbackId);
+
 }

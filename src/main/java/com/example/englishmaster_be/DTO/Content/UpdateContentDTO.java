@@ -18,10 +18,6 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateContentDTO extends CreateContentDTO{
 
-
-    UUID questionId;
-
-    @Schema(hidden = true)
-    MultipartFile file;
+    UUID contentId;
 
 }

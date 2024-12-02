@@ -46,9 +46,9 @@ public class TopicResponse {
 
     String updateAt;
 
-    JSONObject userCreate;
+    UserBasicResponse userCreate;
 
-    JSONObject userUpdate;
+    UserBasicResponse userUpdate;
 
     List<UUID> listPart;
 
@@ -90,20 +90,18 @@ public class TopicResponse {
         if(Objects.nonNull(topic.getUpdateAt()))
             this.updateAt = sdf.format(Timestamp.valueOf(topic.getUpdateAt()));
 
-        userCreate = new JSONObject();
-        userUpdate = new JSONObject();
-
-        if(Objects.nonNull(topic.getUserCreate())){
-            userCreate.put("User Id", topic.getUserCreate().getUserId());
-            userCreate.put("User Name", topic.getUserCreate().getName());
-        }
-        if(Objects.nonNull(topic.getUserUpdate())){
-            userUpdate.put("User Id", topic.getUserUpdate().getUserId());
-            userUpdate.put("User Name", topic.getUserUpdate().getName());
-        }
-
         if(Objects.nonNull(topic.getStatus()))
             this.statusId = topic.getStatus().getStatusId();
+
+        userCreate = UserBasicResponse.builder()
+                .userId(topic.getUserCreate().getUserId())
+                .name(topic.getUserCreate().getName())
+                .build();
+
+        userUpdate = UserBasicResponse.builder()
+                .userId(topic.getUserUpdate().getUserId())
+                .name(topic.getUserUpdate().getName())
+                .build();
     }
 
 }

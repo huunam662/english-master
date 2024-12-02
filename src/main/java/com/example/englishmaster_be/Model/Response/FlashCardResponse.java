@@ -3,7 +3,6 @@ package com.example.englishmaster_be.Model.Response;
 import com.example.englishmaster_be.Model.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.json.simple.JSONObject;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
@@ -31,11 +30,11 @@ public class FlashCardResponse {
 
     String updateAt;
 
-    JSONObject user;
+    UserBasicResponse user;
 
-    JSONObject userCreate;
+    UserBasicResponse userCreate;
 
-    JSONObject userUpdate;
+    UserBasicResponse userUpdate;
 
     public FlashCardResponse(FlashCard flashCard) {
 
@@ -50,18 +49,20 @@ public class FlashCardResponse {
         this.createAt = sdf.format(Timestamp.valueOf(flashCard.getCreateAt()));
         this.updateAt = sdf.format(Timestamp.valueOf(flashCard.getUpdateAt()));
 
-        userCreate = new JSONObject();
-        userUpdate = new JSONObject();
-        user = new JSONObject();
+        user = UserBasicResponse.builder()
+                .userId(flashCard.getUser().getUserId())
+                .name(flashCard.getUser().getName())
+                .build();
 
-        user.put("User Id", flashCard.getUser().getUserId());
-        user.put("User Name", flashCard.getUser().getName());
+        userCreate = UserBasicResponse.builder()
+                .userId(flashCard.getUserCreate().getUserId())
+                .name(flashCard.getUserCreate().getName())
+                .build();
 
-        userCreate.put("User Id", flashCard.getUserCreate().getUserId());
-        userCreate.put("User Name", flashCard.getUserCreate().getName());
-
-        userUpdate.put("User Id", flashCard.getUserUpdate().getUserId());
-        userUpdate.put("User Name", flashCard.getUserUpdate().getName());
+        userUpdate = UserBasicResponse.builder()
+                .userId(flashCard.getUserUpdate().getUserId())
+                .name(flashCard.getUserUpdate().getName())
+                .build();
     }
 
 }
