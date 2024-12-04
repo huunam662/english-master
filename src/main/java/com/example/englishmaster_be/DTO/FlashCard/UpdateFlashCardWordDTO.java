@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.DTO.FlashCard;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -15,6 +16,6 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateFlashCardWordDTO extends CreateFlashCardWordDTO{
 
-    @Schema(hidden = true)
+    @Hidden
     UUID flashCardWordId;
 }

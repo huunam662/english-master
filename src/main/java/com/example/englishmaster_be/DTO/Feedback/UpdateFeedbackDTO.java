@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.DTO.Feedback;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -15,7 +16,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateFeedbackDTO extends CreateFeedbackDTO{
 
-    @Schema(hidden = true)
+    @Hidden
     UUID FeedbackID;
 
 }

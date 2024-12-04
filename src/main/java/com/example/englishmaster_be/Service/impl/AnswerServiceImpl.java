@@ -36,64 +36,53 @@ public class AnswerServiceImpl implements IAnswerService {
     @Override
     public Answer saveAnswer(CreateAnswerDTO createAnswerDTO) {
 
-        try {
+        User user = userService.currentUser();
 
-            User user = userService.currentUser();
+        Question question = questionService.findQuestionById(createAnswerDTO.getQuestionId());
 
-            Question question = questionService.findQuestionById(createAnswerDTO.getQuestionId());
+        boolean check = false;
 
-            boolean check = false;
-
-            for (Answer answerCheck : question.getAnswers()) {
-                if(createAnswerDTO instanceof UpdateAnswerDTO updateAnswerDTO) {
-                    if (
-                            answerCheck.isCorrectAnswer()
-                            && updateAnswerDTO.isCorrectAnswer()
-                            && !answerCheck.getAnswerId().equals(updateAnswerDTO.getAnswerId())
-                    ) {
-                        check = true;
-                        break;
-                    }
-                }
-                else if (answerCheck.isCorrectAnswer() && createAnswerDTO.isCorrectAnswer()){
+        for (Answer answerCheck : question.getAnswers()) {
+            if(createAnswerDTO instanceof UpdateAnswerDTO updateAnswerDTO) {
+                if (
+                        answerCheck.isCorrectAnswer()
+                        && updateAnswerDTO.isCorrectAnswer()
+                        && !answerCheck.getAnswerId().equals(updateAnswerDTO.getAnswerId())
+                ) {
                     check = true;
                     break;
                 }
             }
-
-            if (!check){
-                MessageResponseHolder.setMessage("Had correct Answer");
-                return null;
+            else if (answerCheck.isCorrectAnswer() && createAnswerDTO.isCorrectAnswer()){
+                check = true;
+                break;
             }
-
-            Answer answer;
-
-            if(createAnswerDTO instanceof UpdateAnswerDTO updateAnswerDTO){
-                answer = findAnswerToId(updateAnswerDTO.getAnswerId());
-                answer.setAnswerContent(updateAnswerDTO.getContentAnswer());
-                answer.setCorrectAnswer(updateAnswerDTO.isCorrectAnswer());
-                answer.setExplainDetails(updateAnswerDTO.getExplainDetails());
-                answer.setQuestion(question);
-                answer.setUpdateAt(LocalDateTime.now());
-                answer.setUserUpdate(user);
-            }
-            else{
-                answer = new Answer(createAnswerDTO);
-                answer.setQuestion(question);
-                answer.setUserCreate(user);
-                answer.setUserUpdate(user);
-            }
-
-            answerRepository.save(answer);
-
-            MessageResponseHolder.setMessage("Save answer successfully");
-
-            return answer;
-
-        } catch (BadRequestException e) {
-
-            throw new BadRequestException("Save answer fail: " + e.getMessage());
         }
+
+        if (check) throw new BadRequestException("Had correct Answer");
+
+        Answer answer;
+
+        if(createAnswerDTO instanceof UpdateAnswerDTO updateAnswerDTO){
+            answer = findAnswerToId(updateAnswerDTO.getAnswerId());
+            answer.setAnswerContent(updateAnswerDTO.getContentAnswer());
+            answer.setCorrectAnswer(updateAnswerDTO.isCorrectAnswer());
+            answer.setExplainDetails(updateAnswerDTO.getExplainDetails());
+            answer.setQuestion(question);
+            answer.setUpdateAt(LocalDateTime.now());
+            answer.setUserUpdate(user);
+        }
+        else{
+            answer = new Answer(createAnswerDTO);
+            answer.setQuestion(question);
+            answer.setUserCreate(user);
+            answer.setUserUpdate(user);
+        }
+
+        answerRepository.save(answer);
+
+        return answer;
+
     }
 
     @Override

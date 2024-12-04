@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.DTO.Answer;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UpdateAnswerDTO extends CreateAnswerDTO {
 
-    @Schema(hidden = true)
+    @Hidden
     UUID answerId;
 
 }

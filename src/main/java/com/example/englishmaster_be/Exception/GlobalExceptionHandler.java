@@ -162,6 +162,18 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
+    @ExceptionHandler(AccessDeniedException.class)
+    public ExceptionResponseModel handleAccessDeniedException(AccessDeniedException exception) {
+
+        Error error = Error.UNAUTHORIZED;
+
+        return ExceptionResponseModel.builder()
+                .success(false)
+                .status(error.getStatusCode())
+                .code(error.getStatusCode().value())
+                .message(error.getMessage())
+                .build();
+    }
 
 
 }
