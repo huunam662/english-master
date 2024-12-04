@@ -61,10 +61,9 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .exceptionHandling(exception -> {
-                    exception.authenticationEntryPoint(filterExceptionHandler);
-                    exception.accessDeniedHandler(filterExceptionHandler);
-                })
+                .exceptionHandling(exception ->
+                    exception.authenticationEntryPoint(filterExceptionHandler)
+                )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/api/**", "/ws/**").permitAll()

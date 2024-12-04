@@ -1,6 +1,8 @@
 package com.example.englishmaster_be.Configuration.jwt;
 
+import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Service.IInvalidTokenService;
+import jakarta.mail.AuthenticationFailedException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,7 +13,9 @@ import lombok.NonNull;
 import lombok.experimental.FieldDefaults;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -45,22 +49,23 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
             String headerAuth = request.getHeader("Authorization");
 
-            if (headerAuth != null){
+            if (headerAuth != null && !headerAuth.isEmpty()){
 
                 String jwt = headerAuth.substring(7);
 
-                if (jwtUtils.validateJwtToken(jwt) && !invalidTokenService.verifyToken(jwt)) {
+                if (!jwtUtils.validateJwtToken(jwt) || invalidTokenService.verifyToken(jwt))
+                    throw new AuthenticationServiceException(Error.UNAUTHENTICATED.getMessage());
 
-                    String username = jwtUtils.getUserNameFromJwtToken(jwt);
+                String username = jwtUtils.getUserNameFromJwtToken(jwt);
 
-                    UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
-                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
             }
 
             filterChain.doFilter(request, response);
