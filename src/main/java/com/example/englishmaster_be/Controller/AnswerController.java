@@ -32,6 +32,7 @@ public class AnswerController {
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
+    @MessageResponse("Save answer successfully")
     public AnswerResponse createAnswer(@RequestBody CreateAnswerDTO createAnswerDTO) {
 
         Answer answer = answerService.saveAnswer(createAnswerDTO);;
@@ -41,6 +42,7 @@ public class AnswerController {
 
     @PutMapping(value = "/{answerId:.+}/update")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @MessageResponse("Save answer successfully")
     public AnswerResponse updateAnswer(@PathVariable UUID answerId, @RequestBody UpdateAnswerDTO updateAnswerDTO) {
 
         updateAnswerDTO.setAnswerId(answerId);

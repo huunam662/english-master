@@ -79,7 +79,8 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
         System.out.println("------- ResponseBodyAdvice -----------");
         System.out.println("beforeBodyWrite");
         System.out.println(returnType.getContainingClass().getPackageName());
-        System.out.println(body.getClass().getSimpleName());
+        if(body != null) System.out.println(body.getClass().getSimpleName());
+        System.out.println(returnType.getMethod());
         System.out.println("------- ResponseBodyAdvice -----------");
 
         if(body instanceof ExceptionResponseModel exceptionResponseModel) {
