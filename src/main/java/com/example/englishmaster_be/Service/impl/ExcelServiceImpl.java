@@ -91,49 +91,52 @@ public class ExcelServiceImpl implements IExcelService {
     @Override
     public CreateListQuestionByExcelFileResponse parseListeningPart12DTO(UUID topicId, MultipartFile file, int part) {
 
-        if(file == null || file.isEmpty())
+        if (file == null || file.isEmpty())
             throw new BadRequestException("Please select a file to upload");
 
         if (part != 1 && part != 2)
             throw new BadRequestException("Invalid Part Value. It must be either 1 or 2");
 
-        if(!ExcelUtil.isExcelFile(file))
+        if (!ExcelUtil.isExcelFile(file))
             throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
 
-            Sheet sheet = workbook.getSheetAt(part);
+            Sheet sheet = workbook.getSheetAt(part); // Truy cập sheet theo phần (part)
             CreateListQuestionByExcelFileResponse resultDTO = new CreateListQuestionByExcelFileResponse();
             List<CreateQuestionByExcelFileResponse> listQuestionDTO = new ArrayList<>();
             CreateQuestionByExcelFileResponse questionBig = new CreateQuestionByExcelFileResponse();
             List<CreateQuestionByExcelFileResponse> listQuestionDTOMini = new ArrayList<>();
+
+            // Lấy thông tin câu hỏi lớn từ các hàng đầu tiên của sheet
             Row rowAudio = sheet.getRow(1);
             String contentAudio = rowAudio != null ? getStringCellValue(rowAudio.getCell(1)) : "";
             String contentAudioLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentAudio);
+
             Row rowScoreBig = sheet.getRow(2);
             int scoreBig = rowScoreBig != null ? (int) getNumericCellValue(rowScoreBig.getCell(1)) : 0;
+
+            // Cập nhật thông tin cho câu hỏi lớn
             questionBig.setContentAudio(contentAudioLink);
             questionBig.setQuestionScore(scoreBig);
             UUID partId = part == 1 ? partRepository.findByPartName(PartConstant.PART_1).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId()
                     : partRepository.findByPartName(PartConstant.PART_2).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId();
             questionBig.setPartId(partId);
+
+            // Lấy các câu hỏi con từ sheet
             for (int i = 4; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
-                String[] options;
                 if (row != null) {
                     CreateQuestionByExcelFileResponse question = new CreateQuestionByExcelFileResponse();
                     question.setPartId(partId);
-                    if (part == 1) {
-                        String image = getStringCellValue(row.getCell(3));
-                        String imageLink = contentRepository.findContentDataByTopicIdAndCode(topicId, image);
-                        question.setContentImage(imageLink);
-                        options = new String[]{"A", "B", "C", "D"};
-                    } else {
-                        options = new String[]{"A", "B", "C"};
-                    }
+
+                    // Xử lý câu trả lời với các tuỳ chọn A, B, C, D (phần 1) hoặc A, B, C (phần 2)
+                    String[] options = part == 1 ? new String[]{"A", "B", "C", "D"} : new String[]{"A", "B", "C"};
                     String correctAnswer = getStringCellValue(row.getCell(1));
                     int score = (int) getNumericCellValue(row.getCell(2));
                     question.setQuestionScore(score);
+
+                    // Tạo danh sách câu trả lời
                     List<CreateListAnswerDTO> listAnswerDTO = new ArrayList<>();
                     for (String option : options) {
                         CreateListAnswerDTO answer = new CreateListAnswerDTO();
@@ -142,18 +145,26 @@ public class ExcelServiceImpl implements IExcelService {
                         listAnswerDTO.add(answer);
                     }
                     question.setListAnswer(listAnswerDTO);
+
+                    // Thêm câu hỏi vào danh sách câu hỏi con
                     listQuestionDTOMini.add(question);
                 }
             }
+
+            // Cập nhật thông tin câu hỏi lớn với danh sách câu hỏi con
             questionBig.setListQuestionChild(listQuestionDTOMini);
             listQuestionDTO.add(questionBig);
+
+            // Đặt danh sách câu hỏi vào DTO kết quả
             resultDTO.setQuestions(listQuestionDTO);
             return resultDTO;
-        } catch (Exception e) {
 
+        } catch (Exception e) {
+            e.printStackTrace();
             throw new CustomException(part == 1 ? Error.CAN_NOT_CREATE_PART_1_BY_EXCEL : Error.CAN_NOT_CREATE_PART_2_BY_EXCEL);
         }
     }
+
 
     @Transactional
     @Override

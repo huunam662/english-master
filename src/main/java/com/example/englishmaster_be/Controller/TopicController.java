@@ -39,6 +39,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -80,8 +81,8 @@ public class TopicController {
     private ContentRepository contentRepository;
     @Autowired
     private TopicServiceImpl topicServiceImpl;
-
-    AnswerRepository answerRepository;
+    @Autowired
+    private AnswerRepository answerRepository;
 
 
     @GetMapping(value = "/{topicId:.+}/inforTopic")
@@ -777,27 +778,7 @@ public class TopicController {
         }
     }
 
-    @PostMapping(value = "/{topicId:.+}/addListQuestionPart12ToTopicByExcelFile", consumes = {"multipart/form-data"})
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseModel> addListQuestionPart12ToTopicByExcelFile(@PathVariable UUID topicId, @RequestParam("file") MultipartFile file, @RequestParam("part") int partName) {
-        ResponseModel responseModel = new ResponseModel();
-        try {
-            User user = IUserService.currentUser();
-            CreateListQuestionByExcelFileResponse excelFileDTO = excelService.parseListeningPart12DTO(topicId, file, partName);
 
-            processQuestions(excelFileDTO, topicId, user, responseModel);
-
-
-
-            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-        } catch (Exception e) {
-            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Add Question to Topic fail: " + e.getMessage());
-            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
-        }
-    }
 
     @PostMapping(value = "/{topicId:.+}/addListQuestionPart34ToTopicByExcelFile", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('ADMIN')")
@@ -806,10 +787,7 @@ public class TopicController {
         try {
             User user = IUserService.currentUser();
             CreateListQuestionByExcelFileResponse excelFileDTO = excelService.parseListeningPart34DTO(topicId, file, partName);
-
             processQuestions(excelFileDTO, topicId, user, responseModel);
-
-
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
@@ -842,7 +820,6 @@ public class TopicController {
     }
 
     @PostMapping(value = "/{topicId:.+}/addListQuestionPart67ToTopicByExcelFile", consumes = {"multipart/form-data"})
-    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> addListQuestionPart67ToTopicByExcelFile(@PathVariable UUID topicId, @RequestParam("file") MultipartFile file, @RequestParam("part") int partName) {
         ResponseModel responseModel = new ResponseModel();
         try {
@@ -862,17 +839,14 @@ public class TopicController {
         }
     }
 
-    @PostMapping(value = "/{topicId:.+}/addAllPartsToTopicByExcelFile", consumes = {"multipart/form-data"})
+    @PostMapping(value = "/{topicId:.+}/addListQuestionPart12ToTopicByExcelFile", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ResponseModel> addAllPartsToTopicByExcelFile(@PathVariable UUID topicId, @RequestParam("file") MultipartFile file) {
+    public ResponseEntity<ResponseModel> addListQuestionPart12ToTopicByExcelFile(@PathVariable UUID topicId, @RequestParam("file") MultipartFile file, @RequestParam("part") int partName) {
         ResponseModel responseModel = new ResponseModel();
         try {
             User user = IUserService.currentUser();
-
-            CreateListQuestionByExcelFileResponse excelFileDTO = excelService.parseAllPartsDTO(topicId, file);
-
+            CreateListQuestionByExcelFileResponse excelFileDTO = excelService.parseListeningPart12DTO(topicId, file, partName);
             processQuestions(excelFileDTO, topicId, user, responseModel);
-
             return ResponseEntity.status(HttpStatus.OK).body(responseModel);
         } catch (Exception e) {
             ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
@@ -882,6 +856,24 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
+    @PostMapping(value = "/{topicId:.+}/addAllPartsToTopicByExcelFile", consumes = {"multipart/form-data"})
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ResponseModel> addAllPartsToTopicByExcelFile(@PathVariable UUID topicId, @RequestParam("file") MultipartFile file) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            User user = IUserService.currentUser();
+            CreateListQuestionByExcelFileResponse excelFileDTO = excelService.parseAllPartsDTO(topicId, file);
+            processQuestions(excelFileDTO, topicId, user, responseModel);
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (Exception e) {
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Add Question to Topic fail: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
+        }
+    }
+
 
     @DeleteMapping(value = "/{topicId:.+}/deleteQuestion")
     @PreAuthorize("hasRole('ADMIN')")
