@@ -856,6 +856,7 @@ public class TopicController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
         }
     }
+
     @PostMapping(value = "/{topicId:.+}/addAllPartsToTopicByExcelFile", consumes = {"multipart/form-data"})
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ResponseModel> addAllPartsToTopicByExcelFile(@PathVariable UUID topicId, @RequestParam("file") MultipartFile file) {
