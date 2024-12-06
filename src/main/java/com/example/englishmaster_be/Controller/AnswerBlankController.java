@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Controller;
 
+import com.example.englishmaster_be.DTO.Answer.AnswerBlankRequest;
 import com.example.englishmaster_be.DTO.Answer.UserAnswerRequest;
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
 import com.example.englishmaster_be.Model.Response.AnswerBlankResponse;
@@ -27,12 +28,11 @@ public class AnswerBlankController {
     @GetMapping("/get-list-answer/{questionId}")
     @MessageResponse("List Answer to Question successfully")
     public List<QuestionBlankResponse> getAnswer(@PathVariable UUID questionId){
-
         return answerService.getAnswerWithQuestionBlank(questionId);
     }
 
     @PostMapping("/create-answer-blank")
-    public AnswerBlankResponse createAnswer(@RequestBody UserAnswerRequest request){
+    public AnswerBlankResponse createAnswer(@RequestBody AnswerBlankRequest request){
 
         return answerService.createAnswerBlank(request);
     }

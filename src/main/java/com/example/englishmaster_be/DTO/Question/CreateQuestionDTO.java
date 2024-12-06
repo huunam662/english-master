@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.DTO.Question;
 
 import com.example.englishmaster_be.DTO.Answer.CreateListAnswerDTO;
+import com.example.englishmaster_be.DTO.Type.QuestionType;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,7 +28,7 @@ public class CreateQuestionDTO {
 
     UUID partId;
 
-	String questionType;
+	QuestionType questionType;
 
 	List<CreateListAnswerDTO> listAnswer;
 
@@ -36,5 +37,7 @@ public class CreateQuestionDTO {
 	String questionExplainEn;
 
 	String questionExplainVn;
+
+	int numberChoice;
 
 }

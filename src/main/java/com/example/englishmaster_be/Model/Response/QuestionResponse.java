@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Model.Response;
 
+import com.example.englishmaster_be.DTO.Type.QuestionType;
 import com.example.englishmaster_be.Model.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -39,6 +40,8 @@ public class QuestionResponse {
 
     JSONArray contentList;
 
+    QuestionType questionType;
+
 
     public QuestionResponse(Question question) {
 
@@ -46,7 +49,7 @@ public class QuestionResponse {
         this.questionContent = question.getQuestionContent();
         this.questionScore = question.getQuestionScore();
         this.partId = question.getPart().getPartId();
-
+        this.questionType= question.getQuestionType();
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
         this.createAt = sdf.format(Timestamp.valueOf(question.getCreateAt()));
         this.updateAt = sdf.format(Timestamp.valueOf(question.getUpdateAt()));
@@ -86,6 +89,8 @@ public class QuestionResponse {
         this.questionContent = question.getQuestionContent();
         this.questionScore = question.getQuestionScore();
         this.partId = question.getPart().getPartId();
+
+        this.questionType = question.getQuestionType();
 
         // Định dạng ngày tạo và ngày cập nhật
         SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");

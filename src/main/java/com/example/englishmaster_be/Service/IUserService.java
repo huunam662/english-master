@@ -33,4 +33,5 @@ public interface IUserService {
 
     boolean updatePassword(String otp,String newPassword);
 
+
 }

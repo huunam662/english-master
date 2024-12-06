@@ -72,7 +72,7 @@ public class Question implements Serializable {
     @ManyToMany(mappedBy = "questions")
     List<Topic> topics;
 
-    @OneToMany(mappedBy = "question")
+    @OneToMany(mappedBy = "question",cascade = CascadeType.ALL)
     List<Answer> answers;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
@@ -82,6 +82,9 @@ public class Question implements Serializable {
     @Enumerated(EnumType.STRING)
     private QuestionType questionType;
 
+    @Column(name = "number_choice",columnDefinition = "int default 1")
+    private int numberChoice;
+
     public Question(CreateQuestionDTO createQuestionDTO) {
 
         if(Objects.isNull(createQuestionDTO)) return;
@@ -90,6 +93,8 @@ public class Question implements Serializable {
         this.questionScore = createQuestionDTO.getQuestionScore();
         this.questionExplainEn = createQuestionDTO.getQuestionExplainEn();
         this.questionExplainVn = createQuestionDTO.getQuestionExplainVn();
+        this.questionType=createQuestionDTO.getQuestionType();
+        this.numberChoice = createQuestionDTO.getNumberChoice();
     }
 
     public Question(String questionContent, int questionScore) {

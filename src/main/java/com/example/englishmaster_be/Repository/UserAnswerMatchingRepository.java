@@ -2,7 +2,7 @@ package com.example.englishmaster_be.Repository;
 
 import com.example.englishmaster_be.Model.Question;
 import com.example.englishmaster_be.Model.User;
-import com.example.englishmaster_be.Model.UserBlankAnswer;
+import com.example.englishmaster_be.Model.UserAnswerMatching;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,8 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface UserBlankAnswerRepository extends JpaRepository<UserBlankAnswer, UUID> {
+public interface UserAnswerMatchingRepository extends JpaRepository<UserAnswerMatching, UUID> {
 
-    List<UserBlankAnswer> getByUserAndQuestion(User user, Question question);
-    UserBlankAnswer getByUserAndQuestionAndPosition(User user, Question question, int position);
+    List<UserAnswerMatching> findAllByUserAndQuestion(User user, Question question);
 }
