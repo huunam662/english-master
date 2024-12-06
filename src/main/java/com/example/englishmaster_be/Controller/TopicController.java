@@ -322,7 +322,7 @@ public class TopicController {
     }
 
     @GetMapping(value = "/listTopic")
-    public ResponseEntity<ResponseModel> getAllTopic(@RequestParam(value = "page", defaultValue = "0") @Min(0) Integer page,
+    public ResponseEntity<ResponseModel> getAllTopic(@RequestParam(value = "page", defaultValue = "2") @Min(2) Integer page,
                                                      @RequestParam(value = "size", defaultValue = "12") @Min(1) @Max(100) Integer size,
                                                      @RequestParam(value = "sortBy", defaultValue = "updateAt") String sortBy,
                                                      @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction sortDirection,
