@@ -10,24 +10,22 @@ import com.example.englishmaster_be.Repository.NewsRepository;
 import com.example.englishmaster_be.Repository.TopicRepository;
 import com.example.englishmaster_be.Service.GeneralSearchService;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class GeneralSearchServiceImpl implements GeneralSearchService {
 
-    public final TopicRepository topicRepository;
-    public final FlashCardWordRepository flashCardWordRepository;
-    public final NewsRepository newsRepository;
-    public final JPAQueryFactory queryFactory;
+    JPAQueryFactory queryFactory;
 
-    public GeneralSearchServiceImpl(TopicRepository topicRepository, FlashCardWordRepository flashCardWordRepository, NewsRepository newsRepository, JPAQueryFactory queryFactory) {
-        this.topicRepository = topicRepository;
-        this.flashCardWordRepository = flashCardWordRepository;
-        this.newsRepository = newsRepository;
-        this.queryFactory = queryFactory;
-    }
 
     @Override
     public GeneralSearchAllResponse searchAll(String keyword) {

@@ -2,13 +2,11 @@ package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Common.dto.response.FilterResponse;
 import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
-import com.example.englishmaster_be.DTO.News.CreateNewsDTO;
+import com.example.englishmaster_be.DTO.News.SaveNewsDTO;
 import com.example.englishmaster_be.DTO.News.NewsFilterRequest;
 import com.example.englishmaster_be.DTO.News.UpdateNewsDTO;
 import com.example.englishmaster_be.Model.*;
-import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
 import com.example.englishmaster_be.Model.Response.NewsResponse;
-import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.IFileStorageService;
 import com.example.englishmaster_be.Service.INewsService;
@@ -20,14 +18,11 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,13 +30,13 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class NewsServiceImpl implements INewsService {
 
-    NewsRepository newsRepository;
-
     JPAQueryFactory queryFactory;
+
+    NewsRepository newsRepository;
 
     IFileStorageService fileStorageService;
 
@@ -65,36 +60,41 @@ public class NewsServiceImpl implements INewsService {
                 .content(new ArrayList<>())
                 .build();
 
-        JPAQuery<News> query = queryFactory.selectFrom(QNews.news);
-
-        OrderSpecifier<?> orderSpecifier;
+        BooleanExpression wherePattern = QNews.news.isNotNull();
 
         if(filterRequest.getIsEnable() != null)
-            query.where(QNews.news.enable.eq(filterRequest.getIsEnable()));
+            wherePattern = wherePattern.and(QNews.news.enable.eq(filterRequest.getIsEnable()));
 
         if (filterRequest.getSearch() != null && !filterRequest.getSearch().isEmpty()) {
 
             String likeExpression = "%" + filterRequest.getSearch().trim().toLowerCase().replaceAll("\\s+", "%") + "%";
 
-            BooleanExpression queryConditionPattern = QNews.news.title.equalsIgnoreCase(likeExpression)
-                            .or(QNews.news.content.equalsIgnoreCase(likeExpression));
-
-            query.where(queryConditionPattern);
+            wherePattern = wherePattern.and(
+                                            QNews.news.title.equalsIgnoreCase(likeExpression)
+                                            .or(QNews.news.content.equalsIgnoreCase(likeExpression))
+                                    );
         }
 
-        long totalElements = Optional.ofNullable(query.select(QNews.news.count()).fetchOne()).orElse(0L);
+        long totalElements = Optional.ofNullable(
+                    queryFactory.select(QNews.news.count()).from(QNews.news).where(wherePattern).fetchOne()
+                ).orElse(0L);
         long totalPages = (long) Math.ceil((float) totalElements / filterResponse.getPageSize());
         filterResponse.setTotalElements(totalElements);
         filterResponse.setTotalPages(totalPages);
         filterResponse.withPreviousAndNextPage();
 
+        OrderSpecifier<?> orderSpecifier;
+
         if(Sort.Direction.DESC.equals(filterRequest.getSortDirection()))
             orderSpecifier = QNews.news.updateAt.desc();
         else orderSpecifier = QNews.news.updateAt.asc();
 
-        query.orderBy(orderSpecifier)
-            .offset(filterResponse.getOffset())
-            .limit(filterResponse.getPageSize());
+        JPAQuery<News> query = queryFactory
+                                    .selectFrom(QNews.news)
+                                    .where(wherePattern)
+                                    .orderBy(orderSpecifier)
+                                    .offset(filterResponse.getOffset())
+                                    .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
                 query.fetch().stream().map(NewsResponse::new).toList()
@@ -119,7 +119,7 @@ public class NewsServiceImpl implements INewsService {
 
     @Transactional
     @Override
-    public NewsResponse saveNews(CreateNewsDTO newsDTO) {
+    public NewsResponse saveNews(SaveNewsDTO newsDTO) {
 
         News news;
 

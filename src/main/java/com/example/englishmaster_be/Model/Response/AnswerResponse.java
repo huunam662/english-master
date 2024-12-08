@@ -1,10 +1,14 @@
 package com.example.englishmaster_be.Model.Response;
 
 import com.example.englishmaster_be.Model.Answer;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.springframework.cglib.core.Local;
+
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -23,9 +27,13 @@ public class AnswerResponse {
 
 	String answerContent;
 
-	String createAt;
+    boolean correctAnswer;
 
-	String updateAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+	LocalDateTime createAt;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+	LocalDateTime updateAt;
 
     public AnswerResponse(Answer answer) {
 
@@ -36,12 +44,10 @@ public class AnswerResponse {
 
         answerId = answer.getAnswerId();
         answerContent = answer.getAnswerContent();
+        this.correctAnswer = answer.isCorrectAnswer();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
-        if(Objects.nonNull(answer.getCreateAt()))
-            createAt = sdf.format(Timestamp.valueOf(answer.getCreateAt()));
-        if(Objects.nonNull(answer.getUpdateAt()))
-            updateAt = sdf.format(Timestamp.valueOf(answer.getUpdateAt()));
+        this.createAt = answer.getCreateAt();
+        this.updateAt = answer.getUpdateAt();
 
     }
 }

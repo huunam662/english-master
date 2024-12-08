@@ -1,8 +1,6 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
-import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.DTO.Answer.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Model.*;
@@ -11,14 +9,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.json.simple.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Tag(name = "Answer")
@@ -30,12 +23,13 @@ public class AnswerController {
 
     IAnswerService answerService;
 
+
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
     @MessageResponse("Save answer successfully")
-    public AnswerResponse createAnswer(@RequestBody CreateAnswerDTO createAnswerDTO) {
+    public AnswerResponse createAnswer(@RequestBody SaveAnswerDTO createAnswerDTO) {
 
-        Answer answer = answerService.saveAnswer(createAnswerDTO);;
+        Answer answer = answerService.saveAnswer(createAnswerDTO);
 
         return new AnswerResponse(answer);
     }
@@ -47,7 +41,7 @@ public class AnswerController {
 
         updateAnswerDTO.setAnswerId(answerId);
 
-        Answer answer = answerService.saveAnswer(updateAnswerDTO);;
+        Answer answer = answerService.saveAnswer(updateAnswerDTO);
 
         return new AnswerResponse(answer);
     }

@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.Model.Response;
 
 import com.example.englishmaster_be.Model.MockTest;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.json.simple.JSONObject;
@@ -8,6 +9,7 @@ import org.json.simple.JSONObject;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 
 
@@ -23,13 +25,15 @@ public class MockTestResponse {
 
     UUID topicId;
 
-    String createAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+    LocalDateTime createAt;
 
-    String updateAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+    LocalDateTime updateAt;
 
-    JSONObject userCreate;
+    UserBasicResponse userCreate;
 
-    JSONObject userUpdate;
+    UserBasicResponse userUpdate;
 
     int correctAnswers;
 
@@ -54,20 +58,19 @@ public class MockTestResponse {
         userObj.put("user_name", mockTest.getUser().getName());
         this.user = userObj;
 
-        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
-        if(Objects.nonNull(mockTest.getCreateAt()))
-            this.createAt = sdf.format(Timestamp.valueOf(mockTest.getCreateAt()));
-        if(Objects.nonNull(mockTest.getUpdateAt()))
-            this.updateAt = sdf.format(Timestamp.valueOf(mockTest.getUpdateAt()));
+        this.createAt = mockTest.getCreateAt();
+        this.updateAt = mockTest.getUpdateAt();
 
-        userCreate = new JSONObject();
-        userUpdate = new JSONObject();
+        userCreate = UserBasicResponse.builder()
+                .userId(mockTest.getUserCreate().getUserId())
+                .name(mockTest.getUserCreate().getName())
+                .build();
 
-        userCreate.put("User Id", mockTest.getUserCreate().getUserId());
-        userCreate.put("User Name", mockTest.getUserCreate().getName());
+        userUpdate = UserBasicResponse.builder()
+                .userId(mockTest.getUserUpdate().getUserId())
+                .name(mockTest.getUserUpdate().getName())
+                .build();
 
-        userUpdate.put("User Id", mockTest.getUserUpdate().getUserId());
-        userUpdate.put("User Name", mockTest.getUserUpdate().getName());
     }
 
 }

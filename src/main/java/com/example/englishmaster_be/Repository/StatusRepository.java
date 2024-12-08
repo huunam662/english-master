@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface StatusRepository extends JpaRepository<Status, UUID> {
+
     @Query("SELECT s FROM Status s WHERE s.statusName LIKE :statusName")
     Optional<Status> findByStatusName(String statusName);
+
 }

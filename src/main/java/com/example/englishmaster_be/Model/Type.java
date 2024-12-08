@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Model;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -7,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 import java.util.List;
 import java.util.UUID;
 
+@Hidden
 @Entity
 @Table(name = "Type")
 @Getter

@@ -1,10 +1,10 @@
 package com.example.englishmaster_be.Configuration.jwt;
 
-import com.example.englishmaster_be.Model.CustomUserDetails;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -22,8 +22,8 @@ public class JwtUtils {
     private int jwtExpirationMs;
 
 
-    public String generateJwtToken(CustomUserDetails userPrincipal) {
-        return generateTokenFromUsername(userPrincipal.getUsername());
+    public String generateJwtToken(UserDetails userDetails) {
+        return generateTokenFromUsername(userDetails.getUsername());
     }
 
     public String generateTokenFromUsername(String username) {

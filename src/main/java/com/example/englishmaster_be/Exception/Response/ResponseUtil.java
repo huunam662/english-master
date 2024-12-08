@@ -2,6 +2,7 @@ package com.example.englishmaster_be.Exception.Response;
 
 import org.springframework.http.HttpStatus;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 public class ResponseUtil {
 
@@ -28,6 +29,6 @@ public class ResponseUtil {
     }
 
     public static <T> ApiResponse <T> error(Integer httpStatus,String message,String errors,String path){
-        return error(httpStatus,message,Arrays.asList(errors),path);
+        return error(httpStatus,message, Collections.singletonList(errors),path);
     }
 }

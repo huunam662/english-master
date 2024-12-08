@@ -10,15 +10,19 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface QuestionRepository extends JpaRepository<Question, UUID> {
+
     Optional<Question> findByQuestionId(UUID questionId);
 
     List<Question> findAllByQuestionGroup(Question question);
-    Page<Question> findAllByQuestionGroupAndPart(Question question, Part part,Pageable pageable);
+
+    Page<Question> findAllByQuestionGroupAndPart(Question question, Part part, Pageable pageable);
 
     List<Question> findByTopicsAndPart(Topic topic, Part part);
 
     Page<Question> findAll(Pageable pageable);
+
     int countByQuestionGroup(Question question);
+
     boolean existsByQuestionGroup(Question question);
 
 

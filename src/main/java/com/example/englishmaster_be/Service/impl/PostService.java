@@ -1,15 +1,22 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.PostCategory.CreatePostCategoryDto;
-import com.example.englishmaster_be.DTO.Posts.CreatePostDto;
+import com.example.englishmaster_be.DTO.PostCategory.SavePostCategoryDto;
+import com.example.englishmaster_be.DTO.Posts.SavePostDto;
 import com.example.englishmaster_be.DTO.Posts.FilterPostDto;
 import com.example.englishmaster_be.DTO.Posts.SelectPostDto;
 import com.example.englishmaster_be.DTO.Posts.UpdatePostDto;
 import com.example.englishmaster_be.Service.IPostsService;
+import com.example.englishmaster_be.Value.MicroserviceValue;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -23,48 +30,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+
+@Slf4j
 @Service
+@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PostService implements IPostsService {
 
-    private static final Logger log = LoggerFactory.getLogger(PostService.class);
-    private final RestTemplate restTemplate;
+    RestTemplate restTemplate;
 
-    @Value("${microservice.news.api-key}")
-    private String API_KEY;
+    MicroserviceValue microserviceValue;
 
-    @Value("${microservice.news.url}")
-    private String URL;
-
-    @Value("${microservice.news.prefix}")
-    private String prefix;
-
-    @Value("${microservice.news.endpoint.post.create}")
-    private String createEndpoint;
-
-    @Value("${microservice.news.endpoint.post.get-all}")
-    private String getAllEndpoint;
-
-    @Value("${microservice.news.endpoint.post.get-by-id}")
-    private String getByIdEndpoint;
-
-    @Value("${microservice.news.endpoint.post.update}")
-    private String updateEndpoint;
-
-    @Value("${microservice.news.endpoint.post.get-by-slug}")
-    private String getBySlugEndpoint;
-
-    @Value("${microservice.news.endpoint.post.get-by-post-category}")
-    private String getByPostCategorySlugEndpoint;
-
-    @Value("${microservice.news.endpoint.post.search-post}")
-    private String searchEndpoint;
-
-    @Value("${microservice.news.endpoint.post.delete}")
-    private String deleteEndpoint;
-
-    public PostService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
 
     private Map<String, Object> getResponse(String url, HttpMethod method, HttpEntity<?> requestEntity) {
         ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
@@ -81,11 +57,11 @@ public class PostService implements IPostsService {
     }
 
     @Override
-    public Object createPost(CreatePostDto dto) {
-        String createUrl = URL + prefix + createEndpoint;
+    public Object createPost(SavePostDto dto) {
+        String createUrl = microserviceValue.getURL() + microserviceValue.getPrefix() + microserviceValue.getCreateEndpoint();
         HttpHeaders headers = new HttpHeaders();
-        headers.set("X-API-KEY", API_KEY);
-        HttpEntity<CreatePostDto> requestEntity = new HttpEntity<>(dto, headers);
+        headers.set("X-API-KEY", microserviceValue.getAPI_KEY());
+        HttpEntity<SavePostDto> requestEntity = new HttpEntity<>(dto, headers);
         Map<String, Object> response = getResponse(createUrl, HttpMethod.POST, requestEntity);
         if (response.containsKey("responseData")) {
             return response.get("responseData");
@@ -95,9 +71,9 @@ public class PostService implements IPostsService {
 
     @Override
     public Object updatePost(UUID id, UpdatePostDto dto) {
-        String createUrl = URL + prefix + updateEndpoint.replace("{id}", id.toString());
+        String createUrl = microserviceValue.getURL() + microserviceValue.getPrefix() + microserviceValue.getUpdateEndpoint().replace("{id}", id.toString());
         HttpHeaders headers = new HttpHeaders();
-        headers.set("X-API-KEY", API_KEY);
+        headers.set("X-API-KEY", microserviceValue.getAPI_KEY());
         HttpEntity<UpdatePostDto> requestEntity = new HttpEntity<>(dto, headers);
         Map<String, Object> response = getResponse(createUrl, HttpMethod.PATCH, requestEntity);
         if (response.containsKey("responseData")) {
@@ -108,10 +84,10 @@ public class PostService implements IPostsService {
 
     @Override
     public Object deletePost(UUID id) {
-        String deleteUrl = URL + prefix + deleteEndpoint.replace("{id}", id.toString());
+        String deleteUrl = microserviceValue.getURL() + microserviceValue.getPrefix() + microserviceValue.getDeleteEndpoint().replace("{id}", id.toString());
         HttpHeaders headers = new HttpHeaders();
-        headers.set("X-API-KEY", API_KEY);
-        HttpEntity<CreatePostCategoryDto> requestEntity = new HttpEntity<>(headers);
+        headers.set("X-API-KEY", microserviceValue.getAPI_KEY());
+        HttpEntity<SavePostCategoryDto> requestEntity = new HttpEntity<>(headers);
         Map<String, Object> response = getResponse(deleteUrl, HttpMethod.DELETE, requestEntity);
         if (response.containsKey("responseData")) {
             return response.get("responseData");
@@ -121,7 +97,7 @@ public class PostService implements IPostsService {
 
     @Override
     public Object getAllPosts(SelectPostDto dto) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(URL + prefix + getAllEndpoint);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(microserviceValue.getURL() + microserviceValue.getPrefix() + microserviceValue.getGetAllEndpoint());
         String getAllUrl = parseToUrlDynamic(builder, dto);
         getAllUrl = getAllUrl.replace("%20", " ");
         HttpEntity<SelectPostDto> requestEntity = new HttpEntity<>(new HttpHeaders());
@@ -134,7 +110,7 @@ public class PostService implements IPostsService {
 
     @Override
     public Object getPostByPostCategorySlug(String slug, FilterPostDto dto) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(URL + prefix + getByPostCategorySlugEndpoint.replace("{slug}", slug));
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(microserviceValue.getURL() + microserviceValue.getPrefix() + microserviceValue.getGetByPostCategorySlugEndpoint().replace("{slug}", slug));
         String getByCateSlugUrl = parseToUrlDynamic(builder, dto);
         log.warn(getByCateSlugUrl);
         getByCateSlugUrl = getByCateSlugUrl.replace("%20", " ");
@@ -148,7 +124,7 @@ public class PostService implements IPostsService {
 
     @Override
     public Object getPostBySlug(String slug) {
-        String getBySlugUrl = URL + prefix + getBySlugEndpoint.replace("{slug}", slug);
+        String getBySlugUrl = microserviceValue.getURL() + microserviceValue.getPrefix() + microserviceValue.getGetBySlugEndpoint().replace("{slug}", slug);
         Map<String, Object> response = getResponse(getBySlugUrl, HttpMethod.GET, new HttpEntity<>(new HttpHeaders()));
         if (response.containsKey("responseData")) {
             if (response.get("responseData") == null) {
@@ -161,7 +137,7 @@ public class PostService implements IPostsService {
 
     @Override
     public Object searchPost(FilterPostDto dto) {
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(URL + prefix + searchEndpoint);
+        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(microserviceValue.getURL() + microserviceValue.getPrefix() + microserviceValue.getSearchEndpoint());
         String searchUrl = parseToUrlDynamic(builder, dto);
         searchUrl = searchUrl.replace("%20", " ");
         HttpEntity<FilterPostDto> requestEntity = new HttpEntity<>(dto, new HttpHeaders());
@@ -175,7 +151,7 @@ public class PostService implements IPostsService {
 
     @Override
     public Object getById(UUID id) {
-        String getByIdUrl = URL + prefix + getByIdEndpoint.replace("{id}", id.toString());
+        String getByIdUrl = microserviceValue.getURL() + microserviceValue.getPrefix() + microserviceValue.getGetByIdEndpoint().replace("{id}", id.toString());
         Map<String, Object> response = getResponse(getByIdUrl, HttpMethod.GET, new HttpEntity<>(new HttpHeaders()));
         if (response.containsKey("responseData")) {
             return response.get("responseData");

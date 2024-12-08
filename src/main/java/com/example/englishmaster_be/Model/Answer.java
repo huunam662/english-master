@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.Model;
 
-import com.example.englishmaster_be.DTO.Answer.CreateAnswerDTO;
+import com.example.englishmaster_be.DTO.Answer.SaveAnswerDTO;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
+@Hidden
 @Entity
 @Table(name = "Answer")
 @Getter
@@ -58,7 +60,7 @@ public class Answer implements Serializable {
     @JoinColumn(name = "question_id", referencedColumnName = "id")
     Question question;
 
-    public Answer(CreateAnswerDTO createAnswerDTO) {
+    public Answer(SaveAnswerDTO createAnswerDTO) {
 
         if(Objects.isNull(createAnswerDTO)) return;
 

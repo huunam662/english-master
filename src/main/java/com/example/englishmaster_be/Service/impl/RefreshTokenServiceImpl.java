@@ -1,11 +1,17 @@
 package com.example.englishmaster_be.Service.impl;
 
+import com.example.englishmaster_be.Exception.Response.BadRequestException;
 import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.IRefreshTokenService;
+import com.example.englishmaster_be.Service.IUserService;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.*;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -14,16 +20,16 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class RefreshTokenServiceImpl implements IRefreshTokenService {
 
     @Value("${masterE.jwtRefreshExpirationMs}")
-    private Long refreshTokenDurationMs;
+    static long refreshTokenDurationMs;
 
-    @Autowired
-    private ConfirmationTokenRepository confirmationTokenRepository;
+    ConfirmationTokenRepository confirmationTokenRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    IUserService userService;
 
     @Override
     public ConfirmationToken findByToken(String token) {
@@ -40,7 +46,7 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
 
     @Override
     public ConfirmationToken createRefreshToken(String email) {
-        ConfirmationToken confirmationToken  = new ConfirmationToken(userRepository.findByEmail(email));
+        ConfirmationToken confirmationToken  = new ConfirmationToken(userService.findUserByEmail(email));
 
         confirmationToken.setCode(UUID.randomUUID().toString());
         confirmationToken.setType("REFRESH_TOKEN");
@@ -50,14 +56,11 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
     }
 
     @Override
-    public ResponseModel verifyExpiration(ResponseModel responseModel, ConfirmationToken token) {
-        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-        if(token.getCreateAt().plusSeconds(refreshTokenDurationMs/1000).isBefore(LocalDateTime.now())){
-            confirmationTokenRepository.delete(token);
-            responseModel.setStatus(HttpStatus.BAD_REQUEST);
-            exceptionResponseModel.setMessage("Refresh token was expired. Please make a new signin request");
-        }
-        return exceptionResponseModel;
+    public void verifyExpiration(ConfirmationToken token) {
+
+        if(token.getCreateAt().plusSeconds(refreshTokenDurationMs/1000).isBefore(LocalDateTime.now()))
+            throw new BadRequestException("Refresh token was expired. Please make a new sign in request");
+
     }
 
     @Override

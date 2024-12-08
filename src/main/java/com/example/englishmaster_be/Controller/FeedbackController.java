@@ -5,7 +5,7 @@ import com.example.englishmaster_be.Common.enums.SortByFeedbackFieldsEnum;
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
 import com.example.englishmaster_be.DTO.Feedback.FeedbackFilterRequest;
 import com.example.englishmaster_be.DTO.Feedback.UpdateFeedbackDTO;
-import com.example.englishmaster_be.DTO.Feedback.CreateFeedbackDTO;
+import com.example.englishmaster_be.DTO.Feedback.SaveFeedbackDTO;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Service.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,7 +18,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -79,7 +78,7 @@ public class FeedbackController {
     @PreAuthorize("hasRole('ADMIN')")
     @MessageResponse("Create Feedback successfully")
     public FeedbackResponse createFeedback(
-            @ModelAttribute("contentFeedback") CreateFeedbackDTO createFeedbackDTO
+            @ModelAttribute("contentFeedback") SaveFeedbackDTO createFeedbackDTO
     ){
 
         return feedbackService.saveFeedback(createFeedbackDTO);

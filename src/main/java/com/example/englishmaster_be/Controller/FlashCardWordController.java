@@ -2,24 +2,16 @@ package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
 import com.example.englishmaster_be.DTO.FlashCard.UpdateFlashCardWordDTO;
-import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
-import com.example.englishmaster_be.Model.Response.ResponseModel;
-import com.example.englishmaster_be.DTO.FlashCard.CreateFlashCardWordDTO;
-import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.DTO.FlashCard.SaveFlashCardWordDTO;
 import com.example.englishmaster_be.Model.Response.FlashCardWordResponse;
 import com.example.englishmaster_be.Service.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.json.simple.JSONArray;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 
 import java.util.List;
@@ -47,7 +39,7 @@ public class FlashCardWordController {
     @PostMapping(value = "/{flashCardId:.+}/addWordToFlashCard", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @MessageResponse("Create word for flashcard successfully")
-    public FlashCardWordResponse addWordToFlashCard(@PathVariable UUID flashCardId, @ModelAttribute CreateFlashCardWordDTO createFlashCardWordDTO){
+    public FlashCardWordResponse addWordToFlashCard(@PathVariable UUID flashCardId, @ModelAttribute SaveFlashCardWordDTO createFlashCardWordDTO){
 
         createFlashCardWordDTO.setFlashCardId(flashCardId);
 

@@ -10,9 +10,10 @@ public interface IRefreshTokenService {
     ConfirmationToken findByToken(String token);
 
     void deleteRefreshToken(String token);
+
     ConfirmationToken createRefreshToken(String email);
 
-    ResponseModel verifyExpiration(ResponseModel responseModel, ConfirmationToken token);
+    void verifyExpiration(ConfirmationToken token);
 
     void deleteAllTokenExpired(User user);
 }

@@ -1,10 +1,15 @@
 package com.example.englishmaster_be.Controller;
 
+import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
 import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
-import com.example.englishmaster_be.DTO.MockTest.CreateResultMockTestDTO;
+import com.example.englishmaster_be.DTO.MockTest.SaveResultMockTestDTO;
 import com.example.englishmaster_be.Model.Response.ResultMockTestResponse;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Service.IResultMockTestService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,73 +19,41 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Result Mock Test")
 @RestController
 @RequestMapping("/api")
 @PreAuthorize("hasRole('ADMIN')||hasRole('USER')")
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ResultMockTestController {
-    @Autowired
-    private IResultMockTestService IResultMockTestService;
+
+    IResultMockTestService resultMockTestService;
 
     @PostMapping(value = "/create")
-    public ResponseEntity<ResponseModel> createResultMockTest(CreateResultMockTestDTO CreateResultMockTestDTO) {
-        ResponseModel responseModel = new ResponseModel();
+    @MessageResponse("Create result mock test successfully")
+    public ResultMockTestResponse createResultMockTest(SaveResultMockTestDTO saveResultMockTestDTO) {
 
-        ResultMockTestResponse resultMockTestResponse = IResultMockTestService.createResultMockTest(CreateResultMockTestDTO);
-
-        if (resultMockTestResponse != null) {
-            responseModel.setResponseData(resultMockTestResponse);
-
-            responseModel.setMessage("Create result mock test successfully");
-            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-        } else {
-            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            exceptionResponseModel.setMessage("Create result mock test failed");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
-        }
+        return resultMockTestService.createResultMockTest(saveResultMockTestDTO);
     }
 
     @GetMapping("/getAllResult")
-    public ResponseEntity<ResponseModel> getAllResult() {
-        ResponseModel responseModel = new ResponseModel();
-        List<ResultMockTestResponse> resultMockTestResponses = IResultMockTestService.getAllResultMockTests();
-        if (resultMockTestResponses != null && !resultMockTestResponses.isEmpty()) {
-            responseModel.setResponseData(resultMockTestResponses);
+    @MessageResponse("Get all result mock test successfully")
+    public List<ResultMockTestResponse> getAllResult() {
 
-            responseModel.setMessage("Get all result mock test successfully");
-            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-        } else {
-            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            exceptionResponseModel.setMessage("Get all result mock test failed");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
-        }
+        return resultMockTestService.getAllResultMockTests();
     }
 
     @GetMapping("/getResultMockTestByPartAndMockTest")
-    public ResponseEntity<ResponseModel> getResultMockTest(@RequestParam(required = false) UUID partId, @RequestParam(required = false) UUID mockTestId) {
-        ResponseModel responseModel = new ResponseModel();
-        List<ResultMockTestResponse> resultMockTestResponses = IResultMockTestService.getResultMockTestsByPartIdAndMockTestId(partId, mockTestId);
-        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-        if ((resultMockTestResponses != null) && !resultMockTestResponses.isEmpty()) {
-            responseModel.setResponseData(resultMockTestResponses);
+    @MessageResponse("Get result mock test successfully")
+    public List<ResultMockTestResponse> getResultMockTest(@RequestParam(required = false) UUID partId, @RequestParam(required = false) UUID mockTestId) {
 
-            responseModel.setMessage("Get result mock test successfully");
-        } else {
-            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            exceptionResponseModel.setMessage("Get result mock test failed");
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        return resultMockTestService.getResultMockTestsByPartIdAndMockTestId(partId, mockTestId);
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<ResponseModel> deleteResultMockTest(@RequestParam UUID uuid) {
-        ResponseModel responseModel = new ResponseModel();
-        IResultMockTestService.deleteResultMockTestById(uuid);
+    @MessageResponse("Delete result mock test successfully")
+    public void deleteResultMockTest(@RequestParam UUID uuid) {
 
-        responseModel.setMessage("Delete result mock test successfully");
-        return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-
+        resultMockTestService.deleteResultMockTestById(uuid);
     }
 }

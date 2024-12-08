@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.Model;
 
-import com.example.englishmaster_be.DTO.MockTest.CreateResultMockTestDTO;
+import com.example.englishmaster_be.DTO.MockTest.SaveResultMockTestDTO;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
+@Hidden
 @Entity
 @Table(name = "result_mocktest")
 @Getter
@@ -58,7 +60,7 @@ public class ResultMockTest {
     @JoinColumn(name = "mock_test_id", referencedColumnName = "id")
     MockTest mockTest;
 
-    public ResultMockTest(CreateResultMockTestDTO mockTestDTO) {
+    public ResultMockTest(SaveResultMockTestDTO mockTestDTO) {
 
         if(Objects.isNull(mockTestDTO)) return;
 

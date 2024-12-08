@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Controller;
 
-import com.example.englishmaster_be.DTO.Posts.CreatePostDto;
+import com.example.englishmaster_be.DTO.Posts.SavePostDto;
 import com.example.englishmaster_be.DTO.Posts.FilterPostDto;
 import com.example.englishmaster_be.DTO.Posts.SelectPostDto;
 import com.example.englishmaster_be.DTO.Posts.UpdatePostDto;
@@ -24,7 +24,7 @@ public class PostsController {
     }
 
     @PostMapping("/")
-    public Object createPost(@RequestBody CreatePostDto dto) {
+    public Object createPost(@RequestBody SavePostDto dto) {
         return postService.createPost(dto);
     }
 
@@ -44,7 +44,7 @@ public class PostsController {
     }
 
 
-    @GetMapping("")
+    @GetMapping("/")
     public Object getPosts(@ParameterObject SelectPostDto dto) {
         return postService.getAllPosts(dto);
     }

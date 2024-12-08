@@ -18,6 +18,7 @@ public class SwaggerConfiguration {
                 .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
                 .components(new Components().addSecuritySchemes("Bearer Authentication", createAPIKeyScheme()))
                 .info(new Info().title("Master English API")
+                        .version("1.0.0")
                         .description("Some custom description of API."))
                         .addServersItem(new Server().url("http://localhost:8080").description("Local server"))
                 .addServersItem(new Server().url("https://gateway.dev.meu-solutions.com/englishmaster").description("Production server"));

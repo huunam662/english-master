@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.Model;
 
-import com.example.englishmaster_be.DTO.MockTest.CreateMockTestDTO;
+import com.example.englishmaster_be.DTO.MockTest.SaveMockTestDTO;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+@Hidden
 @Entity
 @Table(name = "mock_test")
 @Getter
@@ -68,7 +70,7 @@ public class MockTest implements Serializable {
     List<ResultMockTest> resultMockTests;
 
 
-    public MockTest(CreateMockTestDTO createMockTestDTO) {
+    public MockTest(SaveMockTestDTO createMockTestDTO) {
 
         if(Objects.isNull(createMockTestDTO)) return;
 
