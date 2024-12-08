@@ -81,8 +81,8 @@ public class TopicController {
     }
 
 
-    @PutMapping(value = "/{topicId:.+}/updateTopic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseModel> updateTopicByExcelFile(@RequestParam("file") MultipartFile file, @RequestParam("url") String url) {
+    @PutMapping(value = "/{topicId:.+}/updateTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseModel> updateTopicByExcelFile(@PathVariable String topicId, @RequestParam("file") MultipartFile file, @RequestParam("url") String url) {
         ResponseModel responseModel = new ResponseModel();
         try {
             // Parse dữ liệu từ file
@@ -181,7 +181,7 @@ public class TopicController {
     @GetMapping(value = "/listTopic")
     @MessageResponse("Show list Topic successfully")
     public FilterResponse<?> getAllTopic(
-            @RequestParam(value = "page", defaultValue = "0") @Min(0) int page,
+            @RequestParam(value = "page", defaultValue = "1") @Min(1) int page,
             @RequestParam(value = "size", defaultValue = "12") @Min(1) @Max(100) int size,
             @RequestParam(value = "sortBy", defaultValue = "updateAt") String sortBy,
             @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction sortDirection,

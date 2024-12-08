@@ -94,19 +94,20 @@ public class TopicResponse {
             this.createAt = topic.getCreateAt();
         if(Objects.nonNull(topic.getUpdateAt()))
             this.updateAt = topic.getUpdateAt();
-
         if(Objects.nonNull(topic.getStatus()))
             this.statusId = topic.getStatus().getStatusId();
 
-        userCreate = UserBasicResponse.builder()
-                .userId(topic.getUserCreate().getUserId())
-                .name(topic.getUserCreate().getName())
-                .build();
+        if(Objects.nonNull(topic.getUserCreate()))
+            userCreate = UserBasicResponse.builder()
+                    .userId(topic.getUserCreate().getUserId())
+                    .name(topic.getUserCreate().getName())
+                    .build();
 
-        userUpdate = UserBasicResponse.builder()
-                .userId(topic.getUserUpdate().getUserId())
-                .name(topic.getUserUpdate().getName())
-                .build();
+        if (Objects.nonNull(topic.getUserUpdate()))
+            userUpdate = UserBasicResponse.builder()
+                    .userId(topic.getUserUpdate().getUserId())
+                    .name(topic.getUserUpdate().getName())
+                    .build();
     }
 
 }

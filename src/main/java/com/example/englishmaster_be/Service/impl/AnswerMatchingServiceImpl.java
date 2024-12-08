@@ -28,7 +28,7 @@ public class AnswerMatchingServiceImpl implements IAnswerMatching {
             throw new ResourceNotFoundException("User not found");
         }
 
-        Question question= questionService.findQuestionById(request.getQuestionId());
+        Question question= questionService.getQuestionById(request.getQuestionId());
 
         if(Objects.isNull(question)){
             throw new ResourceNotFoundException("Question not found");
@@ -43,7 +43,7 @@ public class AnswerMatchingServiceImpl implements IAnswerMatching {
 
     @Override
     public Map<String,String> getListAnswerMatching(UUID questionId) {
-        Question question=questionService.findQuestionById(questionId);
+        Question question=questionService.getQuestionById(questionId);
 
         if(Objects.isNull(question)){
             throw new ResourceNotFoundException("Question not found");
