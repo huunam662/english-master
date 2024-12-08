@@ -1004,7 +1004,7 @@ public class TopicServiceImpl implements ITopicService {
                                             .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
-                query.fetch().stream().map(TopicResponse::new).toList()
+                query.fetch().stream().map(TopicMapper.INSTANCE::toTopicResponse).toList()
         );
 
         return filterResponse;

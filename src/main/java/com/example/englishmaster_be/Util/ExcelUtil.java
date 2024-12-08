@@ -10,10 +10,10 @@ public class ExcelUtil {
 
         String fileName = file.getOriginalFilename();
 
-        return contentType != null &&
-                (contentType.equals("application/vnd.ms-excel") ||
-                        contentType.equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) &&
-                (fileName != null && (fileName.endsWith(".xls") || fileName.endsWith(".xlsx")));
+        return contentType == null ||
+                (!contentType.equals("application/vnd.ms-excel") &&
+                        !contentType.equals("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")) ||
+                (fileName == null || (!fileName.endsWith(".xls") && !fileName.endsWith(".xlsx")));
     }
 
 }

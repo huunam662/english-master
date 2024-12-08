@@ -21,6 +21,7 @@ public interface TopicMapper {
     SaveTopicDTO toSaveTopicDTO(CreateTopicByExcelFileResponse createTopicByExcelFileResponse);
 
     @Mapping(source = "parts", target = "listPart", qualifiedByName = {"mapPartsToListPartId"})
+    @Mapping(source = "enable", target = "isEnable")
     TopicResponse toTopicResponse(Topic topic);
 
     @Named("mapPartsToListPartId")

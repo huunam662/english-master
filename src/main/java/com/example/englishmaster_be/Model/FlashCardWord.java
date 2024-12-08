@@ -11,7 +11,6 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Hidden
 @Entity
 @Table(name = "flash_card_word")
 @Getter

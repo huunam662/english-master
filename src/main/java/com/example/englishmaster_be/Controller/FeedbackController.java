@@ -99,7 +99,7 @@ public class FeedbackController {
     @MessageResponse("Update Feedback successfully")
     public FeedbackResponse updateFeedback(
             @PathVariable UUID FeedbackId,
-            @ModelAttribute("contentFeedback") UpdateFeedbackDTO updateFeedbackDTO
+            @ModelAttribute(name = "contentFeedback") UpdateFeedbackDTO updateFeedbackDTO
     ){
 
         updateFeedbackDTO.setFeedbackID(FeedbackId);

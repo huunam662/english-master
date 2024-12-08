@@ -11,7 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.util.List;
 import java.util.UUID;
 
-@Hidden
+
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter

@@ -20,7 +20,6 @@ public class SaveFeedbackDTO {
 
     String content;
 
-    @Hidden
     MultipartFile avatar;
 
 }

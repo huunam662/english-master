@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Hidden
+
 @Entity
 @Table(name = "topics")
 @Getter
@@ -43,9 +43,10 @@ public class Topic implements Serializable {
     String workTime;
 
     @Column(name = "number_question")
-    int numberQuestion;
+    Integer numberQuestion;
 
-    boolean enable = true;
+    @Column(name = "enable")
+    Boolean enable = true;
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
