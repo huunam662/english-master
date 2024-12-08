@@ -59,9 +59,9 @@ public class TopicResponse {
 
     List<UUID> listPart;
 
-    int numberQuestion;
+    Integer numberQuestion;
 
-    boolean isEnable;
+    Boolean isEnable;
 
 
     public TopicResponse(Topic topic) {
@@ -80,7 +80,7 @@ public class TopicResponse {
         this.topicType = topic.getTopicType();
         this.numberQuestion = topic.getNumberQuestion();
         this.workTime = topic.getWorkTime();
-        this.isEnable = topic.isEnable();
+        this.isEnable = topic.getEnable();
 
         this.listPart = Objects.nonNull(topic.getParts())
                 ? topic.getParts().stream().map(Part::getPartId).toList()

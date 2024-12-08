@@ -347,7 +347,7 @@ public class TopicController {
     }
 
 
-    @GetMapping("searchByStartTime")
+    @GetMapping("/searchByStartTime")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @MessageResponse("Topic retrieved successfully")
     public List<TopicResponse> getTopicByStartTime(

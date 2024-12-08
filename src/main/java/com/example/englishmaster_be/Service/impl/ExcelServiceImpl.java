@@ -23,7 +23,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -54,7 +53,7 @@ public class ExcelServiceImpl implements IExcelService {
         if(file == null || file.isEmpty())
             throw new BadRequestException("Please select a file to upload");
 
-        if(!ExcelUtil.isExcelFile(file))
+        if(ExcelUtil.isExcelFile(file))
             throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
@@ -97,7 +96,7 @@ public class ExcelServiceImpl implements IExcelService {
         if (part != 1 && part != 2)
             throw new BadRequestException("Invalid Part Value. It must be either 1 or 2");
 
-        if (!ExcelUtil.isExcelFile(file))
+        if (ExcelUtil.isExcelFile(file))
             throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
@@ -173,7 +172,7 @@ public class ExcelServiceImpl implements IExcelService {
         if(file == null || file.isEmpty())
             throw new BadRequestException("Please select a file to upload");
 
-        if(!ExcelUtil.isExcelFile(file))
+        if(ExcelUtil.isExcelFile(file))
             throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
@@ -223,7 +222,7 @@ public class ExcelServiceImpl implements IExcelService {
         if (part != 3 && part != 4)
             throw new BadRequestException("Invalid Part Value. It must be either 3 or 4");
 
-        if(!ExcelUtil.isExcelFile(file))
+        if(ExcelUtil.isExcelFile(file))
             throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
@@ -296,7 +295,7 @@ public class ExcelServiceImpl implements IExcelService {
         if(file == null || file.isEmpty())
             throw new BadRequestException("Please select a file to upload");
 
-        if (!ExcelUtil.isExcelFile(file))
+        if (ExcelUtil.isExcelFile(file))
             throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
 
         if (part != 6 && part != 7)
@@ -369,7 +368,7 @@ public class ExcelServiceImpl implements IExcelService {
         if(file == null || file.isEmpty())
             throw new BadRequestException("Please select a file to upload");
 
-        if (!ExcelUtil.isExcelFile(file))
+        if (ExcelUtil.isExcelFile(file))
             throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
 
         CreateListQuestionByExcelFileResponse result = new CreateListQuestionByExcelFileResponse();

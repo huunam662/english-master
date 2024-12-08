@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@Hidden
+
 @Entity
 @Table(name = "flash_card")
 @Getter

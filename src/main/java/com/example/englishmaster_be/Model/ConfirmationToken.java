@@ -9,7 +9,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Hidden
 @Entity
 @Table(name="user_confirm_token")
 @Getter

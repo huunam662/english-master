@@ -8,7 +8,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
-@Hidden
+
 @Entity
 @Table(name = "otp")
 @Getter

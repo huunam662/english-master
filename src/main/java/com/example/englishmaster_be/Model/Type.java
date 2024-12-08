@@ -8,7 +8,7 @@ import lombok.experimental.FieldDefaults;
 import java.util.List;
 import java.util.UUID;
 
-@Hidden
+
 @Entity
 @Table(name = "Type")
 @Getter
