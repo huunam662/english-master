@@ -8,15 +8,8 @@ import com.example.englishmaster_be.DTO.User.UserFilterRequest;
 import com.example.englishmaster_be.Model.Response.AuthResponse;
 import com.example.englishmaster_be.Model.Response.CountMockTestTopicResponse;
 import com.example.englishmaster_be.Model.Response.InformationUserResponse;
-import com.example.englishmaster_be.Model.Response.UserResponse;
 import com.example.englishmaster_be.Model.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-
-
 import java.util.List;
 import java.util.UUID;
 

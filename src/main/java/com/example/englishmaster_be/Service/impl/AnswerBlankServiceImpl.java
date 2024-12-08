@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Service.impl;
 
+import com.example.englishmaster_be.DTO.Answer.AnswerBlankRequest;
 import com.example.englishmaster_be.DTO.Answer.UserAnswerRequest;
 import com.example.englishmaster_be.Exception.Response.ResponseNotFoundException;
 import com.example.englishmaster_be.Model.AnswerBlank;
@@ -56,7 +57,7 @@ public class AnswerBlankServiceImpl implements IAnswerBlankService {
 
     @Override
     @Transactional
-    public AnswerBlankResponse createAnswerBlank(UserAnswerRequest request) {
+    public AnswerBlankResponse createAnswerBlank(AnswerBlankRequest request) {
 
         Question question = questionRepository.findByQuestionId(request.getQuestionId())
                 .orElseThrow(

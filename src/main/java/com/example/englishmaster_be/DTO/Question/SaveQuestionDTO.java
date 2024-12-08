@@ -1,13 +1,14 @@
 package com.example.englishmaster_be.DTO.Question;
 
 import com.example.englishmaster_be.DTO.Answer.SaveListAnswerDTO;
-import io.swagger.v3.oas.annotations.Hidden;
+import com.example.englishmaster_be.DTO.Type.QuestionType;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.UUID;
+
 
 @Getter
 @Setter
@@ -17,26 +18,28 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SaveQuestionDTO {
 
-	UUID questionId;
+    UUID questionId;
 
     String questionContent;
 
     int questionScore;
 
-	MultipartFile contentImage;
+    MultipartFile contentImage;
 
-	MultipartFile contentAudio;
+    MultipartFile contentAudio;
 
     UUID partId;
 
-	String questionType;
+    QuestionType questionType;
 
-	List<SaveListAnswerDTO> listAnswer;
+    List<SaveListAnswerDTO> listAnswer;
 
-	List<SaveQuestionDTO> listQuestionChild;
+    List<SaveQuestionDTO> listQuestionChild;
 
-	String questionExplainEn;
+    String questionExplainEn;
 
-	String questionExplainVn;
+    String questionExplainVn;
+
+    int numberChoice;
 
 }

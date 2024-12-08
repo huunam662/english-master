@@ -13,5 +13,5 @@ import java.util.UUID;
 public interface UserBlankAnswerRepository extends JpaRepository<UserBlankAnswer, UUID> {
 
     List<UserBlankAnswer> getByUserAndQuestion(User user, Question question);
-
+    UserBlankAnswer getByUserAndQuestionAndPosition(User user, Question question, int position);
 }

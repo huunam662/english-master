@@ -6,47 +6,29 @@ import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Constant.StatusConstant;
 import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
-import com.example.englishmaster_be.Model.Response.excel.CreateQuestionByExcelFileResponse;
 import com.example.englishmaster_be.Exception.CustomException;
-import com.example.englishmaster_be.Helper.GetExtension;
-import com.example.englishmaster_be.DTO.Answer.SaveListAnswerDTO;
 import com.example.englishmaster_be.DTO.Question.SaveQuestionDTO;
 import com.example.englishmaster_be.DTO.Topic.*;
 import com.example.englishmaster_be.DTO.UploadFileDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
-import com.example.englishmaster_be.Model.Response.excel.CreateListQuestionByExcelFileResponse;
 import com.example.englishmaster_be.Model.Response.excel.CreateTopicByExcelFileResponse;
-import com.example.englishmaster_be.Repository.AnswerRepository;
-import com.example.englishmaster_be.Repository.ContentRepository;
-import com.example.englishmaster_be.Repository.StatusRepository;
+import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.*;
-import com.example.englishmaster_be.Service.impl.ContentServiceImpl;
-import com.example.englishmaster_be.Service.impl.TopicServiceImpl;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.*;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.json.simple.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.time.LocalDateTime;
 import java.util.*;
+
 
 @Tag(name = "Topic")
 @RestController
@@ -55,8 +37,18 @@ import java.util.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TopicController {
 
-
     ITopicService topicService;
+
+    IUserService userService;
+
+    IPackService packService;
+
+    TopicRepository topicRepository;
+
+    StatusRepository statusRepository;
+
+    IExcelService excelService;
+
 
 
     @GetMapping(value = "/{topicId:.+}/inforTopic")
@@ -87,6 +79,77 @@ public class TopicController {
 
         return topicService.saveTopicByExcelFile(file, url);
     }
+
+
+    @PutMapping(value = "/{topicId:.+}/updateTopic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseModel> updateTopicByExcelFile(@RequestParam("file") MultipartFile file, @RequestParam("url") String url) {
+        ResponseModel responseModel = new ResponseModel();
+        try {
+            // Parse dữ liệu từ file
+            CreateTopicByExcelFileResponse createTopicByExcelFileDTO = excelService.parseCreateTopicDTO(file);
+
+            User user = userService.currentUser();
+
+            // Tìm pack dựa trên ID từ DTO
+            Pack pack = packService.findPackById(createTopicByExcelFileDTO.getTopicPackId());
+            if (pack == null) {
+                throw new Exception("Pack not found with ID: " + createTopicByExcelFileDTO.getTopicPackId());
+            }
+
+            // Tạo đối tượng Topic
+            Topic topic = new Topic(
+                    createTopicByExcelFileDTO.getTopicName(),
+                    null,
+                    createTopicByExcelFileDTO.getTopicDescription(),
+                    createTopicByExcelFileDTO.getTopicType(),
+                    createTopicByExcelFileDTO.getWorkTime(),
+                    createTopicByExcelFileDTO.getStartTime(),
+                    createTopicByExcelFileDTO.getEndTime()
+            );
+
+            topic.setPack(pack);
+
+            // Xử lý ảnh chủ đề
+            if (createTopicByExcelFileDTO.getTopicImageName() == null || createTopicByExcelFileDTO.getTopicImageName().isEmpty()) {
+                topic.setTopicImage(url);
+            }
+
+            // Cập nhật các thông tin liên quan đến số lượng câu hỏi, người tạo và trạng thái
+            topic.setNumberQuestion(createTopicByExcelFileDTO.getNumberQuestion());
+            topic.setUserCreate(user);  // Gán người tạo
+            topic.setUserUpdate(user);  // Gán người cập nhật
+            topic.setStatus(statusRepository.findByStatusName(StatusConstant.ACTIVE)
+                    .orElseThrow(() -> new CustomException(Error.STATUS_NOT_FOUND)));
+
+            // Lưu topic vào cơ sở dữ liệu
+            topicRepository.save(topic);
+
+            // Thêm các phần vào topic
+            createTopicByExcelFileDTO.getListPart().forEach(partId -> topicService.addPartToTopic(topic.getTopicId(), partId));
+
+            // Tạo response với thông tin của topic
+            TopicResponse topicResponse = new TopicResponse(topic);
+            responseModel.setMessage("Create Topic successfully");
+            responseModel.setResponseData(topicResponse);
+
+            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        } catch (CustomException ce) {
+            // Xử lý lỗi do người dùng không hợp lệ hoặc các lỗi tùy chỉnh khác
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Create Topic failed: " + ce.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.BAD_REQUEST));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
+        } catch (Exception e) {
+            // Xử lý các lỗi không mong muốn
+            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
+            exceptionResponseModel.setMessage("Create Topic failed: " + e.getMessage());
+            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
+            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
+        }
+    }
+
 
 
     @PutMapping(value = "/{topicId:.+}/updateTopic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -214,6 +277,7 @@ public class TopicController {
 
         topicService.addListQuestionPart5ToTopicByExcelFile(topicId, file);
     }
+
 
     @PostMapping(value = "/{topicId:.+}/addListQuestionPart67ToTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")

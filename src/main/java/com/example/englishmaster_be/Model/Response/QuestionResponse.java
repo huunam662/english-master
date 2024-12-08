@@ -1,15 +1,10 @@
 package com.example.englishmaster_be.Model.Response;
 
+import com.example.englishmaster_be.DTO.Type.QuestionType;
 import com.example.englishmaster_be.Model.*;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.springframework.cglib.core.Local;
-
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -19,7 +14,6 @@ import java.util.*;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@SuppressWarnings("unchecked")
 public class QuestionResponse {
 
     UUID questionId;
@@ -44,6 +38,8 @@ public class QuestionResponse {
 
     List<ContentResponse> contentList;
 
+    QuestionType questionType;
+
 
     public QuestionResponse(Question question) {
 
@@ -51,9 +47,9 @@ public class QuestionResponse {
         this.questionContent = question.getQuestionContent();
         this.questionScore = question.getQuestionScore();
         this.partId = question.getPart().getPartId();
-
         this.createAt = question.getCreateAt();
         this.updateAt = question.getUpdateAt();
+        this.questionType= question.getQuestionType();
 
         if (Objects.nonNull(question.getAnswers())) {
             this.listAnswer = question.getAnswers().stream().map(
@@ -61,14 +57,12 @@ public class QuestionResponse {
             ).toList();
         }
 
-        this.contentList = new JSONArray();
-
         if (Objects.nonNull(question.getContentCollection())) {
 
-                this.contentList = question.getContentCollection().stream().map(
-                        content -> new ContentResponse(content)
-                ).toList();
-            
+            this.contentList = question.getContentCollection().stream().map(
+                    ContentResponse::new
+            ).toList();
+
         }
 
     }
@@ -82,9 +76,9 @@ public class QuestionResponse {
         this.questionContent = question.getQuestionContent();
         this.questionScore = question.getQuestionScore();
         this.partId = question.getPart().getPartId();
-
         this.createAt = question.getCreateAt();
         this.updateAt = question.getUpdateAt();
+        this.questionType = question.getQuestionType();
 
         // Xử lý danh sách câu trả lời
         if (Objects.nonNull(question.getAnswers())) {
@@ -95,12 +89,9 @@ public class QuestionResponse {
                     .toList();
         }
 
-        // Xử lý Content
-        this.contentList = new JSONArray();
-
         if (Objects.nonNull(question.getContentCollection())) {
             this.contentList = question.getContentCollection().stream().map(
-                    content -> new ContentResponse(content)
+                    ContentResponse::new
             ).toList();
         }
     }

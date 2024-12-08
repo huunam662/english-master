@@ -68,7 +68,7 @@ public class ImportExcelFileController {
             @RequestParam("part") int part
     ) {
 
-        return excelService.parseListeningPart12DTO(topicId, file, part);
+        return (CreateListQuestionByExcelFileResponse) excelService.parseListeningPart12DTO(topicId, file, part);
     }
 
 
