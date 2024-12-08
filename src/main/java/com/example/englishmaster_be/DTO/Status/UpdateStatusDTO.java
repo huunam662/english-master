@@ -2,6 +2,8 @@ package com.example.englishmaster_be.DTO.Status;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
+
 import java.util.UUID;
 
 
@@ -9,16 +11,10 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UpdateStatusDTO {
+public class UpdateStatusDTO extends SaveStatusDTO{
 
-    UUID id;
-
-    UUID typeId;
-
-    String statusName;
-
-    boolean flag;
+    UUID updateStatusId;
 
 }

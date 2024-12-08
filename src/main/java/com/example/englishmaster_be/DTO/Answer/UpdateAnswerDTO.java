@@ -13,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UpdateAnswerDTO extends CreateAnswerDTO {
+public class UpdateAnswerDTO extends SaveAnswerDTO {
 
     @Hidden
     UUID answerId;

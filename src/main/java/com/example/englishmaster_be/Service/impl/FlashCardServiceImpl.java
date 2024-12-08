@@ -1,11 +1,8 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.FlashCard.CreateFlashCardDTO;
-import com.example.englishmaster_be.DTO.FlashCard.CreateFlashCardWordDTO;
+import com.example.englishmaster_be.DTO.FlashCard.SaveFlashCardDTO;
 import com.example.englishmaster_be.DTO.FlashCard.UpdateFlashCardDTO;
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
 import com.example.englishmaster_be.Model.FlashCard;
-import com.example.englishmaster_be.Model.FlashCardWord;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Model.User;
 import com.example.englishmaster_be.Repository.*;
@@ -16,21 +13,18 @@ import com.google.cloud.storage.Blob;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FlashCardServiceImpl implements IFlashCardService {
 
@@ -110,7 +104,7 @@ public class FlashCardServiceImpl implements IFlashCardService {
 
     @Transactional
     @Override
-    public FlashCardResponse saveFlashCard(CreateFlashCardDTO createFlashCardDTO) {
+    public FlashCardResponse saveFlashCard(SaveFlashCardDTO createFlashCardDTO) {
 
         User user = userService.currentUser();
 

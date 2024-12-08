@@ -4,6 +4,7 @@ import com.example.englishmaster_be.Configuration.global.annotation.MessageRespo
 import com.example.englishmaster_be.Model.Response.FileResponse;
 import com.example.englishmaster_be.Service.IFileStorageService;
 import com.google.cloud.storage.Blob;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
@@ -29,7 +30,7 @@ public class FileController {
     @GetMapping("/{filename:.+}")
     @MessageResponse("Load file successfully")
     public Resource getFile(
-            HttpServletResponse response,
+            @Parameter(hidden = true) HttpServletResponse response,
             @PathVariable String filename
     ) {
 
@@ -46,7 +47,7 @@ public class FileController {
     @GetMapping("/showImage/{filename:.+}")
     @MessageResponse("Load file successfully")
     public Resource showImage(
-            HttpServletResponse response,
+            @Parameter(hidden = true) HttpServletResponse response,
             @PathVariable String filename
     ) {
 
@@ -61,7 +62,7 @@ public class FileController {
     @GetMapping("/showAudio/{filename:.+}")
     @MessageResponse("Load file successfully")
     public Resource showAudio(
-            HttpServletResponse response,
+            @Parameter(hidden = true) HttpServletResponse response,
             @PathVariable String filename
     ) {
 

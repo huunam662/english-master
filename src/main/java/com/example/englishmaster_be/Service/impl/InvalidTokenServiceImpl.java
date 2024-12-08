@@ -5,21 +5,28 @@ import com.example.englishmaster_be.Model.InvalidToken;
 import com.example.englishmaster_be.Model.Response.InvalidTokenResponse;
 import com.example.englishmaster_be.Repository.InvalidTokenRepository;
 import com.example.englishmaster_be.Service.IInvalidTokenService;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class InvalidTokenServiceImpl implements IInvalidTokenService {
-
-    InvalidTokenRepository invalidTokenRepository;
 
     JwtUtils jwtUtils;
 
+    InvalidTokenRepository invalidTokenRepository;
+
+
     @Override
-    public boolean verifyToken(String token) {
+    public boolean invalidToken(String token) {
         InvalidToken tokenExpire = invalidTokenRepository.findById(token).orElse(null);
         return tokenExpire != null;
     }

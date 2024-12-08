@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.Model.Response;
 
+import com.example.englishmaster_be.Mapper.PartMapper;
 import com.example.englishmaster_be.Model.ResultMockTest;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -38,7 +39,7 @@ public class ResultMockTestResponse {
 
         this.resultMockTestId = resultMockTest.getResultMockTestId();
         this.mockTestId = resultMockTest.getMockTest().getMockTestId();
-        this.partResponse = new PartResponse(resultMockTest.getPart());
+        this.partResponse = PartMapper.INSTANCE.partEntityToPartResponse(resultMockTest.getPart());
         this.correctAnswer = resultMockTest.getCorrectAnswer();
         this.score = resultMockTest.getScore();
 

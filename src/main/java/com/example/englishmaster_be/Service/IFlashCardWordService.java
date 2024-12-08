@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Service;
 
-import com.example.englishmaster_be.DTO.FlashCard.CreateFlashCardWordDTO;
+import com.example.englishmaster_be.DTO.FlashCard.SaveFlashCardWordDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.FlashCardWordResponse;
 
@@ -15,7 +15,7 @@ public interface IFlashCardWordService {
 
     FlashCardWord getWordToID(UUID wordId);
 
-    FlashCardWordResponse saveWordToFlashCard(CreateFlashCardWordDTO createFlashCardWordDTO);
+    FlashCardWordResponse saveWordToFlashCard(SaveFlashCardWordDTO createFlashCardWordDTO);
 
 }
 

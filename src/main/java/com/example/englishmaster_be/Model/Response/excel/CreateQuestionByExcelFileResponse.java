@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Model.Response.excel;
 
-import com.example.englishmaster_be.DTO.Answer.CreateListAnswerDTO;
+import com.example.englishmaster_be.DTO.Answer.SaveListAnswerDTO;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -31,7 +31,7 @@ public class CreateQuestionByExcelFileResponse {
 
     int questionScore;
 
-    List<CreateListAnswerDTO> listAnswer;
+    List<SaveListAnswerDTO> listAnswer;
 
     List<CreateQuestionByExcelFileResponse> listQuestionChild;
 

@@ -1,15 +1,16 @@
 package com.example.englishmaster_be.Service;
 
-import com.example.englishmaster_be.DTO.MockTest.CreateResultMockTestDTO;
+import com.example.englishmaster_be.DTO.MockTest.SaveResultMockTestDTO;
 import com.example.englishmaster_be.Model.Response.ResultMockTestResponse;
+import com.example.englishmaster_be.Model.ResultMockTest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
-@Service
 public interface IResultMockTestService {
-    ResultMockTestResponse createResultMockTest(CreateResultMockTestDTO resultMockTest);
+
+    ResultMockTestResponse createResultMockTest(SaveResultMockTestDTO resultMockTest);
 
     List<ResultMockTestResponse> getAllResultMockTests();
 
@@ -17,6 +18,6 @@ public interface IResultMockTestService {
 
     void deleteResultMockTestById(UUID id);
 
-
+    ResultMockTest getResultMockTestById(UUID id);
 
 }

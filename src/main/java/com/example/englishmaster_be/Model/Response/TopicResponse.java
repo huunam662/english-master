@@ -1,12 +1,15 @@
 package com.example.englishmaster_be.Model.Response;
 
 import com.example.englishmaster_be.Model.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.json.simple.JSONObject;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -38,13 +41,17 @@ public class TopicResponse {
 
     String workTime;
 
-    String startTime;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+    LocalDateTime startTime;
 
-    String endTime;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+    LocalDateTime endTime;
 
-    String createAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+    LocalDateTime createAt;
 
-    String updateAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+    LocalDateTime updateAt;
 
     UserBasicResponse userCreate;
 
@@ -79,29 +86,28 @@ public class TopicResponse {
                 ? topic.getParts().stream().map(Part::getPartId).toList()
                 : new ArrayList<>();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
-
         if(Objects.nonNull(topic.getStartTime()))
-            this.startTime = sdf.format(Timestamp.valueOf(topic.getStartTime()));
+            this.startTime = topic.getStartTime();
         if(Objects.nonNull(topic.getEndTime()))
-            this.endTime = sdf.format(Timestamp.valueOf(topic.getEndTime()));
+            this.endTime = topic.getEndTime();
         if(Objects.nonNull(topic.getCreateAt()))
-            this.createAt = sdf.format(Timestamp.valueOf(topic.getCreateAt()));
+            this.createAt = topic.getCreateAt();
         if(Objects.nonNull(topic.getUpdateAt()))
-            this.updateAt = sdf.format(Timestamp.valueOf(topic.getUpdateAt()));
-
+            this.updateAt = topic.getUpdateAt();
         if(Objects.nonNull(topic.getStatus()))
             this.statusId = topic.getStatus().getStatusId();
 
-        userCreate = UserBasicResponse.builder()
-                .userId(topic.getUserCreate().getUserId())
-                .name(topic.getUserCreate().getName())
-                .build();
+        if(Objects.nonNull(topic.getUserCreate()))
+            userCreate = UserBasicResponse.builder()
+                    .userId(topic.getUserCreate().getUserId())
+                    .name(topic.getUserCreate().getName())
+                    .build();
 
-        userUpdate = UserBasicResponse.builder()
-                .userId(topic.getUserUpdate().getUserId())
-                .name(topic.getUserUpdate().getName())
-                .build();
+        if (Objects.nonNull(topic.getUserUpdate()))
+            userUpdate = UserBasicResponse.builder()
+                    .userId(topic.getUserUpdate().getUserId())
+                    .name(topic.getUserUpdate().getName())
+                    .build();
     }
 
 }

@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Service;
 
-import com.example.englishmaster_be.DTO.Comment.CreateCommentDTO;
+import com.example.englishmaster_be.DTO.Comment.SaveCommentDTO;
 import com.example.englishmaster_be.DTO.Comment.UpdateCommentDTO;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.CommentResponse;
@@ -22,11 +22,11 @@ public interface ICommentService {
 
     List<CommentResponse> getListCommentByCommentId(UUID commentId);
 
-    CommentResponse createCommentToTopic(UUID topicId, CreateCommentDTO createCommentDTO);
+    CommentResponse createCommentToTopic(UUID topicId, SaveCommentDTO createCommentDTO);
 
-    CommentResponse createCommentToPost(UUID postId, CreateCommentDTO createCommentDTO);
+    CommentResponse createCommentToPost(UUID postId, SaveCommentDTO createCommentDTO);
 
-    CommentResponse createCommentToComment(UUID commentId, CreateCommentDTO createCommentDTO);
+    CommentResponse createCommentToComment(UUID commentId, SaveCommentDTO createCommentDTO);
 
     CommentResponse updateComment(UpdateCommentDTO updateCommentDTO);
 

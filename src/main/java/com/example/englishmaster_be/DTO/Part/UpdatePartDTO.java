@@ -1,21 +1,22 @@
 package com.example.englishmaster_be.DTO.Part;
 
 
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
+
+import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UpdatePartDTO {
+public class UpdatePartDTO extends SavePartDTO{
 
-    String partName;
-
-    String partDiscription;
-
-    String partType;
+    @Hidden
+    UUID partId;
 
 }

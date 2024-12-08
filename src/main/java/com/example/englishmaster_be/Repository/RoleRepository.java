@@ -8,6 +8,6 @@ import java.util.UUID;
 
 public interface RoleRepository extends JpaRepository<Role, UUID> {
 
-    @Query("select r from Role r where r.roleName like %:roleName%")
+    @Query("select r from Role r where r.roleName = :roleName")
     Role findByRoleName(String roleName);
 }

@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Controller;
 
-import com.example.englishmaster_be.DTO.PostCategory.CreatePostCategoryDto;
+import com.example.englishmaster_be.DTO.PostCategory.SavePostCategoryDto;
 import com.example.englishmaster_be.DTO.PostCategory.UpdatePostCategoryDto;
 import com.example.englishmaster_be.Service.IPostCategoryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -22,7 +22,7 @@ public class PostCategoryController {
 
 
     @PostMapping("/")
-    public Object createPostCategory(@RequestBody CreatePostCategoryDto dto) {
+    public Object createPostCategory(@RequestBody SavePostCategoryDto dto) {
         return postCategoryService.createPostCategory(dto);
     }
 

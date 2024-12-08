@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.DTO.Content.CreateContentDTO;
+import com.example.englishmaster_be.DTO.Content.SaveContentDTO;
 import com.example.englishmaster_be.DTO.Content.UpdateContentDTO;
 import com.example.englishmaster_be.Model.Content;
 import com.example.englishmaster_be.Model.Response.ContentResponse;
@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -24,6 +23,7 @@ import java.util.UUID;
 public class ContentController {
 
     IContentService contentService;
+
 
     @GetMapping
     @MessageResponse("Get content successfully")
@@ -47,7 +47,7 @@ public class ContentController {
     @MessageResponse("Get content successfully")
     public ContentResponse getContent(@RequestParam String contentData) {
 
-        Content content = contentService.getContentByContentData(contentData);;
+        Content content = contentService.getContentByContentData(contentData);
 
         return new ContentResponse(content);
     }
@@ -55,7 +55,7 @@ public class ContentController {
     @PostMapping(value = "/create-content", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @MessageResponse("Create content successfully")
     public ContentResponse createContent(
-            @ModelAttribute CreateContentDTO createContentDTO
+            @ModelAttribute SaveContentDTO createContentDTO
     ) {
 
         Content content = contentService.saveContent(createContentDTO);

@@ -3,19 +3,29 @@ package com.example.englishmaster_be.Service.impl;
 import com.example.englishmaster_be.Model.Otp;
 import com.example.englishmaster_be.Repository.OtpRepository;
 import com.example.englishmaster_be.Service.IOtpService;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
 import java.util.Optional;
 import java.util.Random;
+
+
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OtpServiceImpl implements IOtpService {
 
-    private final OtpRepository otpRepository;
+    OtpRepository otpRepository;
 
+    @Transactional
     @Override
     public String generateOtp(String email) {
 
@@ -38,17 +48,14 @@ public class OtpServiceImpl implements IOtpService {
 
         Optional<Otp> otpObj = otpRepository.findById(otp);
 
-        if (otpObj.isEmpty()) {
-            return false;
-        }
+        if (otpObj.isEmpty()) return false;
 
         Otp foundOtp = otpObj.get();
 
-        boolean isExpired = foundOtp.getExpirationTime().isBefore(LocalDateTime.now());
-
-        return !isExpired;
+        return foundOtp.getExpirationTime().isBefore(LocalDateTime.now());
     }
 
+    @Transactional
     @Override
     public void updateOtpStatusToVerified(String otp) {
         Optional<Otp> otpObj = otpRepository.findById(otp);
@@ -60,7 +67,12 @@ public class OtpServiceImpl implements IOtpService {
     }
     @Override
     public void deleteOtp(String otp) {
-        otpRepository.deleteById(otp);
+
+        Otp otpEntity = otpRepository.findById(otp).orElseThrow(
+                () -> new RuntimeException("Otp not found")
+        );
+
+        otpRepository.delete(otpEntity);
     }
 
 }

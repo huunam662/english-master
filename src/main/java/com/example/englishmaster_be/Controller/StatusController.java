@@ -1,11 +1,15 @@
 package com.example.englishmaster_be.Controller;
 
+import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
 import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
-import com.example.englishmaster_be.DTO.Status.CreateStatusDTO;
+import com.example.englishmaster_be.DTO.Status.SaveStatusDTO;
 import com.example.englishmaster_be.DTO.Status.UpdateStatusDTO;
 import com.example.englishmaster_be.Model.Response.StatusResponse;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
+import com.example.englishmaster_be.Model.Status;
 import com.example.englishmaster_be.Service.IStatusService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,92 +20,42 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Status")
 @RestController
 @RequestMapping("/api/status")
 @PreAuthorize("hasRole('ADMIN')")
+@RequiredArgsConstructor
 public class StatusController {
-    @Autowired
+
     IStatusService statusService;
 
     @PostMapping("/createStatus")
-    public ResponseEntity<ResponseModel> createStatus(@RequestBody CreateStatusDTO createStatusDTO) {
-        ResponseModel responseModel = new ResponseModel();
-        StatusResponse statusResponse = statusService.createStatus(createStatusDTO);
-        if (statusResponse == null) {
-            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Create Status failed");
-            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
-        }
-        JSONObject responseObject = new JSONObject();
-        responseObject.put("status", statusResponse);
+    @MessageResponse("Create Status successfully")
+    public StatusResponse createStatus(@RequestBody SaveStatusDTO createStatusDTO) {
 
-        responseModel.setMessage("Create Status successful");
-        responseModel.setResponseData(responseObject);
-
-
-        return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        return statusService.saveStatus(createStatusDTO);
     }
 
     @GetMapping("/getStatusByTypeId/{id}")
-    public ResponseEntity<ResponseModel> getStatusByTypeId(@PathVariable("id") UUID id) {
-        ResponseModel responseModel = new ResponseModel();
-        List<StatusResponse> statusResponse = statusService.getAllStatusByType(id);
-        if (statusResponse.isEmpty()) {
-            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("No Status found");
-            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
-        }
-        JSONObject responseObject = new JSONObject();
-        responseObject.put("statuses", statusResponse);
+    @MessageResponse("List Status successfully")
+    public List<StatusResponse> getStatusByTypeId(@PathVariable("id") UUID id) {
 
-        responseModel.setMessage("List Status successful");
-        responseModel.setResponseData(responseObject);
-
-
-        return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        return statusService.getAllStatusByType(id);
     }
 
     @GetMapping("/getStatusById/{id}")
-    public ResponseEntity<ResponseModel> getStatusById(@PathVariable("id") UUID id) {
-        ResponseModel responseModel = new ResponseModel();
-        StatusResponse statusResponse = statusService.getStatusById(id);
-        if (statusResponse == null) {
-            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("No Status found");
-            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
-        }
-        JSONObject responseObject = new JSONObject();
-        responseObject.put("statuses", statusResponse);
+    @MessageResponse("Get Status successfully")
+    public StatusResponse getStatusById(@PathVariable("id") UUID id) {
 
-        responseModel.setMessage("Status successful");
-        responseModel.setResponseData(responseObject);
+        Status status = statusService.getStatusById(id);
 
-
-        return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        return new StatusResponse(status);
     }
 
     @PutMapping("/updateStatus")
-    public ResponseEntity<ResponseModel> updateStatus(@RequestBody UpdateStatusDTO updateStatusDTO) {
-        ResponseModel responseModel = new ResponseModel();
-        StatusResponse statusResponse = statusService.updateStatus(updateStatusDTO);
-        if (statusResponse == null) {
-            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Update Status failed");
-            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
-        }
-        JSONObject responseObject = new JSONObject();
-        responseObject.put("status", statusResponse);
-        responseModel.setMessage("Update Status successful");
-        responseModel.setResponseData(responseObject);
+    @MessageResponse("Update Status successfully")
+    public StatusResponse updateStatus(@RequestBody UpdateStatusDTO updateStatusDTO) {
 
-        return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        return statusService.saveStatus(updateStatusDTO);
     }
 }

@@ -13,13 +13,11 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserAnswerRequest {
 
-    UUID userId;
-
     UUID questionId;
 
     UUID answerId;
 
-    String content;
 
-    int position;
+
+
 }

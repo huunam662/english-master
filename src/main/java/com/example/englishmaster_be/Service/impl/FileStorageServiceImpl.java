@@ -100,6 +100,8 @@ public class FileStorageServiceImpl implements IFileStorageService {
 
             String fileName = nameFile(file);
 
+            delete(fileName);
+
             Bucket bucket = StorageClient.getInstance().bucket(bucketName);
 
             return bucket.create(fileName, file.getBytes(), file.getContentType());

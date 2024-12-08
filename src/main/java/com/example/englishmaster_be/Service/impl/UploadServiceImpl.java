@@ -3,6 +3,7 @@ package com.example.englishmaster_be.Service.impl;
 import com.example.englishmaster_be.DTO.DeleteRequestDTO;
 import com.example.englishmaster_be.Exception.CustomException;
 import com.example.englishmaster_be.Exception.Error;
+import com.example.englishmaster_be.Exception.Response.BadRequestException;
 import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.Model.Content;
 import com.example.englishmaster_be.Model.Response.DeleteResponse;
@@ -12,7 +13,13 @@ import com.example.englishmaster_be.Service.IUploadService;
 import com.example.englishmaster_be.Service.IUserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
 import org.springframework.http.client.MultipartBodyBuilder;
@@ -29,25 +36,25 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UploadServiceImpl implements IUploadService {
-    private final RestTemplate restTemplate;
-    private final ContentRepository contentRepository;
-    private final IUserService userService;
 
     @Value("${upload.server.api.upload}")
-    private String uploadApiUrl;
+    static String uploadApiUrl;
 
     @Value("${upload.server.token}")
-    private String token;
+    static String token;
 
     @Value("${upload.server.api.delete}")
-    private String deleteApiUrl;
+    static String deleteApiUrl;
 
-    public UploadServiceImpl(RestTemplate restTemplate, ContentRepository contentRepository, IUserService userService) {
-        this.restTemplate = restTemplate;
-        this.contentRepository = contentRepository;
-        this.userService = userService;
-    }
+    RestTemplate restTemplate;
+
+    ContentRepository contentRepository;
+
+    IUserService userService;
+
 
     private ResponseEntity<String> sendHttpRequest(String url, HttpMethod method, HttpHeaders headers, Object body) {
         HttpEntity<?> entity = new HttpEntity<>(body, headers);
@@ -61,48 +68,54 @@ public class UploadServiceImpl implements IUploadService {
         return headers;
     }
 
+
+    @SneakyThrows
     @Override
     public String upload(MultipartFile file, String dir, boolean isPrivateFile, UUID topicId, String code) {
+
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException("File is null or empty");
+            throw new BadRequestException("File is null or empty");
         }
         if (file.getContentType() == null) {
-            throw new IllegalArgumentException("Invalid file Type");
+            throw new BadRequestException("Invalid file Type");
         }
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         HttpHeaders headers = createHttpHeaders(MediaType.MULTIPART_FORM_DATA);
-        try {
-            builder.part("file", new ByteArrayResource(file.getBytes()) {
-                @Override
-                public String getFilename() {
-                    return file.getOriginalFilename();
-                }
-            }, MediaType.parseMediaType(Objects.requireNonNull(file.getContentType())));
-            builder.part("dir", dir);
-            builder.part("isPrivateFile", isPrivateFile);
 
-            HttpEntity<?> entity = new HttpEntity<>(builder.build(), headers);
-            ResponseEntity<String> response = restTemplate.exchange(uploadApiUrl, HttpMethod.POST, entity, String.class);
-            if (response.getBody() == null) {
-                throw new RuntimeException("Server response is empty");
+        builder.part("file", new ByteArrayResource(file.getBytes()) {
+            @Override
+            public String getFilename() {
+                return file.getOriginalFilename();
             }
-            ObjectMapper objectMapper = new ObjectMapper();
-            JsonNode jsonResponse = objectMapper.readTree(response.getBody());
-            boolean isSuccess = jsonResponse.path("success").asBoolean();
-            if (isSuccess) {
-                String url = jsonResponse.path("responseData").path("url").asText();
-                if (topicId != null && code != null && !code.isEmpty()) {
-                    return handleSuccessfulUpload(jsonResponse, topicId, code, file);
-                }
-                return url;
-            } else {
-                String errorMessage = jsonResponse.path("message").asText("Upload failed");
-                throw new RuntimeException("Error: " + errorMessage);
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Error uploading file: " + e.getMessage(), e);
+        }, MediaType.parseMediaType(Objects.requireNonNull(file.getContentType())));
+        builder.part("dir", dir);
+        builder.part("isPrivateFile", isPrivateFile);
+
+        HttpEntity<?> entity = new HttpEntity<>(builder.build(), headers);
+        ResponseEntity<String> response = restTemplate.exchange(uploadApiUrl, HttpMethod.POST, entity, String.class);
+        if (response.getBody() == null) {
+            throw new RuntimeException("Server response is empty");
         }
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonResponse = objectMapper.readTree(response.getBody());
+        boolean isSuccess = jsonResponse.path("success").asBoolean();
+        if (isSuccess) {
+            String url = jsonResponse.path("responseData").path("url").asText();
+            if (topicId != null && code != null && !code.isEmpty()) {
+                return handleSuccessfulUpload(jsonResponse, topicId, code, file);
+            }
+
+            if(url == null || !url.startsWith("https"))
+                throw new RuntimeException("Upload failed");
+
+            return url;
+        } else {
+            String errorMessage = jsonResponse.path("message").asText("Upload failed");
+            throw new RuntimeException("Error: " + errorMessage);
+        }
+
+
     }
 
     private String handleSuccessfulUpload(JsonNode jsonResponse, UUID topicId, String code, MultipartFile file) {
