@@ -1,7 +1,11 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.Status.CreateStatusDTO;
+import com.example.englishmaster_be.Constant.StatusConstant;
+import com.example.englishmaster_be.DTO.Status.SaveStatusDTO;
 import com.example.englishmaster_be.DTO.Status.UpdateStatusDTO;
+import com.example.englishmaster_be.Exception.CustomException;
+import com.example.englishmaster_be.Exception.Error;
+import com.example.englishmaster_be.Exception.Response.BadRequestException;
 import com.example.englishmaster_be.Model.QStatus;
 import com.example.englishmaster_be.Model.Response.StatusResponse;
 import com.example.englishmaster_be.Model.Status;
@@ -14,6 +18,8 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,20 +27,48 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class StatusServiceImpl implements IStatusService {
-    StatusRepository statusRepository;
+
     JPAQueryFactory queryFactory;
+
+    StatusRepository statusRepository;
+
     TypeRepository typeRepository;
 
     @Override
-    public StatusResponse createStatus(CreateStatusDTO statusDTO) {
-        Status status = statusRepository.save(Status.builder()
-                .statusName(statusDTO.getStatusName())
-                .flag(statusDTO.isFlag())
-                .type(typeRepository.findById(statusDTO.getTypeId()).orElse(null))
-                .build());
+    public StatusResponse saveStatus(SaveStatusDTO statusDTO) {
+
+        Status status;
+
+        Type type = typeRepository.findById(statusDTO.getTypeId()).orElseThrow(
+                () -> new BadRequestException("Type not found")
+        );
+
+        if(statusDTO instanceof UpdateStatusDTO updateStatusDTO){
+
+            status = getStatusById(updateStatusDTO.getUpdateStatusId());
+
+            status.setFlag(statusDTO.isFlag());
+            status.setStatusName(statusDTO.getStatusName());
+            status.setType(type);
+        }
+        else{
+            status = statusRepository.findByStatusName(statusDTO.getStatusName()).orElse(null);
+
+            if(status != null) throw new BadRequestException("Status is already exist");
+
+            status = Status.builder()
+                    .statusName(statusDTO.getStatusName())
+                    .flag(statusDTO.isFlag())
+                    .type(type)
+                    .build();
+
+        }
+
+        status = statusRepository.save(status);
+
         return StatusResponse.builder()
                 .statusId(status.getStatusId())
                 .statusName(status.getStatusName())
@@ -63,29 +97,19 @@ public class StatusServiceImpl implements IStatusService {
     }
 
     @Override
-    public StatusResponse getStatusById(UUID statusId) {
-        Status status = statusRepository.findById(statusId).orElse(null);
-        if (status == null) {
-            return null;
-        }
-        return new StatusResponse(status);
+    public Status getStatusById(UUID statusId) {
+
+        return statusRepository.findById(statusId).orElseThrow(
+                () -> new CustomException(Error.STATUS_NOT_FOUND)
+        );
     }
 
     @Override
-    public StatusResponse updateStatus(UpdateStatusDTO statusDTO) {
-        Status status = statusRepository.findById(statusDTO.getId()).orElse(null);
-        Type type = typeRepository.findById(statusDTO.getTypeId()).orElse(null);
-        if (status == null) {
-            return null;
-        }
-        if (type == null) {
-            return null;
-        }
-        status.setStatusName(statusDTO.getStatusName());
-        status.setFlag(statusDTO.isFlag());
-        status.setType(type);
+    public Status getStatusByName(String statusName) {
 
-        statusRepository.save(status);
-        return new StatusResponse(status);
+        return statusRepository.findByStatusName(statusName).orElseThrow(
+                () -> new CustomException(Error.STATUS_NOT_FOUND)
+        );
     }
+
 }

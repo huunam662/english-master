@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Service;
 
 import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.DTO.Feedback.CreateFeedbackDTO;
+import com.example.englishmaster_be.DTO.Feedback.SaveFeedbackDTO;
 import com.example.englishmaster_be.DTO.Feedback.FeedbackFilterRequest;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.FeedbackResponse;
@@ -16,7 +16,7 @@ public interface IFeedbackService {
 
     FilterResponse<?> getListFeedbackOfUser(FeedbackFilterRequest filterRequest);
 
-    FeedbackResponse saveFeedback(CreateFeedbackDTO createFeedbackDTO);
+    FeedbackResponse saveFeedback(SaveFeedbackDTO createFeedbackDTO);
 
     void enableFeedback(UUID feedbackId, boolean enable);
 

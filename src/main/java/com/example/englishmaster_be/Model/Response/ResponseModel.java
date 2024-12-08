@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
 @Getter
@@ -21,7 +22,7 @@ public class ResponseModel {
 
     String path;
 
-    HttpStatusCode status;
+    HttpStatus status;
 
     int code;
 

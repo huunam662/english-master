@@ -10,6 +10,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.FieldError;
@@ -98,7 +99,19 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.UNAUTHORIZED)
                 .code(HttpStatus.UNAUTHORIZED.value())
                 .message(message)
-                .violations("")
+                .build();
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ExceptionResponseModel handleDisabledException(DisabledException ignored) {
+
+        Error error = Error.ACCOUNT_DISABLED;
+
+        return ExceptionResponseModel.builder()
+                .success(Boolean.FALSE)
+                .status(error.getStatusCode())
+                .code(error.getStatusCode().value())
+                .message(error.getMessage())
                 .build();
     }
 
@@ -142,7 +155,6 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.CONFLICT)
                 .code(HttpStatus.CONFLICT.value())
                 .message(exception.getMessage())
-                .violations("")
                 .build();
     }
 
@@ -158,7 +170,6 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .message(exception.getMessage())
-                .violations("")
                 .build();
     }
 

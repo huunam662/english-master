@@ -1,10 +1,16 @@
 package com.example.englishmaster_be.Controller;
 
+import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
 import com.example.englishmaster_be.DTO.DeleteRequestDTO;
 import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
 import com.example.englishmaster_be.Model.Response.DeleteResponse;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Service.IUploadService;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
@@ -13,50 +19,33 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.FileNotFoundException;
 import java.util.UUID;
 
+@Tag(name = "Upload")
 @RestController
 @RequestMapping("/api/v1/upload")
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UploadController {
 
-    @Autowired
-    private IUploadService IUploadService;
+    IUploadService uploadService;
 
     @PostMapping(value = "/file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseModel> uploadFile(
+    @MessageResponse("Successfully uploaded file")
+    public String uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "dir", defaultValue = "/") String dir,
             @RequestParam(value = "isPrivateFile", defaultValue = "false") boolean isPrivateFile,
             @RequestParam(value = "topicId", required = false) UUID topicId,
-            @RequestParam(value = "code", required = false) String code) {
-        ResponseModel responseModel = new ResponseModel();
-        String urlFile = IUploadService.upload(file, dir, isPrivateFile, topicId, code);
-        if (urlFile != null && urlFile.startsWith("https")) {
-            responseModel.setMessage("Successfully uploaded file");
+            @RequestParam(value = "code", required = false) String code
+    ) {
 
-            responseModel.setResponseData(urlFile);
-            return ResponseEntity.ok(responseModel);
-        } else {
-            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Upload failed");
-            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
-        }
+        return uploadService.upload(file, dir, isPrivateFile, topicId, code);
     }
 
     @DeleteMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ResponseModel> deleteFile(@RequestBody DeleteRequestDTO dto) throws FileNotFoundException {
-        ResponseModel responseModel = new ResponseModel();
-        DeleteResponse response = IUploadService.delete(dto);
-        if (response.getMessage().equalsIgnoreCase("Image deleted")) {
-            responseModel.setMessage("Successfully uploaded file");
+    @MessageResponse("Successfully delete file")
+    @SneakyThrows
+    public void deleteFile(@RequestBody DeleteRequestDTO dto) {
 
-            responseModel.setResponseData(response.getMessage());
-            return ResponseEntity.ok(responseModel);
-        } else {
-            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Deleted failed");
-            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            exceptionResponseModel.setResponseData(null);
-            return ResponseEntity.internalServerError().body(exceptionResponseModel);
-        }
+        uploadService.delete(dto);
     }
 }

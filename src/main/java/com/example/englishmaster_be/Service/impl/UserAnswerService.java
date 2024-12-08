@@ -5,8 +5,11 @@ import com.example.englishmaster_be.DTO.Type.QuestionType;
 import com.example.englishmaster_be.Exception.Response.ResourceNotFoundException;
 import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Repository.*;
+import com.example.englishmaster_be.Service.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,19 +18,27 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 public class UserAnswerService {
-    private final AnswerBlankRepository answerBlankRepository;
-    private final UserRepository userRepository;
-    private final QuestionRepository questionRepository;
-    private final UserBlankAnswerRepository userBlankAnswerRepository;
-    private final UserAnswerRepository userAnswerRepository;
-    private final AnswerRepository answerRepository;
+
+    AnswerBlankRepository answerBlankRepository;
+
+    QuestionRepository questionRepository;
+
+    UserBlankAnswerRepository userBlankAnswerRepository;
+
+    UserAnswerRepository userAnswerRepository;
+
+    AnswerRepository answerRepository;
+
+    IUserService userService;
+
 
 
     @Transactional
     public void createUserAnswer(UserAnswerRequest request){
-        User user = userRepository.findByUserId(request.getUserId());
+
+        User user = userService.findUserById(request.getUserId());
 
         if (Objects.isNull(user))
             throw new ResourceNotFoundException("User not found");
@@ -71,7 +82,8 @@ public class UserAnswerService {
 
     @Transactional
     public void deleteAnswer(UUID questionId, UUID userId){
-        User user = userRepository.findByUserId(userId);
+
+        User user = userService.findUserById(userId);
 
         if (Objects.isNull(user))
             throw new ResourceNotFoundException("User not found");
@@ -92,7 +104,8 @@ public class UserAnswerService {
         }
     }
     public boolean checkCorrectAnswerBlank(UUID questionId, UUID userId) {
-        User user = userRepository.findByUserId(userId);
+
+        User user = userService.findUserById(userId);
 
         if (Objects.isNull(user))
             throw new ResourceNotFoundException("User not found");
@@ -123,7 +136,8 @@ public class UserAnswerService {
     }
 
     public boolean checkCorrectAnswerMultipleChoice(UUID questionId, UUID userId){
-        User user = userRepository.findByUserId(userId);
+
+        User user = userService.findUserById(userId);
 
         if (Objects.isNull(user))
             throw new ResourceNotFoundException("User not found");
@@ -147,7 +161,8 @@ public class UserAnswerService {
     }
 
     public Map<String,Integer> scoreAnswer(UUID questionId, UUID userId){
-        User user = userRepository.findByUserId(userId);
+
+        User user = userService.findUserById(userId);
 
         if (Objects.isNull(user))
             throw new ResourceNotFoundException("User not found");

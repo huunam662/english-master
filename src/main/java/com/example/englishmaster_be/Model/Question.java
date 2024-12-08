@@ -2,6 +2,7 @@ package com.example.englishmaster_be.Model;
 
 import com.example.englishmaster_be.DTO.Question.*;
 import com.example.englishmaster_be.DTO.Type.QuestionType;
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+@Hidden
 @Entity
 @Table(name = "Question")
 @Getter
@@ -82,7 +84,7 @@ public class Question implements Serializable {
     @Enumerated(EnumType.STRING)
     private QuestionType questionType;
 
-    public Question(CreateQuestionDTO createQuestionDTO) {
+    public Question(SaveQuestionDTO createQuestionDTO) {
 
         if(Objects.isNull(createQuestionDTO)) return;
 

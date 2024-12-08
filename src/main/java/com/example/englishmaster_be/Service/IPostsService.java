@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Service;
 
-import com.example.englishmaster_be.DTO.Posts.CreatePostDto;
+import com.example.englishmaster_be.DTO.Posts.SavePostDto;
 import com.example.englishmaster_be.DTO.Posts.FilterPostDto;
 import com.example.englishmaster_be.DTO.Posts.SelectPostDto;
 import com.example.englishmaster_be.DTO.Posts.UpdatePostDto;
@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface IPostsService {
 
-    Object createPost(CreatePostDto dto);
+    Object createPost(SavePostDto dto);
 
     Object updatePost(UUID id, UpdatePostDto dto);
 

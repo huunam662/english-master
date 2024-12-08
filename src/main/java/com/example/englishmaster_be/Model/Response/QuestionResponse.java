@@ -1,13 +1,16 @@
 package com.example.englishmaster_be.Model.Response;
 
 import com.example.englishmaster_be.Model.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.springframework.cglib.core.Local;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Getter
@@ -27,9 +30,11 @@ public class QuestionResponse {
 
     String questionContent;
 
-    String createAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+    LocalDateTime createAt;
 
-    String updateAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+    LocalDateTime updateAt;
 
     List<QuestionResponse> questionGroup;
 
@@ -37,7 +42,7 @@ public class QuestionResponse {
 
     int questionScore;
 
-    JSONArray contentList;
+    List<ContentResponse> contentList;
 
 
     public QuestionResponse(Question question) {
@@ -47,9 +52,8 @@ public class QuestionResponse {
         this.questionScore = question.getQuestionScore();
         this.partId = question.getPart().getPartId();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
-        this.createAt = sdf.format(Timestamp.valueOf(question.getCreateAt()));
-        this.updateAt = sdf.format(Timestamp.valueOf(question.getUpdateAt()));
+        this.createAt = question.getCreateAt();
+        this.updateAt = question.getUpdateAt();
 
         if (Objects.nonNull(question.getAnswers())) {
             this.listAnswer = question.getAnswers().stream().map(
@@ -61,17 +65,9 @@ public class QuestionResponse {
 
         if (Objects.nonNull(question.getContentCollection())) {
 
-                question.getContentCollection().forEach(
-                contentItem -> {
-                        JSONObject content = new JSONObject();
-
-                        content.put("Content Type", contentItem.getContentType());
-
-                        content.put("Content Data", contentItem.getContentData());
-
-                        this.contentList.add(content);
-                    }
-                );
+                this.contentList = question.getContentCollection().stream().map(
+                        content -> new ContentResponse(content)
+                ).toList();
             
         }
 
@@ -87,12 +83,8 @@ public class QuestionResponse {
         this.questionScore = question.getQuestionScore();
         this.partId = question.getPart().getPartId();
 
-        // Định dạng ngày tạo và ngày cập nhật
-        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
-        if(Objects.nonNull(question.getCreateAt()))
-            this.createAt = sdf.format(Timestamp.valueOf(question.getCreateAt()));
-        if(Objects.nonNull(question.getUpdateAt()))
-            this.updateAt = sdf.format(Timestamp.valueOf(question.getUpdateAt()));
+        this.createAt = question.getCreateAt();
+        this.updateAt = question.getUpdateAt();
 
         // Xử lý danh sách câu trả lời
         if (Objects.nonNull(question.getAnswers())) {
@@ -107,18 +99,9 @@ public class QuestionResponse {
         this.contentList = new JSONArray();
 
         if (Objects.nonNull(question.getContentCollection())) {
-            question.getContentCollection().forEach(
-                contentItem -> {
-                    JSONObject contentJson = new JSONObject();
-                    contentJson.put("Content Type", contentItem.getContentType());
-
-                    if(Objects.nonNull(contentItem.getContentData()))
-                        contentJson.put("Content Data", contentItem.getContentData());
-                    else contentJson.put("Content Data", "");
-
-                    this.contentList.add(contentJson);
-                }
-            );
+            this.contentList = question.getContentCollection().stream().map(
+                    content -> new ContentResponse(content)
+            ).toList();
         }
     }
 

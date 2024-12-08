@@ -12,9 +12,9 @@ import java.util.stream.Stream;
 @Component
 public class EnglishWordDictionary {
     //@Value("${dictionary.file.path}")
-    private String dictionaryFilePath = "english.txt";
+    private final String dictionaryFilePath = "english.txt";
 
-    private Set<String> wordSet = new HashSet<>();
+    private final Set<String> wordSet = new HashSet<>();
 
     @PostConstruct
     public void loadWordList() throws IOException {

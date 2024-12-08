@@ -1,11 +1,11 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
-import com.example.englishmaster_be.DTO.Answer.CreateAnswerDTO;
+import com.example.englishmaster_be.DTO.Answer.SaveAnswerDTO;
 import com.example.englishmaster_be.DTO.Answer.UpdateAnswerDTO;
 import com.example.englishmaster_be.Exception.CustomException;
 import com.example.englishmaster_be.Exception.Response.BadRequestException;
 import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.Model.Response.AnswerResponse;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.IAnswerService;
 import com.example.englishmaster_be.Service.IQuestionService;
@@ -13,14 +13,22 @@ import com.example.englishmaster_be.Service.IUserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.englishmaster_be.Exception.Error;
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AnswerServiceImpl implements IAnswerService {
 
@@ -32,13 +40,14 @@ public class AnswerServiceImpl implements IAnswerService {
 
     IQuestionService questionService;
 
+
     @Transactional
     @Override
-    public Answer saveAnswer(CreateAnswerDTO createAnswerDTO) {
+    public Answer saveAnswer(SaveAnswerDTO createAnswerDTO) {
 
         User user = userService.currentUser();
 
-        Question question = questionService.findQuestionById(createAnswerDTO.getQuestionId());
+        Question question = questionService.getQuestionById(createAnswerDTO.getQuestionId());
 
         boolean check = false;
 
@@ -126,4 +135,13 @@ public class AnswerServiceImpl implements IAnswerService {
         return null;
     }
 
+    @Override
+    public List<AnswerResponse> getListAnswerByQuestionId(UUID questionId) {
+
+        Question question = questionService.getQuestionById(questionId);
+
+        List<Answer> answerList = question.getAnswers();
+
+        return answerList.stream().map(AnswerResponse::new).toList();
+    }
 }

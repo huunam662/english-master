@@ -16,6 +16,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
@@ -27,17 +29,19 @@ import java.util.stream.Collectors;
 
 
 @Service
+@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor
 public class DictionaryServiceImpl implements IDictionaryService {
-
-    DictionaryValue dictionaryValue;
 
     CloseableHttpClient httpClient;
 
     ObjectMapper objectMapper;
 
+    DictionaryValue dictionaryValue;
+
     EnglishWordDictionary englishWordDictionary;
+
+
 
     @SneakyThrows
     @Override

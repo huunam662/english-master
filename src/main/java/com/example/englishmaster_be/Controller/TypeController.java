@@ -1,11 +1,17 @@
 package com.example.englishmaster_be.Controller;
 
+import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
 import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
-import com.example.englishmaster_be.DTO.Type.CreateTypeDTO;
+import com.example.englishmaster_be.DTO.Type.SaveTypeDTO;
 import com.example.englishmaster_be.Model.Response.TypeResponse;
 import com.example.englishmaster_be.Model.Response.ResponseModel;
+import com.example.englishmaster_be.Model.Type;
 import com.example.englishmaster_be.Service.ITypeService;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -16,97 +22,46 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Type")
 @RestController
 @RequestMapping("/api/type")
 @PreAuthorize("hasRole('ADMIN')")
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TypeController {
-    @Autowired
+
     ITypeService typeService;
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getAllTypes")
-    public ResponseEntity<ResponseModel> getAllTypes() {
-        ResponseModel responseModel = new ResponseModel();
-        List<TypeResponse> typeList = typeService.getAllTypes();
+    @MessageResponse("List Type successfully")
+    public List<TypeResponse> getAllTypes() {
 
-        if (typeList == null || typeList.isEmpty()) {
-            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("No types found");
-            exceptionResponseModel.setStatus(HttpStatus.NOT_FOUND);
-            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponseModel);
-        }
-
-        JSONObject responseObject = new JSONObject();
-        responseObject.put("typeList", typeList);
-
-        responseModel.setMessage("List Type successful");
-        responseModel.setResponseData(responseObject);
-
-        return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        return typeService.getAllTypes();
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getType/{id}")
-    public ResponseEntity<ResponseModel> getType(@PathVariable("id") UUID id) {
-        ResponseModel responseModel = new ResponseModel();
-        ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-        TypeResponse typeResponse = typeService.getTypeById(id);
-        if (typeResponse == null) {
-            exceptionResponseModel.setMessage("No Type found");
-            exceptionResponseModel.setStatus(HttpStatus.NOT_FOUND);
-            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(exceptionResponseModel);
-        }
-        JSONObject responseObject = new JSONObject();
-        responseObject.put("type", typeResponse);
+    @MessageResponse("Type successfully")
+    public TypeResponse getType(@PathVariable("id") UUID id) {
 
-        responseModel.setMessage("Type successful");
-        responseModel.setResponseData(responseObject);
-
-
-        return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        return typeService.getTypeById(id);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/createType")
-    public ResponseEntity<ResponseModel> createType(@RequestBody CreateTypeDTO createTypeDTO) {
-        ResponseModel responseModel = new ResponseModel();
-        TypeResponse typeResponse = typeService.createType(createTypeDTO);
-        if (typeResponse == null) {
-            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Create Type failed");
-            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
-        }
-        JSONObject responseObject = new JSONObject();
-        responseObject.put("type", typeResponse);
+    @MessageResponse("Create Type successfully")
+    public TypeResponse createType(@RequestBody SaveTypeDTO createTypeDTO) {
 
-        responseModel.setMessage("Create Type successful");
-        responseModel.setResponseData(responseObject);
-
-
-        return ResponseEntity.status(HttpStatus.OK).body(responseModel);
+        return typeService.createType(createTypeDTO);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<ResponseModel> deleteType(@PathVariable("id") UUID id) {
-        ResponseModel responseModel = new ResponseModel();
-        TypeResponse typeResponse = typeService.getTypeById(id);
-        if (typeResponse == null) {
-            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("No Type found");
-            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
-        }
+    @MessageResponse("Delete Type successfully")
+    public void deleteType(@PathVariable("id") UUID id) {
+
         typeService.deleteTypeById(id);
-        responseModel.setMessage("Delete account of User successful");
-
-
-        return ResponseEntity.status(HttpStatus.OK).body(responseModel);
     }
 }
 

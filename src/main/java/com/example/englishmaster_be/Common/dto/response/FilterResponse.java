@@ -30,7 +30,7 @@ public class FilterResponse<T> {
     List<T> content = null;
 
     public void withPreviousAndNextPage() {
-        this.hasPreviousPage = pageNumber > 1;
+        this.hasPreviousPage = pageNumber > 1 && totalPages > 1;
         this.hasNextPage = pageNumber < totalPages;
     }
 

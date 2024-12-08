@@ -2,7 +2,7 @@ package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Constant.PartConstant;
 import com.example.englishmaster_be.Exception.Error;
-import com.example.englishmaster_be.DTO.Answer.CreateListAnswerDTO;
+import com.example.englishmaster_be.DTO.Answer.SaveListAnswerDTO;
 import com.example.englishmaster_be.Model.Response.excel.CreateQuestionByExcelFileResponse;
 import com.example.englishmaster_be.Model.Response.excel.CreateListQuestionByExcelFileResponse;
 import com.example.englishmaster_be.Model.Response.excel.CreateTopicByExcelFileResponse;
@@ -16,6 +16,7 @@ import com.example.englishmaster_be.Util.ExcelUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -23,7 +24,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,18 +36,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ExcelServiceImpl implements IExcelService {
-
-    static final Logger log = LoggerFactory.getLogger(ExcelServiceImpl.class);
 
     PackRepository packRepository;
 
     PartRepository partRepository;
 
     ContentRepository contentRepository;
+
+
 
     @Transactional
     @Override
@@ -134,9 +137,9 @@ public class ExcelServiceImpl implements IExcelService {
                     String correctAnswer = getStringCellValue(row.getCell(1));
                     int score = (int) getNumericCellValue(row.getCell(2));
                     question.setQuestionScore(score);
-                    List<CreateListAnswerDTO> listAnswerDTO = new ArrayList<>();
+                    List<SaveListAnswerDTO> listAnswerDTO = new ArrayList<>();
                     for (String option : options) {
-                        CreateListAnswerDTO answer = new CreateListAnswerDTO();
+                        SaveListAnswerDTO answer = new SaveListAnswerDTO();
                         answer.setContentAnswer(option);
                         answer.setCorrectAnswer(correctAnswer.equalsIgnoreCase(option));
                         listAnswerDTO.add(answer);
@@ -182,7 +185,7 @@ public class ExcelServiceImpl implements IExcelService {
                     question.setQuestionContent(row.getCell(1).getStringCellValue());
                     int score = (int) getNumericCellValue(row.getCell(7));
                     question.setQuestionScore(score);
-                    List<CreateListAnswerDTO> listAnswerDTO = processAnswers(
+                    List<SaveListAnswerDTO> listAnswerDTO = processAnswers(
                             getStringCellValue(row, 2),
                             getStringCellValue(row, 3),
                             getStringCellValue(row, 4),
@@ -252,7 +255,7 @@ public class ExcelServiceImpl implements IExcelService {
                     question.setQuestionContent(getStringCellValue(row, 1));
                     question.setQuestionScore(getNumericCellValue(row, 7));
                     question.setPartId(currentListeningPart.getPartId());
-                    List<CreateListAnswerDTO> listAnswerDTO = processAnswers(
+                    List<SaveListAnswerDTO> listAnswerDTO = processAnswers(
                             getStringCellValue(row, 2),
                             getStringCellValue(row, 3),
                             getStringCellValue(row, 4),
@@ -325,7 +328,7 @@ public class ExcelServiceImpl implements IExcelService {
                     question.setQuestionContent(getStringCellValue(row, 1));
                     question.setQuestionScore(getNumericCellValue(row, 7));
                     question.setPartId(currentReadingPart.getPartId());
-                    List<CreateListAnswerDTO> listAnswerDTO = processAnswers(
+                    List<SaveListAnswerDTO> listAnswerDTO = processAnswers(
                             getStringCellValue(row, 2),
                             getStringCellValue(row, 3),
                             getStringCellValue(row, 4),
@@ -494,8 +497,8 @@ public class ExcelServiceImpl implements IExcelService {
         return (cell != null) ? (int) cell.getNumericCellValue() : 0;
     }
 
-    private List<CreateListAnswerDTO> processAnswers(String optionA, String optionB, String optionC, String optionD, String result) {
-        List<CreateListAnswerDTO> listAnswerDTO = new ArrayList<>();
+    private List<SaveListAnswerDTO> processAnswers(String optionA, String optionB, String optionC, String optionD, String result) {
+        List<SaveListAnswerDTO> listAnswerDTO = new ArrayList<>();
         listAnswerDTO.add(createAnswerDTO(optionA, result));
         listAnswerDTO.add(createAnswerDTO(optionB, result));
         listAnswerDTO.add(createAnswerDTO(optionC, result));
@@ -503,8 +506,8 @@ public class ExcelServiceImpl implements IExcelService {
         return listAnswerDTO;
     }
 
-    private CreateListAnswerDTO createAnswerDTO(String option, String result) {
-        CreateListAnswerDTO answerDTO = new CreateListAnswerDTO();
+    private SaveListAnswerDTO createAnswerDTO(String option, String result) {
+        SaveListAnswerDTO answerDTO = new SaveListAnswerDTO();
         answerDTO.setContentAnswer(option);
         answerDTO.setCorrectAnswer(option != null && option.equalsIgnoreCase(result));
         return answerDTO;

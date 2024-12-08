@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class GetExtension {
+
     public static String getExtension(String filename) {
         int dotIndex = filename.lastIndexOf(".");
         if (dotIndex > -1 && dotIndex < filename.length() - 1) {
@@ -13,53 +14,26 @@ public class GetExtension {
     }
 
     public static String linkName(String name){
-        String link = PublicLink.getLink();
-        String extension = GetExtension.getExtension(name);
-        String fileLink = link;
 
-        switch (extension){
-            case ".jpg":
-            case ".JPG":
-            case ".jpeg":
-            case ".JPEG":
-            case ".png":
-            case ".PNG":
-            case ".gif":
-            case ".GIF":
-                fileLink = link + "file/showImage/";
-                break;
-            case ".mp3":
-                fileLink = link + "file/showAudio/";
-                break;
-            default:
-                fileLink = "";
-                break;
-        }
-        return fileLink;
+        String link = PublicLink.getLink();
+
+        String extension = GetExtension.getExtension(name);
+
+        return switch (extension) {
+            case ".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG", ".gif", ".GIF" -> link + "file/showImage/";
+            case ".mp3" -> link + "file/showAudio/";
+            default -> "";
+        };
     }
 
     public static String typeFile(String filename){
-        String type ;
+
         String extension = GetExtension.getExtension(filename);
 
-        switch (extension){
-            case ".jpg":
-            case ".JPG":
-            case ".jpeg":
-            case ".JPEG":
-            case ".png":
-            case ".PNG":
-            case ".gif":
-            case ".GIF":
-                type = "IMAGE";
-                break;
-            case ".mp3":
-                type = "AUDIO";
-                break;
-            default:
-                type = "TEXT";
-                break;
-        }
-        return type;
+        return switch (extension) {
+            case ".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG", ".gif", ".GIF" -> "IMAGE";
+            case ".mp3" -> "AUDIO";
+            default -> "TEXT";
+        };
     }
 }

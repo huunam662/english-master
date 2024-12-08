@@ -1,9 +1,7 @@
 package com.example.englishmaster_be.Service;
 
-import com.example.englishmaster_be.DTO.Content.CreateContentDTO;
-import com.example.englishmaster_be.DTO.Content.UpdateContentDTO;
+import com.example.englishmaster_be.DTO.Content.SaveContentDTO;
 import com.example.englishmaster_be.Model.Content;
-import com.example.englishmaster_be.Model.Response.ContentResponse;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,9 +9,7 @@ import java.util.UUID;
 
 public interface IContentService {
 
-    void uploadContent(Content content);
-
-    void delete(Content content);
+    void delete(UUID contentId);
 
     Content getContentByTopicIdAndCode(UUID topicId, String code);
 
@@ -21,7 +17,7 @@ public interface IContentService {
 
     Content getContentByContentData(String contentData);
 
-    Content saveContent(CreateContentDTO createContentDTO);
+    Content saveContent(SaveContentDTO createContentDTO);
 
     List<String> getImageCdnLink();
 

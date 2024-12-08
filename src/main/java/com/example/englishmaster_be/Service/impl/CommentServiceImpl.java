@@ -1,13 +1,11 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.Comment.CreateCommentDTO;
+import com.example.englishmaster_be.DTO.Comment.SaveCommentDTO;
 import com.example.englishmaster_be.DTO.Comment.UpdateCommentDTO;
 import com.example.englishmaster_be.Exception.Response.BadRequestException;
 import com.example.englishmaster_be.Model.Comment;
 import com.example.englishmaster_be.Model.Post;
 import com.example.englishmaster_be.Model.Response.CommentResponse;
-import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
-import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Model.Topic;
 import com.example.englishmaster_be.Model.User;
 import com.example.englishmaster_be.Repository.*;
@@ -19,8 +17,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,13 +28,13 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor
 public class CommentServiceImpl implements ICommentService {
 
-    CommentRepository commentRepository;
-
     SimpMessagingTemplate messagingTemplate;
+
+    CommentRepository commentRepository;
 
     IUserService userService;
 
@@ -66,7 +63,7 @@ public class CommentServiceImpl implements ICommentService {
     @Override
     public List<Comment> findAllByCommentParent(Comment commentParent) {
         if(!commentRepository.existsByCommentParent(commentParent))
-            return null;
+            return new ArrayList<>();
 
         return commentRepository.findAllByCommentParent(commentParent).stream().toList();
     }
@@ -86,8 +83,6 @@ public class CommentServiceImpl implements ICommentService {
 
         List<Comment> commentList = findAllByCommentParent(comment);
 
-        if(commentList == null) commentList = new ArrayList<>();
-
         return commentList.stream().map(
                 commentItem -> new CommentResponse(
                         commentItem, checkCommentParent(commentItem)
@@ -97,7 +92,7 @@ public class CommentServiceImpl implements ICommentService {
 
     @Transactional
     @Override
-    public CommentResponse createCommentToTopic(UUID topicId, CreateCommentDTO createCommentDTO) {
+    public CommentResponse createCommentToTopic(UUID topicId, SaveCommentDTO createCommentDTO) {
 
         User user = userService.currentUser();
 
@@ -120,7 +115,7 @@ public class CommentServiceImpl implements ICommentService {
 
     @Transactional
     @Override
-    public CommentResponse createCommentToPost(UUID postId, CreateCommentDTO createCommentDTO) {
+    public CommentResponse createCommentToPost(UUID postId, SaveCommentDTO createCommentDTO) {
 
         User user = userService.currentUser();
 
@@ -143,7 +138,7 @@ public class CommentServiceImpl implements ICommentService {
 
     @Transactional
     @Override
-    public CommentResponse createCommentToComment(UUID commentId, CreateCommentDTO createCommentDTO) {
+    public CommentResponse createCommentToComment(UUID commentId, SaveCommentDTO createCommentDTO) {
 
         User user = userService.currentUser();
 

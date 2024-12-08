@@ -1,31 +1,29 @@
 package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
-import com.example.englishmaster_be.DTO.Content.CreateContentDTO;
+import com.example.englishmaster_be.DTO.Content.SaveContentDTO;
 import com.example.englishmaster_be.DTO.Content.UpdateContentDTO;
 import com.example.englishmaster_be.Exception.Response.BadRequestException;
 import com.example.englishmaster_be.Model.Content;
 import com.example.englishmaster_be.Model.Response.CloudiaryUploadFileResponse;
-import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.ICloudinaryService;
 import com.example.englishmaster_be.Service.IContentService;
 import com.example.englishmaster_be.Service.IQuestionService;
-import com.example.englishmaster_be.Service.ITopicService;
 import com.example.englishmaster_be.Util.LinkUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ContentServiceImpl implements IContentService {
 
@@ -35,22 +33,22 @@ public class ContentServiceImpl implements IContentService {
 
     IQuestionService questionService;
 
-    @Transactional
-    @Override
-    public void uploadContent(Content content) {
-        contentRepository.save(content);
-    }
 
     @Transactional
     @Override
-    public void delete(Content content) {
+    public void delete(UUID contentId) {
+
+        Content content = getContentToContentId(contentId);
+
         contentRepository.delete(content);
     }
 
     @Override
     public Content getContentToContentId(UUID contentId) {
         return contentRepository.findByContentId(contentId)
-                .orElseThrow(() -> new IllegalArgumentException("Content not found with ID: " + contentId));
+                .orElseThrow(
+                        () -> new IllegalArgumentException("Content not found with ID: " + contentId)
+                );
     }
 
     @Override
@@ -72,7 +70,7 @@ public class ContentServiceImpl implements IContentService {
 
     @Transactional
     @Override
-    public Content saveContent(CreateContentDTO createContentDTO) {
+    public Content saveContent(SaveContentDTO createContentDTO) {
 
         Content content;
 
@@ -89,7 +87,7 @@ public class ContentServiceImpl implements IContentService {
                 .topicId(createContentDTO.getTopicId())
                 .build();
 
-        content.setQuestion(questionService.findQuestionById(createContentDTO.getQuestionId()));
+        content.setQuestion(questionService.getQuestionById(createContentDTO.getQuestionId()));
 
         if(createContentDTO.getFile() != null){
 
