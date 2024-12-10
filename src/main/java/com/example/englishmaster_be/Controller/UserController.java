@@ -6,9 +6,12 @@ import com.example.englishmaster_be.DTO.*;
 import com.example.englishmaster_be.DTO.User.ChangePassDTO;
 import com.example.englishmaster_be.DTO.User.ChangeProfileDTO;
 import com.example.englishmaster_be.DTO.User.UserFilterRequest;
-import com.example.englishmaster_be.Model.Response.AuthResponse;
-import com.example.englishmaster_be.Model.Response.InformationUserResponse;
+import com.example.englishmaster_be.Model.Response.*;
+import com.example.englishmaster_be.Model.User;
 import com.example.englishmaster_be.Service.IUserService;
+import com.example.englishmaster_be.Service.impl.UserServiceImpl;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -17,9 +20,16 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Tag(name = "User")
@@ -30,6 +40,8 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     IUserService userService;
+    private final UserServiceImpl userServiceImpl;
+    private final JPAQueryFactory jpaQueryFactory;
 
 
     @PostMapping("/register")
@@ -144,6 +156,25 @@ public class UserController {
     public void logoutUser(@RequestBody UserLogoutDTO userLogoutDTO) {
 
         userService.logoutUserOf(userLogoutDTO);
+    }
+
+    @PostMapping("/notifyInactiveUsers")
+    public void notifyInactiveUsers() {
+        userServiceImpl.notifyInactiveUsers();
+    }
+
+    // API để tìm kiếm người dùng lâu ngày chưa đăng nhập
+    @GetMapping("/users/inactive")
+    @PreAuthorize("hasRole('ADMIN')")
+    @MessageResponse("List inactive users successfully")
+    public ResponseEntity<List<UserResponse>> getInactiveUsers() {
+        List<UserResponse> inactiveUsers = userServiceImpl.getUsersNotLoggedInLast10Days();
+        return ResponseEntity.ok(inactiveUsers);
+    }
+
+    @GetMapping("/inactive-notify")
+    public List<UserResponse> notifyInactiveUsers(@RequestParam int days){
+        return userServiceImpl.findUsersInactiveForDaysAndNotify(days);
     }
 
 }

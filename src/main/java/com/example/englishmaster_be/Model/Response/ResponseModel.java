@@ -24,6 +24,7 @@ public class ResponseModel {
 
     HttpStatus status;
 
+    Object data;
     int code;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

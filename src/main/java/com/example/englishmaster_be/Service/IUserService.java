@@ -8,7 +8,9 @@ import com.example.englishmaster_be.DTO.User.UserFilterRequest;
 import com.example.englishmaster_be.Model.Response.AuthResponse;
 import com.example.englishmaster_be.Model.Response.CountMockTestTopicResponse;
 import com.example.englishmaster_be.Model.Response.InformationUserResponse;
+import com.example.englishmaster_be.Model.Response.UserResponse;
 import com.example.englishmaster_be.Model.User;
+import jakarta.mail.MessagingException;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.List;
 import java.util.UUID;
@@ -22,6 +24,7 @@ public interface IUserService {
 
     AuthResponse login(UserLoginDTO userLoginDTO);
 
+    void sendMail(String recipientEmail) throws MessagingException;
     void forgotPassword(String email);
 
     void verifyOtp(String otp);
@@ -42,6 +45,7 @@ public interface IUserService {
 
     FilterResponse<?> getExamResultsUser(UserFilterRequest filterRequest);
 
+    FilterResponse<?> getInactiveUsers(UserFilterRequest filterRequest);
     FilterResponse<?> getAllUser(UserFilterRequest filterRequest);
 
     void deleteUser(UUID userId);
@@ -56,6 +60,8 @@ public interface IUserService {
 
     void logoutUserOf(UserLogoutDTO userLogoutDTO);
 
+    void sendMail(String to, String subject, String body);
+
     boolean logoutUser();
 
     boolean existsEmail(String email);
@@ -63,7 +69,7 @@ public interface IUserService {
     boolean updatePassword(String otp,String newPassword);
 
     void enableUser(UUID userId, Boolean enable);
+    List<UserResponse> findUsersInactiveForDays(int inactiveDays);
 
     List<CountMockTestTopicResponse> getCountMockTestOfTopic(String date, UUID packId);
-
 }

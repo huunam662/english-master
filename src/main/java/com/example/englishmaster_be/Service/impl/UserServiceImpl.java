@@ -32,6 +32,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Sort;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -53,6 +54,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -176,6 +178,31 @@ public class UserServiceImpl implements IUserService {
         return new AuthResponse(jwt, refreshToken.getCode());
     }
 
+    @Override
+    public void sendMail(String recipientEmail) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        helper.setTo(recipientEmail);
+        helper.setSubject("Đã lâu bạn không đăng nhập rồi nhỉ?");
+        helper.setSubject("Đã lâu bạn không đăng nhập rồi nhỉ?. Hãy đăng nhập và khám phá những tính năng mới của MEU-English nào!");
+
+        mailSender.send(message);
+    }
+
+    public void notifyInactiveUsers(){
+        LocalDateTime cutoffDate = LocalDateTime.now().minusDays(10);
+
+        List<User> inactiveUsers = userRepository.findUsersNotLoggedInSince(cutoffDate);
+
+        for (User user : inactiveUsers) {
+            try {
+                sendMail(user.getEmail());
+            }catch (MessagingException e){
+                System.out.println("Failed to send email to: "+ user.getEmail());
+            }
+        }
+    }
     @Transactional
     @SneakyThrows
     @Override
@@ -465,6 +492,11 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
+    public FilterResponse<?> getInactiveUsers(UserFilterRequest filterRequest) {
+        return null;
+    }
+
+    @Override
     public void logoutUserOf(UserLogoutDTO userLogoutDTO) {
 
         boolean logoutSuccessfully = logoutUser();
@@ -478,6 +510,15 @@ public class UserServiceImpl implements IUserService {
 
         iRefreshTokenService.deleteRefreshToken(refreshToken);
 
+    }
+
+    @Override
+    public void sendMail(String to, String subject, String body) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(body);
+        mailSender.send(message);
     }
 
     @Transactional
@@ -677,5 +718,73 @@ public class UserServiceImpl implements IUserService {
                     .countMockTest(mockTests.size())
                     .build();
         }).toList();
+    }
+
+    public List<UserResponse> getUsersNotLoggedInLast10Days() {
+        // Tính thời gian cách đây 10 ngày
+        LocalDateTime tenDaysAgo = LocalDateTime.now().minusDays(10);
+
+        // Xây dựng điều kiện truy vấn
+        BooleanExpression condition = QUser.user.lastLogin.before(tenDaysAgo);
+
+        // Thực hiện truy vấn với QueryDSL
+        List<User> users = queryFactory
+                .selectFrom(QUser.user)
+                .where(condition)
+                .fetch();
+
+        // Chuyển đổi sang DTO để trả về
+        return users.stream()
+                .map(UserResponse::new)
+                .collect(Collectors.toList());
+    }
+    @Transactional
+    public List<UserResponse> findUsersInactiveForDays(int inactiveDays) {
+
+        // Tính toán ngày đã qua kể từ ngày hiện tại
+        LocalDateTime thresholdDate = LocalDateTime.now().minusDays(inactiveDays);
+
+        // Xây dựng điều kiện lọc
+        BooleanExpression wherePattern = QUser.user.lastLogin.before(thresholdDate);
+
+        // Truy vấn người dùng lâu ngày chưa đăng nhập
+        JPAQuery<User> query = queryFactory
+                .selectFrom(QUser.user)
+                .where(wherePattern);
+
+        List<User> inactiveUsers = query.fetch();
+
+        // Chuyển đổi kết quả thành UserResponse
+        return inactiveUsers.stream()
+                .map(UserResponse::new)
+                .toList();
+    }
+
+    @Transactional
+    public List<UserResponse> findUsersInactiveForDaysAndNotify(int inactiveDays) {
+        LocalDateTime thresholdDate = LocalDateTime.now().minusDays(inactiveDays);
+
+        BooleanExpression wherePattern = QUser.user.lastLogin.before(thresholdDate);
+
+        JPAQuery<User> query = queryFactory
+                .selectFrom(QUser.user)
+                .where(wherePattern);
+        List<User> inactiveUsers = query.fetch();
+
+        for (User user : inactiveUsers) {
+            sendNotificationEmail(user);
+        }
+        return inactiveUsers.stream()
+                .map(UserResponse::new)
+                .toList();
+    }
+
+    public void sendNotificationEmail(User user){
+        String subject = "Đã lâu bạn không truy cập rồi!";
+        String body = String.format(
+                "Chào %s, \n\n Đã lâu rồi bạn không đăng nhập vào hệ thống. Hãy quay lại để khám phá các tính năng mới nào!\n\nTrân trọng, \n Đội ngũ chúng tôi.",
+                user.getName()
+        );
+        sendMail(user.getEmail(),subject,body);
     }
 }
