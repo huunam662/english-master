@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-@Hidden
+
 @Entity
 @Table(name = "mock_test")
 @Getter

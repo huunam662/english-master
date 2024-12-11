@@ -6,7 +6,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.time.LocalDateTime;
 
-@Hidden
+
 @Entity
 @Table(name = "invalid_token")
 @Getter

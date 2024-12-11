@@ -9,7 +9,7 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
-@Hidden
+
 @Entity
 @Table(name = "Status")
 @Getter
