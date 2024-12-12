@@ -82,7 +82,6 @@ public class NewsServiceImpl implements INewsService {
         long totalPages = (long) Math.ceil((float) totalElements / filterResponse.getPageSize());
         filterResponse.setTotalElements(totalElements);
         filterResponse.setTotalPages(totalPages);
-        filterResponse.withPreviousAndNextPage();
 
         OrderSpecifier<?> orderSpecifier;
 

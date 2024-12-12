@@ -32,7 +32,6 @@ public interface TopicMapper {
         return parts.stream().filter(Objects::nonNull).map(PartEntity::getPartId).toList();
     }
 
-    @IterableMapping(elementTargetType = TopicResponse.class)
     List<TopicResponse> toTopicResponseList(List<TopicEntity> topicEntityList);
 
     @Mapping(target = "topicImage", ignore = true)

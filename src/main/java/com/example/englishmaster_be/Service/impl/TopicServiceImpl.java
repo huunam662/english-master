@@ -1023,7 +1023,6 @@ public class TopicServiceImpl implements ITopicService {
         if (filterRequest.getSearch() != null && !filterRequest.getSearch().isEmpty())
             wherePattern = wherePattern.and(QTopicEntity.topicEntity.topicName.lower().like("%" + filterRequest.getSearch().toLowerCase() + "%"));
 
-
         if (filterRequest.getType() != null && !filterRequest.getType().isEmpty())
             wherePattern = wherePattern.and(QTopicEntity.topicEntity.topicType.lower().like(filterRequest.getType().toLowerCase()));
 
@@ -1037,7 +1036,6 @@ public class TopicServiceImpl implements ITopicService {
         long totalPages = (long) Math.ceil((double) totalElements / filterRequest.getSize());
         filterResponse.setTotalElements(totalElements);
         filterResponse.setTotalPages(totalPages);
-        filterResponse.withPreviousAndNextPage();
 
         OrderSpecifier<?> orderSpecifier;
 
@@ -1067,7 +1065,7 @@ public class TopicServiceImpl implements ITopicService {
                                             .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
-                query.fetch().stream().map(TopicMapper.INSTANCE::toTopicResponse).toList()
+                TopicMapper.INSTANCE.toTopicResponseList(query.fetch())
         );
 
         return filterResponse;
