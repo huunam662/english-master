@@ -7,6 +7,7 @@ import com.example.englishmaster_be.Model.Request.User.UserFilterRequest;
 import com.example.englishmaster_be.Model.Response.AuthResponse;
 import com.example.englishmaster_be.Model.Response.CountMockTestTopicResponse;
 import com.example.englishmaster_be.entity.UserEntity;
+import jakarta.mail.MessagingException;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.List;
 import java.util.UUID;
@@ -14,25 +15,27 @@ import java.util.UUID;
 
 public interface IUserService {
 
-    void registerUser(UserRegisterRequest userRegisterDTO);
+    void registerUser(UserRegisterRequest userRegisterRequest);
 
     void confirmRegister(String confirmationToken);
 
-    AuthResponse login(UserLoginRequest userLoginDTO);
+    AuthResponse login(UserLoginRequest userLoginRequest);
+
+    void sendMail(String recipientEmail) throws MessagingException;
 
     void forgotPassword(String email);
 
     void verifyOtp(String otp);
 
-    void changePassword(ChangePasswordRequest changePasswordDTO);
+    void changePassword(ChangePasswordRequest changePasswordRequest);
 
     String confirmForgetPassword(String token);
 
-    AuthResponse refreshToken(RefreshTokenRequest refreshTokenDTO);
+    AuthResponse refreshToken(RefreshTokenRequest refreshTokenRequest);
 
     UserEntity changeProfile(ChangeProfileRequest changeProfileRequest);
 
-    void changePass(com.example.englishmaster_be.Model.Request.User.ChangePasswordRequest changePassDTO);
+    void changePass(ChangePasswordRequest changePasswordRequest);
 
     FilterResponse<?> getExamResultsUser(UserFilterRequest filterRequest);
 
@@ -48,7 +51,9 @@ public interface IUserService {
 
     UserEntity findUserById(UUID userId);
 
-    void logoutUserOf(UserLogoutRequest userLogoutDTO);
+    void logoutUserOf(UserLogoutRequest userLogoutRequest);
+
+    void sendMail(String to, String subject, String body);
 
     boolean logoutUser();
 
@@ -58,6 +63,15 @@ public interface IUserService {
 
     void enableUser(UUID userId, Boolean enable);
 
+    List<UserEntity> findUsersInactiveForDays(int inactiveDays);
+
     List<CountMockTestTopicResponse> getCountMockTestOfTopic(String date, UUID packId);
 
+    void sendNotificationEmail(UserEntity user);
+
+    List<UserEntity> findUsersInactiveForDaysAndNotify(int inactiveDays);
+
+    List<UserEntity> getUsersNotLoggedInLast10Days();
+
+    void notifyInactiveUsers();
 }

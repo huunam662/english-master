@@ -18,4 +18,6 @@ public class ChangePasswordRequest {
 
     String confirmPass;
 
+    String oldPassword;
+
 }

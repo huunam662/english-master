@@ -36,7 +36,7 @@ public class UploadController {
         return uploadService.upload(file, dir, isPrivateFile, topicId, code);
     }
 
-    @DeleteMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping
     @MessageResponse("Successfully delete file")
     @SneakyThrows
     public void deleteFile(@RequestBody DeleteRequestRequest dto) {

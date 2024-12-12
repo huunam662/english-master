@@ -21,8 +21,6 @@ public class FilterResponse<T> {
 
     Long totalPages = 0L;
 
-    Long totalElements = 0L;
-
     Boolean hasPreviousPage = Boolean.FALSE;
 
     Boolean hasNextPage = Boolean.FALSE;
@@ -30,6 +28,7 @@ public class FilterResponse<T> {
     List<T> content = null;
 
     public void withPreviousAndNextPage() {
+
         this.hasPreviousPage = pageNumber > 1;
         this.hasNextPage = pageNumber < totalPages;
     }

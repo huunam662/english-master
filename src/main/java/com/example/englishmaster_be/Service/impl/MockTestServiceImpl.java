@@ -192,7 +192,6 @@ public class MockTestServiceImpl implements IMockTestService {
                                                  .fetchOne()
                                         ).orElse(0L);
         long totalPages = (long) Math.ceil((double) totalElements / filterResponse.getPageSize());
-        filterResponse.setTotalElements(totalElements);
         filterResponse.setTotalPages(totalPages);
 
         OrderSpecifier<?> orderSpecifier;

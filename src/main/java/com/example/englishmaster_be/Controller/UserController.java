@@ -10,6 +10,7 @@ import com.example.englishmaster_be.Model.Response.AuthResponse;
 import com.example.englishmaster_be.Model.Response.InformationUserResponse;
 import com.example.englishmaster_be.Service.IUserService;
 import com.example.englishmaster_be.entity.UserEntity;
+import com.example.englishmaster_be.Model.Response.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -21,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 
 @Tag(name = "User")
@@ -107,7 +109,9 @@ public class UserController {
     @PatchMapping(value = "/changeProfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @MessageResponse("Change profile UserEntity successfully")
-    public InformationUserResponse changeProfile(@ModelAttribute("profileUser") ChangeProfileRequest changeProfileRequest) {
+    public InformationUserResponse changeProfile(
+            @ModelAttribute("profileUser") ChangeProfileRequest changeProfileRequest
+    ) {
 
         UserEntity user = userService.changeProfile(changeProfileRequest);
 
@@ -118,9 +122,9 @@ public class UserController {
     @PatchMapping(value = "/changePass")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @MessageResponse("Change pass UserEntity successfully")
-    public void changePass(@RequestBody com.example.englishmaster_be.Model.Request.User.ChangePasswordRequest changePassDTO) {
+    public void changePass(@RequestBody ChangePasswordRequest changePasswordRequest) {
 
-        userService.changePass(changePassDTO);
+        userService.changePass(changePasswordRequest);
     }
 
 
@@ -149,6 +153,33 @@ public class UserController {
     public void logoutUser(@RequestBody UserLogoutRequest userLogoutDTO) {
 
         userService.logoutUserOf(userLogoutDTO);
+    }
+
+    @PostMapping("/notifyInactiveUsers")
+    @MessageResponse("Notify inactive users successfully")
+    public void notifyInactiveUsers() {
+
+        userService.notifyInactiveUsers();
+    }
+
+    // API để tìm kiếm người dùng lâu ngày chưa đăng nhập
+    @GetMapping("/users/inactive")
+    @PreAuthorize("hasRole('ADMIN')")
+    @MessageResponse("List inactive users successfully")
+    public List<UserResponse> getInactiveUsers() {
+
+        List<UserEntity> inactiveUsers = userService.getUsersNotLoggedInLast10Days();
+
+        return UserMapper.INSTANCE.toUserResponseList(inactiveUsers);
+    }
+
+    @GetMapping("/inactive-notify")
+    @MessageResponse("Notify inactive users successfully")
+    public List<UserResponse> notifyInactiveUsers(@RequestParam int days){
+
+        List<UserEntity> notifyInactiveUsers = userService.findUsersInactiveForDaysAndNotify(days);
+
+        return UserMapper.INSTANCE.toUserResponseList(notifyInactiveUsers);
     }
 
 }

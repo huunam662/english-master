@@ -97,7 +97,6 @@ public class FeedbackServiceImpl implements IFeedbackService {
                                                 .fetchOne()
                                             ).orElse(0L);
         long totalPages = (long) Math.ceil((float) totalElements / filterResponse.getPageSize());
-        filterResponse.setTotalElements(totalElements);
         filterResponse.setTotalPages(totalPages);
 
         JPAQuery<FeedbackEntity> query = queryFactory
@@ -138,7 +137,6 @@ public class FeedbackServiceImpl implements IFeedbackService {
         ).orElse(0L);
 
         long totalPages = (long) Math.ceil((float) totalElements / filterResponse.getPageSize());
-        filterResponse.setTotalElements(totalElements);
         filterResponse.setTotalPages(totalPages);
 
         OrderSpecifier<?> orderSpecifier = QFeedbackEntity.feedbackEntity.updateAt.desc();

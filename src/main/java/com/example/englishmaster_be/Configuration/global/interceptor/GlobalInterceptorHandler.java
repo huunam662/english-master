@@ -26,6 +26,7 @@ public class GlobalInterceptorHandler implements HandlerInterceptor {
         System.out.println("-> preHandle in Interceptor");
 
         if(handler instanceof HandlerMethod handlerMethod) {
+
             MessageResponse messageResponse = handlerMethod.getMethodAnnotation(MessageResponse.class);
 
             System.out.println("messageResponse: " + messageResponse);

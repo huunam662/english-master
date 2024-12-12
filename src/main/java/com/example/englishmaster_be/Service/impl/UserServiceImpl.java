@@ -33,6 +33,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.Sort;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -55,12 +56,12 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 @Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserServiceImpl implements IUserService {
-
 
     @Value("${masterE.linkFE}")
     static String linkFE;
@@ -110,15 +111,15 @@ public class UserServiceImpl implements IUserService {
     @Transactional
     @SneakyThrows
     @Override
-    public void registerUser(UserRegisterRequest userRegisterDTO) {
+    public void registerUser(UserRegisterRequest userRegisterRequest) {
 
-        UserEntity user = userRepository.findByEmail(userRegisterDTO.getEmail()).orElse(null);
+        UserEntity user = userRepository.findByEmail(userRegisterRequest.getEmail()).orElse(null);
 
         if (user != null && !user.getEnabled())
             userRepository.delete(user);
 
-        user = UserMapper.INSTANCE.toUserEntity(userRegisterDTO);
-        user.setPassword(passwordEncoder.encode(userRegisterDTO.getPassword()));
+        user = UserMapper.INSTANCE.toUserEntity(userRegisterRequest);
+        user.setPassword(passwordEncoder.encode(userRegisterRequest.getPassword()));
         user.setRole(roleRepository.findByRoleName(RoleEnum.USER.name()));
 
         user = userRepository.save(user);
@@ -157,10 +158,10 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public AuthResponse login(UserLoginRequest userLoginDTO) {
+    public AuthResponse login(UserLoginRequest userLoginRequest) {
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(userLoginDTO.getEmail(), userLoginDTO.getPassword())
+                new UsernamePasswordAuthenticationToken(userLoginRequest.getEmail(), userLoginRequest.getPassword())
         );
 
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
@@ -182,6 +183,33 @@ public class UserServiceImpl implements IUserService {
                 .build();
     }
 
+    @Override
+    public void sendMail(String recipientEmail) throws MessagingException {
+
+        MimeMessage message = mailSender.createMimeMessage();
+
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        helper.setTo(recipientEmail);
+        helper.setSubject("There is a long time you missing sign in ?");
+        helper.setSubject("Take your sign in and looking new features from MEU-English, let's go!");
+
+        mailSender.send(message);
+    }
+
+    public void notifyInactiveUsers(){
+        LocalDateTime cutoffDate = LocalDateTime.now().minusDays(10);
+
+        List<UserEntity> inactiveUsers = userRepository.findUsersNotLoggedInSince(cutoffDate);
+
+        for (UserEntity user : inactiveUsers) {
+            try {
+                sendMail(user.getEmail());
+            }catch (MessagingException e){
+                System.out.println("Failed to send email to: " + user.getEmail());
+            }
+        }
+    }
     @Transactional
     @SneakyThrows
     @Override
@@ -201,7 +229,9 @@ public class UserServiceImpl implements IUserService {
 
     }
 
-    protected void sendOtpToEmail(String email, String otp) throws MessagingException, IOException {
+    protected void sendOtpToEmail(String email, String otp)
+            throws MessagingException, IOException
+    {
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -211,8 +241,8 @@ public class UserServiceImpl implements IUserService {
         // Nếu bạn vẫn muốn sử dụng template, thay thế nội dung theo cách này:
         String templateContent = readTemplateContent("sendOtpEmail.html");
         templateContent = templateContent.replace("{{otpMessage}}", otpMessage)
-                                        .replace("{{btnConfirm}}", otpTemplate)
-                                        .replace("{{nameLink}}", "Verify by OTP");
+                .replace("{{btnConfirm}}", otpTemplate)
+                .replace("{{nameLink}}", "Verify by OTP");
 
         helper.setTo(email);
         helper.setSubject("Forgot your password");
@@ -255,11 +285,11 @@ public class UserServiceImpl implements IUserService {
 
     @Transactional
     @Override
-    public void changePassword(ChangePasswordRequest changePasswordDTO) {
+    public void changePassword(ChangePasswordRequest changePasswordRequest) {
 
-        String otp = changePasswordDTO.getCode();
-        String newPassword = changePasswordDTO.getNewPass();
-        String confirmPassword = changePasswordDTO.getConfirmPass();
+        String otp = changePasswordRequest.getCode();
+        String newPassword = changePasswordRequest.getNewPass();
+        String confirmPassword = changePasswordRequest.getConfirmPass();
 
         // Regex để kiểm tra mật khẩu
         String regexPassword = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";
@@ -342,7 +372,7 @@ public class UserServiceImpl implements IUserService {
 
     @Transactional
     @Override
-    public void changePass(com.example.englishmaster_be.Model.Request.User.ChangePasswordRequest changePassDTO) {
+    public void changePass(ChangePasswordRequest changePasswordRequest) {
 
         UserEntity user = currentUser();
 
@@ -353,9 +383,9 @@ public class UserServiceImpl implements IUserService {
 
         Pattern pattern = Pattern.compile(regex);
 
-        Matcher matcherOldPassword = pattern.matcher(changePassDTO.getOldPass());
-        Matcher matcherNewPassword = pattern.matcher(changePassDTO.getNewPass());
-        Matcher matcherConfirmPassword = pattern.matcher(changePassDTO.getConfirmPass());
+        Matcher matcherOldPassword = pattern.matcher(changePasswordRequest.getOldPassword());
+        Matcher matcherNewPassword = pattern.matcher(changePasswordRequest.getNewPass());
+        Matcher matcherConfirmPassword = pattern.matcher(changePasswordRequest.getConfirmPass());
 
         if(!matcherOldPassword.matches())
             throw new BadRequestException("Old password must be contain at least 1 uppercase, 1 lowercase, 1 numeric, 1 special character and no spaces");
@@ -366,16 +396,16 @@ public class UserServiceImpl implements IUserService {
         if (!matcherConfirmPassword.matches())
             throw new BadRequestException("The confirm password must be contain at least 1 uppercase, 1 lowercase, 1 numeric, 1 special character and no spaces");
 
-        if (!changePassDTO.getConfirmPass().equals(changePassDTO.getNewPass()))
+        if (!changePasswordRequest.getConfirmPass().equals(changePasswordRequest.getNewPass()))
             throw new BadRequestException("Your new password doesn't match with your confirm password");
 
-        if (!passwordEncoder.matches(changePassDTO.getOldPass(), user.getPassword()))
+        if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword()))
             throw new BadRequestException("Your old password doesn't correct");
 
-        if (passwordEncoder.matches(changePassDTO.getNewPass(), user.getPassword()))
+        if (passwordEncoder.matches(changePasswordRequest.getNewPass(), user.getPassword()))
             throw new BadRequestException("New password can't be the same as old password");
 
-        user.setPassword(passwordEncoder.encode(changePassDTO.getNewPass()));
+        user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPass()));
 
         userRepository.save(user);
 
@@ -394,9 +424,9 @@ public class UserServiceImpl implements IUserService {
         UserEntity user = currentUser();
 
         JPAQuery<TopicEntity> queryMockTest = queryFactory.select(QMockTestEntity.mockTestEntity.topic)
-                                                    .from(QMockTestEntity.mockTestEntity)
-                                                    .where(QMockTestEntity.mockTestEntity.user.userId.eq(user.getUserId()))
-                                                    .groupBy(QMockTestEntity.mockTestEntity.topic);
+                .from(QMockTestEntity.mockTestEntity)
+                .where(QMockTestEntity.mockTestEntity.user.userId.eq(user.getUserId()))
+                .groupBy(QMockTestEntity.mockTestEntity.topic);
 
         List<TopicEntity> listTopicUser = queryMockTest.fetch();
 
@@ -404,12 +434,11 @@ public class UserServiceImpl implements IUserService {
 
         long totalElements = Optional.ofNullable(
                 queryFactory.select(QTopicEntity.topicEntity.count())
-                            .from(QTopicEntity.topicEntity)
-                            .where(wherePatternOfTopic)
-                            .fetchOne()
-                        ).orElse(0L);
+                        .from(QTopicEntity.topicEntity)
+                        .where(wherePatternOfTopic)
+                        .fetchOne()
+        ).orElse(0L);
         long totalPages = (long) Math.ceil((double) totalElements / filterResponse.getPageSize());
-        filterResponse.setTotalElements(totalElements);
         filterResponse.setTotalPages(totalPages);
 
         OrderSpecifier<?> orderSpecifier;
@@ -419,11 +448,11 @@ public class UserServiceImpl implements IUserService {
         else orderSpecifier = QTopicEntity.topicEntity.updateAt.asc();
 
         JPAQuery<TopicEntity> query = queryFactory
-                                .selectFrom(QTopicEntity.topicEntity)
-                                .where(wherePatternOfTopic)
-                                .orderBy(orderSpecifier)
-                                .offset(filterResponse.getOffset())
-                                .limit(filterResponse.getPageSize());
+                .selectFrom(QTopicEntity.topicEntity)
+                .where(wherePatternOfTopic)
+                .orderBy(orderSpecifier)
+                .offset(filterResponse.getOffset())
+                .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
                 query.fetch().stream().map(
@@ -448,20 +477,30 @@ public class UserServiceImpl implements IUserService {
         return filterResponse;
     }
 
+
     @Override
-    public void logoutUserOf(UserLogoutRequest userLogoutDTO) {
+    public void logoutUserOf(UserLogoutRequest userLogoutRequest) {
 
         boolean logoutSuccessfully = logoutUser();
 
         if(!logoutSuccessfully)
             throw new AuthenticationServiceException("You aren't logged in");
 
-        iInvalidTokenService.insertInvalidToken(userLogoutDTO.getAccessToken());
+        iInvalidTokenService.insertInvalidToken(userLogoutRequest.getAccessToken());
 
-        String refreshToken = userLogoutDTO.getRefreshToken();
+        String refreshToken = userLogoutRequest.getRefreshToken();
 
         iRefreshTokenService.deleteRefreshToken(refreshToken);
 
+    }
+
+    @Override
+    public void sendMail(String to, String subject, String body) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(body);
+        mailSender.send(message);
     }
 
     @Transactional
@@ -538,7 +577,8 @@ public class UserServiceImpl implements IUserService {
 
         return true;
     }
-    private void sendConfirmationEmail(String email, String confirmationToken) throws IOException, MessagingException {
+
+    protected void sendConfirmationEmail(String email, String confirmationToken) throws IOException, MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         String confirmationLink = linkFE + "register/confirm?token=" + confirmationToken;
@@ -557,8 +597,10 @@ public class UserServiceImpl implements IUserService {
     }
 
     protected String readTemplateContent(String templateFileName) throws IOException {
+
         Resource templateResource = resourceLoader.getResource("classpath:templates/" + templateFileName);
         byte[] templateBytes = FileCopyUtils.copyToByteArray(templateResource.getInputStream());
+
         return new String(templateBytes, StandardCharsets.UTF_8);
     }
 
@@ -577,15 +619,14 @@ public class UserServiceImpl implements IUserService {
             wherePattern.and(QUserEntity.userEntity.enabled.eq(filterRequest.getEnable()));
 
         long totalElements = Optional.ofNullable(
-                                                queryFactory
-                                                .select(QUserEntity.userEntity.count())
-                                                .from(QUserEntity.userEntity)
-                                                .where(wherePattern)
-                                                .fetchOne()
-                                        ).orElse(0L);
+                queryFactory
+                        .select(QUserEntity.userEntity.count())
+                        .from(QUserEntity.userEntity)
+                        .where(wherePattern)
+                        .fetchOne()
+        ).orElse(0L);
 
         long totalPages = (long) Math.ceil((double) totalElements / filterResponse.getPageSize());
-        filterResponse.setTotalElements(totalElements);
         filterResponse.setTotalPages(totalPages);
 
         OrderSpecifier<?> orderSpecifier;
@@ -660,5 +701,76 @@ public class UserServiceImpl implements IUserService {
                     .countMockTest(mockTests.size())
                     .build();
         }).toList();
+    }
+
+    @Override
+    public List<UserEntity> getUsersNotLoggedInLast10Days() {
+
+        // Tính thời gian cách đây 10 ngày
+        LocalDateTime tenDaysAgo = LocalDateTime.now().minusDays(10);
+
+        // Xây dựng điều kiện truy vấn
+        BooleanExpression condition = QUserEntity.userEntity.lastLogin.before(tenDaysAgo);
+
+        // Thực hiện truy vấn với QueryDSL
+        JPAQuery<UserEntity> query = queryFactory
+                .selectFrom(QUserEntity.userEntity)
+                .where(condition);
+
+        // Chuyển đổi sang DTO để trả về
+        return query.fetch();
+    }
+
+    @Transactional
+    @Override
+    public List<UserEntity> findUsersInactiveForDays(int inactiveDays) {
+
+        // Tính toán ngày đã qua kể từ ngày hiện tại
+        LocalDateTime thresholdDate = LocalDateTime.now().minusDays(inactiveDays);
+
+        // Xây dựng điều kiện lọc
+        BooleanExpression wherePattern = QUserEntity.userEntity.lastLogin.before(thresholdDate);
+
+        // Truy vấn người dùng lâu ngày chưa đăng nhập
+        JPAQuery<UserEntity> query = queryFactory
+                .selectFrom(QUserEntity.userEntity)
+                .where(wherePattern);
+
+        // Chuyển đổi kết quả thành UserResponse
+        return query.fetch();
+    }
+
+    @Transactional
+    @Override
+    public List<UserEntity> findUsersInactiveForDaysAndNotify(int inactiveDays) {
+
+        LocalDateTime thresholdDate = LocalDateTime.now().minusDays(inactiveDays);
+
+        BooleanExpression wherePattern = QUserEntity.userEntity.lastLogin.before(thresholdDate);
+
+        JPAQuery<UserEntity> query = queryFactory
+                .selectFrom(QUserEntity.userEntity)
+                .where(wherePattern);
+
+        List<UserEntity> inactiveUsers = query.fetch();
+
+        for (UserEntity user : inactiveUsers)
+            sendNotificationEmail(user);
+
+        return inactiveUsers;
+    }
+
+    @Override
+    public void sendNotificationEmail(UserEntity user){
+        String subject = "Đã lâu bạn không truy cập rồi!";
+        String body = String.format(
+                "Hello %s, We from MEU-English." +
+                        "\n\nFor a long time you missing for a sign in." +
+                        "\n\nTake your come bank to looking for a new feature from us." +
+                        "\n\nBest regards," +
+                        "\nOur team.",
+                user.getName()
+        );
+        sendMail(user.getEmail(),subject,body);
     }
 }

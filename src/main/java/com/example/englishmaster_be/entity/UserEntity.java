@@ -40,6 +40,10 @@ public class UserEntity {
     String address;
 
     String avatar;
+    @Temporal(TemporalType.TIMESTAMP)
+    @CreationTimestamp
+    @Column(name = "last_login")
+    LocalDateTime lastLogin = LocalDateTime.now();
 
     @Column(name = "is_enabled")
     Boolean enabled;

@@ -1034,7 +1034,6 @@ public class TopicServiceImpl implements ITopicService {
                                     .fetchOne()
                 ).orElse(0L);
         long totalPages = (long) Math.ceil((double) totalElements / filterRequest.getSize());
-        filterResponse.setTotalElements(totalElements);
         filterResponse.setTotalPages(totalPages);
 
         OrderSpecifier<?> orderSpecifier;

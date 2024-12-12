@@ -60,7 +60,6 @@ public class PostServiceImpl implements IPostService {
 
         long totalElements = Optional.ofNullable(queryFactory.select(QPostEntity.postEntity.count()).from(QPostEntity.postEntity).fetchOne()).orElse(0L);
         long totalPages = (long)Math.ceil((double) totalElements / filterResponse.getPageSize());
-        filterResponse.setTotalElements(totalElements);
         filterResponse.setTotalPages(totalPages);
 
         OrderSpecifier<?> orderSpecifier;
