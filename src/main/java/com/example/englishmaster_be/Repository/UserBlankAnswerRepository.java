@@ -1,17 +1,16 @@
 package com.example.englishmaster_be.Repository;
 
-import com.example.englishmaster_be.Model.Question;
-import com.example.englishmaster_be.Model.User;
-import com.example.englishmaster_be.Model.UserBlankAnswer;
+import com.example.englishmaster_be.entity.QuestionEntity;
+import com.example.englishmaster_be.entity.UserBlankAnswerEntity;
+import com.example.englishmaster_be.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
 
 
-public interface UserBlankAnswerRepository extends JpaRepository<UserBlankAnswer, UUID> {
+public interface UserBlankAnswerRepository extends JpaRepository<UserBlankAnswerEntity, UUID> {
 
-    List<UserBlankAnswer> getByUserAndQuestion(User user, Question question);
-    UserBlankAnswer getByUserAndQuestionAndPosition(User user, Question question, int position);
+    List<UserBlankAnswerEntity> getByUserAndQuestion(UserEntity user, QuestionEntity question);
+    UserBlankAnswerEntity getByUserAndQuestionAndPosition(UserEntity user, QuestionEntity question, int position);
 }

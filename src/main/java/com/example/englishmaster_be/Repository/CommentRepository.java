@@ -1,16 +1,17 @@
 package com.example.englishmaster_be.Repository;
 
-import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.entity.CommentEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface CommentRepository extends JpaRepository<Comment, UUID> {
+public interface CommentRepository extends JpaRepository<CommentEntity, UUID> {
 
-    boolean existsByCommentParent(Comment comment);
+    boolean existsByCommentParent(CommentEntity comment);
 
-    Optional<Comment> findByCommentId(UUID commentId);
-    List<Comment> findAllByCommentParent(Comment comment);
+    Optional<CommentEntity> findByCommentId(UUID commentId);
+
+    List<CommentEntity> findAllByCommentParent(CommentEntity comment);
 }

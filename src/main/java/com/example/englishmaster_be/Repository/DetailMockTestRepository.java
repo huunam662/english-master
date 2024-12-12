@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.Repository;
 
-import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.entity.DetailMockTestEntity;
+import com.example.englishmaster_be.entity.MockTestEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,8 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.UUID;
 
-public interface DetailMockTestRepository extends JpaRepository<DetailMockTest, UUID> {
-    Page<DetailMockTest> findAllByMockTest(MockTest mockTest, Pageable pageable);
+public interface DetailMockTestRepository extends JpaRepository<DetailMockTestEntity, UUID> {
+    Page<DetailMockTestEntity> findAllByMockTest(MockTestEntity mockTest, Pageable pageable);
 
-    List<DetailMockTest> findAllByMockTest(MockTest mockTest);
+    List<DetailMockTestEntity> findAllByMockTest(MockTestEntity mockTest);
 }

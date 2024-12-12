@@ -2,13 +2,15 @@ package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Common.dto.response.FilterResponse;
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.DTO.*;
-import com.example.englishmaster_be.DTO.User.ChangePassDTO;
-import com.example.englishmaster_be.DTO.User.ChangeProfileDTO;
-import com.example.englishmaster_be.DTO.User.UserFilterRequest;
+import com.example.englishmaster_be.Mapper.UserMapper;
+import com.example.englishmaster_be.Model.Request.*;
+import com.example.englishmaster_be.Model.Request.User.ChangePasswordRequest;
+import com.example.englishmaster_be.Model.Request.User.ChangeProfileRequest;
+import com.example.englishmaster_be.Model.Request.User.UserFilterRequest;
 import com.example.englishmaster_be.Model.Response.AuthResponse;
 import com.example.englishmaster_be.Model.Response.InformationUserResponse;
 import com.example.englishmaster_be.Service.IUserService;
+import com.example.englishmaster_be.entity.UserEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -24,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "User")
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/user")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserController {
@@ -95,25 +97,29 @@ public class UserController {
 
     @GetMapping("/information")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Information User successfully")
+    @MessageResponse("Information UserEntity successfully")
     public InformationUserResponse informationUser() {
 
-        return userService.informationCurrentUser();
+        UserEntity currentUser = userService.currentUser();
+
+        return UserMapper.INSTANCE.toInformationUserResponse(currentUser);
     }
 
     @PatchMapping(value = "/changeProfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Change profile User successfully")
-    public InformationUserResponse changeProfile(@ModelAttribute("profileUser") ChangeProfileDTO changeProfileDTO) {
+    @MessageResponse("Change profile UserEntity successfully")
+    public InformationUserResponse changeProfile(@ModelAttribute("profileUser") ChangeProfileRequest changeProfileRequest) {
 
-        return userService.changeProfile(changeProfileDTO);
+        UserEntity user = userService.changeProfile(changeProfileRequest);
+
+        return UserMapper.INSTANCE.toInformationUserResponse(user);
     }
 
 
     @PatchMapping(value = "/changePass")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Change pass User successfully")
-    public void changePass(@RequestBody ChangePassDTO changePassDTO) {
+    @MessageResponse("Change pass UserEntity successfully")
+    public void changePass(@RequestBody ChangePasswordRequest changePassDTO) {
 
         userService.changePass(changePassDTO);
     }

@@ -1,14 +1,14 @@
 package com.example.englishmaster_be.Service;
 
 import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.DTO.*;
-import com.example.englishmaster_be.DTO.User.ChangePassDTO;
-import com.example.englishmaster_be.DTO.User.ChangeProfileDTO;
-import com.example.englishmaster_be.DTO.User.UserFilterRequest;
+import com.example.englishmaster_be.Model.Request.*;
+import com.example.englishmaster_be.Model.Request.User.ChangePasswordRequest;
+import com.example.englishmaster_be.Model.Request.User.ChangeProfileRequest;
+import com.example.englishmaster_be.Model.Request.User.UserFilterRequest;
 import com.example.englishmaster_be.Model.Response.AuthResponse;
 import com.example.englishmaster_be.Model.Response.CountMockTestTopicResponse;
 import com.example.englishmaster_be.Model.Response.InformationUserResponse;
-import com.example.englishmaster_be.Model.User;
+import com.example.englishmaster_be.entity.UserEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.List;
 import java.util.UUID;
@@ -32,13 +32,9 @@ public interface IUserService {
 
     AuthResponse refreshToken(RefreshTokenDTO refreshTokenDTO);
 
-    InformationUserResponse informationCurrentUser();
+    UserEntity changeProfile(ChangeProfileRequest changeProfileRequest);
 
-    InformationUserResponse informationUserOf(User user);
-
-    InformationUserResponse changeProfile(ChangeProfileDTO changeProfileDTO);
-
-    void changePass(ChangePassDTO changePassDTO);
+    void changePass(ChangePasswordRequest changePassDTO);
 
     FilterResponse<?> getExamResultsUser(UserFilterRequest filterRequest);
 
@@ -46,13 +42,13 @@ public interface IUserService {
 
     void deleteUser(UUID userId);
 
-    User findUser(UserDetails userDetails);
+    UserEntity findUser(UserDetails userDetails);
 
-    User currentUser();
+    UserEntity currentUser();
 
-    User findUserByEmail(String email);
+    UserEntity findUserByEmail(String email);
 
-    User findUserById(UUID userId);
+    UserEntity findUserById(UUID userId);
 
     void logoutUserOf(UserLogoutDTO userLogoutDTO);
 

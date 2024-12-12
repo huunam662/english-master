@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.Repository;
 
-import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.entity.AnswerEntity;
+import com.example.englishmaster_be.entity.QuestionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,10 +10,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface AnswerRepository extends JpaRepository<Answer, UUID> {
-    Optional<Answer> findByAnswerId(UUID answerId);
+public interface AnswerRepository extends JpaRepository<AnswerEntity, UUID> {
 
-    Optional<Answer> findByQuestionAndCorrectAnswer(Question question, boolean isCorrect);
+    Optional<AnswerEntity> findByAnswerId(UUID answerId);
 
-    List<Answer> findByQuestion(Question question);
+    Optional<AnswerEntity> findByQuestionAndCorrectAnswer(QuestionEntity question, boolean isCorrect);
+
+    List<AnswerEntity> findByQuestion(QuestionEntity question);
 }

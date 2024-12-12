@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Model.Response;
 
-import com.example.englishmaster_be.Model.User;
+import com.example.englishmaster_be.entity.UserEntity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.time.LocalDateTime;
@@ -21,7 +21,7 @@ public class ConfirmationTokenResponse {
 
     String code;
 
-    User user;
+    UserEntity user;
 
     LocalDateTime createAt;
 

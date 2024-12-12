@@ -1,9 +1,8 @@
 
 package com.example.englishmaster_be.Configuration.global.response;
 
-import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
-import com.example.englishmaster_be.Model.Response.ResponseModel;
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
+import com.example.englishmaster_be.Common.dto.response.ExceptionResponseModel;
+import com.example.englishmaster_be.Common.dto.response.ResponseModel;
 import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
 import com.example.englishmaster_be.Exception.Response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -51,8 +50,8 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
 
         // -> Cho phép beforeBodyWrite nhận xử lý nếu thỏa điều kiện dưới đây
         return !requestURI.contains("/v3/api-docs")
-                && !packageName.contains("org.springdoc.webmvc.ui")
-                && !declaringClass.getPackageName().contains("org.springdoc.webmvc.api")
+                && !packageName.contains("org.springdoc.webmvc")
+                && !declaringClass.getPackageName().contains("org.springdoc.webmvc")
                 && (
                     declaringClass.getAnnotation(RestController.class) != null
                     ||

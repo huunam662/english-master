@@ -1,9 +1,9 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.DTO.Content.SaveContentDTO;
-import com.example.englishmaster_be.DTO.Content.UpdateContentDTO;
-import com.example.englishmaster_be.Model.Content;
+import com.example.englishmaster_be.Model.Request.Content.ContentRequest;
+import com.example.englishmaster_be.Mapper.ContentMapper;
+import com.example.englishmaster_be.entity.ContentEntity;
 import com.example.englishmaster_be.Model.Response.ContentResponse;
 import com.example.englishmaster_be.Service.IContentService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -11,13 +11,14 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @Tag(name = "Content")
 @RestController
-@RequestMapping("/api/content")
+@RequestMapping("/content")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ContentController {
@@ -29,49 +30,60 @@ public class ContentController {
     @MessageResponse("Get content successfully")
     public ContentResponse getContentById(@RequestParam UUID id) {
 
-        Content content = contentService.getContentToContentId(id);
+        ContentEntity content = contentService.getContentByContentId(id);
 
-        return new ContentResponse(content);
+        return ContentMapper.INSTANCE.toContentResponse(content);
     }
 
     @GetMapping("/contentData")
     @MessageResponse("Get content successfully")
     public ContentResponse getContentData(@RequestParam UUID topicId, @RequestParam String code) {
 
-        Content content = contentService.getContentByTopicIdAndCode(topicId, code);
+        ContentEntity content = contentService.getContentByTopicIdAndCode(topicId, code);
 
-        return new ContentResponse(content);
+        return ContentMapper.INSTANCE.toContentResponse(content);
+    }
+
+    @DeleteMapping("/{contentId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @MessageResponse("Delete content successfully")
+    public void getContentData(@PathVariable UUID contentId) {
+
+        contentService.deleteContent(contentId);
     }
 
     @GetMapping("/content")
     @MessageResponse("Get content successfully")
     public ContentResponse getContent(@RequestParam String contentData) {
 
-        Content content = contentService.getContentByContentData(contentData);
+        ContentEntity content = contentService.getContentByContentData(contentData);
 
-        return new ContentResponse(content);
+        return ContentMapper.INSTANCE.toContentResponse(content);
     }
 
     @PostMapping(value = "/create-content", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @MessageResponse("Create content successfully")
     public ContentResponse createContent(
-            @ModelAttribute SaveContentDTO createContentDTO
+            @ModelAttribute ContentRequest contentRequest
     ) {
 
-        Content content = contentService.saveContent(createContentDTO);
+        ContentEntity content = contentService.saveContent(contentRequest);
 
-        return new ContentResponse(content);
+        return ContentMapper.INSTANCE.toContentResponse(content);
     }
 
-    @PutMapping(value = "/update-content", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{contentId}/update-content", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @MessageResponse("Update content successfully")
     public ContentResponse updateContent(
-            @ModelAttribute UpdateContentDTO updateContentDTO
+            @PathVariable UUID contentId,
+            @ModelAttribute ContentRequest contentRequest
     ) {
 
-        Content content = contentService.saveContent(updateContentDTO);
+        contentRequest.setContentId(contentId);
 
-        return new ContentResponse(content);
+        ContentEntity content = contentService.saveContent(contentRequest);
+
+        return ContentMapper.INSTANCE.toContentResponse(content);
     }
 
 

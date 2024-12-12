@@ -1,9 +1,11 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.DTO.FlashCard.UpdateFlashCardDTO;
-import com.example.englishmaster_be.DTO.FlashCard.SaveFlashCardDTO;
-import com.example.englishmaster_be.Model.Response.*;
+import com.example.englishmaster_be.Model.Request.FlashCard.FlashCardRequest;
+import com.example.englishmaster_be.Mapper.FlashCardMapper;
+import com.example.englishmaster_be.Model.Response.FlashCardListWordResponse;
+import com.example.englishmaster_be.Model.Response.FlashCardResponse;
+import com.example.englishmaster_be.entity.FlashCardEntity;
 import com.example.englishmaster_be.Service.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -12,13 +14,12 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "Flash card")
 @RestController
-@RequestMapping("/api/flashCard")
+@RequestMapping("/flashCard")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FlashCardController {
@@ -30,9 +31,11 @@ public class FlashCardController {
     @GetMapping(value = "/{flashCardId:.+}/listFlashCardWord")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @MessageResponse("Show list flashcard word successfully")
-    public FlashCardListWordsResponse getWordToFlashCard(@PathVariable UUID flashCardId){
+    public FlashCardListWordResponse getWordToFlashCard(@PathVariable UUID flashCardId){
 
-        return flashCardService.getWordToFlashCard(flashCardId);
+        FlashCardEntity flashCard = flashCardService.getFlashCardById(flashCardId);
+
+        return FlashCardMapper.INSTANCE.toFlashCardListWordResponse(flashCard);
     }
 
 
@@ -41,26 +44,32 @@ public class FlashCardController {
     @MessageResponse("Show list flashcard successfully")
     public List<FlashCardResponse> listFlashCardUser(){
 
-        return flashCardService.getListFlashCardUser();
+        List<FlashCardEntity> flashCardList = flashCardService.getListFlashCardByCurrentUser();
+
+        return FlashCardMapper.INSTANCE.toFlashCardResponseList(flashCardList);
     }
 
 
     @PostMapping(value = "/addFlashCardUser", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @MessageResponse("Create flashcard successfully")
-    public FlashCardResponse addFlashCardUser(@ModelAttribute SaveFlashCardDTO createFlashCardDTO){
+    public FlashCardResponse addFlashCardUser(@ModelAttribute FlashCardRequest flashCardRequest){
 
-        return flashCardService.saveFlashCard(createFlashCardDTO);
+        FlashCardEntity flashCard = flashCardService.saveFlashCard(flashCardRequest);
+
+        return FlashCardMapper.INSTANCE.toFlashCardResponse(flashCard);
     }
 
     @PutMapping(value = "/{flashCardId:.+}/updateFlashCard", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @MessageResponse("Update flashcard successfully")
-    public FlashCardResponse updateFlashCard(@PathVariable UUID flashCardId, @ModelAttribute UpdateFlashCardDTO updateFlashCardDTO){
+    public FlashCardResponse updateFlashCard(@PathVariable UUID flashCardId, @ModelAttribute FlashCardRequest flashCardRequest){
 
-        updateFlashCardDTO.setFlashCardId(flashCardId);
+        flashCardRequest.setFlashCardId(flashCardId);
 
-        return flashCardService.saveFlashCard(updateFlashCardDTO);
+        FlashCardEntity flashCard = flashCardService.saveFlashCard(flashCardRequest);
+
+        return FlashCardMapper.INSTANCE.toFlashCardResponse(flashCard);
     }
 
     @DeleteMapping(value = "/{flashCardId:.+}/removeFlashCard")

@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Service;
 
-import com.example.englishmaster_be.DTO.Pack.PackDTO;
-import com.example.englishmaster_be.Model.Pack;
+import com.example.englishmaster_be.Model.Request.Pack.PackRequest;
+import com.example.englishmaster_be.entity.PackEntity;
 import com.example.englishmaster_be.Model.Response.PackResponse;
 
 import java.util.List;
@@ -9,12 +9,14 @@ import java.util.UUID;
 
 public interface IPackService {
 
-    PackResponse createPack(PackDTO packDTO);
+    PackEntity createPack(PackRequest packRequest);
 
-    Pack checkPack(String packName);
+    PackEntity checkPack(String packName);
 
-    Pack findPackById(UUID packId);
+    PackEntity getPackById(UUID packId);
 
-    List<PackResponse> getListPack();
+    PackEntity getPackByName(String packName);
+
+    List<PackEntity> getListPack();
 
 }

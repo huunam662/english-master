@@ -1,52 +1,42 @@
 package com.example.englishmaster_be.Mapper;
 
-import com.example.englishmaster_be.DTO.Question.SaveGroupQuestionDTO;
-import com.example.englishmaster_be.DTO.Question.SaveQuestionDTO;
-import com.example.englishmaster_be.Model.Answer;
-import com.example.englishmaster_be.Model.Question;
-import com.example.englishmaster_be.Model.Response.AnswerResponse;
-import com.example.englishmaster_be.Model.Response.QuestionGroupResponse;
+import com.example.englishmaster_be.Model.Request.Question.GroupQuestionRequest;
+import com.example.englishmaster_be.Model.Request.Question.QuestionRequest;
+import com.example.englishmaster_be.Model.Response.QuestionBasicResponse;
+import com.example.englishmaster_be.Model.Response.excel.QuestionByExcelFileResponse;
+import com.example.englishmaster_be.entity.QuestionEntity;
 import com.example.englishmaster_be.Model.Response.QuestionResponse;
-import org.mapstruct.IterableMapping;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
+import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
-import java.util.Objects;
 
 @Mapper
 public interface QuestionMapper {
 
     QuestionMapper INSTANCE = Mappers.getMapper(QuestionMapper.class);
 
-    Question toQuestionEntity(SaveQuestionDTO questionDto);
+    QuestionEntity toQuestionEntity(QuestionRequest questionDto);
 
-    Question toQuestionEntity(SaveGroupQuestionDTO saveGroupQuestionDTO);
+    QuestionEntity toQuestionEntity(GroupQuestionRequest saveGroupQuestionDTO);
 
+    @Mapping(target = "partId", source = "part.partId")
+    @Mapping(target = "contentList", source = "contentCollection")
+    @Mapping(target = "listAnswer", expression = "java(AnswerMapper.INSTANCE.toAnswerResponseList(question.getAnswers()))")
+    @Mapping(target = "questionGroupParent", expression = "java(toQuestionBasicResponse(question.getQuestionGroupParent()))")
+    @Mapping(target = "questionGroupChildren", expression = "java(toQuestionBasicResponseList(question.getQuestionGroupChildren()))")
+    QuestionResponse toQuestionResponse(QuestionEntity question);
 
-    @Mapping(target = "questionGroup", ignore = true)
-    @Mapping(source = "part.partId", target = "partId")
-    @Mapping(source = "contentCollection", target = "contentList")
-    @Mapping(source = "answers", target = "listAnswer", qualifiedByName = {"mapListAnswersToListAnswerResponse"})
-    QuestionResponse toQuestionResponse(Question question);
+    List<QuestionResponse> toQuestionGroupChildrenResponseList(List<QuestionEntity> questionGroupChildren);
 
-    @Named("mapListAnswersToListAnswerResponse")
-    default List<AnswerResponse> mapListAnswersToListAnswerResponse(List<Answer> answers) {
-        return answers.stream()
-                .filter(Objects::nonNull)
-                .map(answer -> new AnswerResponse(answer))
-                .toList();
-    }
+    @Mapping(target = "partId", source = "part.partId")
+    QuestionBasicResponse toQuestionBasicResponse(QuestionEntity question);
 
-    @IterableMapping(elementTargetType = QuestionResponse.class)
-    List<QuestionResponse> toQuestionResponseList(List<Question> questionList);
+    List<QuestionBasicResponse> toQuestionBasicResponseList(List<QuestionEntity> questionList);
 
-    @Mapping(source = "part.partId", target = "partId")
-    @Mapping(source = "questionGroup.questionId", target = "questionGroupId")
-    QuestionGroupResponse toQuestionGroupResponse(Question question);
+    @Mapping(target = "questionId", ignore = true)
+    void flowToQuestionEntity(QuestionByExcelFileResponse questionByExcelFileResponse, @MappingTarget QuestionEntity questionEntity);
 
-    @IterableMapping(elementTargetType = QuestionGroupResponse.class)
-    List<QuestionGroupResponse> toQuestionGroupResponseList(List<Question> questionList);
+    @Mapping(target = "questionId", ignore = true)
+    void flowToQuestionEntity(QuestionRequest questionRequest, @MappingTarget QuestionEntity questionEntity);
 }

@@ -1,0 +1,43 @@
+package com.example.englishmaster_be.entity;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.persistence.*;
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+
+@Entity
+@Table(name="user_confirm_token")
+@Getter
+@Setter
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Schema(hidden = true)
+@AllArgsConstructor
+@NoArgsConstructor
+public class ConfirmationTokenEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+	@Column(name = "id")
+    UUID userConfirmTokenId;
+
+    @Column(name = "Type")
+    String type;
+
+    @Column(name = "code")
+    String code;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "create_at")
+    @CreationTimestamp
+    LocalDateTime createAt = LocalDateTime.now();
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    UserEntity user;
+
+}

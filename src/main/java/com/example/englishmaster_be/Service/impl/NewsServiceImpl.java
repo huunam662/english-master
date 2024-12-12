@@ -2,14 +2,15 @@ package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Common.dto.response.FilterResponse;
 import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
-import com.example.englishmaster_be.DTO.News.SaveNewsDTO;
-import com.example.englishmaster_be.DTO.News.NewsFilterRequest;
-import com.example.englishmaster_be.DTO.News.UpdateNewsDTO;
-import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.Mapper.NewsMapper;
+import com.example.englishmaster_be.Model.Request.News.NewsRequest;
+import com.example.englishmaster_be.Model.Request.News.NewsFilterRequest;
 import com.example.englishmaster_be.Model.Response.NewsResponse;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.IFileStorageService;
 import com.example.englishmaster_be.Service.INewsService;
+import com.example.englishmaster_be.entity.NewsEntity;
+import com.example.englishmaster_be.entity.QNewsEntity;
 import com.google.cloud.storage.Blob;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -23,7 +24,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -42,10 +43,10 @@ public class NewsServiceImpl implements INewsService {
 
 
     @Override
-    public News findNewsById(UUID newsId) {
+    public NewsEntity findNewsById(UUID newsId) {
         return newsRepository.findByNewsId(newsId)
                 .orElseThrow(
-                        () -> new IllegalArgumentException("News not found with ID: " + newsId)
+                        () -> new IllegalArgumentException("NewsEntity not found with ID: " + newsId)
                 );
     }
 
@@ -60,23 +61,23 @@ public class NewsServiceImpl implements INewsService {
                 .content(new ArrayList<>())
                 .build();
 
-        BooleanExpression wherePattern = QNews.news.isNotNull();
+        BooleanExpression wherePattern = QNewsEntity.newsEntity.isNotNull();
 
         if(filterRequest.getIsEnable() != null)
-            wherePattern = wherePattern.and(QNews.news.enable.eq(filterRequest.getIsEnable()));
+            wherePattern = wherePattern.and(QNewsEntity.newsEntity.enable.eq(filterRequest.getIsEnable()));
 
         if (filterRequest.getSearch() != null && !filterRequest.getSearch().isEmpty()) {
 
             String likeExpression = "%" + filterRequest.getSearch().trim().toLowerCase().replaceAll("\\s+", "%") + "%";
 
             wherePattern = wherePattern.and(
-                                            QNews.news.title.equalsIgnoreCase(likeExpression)
-                                            .or(QNews.news.content.equalsIgnoreCase(likeExpression))
+                                            QNewsEntity.newsEntity.title.equalsIgnoreCase(likeExpression)
+                                            .or(QNewsEntity.newsEntity.content.equalsIgnoreCase(likeExpression))
                                     );
         }
 
         long totalElements = Optional.ofNullable(
-                    queryFactory.select(QNews.news.count()).from(QNews.news).where(wherePattern).fetchOne()
+                    queryFactory.select(QNewsEntity.newsEntity.count()).from(QNewsEntity.newsEntity).where(wherePattern).fetchOne()
                 ).orElse(0L);
         long totalPages = (long) Math.ceil((float) totalElements / filterResponse.getPageSize());
         filterResponse.setTotalElements(totalElements);
@@ -86,81 +87,79 @@ public class NewsServiceImpl implements INewsService {
         OrderSpecifier<?> orderSpecifier;
 
         if(Sort.Direction.DESC.equals(filterRequest.getSortDirection()))
-            orderSpecifier = QNews.news.updateAt.desc();
-        else orderSpecifier = QNews.news.updateAt.asc();
+            orderSpecifier = QNewsEntity.newsEntity.updateAt.desc();
+        else orderSpecifier = QNewsEntity.newsEntity.updateAt.asc();
 
-        JPAQuery<News> query = queryFactory
-                                    .selectFrom(QNews.news)
+        JPAQuery<NewsEntity> query = queryFactory
+                                    .selectFrom(QNewsEntity.newsEntity)
                                     .where(wherePattern)
                                     .orderBy(orderSpecifier)
                                     .offset(filterResponse.getOffset())
                                     .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
-                query.fetch().stream().map(NewsResponse::new).toList()
+                NewsMapper.INSTANCE.toNewsResponseList(query.fetch())
         );
 
         return filterResponse;
     }
 
     @Override
-    public List<NewsResponse> listNewsOfUser(NewsFilterRequest filterRequest) {
+    public List<NewsEntity> listNewsOfUser(NewsFilterRequest filterRequest) {
 
-        OrderSpecifier<?> orderSpecifier = QNews.news.updateAt.desc();
+        OrderSpecifier<?> orderSpecifier = QNewsEntity.newsEntity.updateAt.desc();
 
-        JPAQuery<News> query = queryFactory.selectFrom(QNews.news)
+        JPAQuery<NewsEntity> query = queryFactory.selectFrom(QNewsEntity.newsEntity)
                 .orderBy(orderSpecifier)
                 .limit(filterRequest.getSize());
 
-        query.where(QNews.news.enable.eq(true));
+        query.where(QNewsEntity.newsEntity.enable.eq(true));
 
-        return query.fetch().stream().map(NewsResponse::new).toList();
+        return query.fetch();
     }
 
     @Transactional
     @Override
-    public NewsResponse saveNews(SaveNewsDTO newsDTO) {
+    public NewsEntity saveNews(NewsRequest newsRequest) {
 
-        News news;
+        NewsEntity news;
 
-        if(newsDTO instanceof UpdateNewsDTO updateNewsDTO){
+        if(newsRequest.getNewsId() != null)
+            news = findNewsById(newsRequest.getNewsId());
 
-            news = findNewsById(updateNewsDTO.getNewsId());
-            news.setTitle(updateNewsDTO.getTitle());
-            news.setContent(updateNewsDTO.getContent());
-        }
-        else news = News.builder()
-                .title(newsDTO.getTitle())
-                .content(newsDTO.getContent())
+        else news = NewsEntity.builder()
+                .createAt(LocalDateTime.now())
                 .build();
 
-        if(newsDTO.getImage() != null && !newsDTO.getImage().isEmpty()){
+        NewsMapper.INSTANCE.flowToNewsEntity(newsRequest, news);
+
+        news.setUpdateAt(LocalDateTime.now());
+
+        if(newsRequest.getImage() != null && !newsRequest.getImage().isEmpty()){
 
             if (news.getImage() != null && !news.getImage().isEmpty())
                 fileStorageService.delete(news.getImage());
 
-            Blob blob = fileStorageService.save(newsDTO.getImage());
+            Blob blob = fileStorageService.save(newsRequest.getImage());
 
             String fileName = blob.getName();
 
             news.setImage(fileName);
         }
 
-        news = newsRepository.save(news);
-
-        return new NewsResponse(news);
+        return newsRepository.save(news);
     }
 
     @Transactional
     @Override
     public void enableNews(UUID newsId, boolean enable) {
 
-        News news = findNewsById(newsId);
+        NewsEntity news = findNewsById(newsId);
 
         news.setEnable(enable);
 
-        if(enable) MessageResponseHolder.setMessage("Enable News successfully");
-        else MessageResponseHolder.setMessage("Disable News successfully");
+        if(enable) MessageResponseHolder.setMessage("Enable NewsEntity successfully");
+        else MessageResponseHolder.setMessage("Disable NewsEntity successfully");
 
         newsRepository.save(news);
     }
@@ -168,7 +167,7 @@ public class NewsServiceImpl implements INewsService {
     @Override
     public void deleteNews(UUID newsId) {
 
-        News news = findNewsById(newsId);
+        NewsEntity news = findNewsById(newsId);
 
         if(news.getImage() != null && !news.getImage().isEmpty())
             fileStorageService.delete(news.getImage());
@@ -178,16 +177,16 @@ public class NewsServiceImpl implements INewsService {
     }
 
     @Override
-    public List<NewsResponse> searchByTitle(String title) {
+    public List<NewsEntity> searchByTitle(String title) {
 
         // Sử dụng queryFactory để tìm kiếm các tin tức có tiêu đề chứa chuỗi "title"
 
         String likePattern = "%" + title.trim().toLowerCase().replaceAll("\\s+", "%") + "%";
 
-        JPAQuery<News> query = queryFactory.selectFrom(QNews.news)
-                .where(QNews.news.title.likeIgnoreCase(likePattern));
+        JPAQuery<NewsEntity> query = queryFactory.selectFrom(QNewsEntity.newsEntity)
+                .where(QNewsEntity.newsEntity.title.likeIgnoreCase(likePattern));
 
-        return query.fetch().stream().map(NewsResponse::new).toList();
+        return query.fetch();
     }
 }
 

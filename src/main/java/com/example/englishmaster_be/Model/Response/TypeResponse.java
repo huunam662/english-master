@@ -1,9 +1,10 @@
 package com.example.englishmaster_be.Model.Response;
 
-import com.example.englishmaster_be.Model.Type;
+import com.example.englishmaster_be.entity.TypeEntity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -21,12 +22,4 @@ public class TypeResponse {
 
     String nameSlug;
 
-    public TypeResponse(Type type) {
-
-        if(Objects.isNull(type)) return;
-
-        this.typeId = type.getTypeId();
-        this.typeName = type.getTypeName();
-        this.nameSlug = type.getNameSlug();
-    }
 }

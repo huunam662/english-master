@@ -1,16 +1,21 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.Answer.AnswerBlankRequest;
-import com.example.englishmaster_be.DTO.Answer.AnswerMatchingRequest;
-import com.example.englishmaster_be.DTO.Answer.UserAnswerRequest;
-import com.example.englishmaster_be.DTO.Type.QuestionType;
+import com.example.englishmaster_be.Mapper.AnswerMatchingMapper;
+import com.example.englishmaster_be.Model.Request.Answer.AnswerBlankRequest;
+import com.example.englishmaster_be.Model.Request.Answer.AnswerMatchingQuestionRequest;
+import com.example.englishmaster_be.Model.Request.Answer.UserAnswerRequest;
+import com.example.englishmaster_be.Common.enums.QuestionTypeEnum;
 import com.example.englishmaster_be.Exception.Response.BadRequestException;
-import com.example.englishmaster_be.Exception.Response.ResourceNotFoundException;
-import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.Model.Response.AnswerMatchingBasicResponse;
+import com.example.englishmaster_be.Model.Response.ScoreAnswerResponse;
 import com.example.englishmaster_be.Repository.*;
+import com.example.englishmaster_be.Service.IAnswerService;
 import com.example.englishmaster_be.Service.IQuestionService;
 import com.example.englishmaster_be.Service.IUserService;
+import com.example.englishmaster_be.entity.*;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -22,11 +27,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserAnswerService {
 
     AnswerBlankRepository answerBlankRepository;
-
-    QuestionRepository questionRepository;
 
     UserBlankAnswerRepository userBlankAnswerRepository;
 
@@ -42,65 +46,55 @@ public class UserAnswerService {
 
     IQuestionService questionService;
 
+    IAnswerService answerService;
+
 
     @Transactional
-    public UserAnswer createUserAnswer(UserAnswerRequest request){
+    public UserAnswerEntity saveUserAnswer(UserAnswerRequest userAnswerRequest){
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        if (Objects.isNull(user))
-            throw new ResourceNotFoundException("User not found");
+        QuestionEntity question = questionService.getQuestionById(userAnswerRequest.getQuestionId());
 
-        Question question = questionRepository.findByQuestionId(request.getQuestionId())
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Question not found")
-                );
-        Answer answer = answerRepository.findByAnswerId(request.getAnswerId())
-                .orElseThrow(
-                        ()-> new ResourceNotFoundException("Answer not found")
-                );
+        AnswerEntity answer = answerService.getAnswerById(userAnswerRequest.getAnswerId());
 
-        UserAnswer userAns = userAnswerRepository.findByUserAndQuestion(user,question);
+        UserAnswerEntity userAns = userAnswerRepository.findByUserAndQuestion(user, question);
 
         if(Objects.isNull(userAns)){
-            userAns=new UserAnswer();
-            userAns.setUser(user);
-            userAns.setQuestion(question);
-            userAns.setAnswers(List.of(answer));
-            userAns.setNumberChoice(1);
-            userAnswerRepository.save(userAns);
-            return userAns;
+
+            userAns = UserAnswerEntity.builder()
+                    .user(user)
+                    .question(question)
+                    .answers(Collections.singletonList(answer))
+                    .numberChoice(1)
+                    .build();
+
+            return userAnswerRepository.save(userAns);
         }
 
-        int numberChoice=userAns.getNumberChoice();
-        if(question.getNumberChoice()<numberChoice+1){
-            throw new BadRequestException("The number of choices must be less than or equal to "+question.getNumberChoice());
-        }
+        int numberChoice = userAns.getNumberChoice();
 
-        List<Answer> answerList=userAns.getAnswers();
-        answerList.add(answer);
-        userAns.setAnswers(answerList);
-        userAns.setNumberChoice(numberChoice+1);
-        userAnswerRepository.save(userAns);
+        if(question.getNumberChoice() < numberChoice + 1)
+            throw new BadRequestException("The number of choices must be less than or equal to " + question.getNumberChoice());
 
-        return userAns;
+        if(userAns.getAnswers() == null)
+            userAns.setAnswers(new ArrayList<>());
+
+        userAns.getAnswers().add(answer);
+        userAns.setNumberChoice(numberChoice + 1);
+
+        return userAnswerRepository.save(userAns);
     }
 
 
     @Transactional
-    public UserBlankAnswer createUserBlankAnswer(AnswerBlankRequest request) {
+    public UserBlankAnswerEntity createUserBlankAnswer(AnswerBlankRequest request) {
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        if(Objects.isNull(user))
-            throw new ResourceNotFoundException("User not found");
+        QuestionEntity question = questionService.getQuestionById(request.getQuestionId());
 
-        Question question = questionRepository.findByQuestionId(request.getQuestionId())
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Question not found")
-                );
-
-        UserBlankAnswer answer=new UserBlankAnswer();
+        UserBlankAnswerEntity answer = new UserBlankAnswerEntity();
         answer.setUser(user);
         answer.setQuestion(question);
         answer.setAnswer(request.getContent());
@@ -112,42 +106,42 @@ public class UserAnswerService {
     @Transactional
     public void deleteAnswer(UUID questionId){
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        Question question = questionService.getQuestionById(questionId);
+        QuestionEntity question = questionService.getQuestionById(questionId);
 
-        if(Objects.equals(question.getQuestionType(),QuestionType.Fill_In_Blank)){
-            List<UserBlankAnswer> answers= userBlankAnswerRepository.getByUserAndQuestion(user,question);
-            for (UserBlankAnswer answer : answers) {
+        if(Objects.equals(question.getQuestionType(), QuestionTypeEnum.Fill_In_Blank)){
+            List<UserBlankAnswerEntity> answers= userBlankAnswerRepository.getByUserAndQuestion(user,question);
+            for (UserBlankAnswerEntity answer : answers) {
                 userBlankAnswerRepository.deleteById(answer.getId());
             }
         }
-        else if(Objects.equals(question.getQuestionType(),QuestionType.Multiple_Choice) || Objects.equals(question.getQuestionType(),QuestionType.T_F_Not_Given)){
-            UserAnswer userAnswer=userAnswerRepository.findByUserAndQuestion(user,question);
+        else if(Objects.equals(question.getQuestionType(), QuestionTypeEnum.Multiple_Choice) || Objects.equals(question.getQuestionType(), QuestionTypeEnum.T_F_Not_Given)){
+            UserAnswerEntity userAnswer=userAnswerRepository.findByUserAndQuestion(user,question);
             userAnswerRepository.deleteById(userAnswer.getId());
         }
     }
 
     public boolean checkCorrectAnswerBlank(UUID questionId, UUID userId) {
 
-        User user = userService.findUserById(userId);
+        UserEntity user = userService.findUserById(userId);
 
-        Question question = questionService.getQuestionById(questionId);
+        QuestionEntity question = questionService.getQuestionById(questionId);
 
-        List<UserBlankAnswer> answers= userBlankAnswerRepository.getByUserAndQuestion(user,question);
+        List<UserBlankAnswerEntity> answers = userBlankAnswerRepository.getByUserAndQuestion(user,question);
 
-        List<AnswerBlank> answerBlanks= answerBlankRepository.findByQuestion(question);
+        List<AnswerBlankEntity> answerBlanks = answerBlankRepository.findByQuestion(question);
         Map<Integer, String> answerMap=answerBlanks.stream()
-                .collect(Collectors.toMap(AnswerBlank::getPosition,AnswerBlank::getAnswer));
+                .collect(Collectors.toMap(AnswerBlankEntity::getPosition, AnswerBlankEntity::getAnswer));
 
-        for (UserBlankAnswer userBlankAnswer:answers){
+        for (UserBlankAnswerEntity userBlankAnswer:answers){
+
             int pos=userBlankAnswer.getPosition();
             String answer=userBlankAnswer.getAnswer();
 
-            if(!answer.equalsIgnoreCase(answerMap.get(pos))){
+            if(!answer.equalsIgnoreCase(answerMap.get(pos)))
                 return false;
 
-            }
         }
 
         return true;
@@ -155,33 +149,25 @@ public class UserAnswerService {
 
     public int scoreAnswerBlank(UUID questionId) {
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        if (Objects.isNull(user))
-            throw new ResourceNotFoundException("User not found");
+        QuestionEntity question = questionService.getQuestionById(questionId);
 
-        Question question = questionRepository.findByQuestionId(questionId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Question not found")
-                );
+        List<UserBlankAnswerEntity> answers= userBlankAnswerRepository.getByUserAndQuestion(user,question);
 
+        List<AnswerBlankEntity> answerBlanks= answerBlankRepository.findByQuestion(question);
+        Map<Integer, String> answerMap=answerBlanks.stream()
+                .collect(Collectors.toMap(AnswerBlankEntity::getPosition, AnswerBlankEntity::getAnswer));
 
         int score = 0;
 
-        List<UserBlankAnswer> answers= userBlankAnswerRepository.getByUserAndQuestion(user,question);
-
-        List<AnswerBlank> answerBlanks= answerBlankRepository.findByQuestion(question);
-        Map<Integer, String> answerMap=answerBlanks.stream()
-                .collect(Collectors.toMap(AnswerBlank::getPosition,AnswerBlank::getAnswer));
-
-        for (UserBlankAnswer userBlankAnswer:answers){
+        for (UserBlankAnswerEntity userBlankAnswer:answers){
             int pos=userBlankAnswer.getPosition();
             String answer=userBlankAnswer.getAnswer();
 
-            if(answer.equalsIgnoreCase(answerMap.get(pos))){
-                score+= question.getQuestionScore()/answerBlanks.size();
+            if(answer.equalsIgnoreCase(answerMap.get(pos)))
+                score += question.getQuestionScore() / answerBlanks.size();
 
-            }
         }
 
         return score;
@@ -189,160 +175,131 @@ public class UserAnswerService {
 
     public boolean checkCorrectAnswerMultipleChoice(UUID questionId, UUID userId){
 
-        User user = userService.findUserById(userId);
+        UserEntity user = userService.findUserById(userId);
 
-        Question question = questionService.getQuestionById(questionId);
+        QuestionEntity question = questionService.getQuestionById(questionId);
 
-        UserAnswer userAnswer=userAnswerRepository.findByUserAndQuestion(user,question);
-        for (Answer answer:userAnswer.getAnswers()){
-            if(!answer.isCorrectAnswer())
+        UserAnswerEntity userAnswer=userAnswerRepository.findByUserAndQuestion(user,question);
+        for (AnswerEntity answer : userAnswer.getAnswers())
+            if(!answer.getCorrectAnswer())
                 return false;
-        }
+
 
         return true;
     }
 
     public int scoreAnswerMultipleChoice(UUID questionId){
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        if (Objects.isNull(user))
-            throw new ResourceNotFoundException("User not found");
+        QuestionEntity question = questionService.getQuestionById(questionId);
 
-        Question question = questionRepository.findByQuestionId(questionId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Question not found")
-                );
+        List<AnswerEntity> answers = answerRepository.findByQuestion(question);
+
+        int answerCount=answers.stream()
+                .filter(AnswerEntity::getCorrectAnswer)
+                .toList().size();
 
         int score = 0;
 
-        List<Answer> answers=answerRepository.findByQuestion(question);
-
-        int answerCount=answers.stream()
-                .filter(Answer::isCorrectAnswer)
-                .toList().size();
-
-        UserAnswer userAnswer=userAnswerRepository.findByUserAndQuestion(user,question);
-        for (Answer answer:userAnswer.getAnswers()){
-            if(!answer.isCorrectAnswer())
+        UserAnswerEntity userAnswer=userAnswerRepository.findByUserAndQuestion(user,question);
+        for (AnswerEntity answer:userAnswer.getAnswers()){
+            if(!answer.getCorrectAnswer())
                 return 0;
-            score+=question.getQuestionScore()/answerCount;
+
+            score += question.getQuestionScore() / answerCount;
         }
 
         return score;
     }
 
-    public Map<String, Object> scoreAnswer(UUID questionId, UUID userId){
+    public ScoreAnswerResponse scoreAnswer(UUID questionId, UUID userId){
 
-        User user = userService.findUserById(userId);
+        UserEntity user = userService.findUserById(userId);
 
-        Question question = questionService.getQuestionById(questionId);
+        QuestionEntity question = questionService.getQuestionById(questionId);
 
-        int score = 0;
+        List<UserAnswerMatchingEntity> userAnswerMatchings = userAnswerMatchingRepository.findAllByUserAndQuestion(user, question);
 
-        List<UserAnswerMatching> userAnswerMatchings = userAnswerMatchingRepository.findAllByUserAndQuestion(user,question);
+        List<AnswerMatchingEntity> answerMatchings = answerMatchingRepository.findAllByQuestion(question);
 
+        ScoreAnswerResponse scoreAnswerResponse = ScoreAnswerResponse.builder()
+                .answers(AnswerMatchingMapper.INSTANCE.toAnswerMatchingBasicResponseList(answerMatchings))
+                .build();
 
-        List<AnswerMatching> answerMatchings = answerMatchingRepository.findAllByQuestion(question);
+        for(UserAnswerMatchingEntity matching : userAnswerMatchings){
 
-        Map<String, Object> map = new HashMap<>();
+            scoreAnswerResponse.getAnswers().stream()
+                    .map(AnswerMatchingBasicResponse::getContentRight)
+                    .filter(contentRightItem -> contentRightItem.equalsIgnoreCase(matching.getContentRight()))
+                    .findFirst().ifPresent(contentRight -> {
+                        int scoreAnswer = scoreAnswerResponse.getScoreAnswer();
+                        scoreAnswerResponse.setScoreAnswer(scoreAnswer + question.getQuestionScore() / answerMatchings.size());
+                    });
 
-        for(AnswerMatching matching:answerMatchings){
-            map.put(matching.getContentLeft(),matching.getContentRight());
         }
 
-        for(UserAnswerMatching matching:userAnswerMatchings){
-            String contentRight= String.valueOf(map.get(matching.getContentLeft()));
-            if(contentRight.equalsIgnoreCase(matching.getContentRight())){
-                score += question.getQuestionScore() / answerMatchings.size();
-            }
-        }
-
-        map.put("scoreAnswer", score);
-
-        return map;
+        return scoreAnswerResponse;
     }
 
-    public Map<String, Object> scoreAnswerMatching(UUID questionId){
+    public ScoreAnswerResponse scoreAnswerMatching(UUID questionId){
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        if (Objects.isNull(user))
-            throw new ResourceNotFoundException("User not found");
+        QuestionEntity question = questionService.getQuestionById(questionId);
 
-        Question question = questionRepository.findByQuestionId(questionId)
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Question not found")
-                );
+        ScoreAnswerResponse scoreAnswerResponse = new ScoreAnswerResponse();
 
-        Map<String, Object> score= new HashMap<>();
-        if(Objects.equals(question.getQuestionType(), QuestionType.Fill_In_Blank)){
+        if(Objects.equals(question.getQuestionType(), QuestionTypeEnum.Fill_In_Blank)){
 //            if(!checkCorrectAnswerBlank(questionId)){
 //                score.put("scoreAnswer",0);
 //            }
 //            else{
-//                List<UserBlankAnswer> answers= userBlankAnswerRepository.getByUserAndQuestion(user,question);
-//                List<AnswerBlank> answerBlanks= answerBlankRepository.findByQuestion(question);
+//                List<UserBlankAnswerEntity> answers= userBlankAnswerRepository.getByUserAndQuestion(user,question);
+//                List<AnswerBlankEntity> answerBlanks= answerBlankRepository.findByQuestion(question);
 //                score.put("scoreAnswer",(question.getQuestionScore()/answerBlanks.size())* answers.size());
 //            }
-            score.put("scoreAnswer",scoreAnswerBlank(questionId));
-            return score;
+            scoreAnswerResponse.setScoreAnswer(scoreAnswerBlank(questionId));
         }
-        else if(Objects.equals(question.getQuestionType(),QuestionType.Multiple_Choice)){
-            score.put("scoreAnswer",scoreAnswerMultipleChoice(questionId));
+        else if(Objects.equals(question.getQuestionType(), QuestionTypeEnum.Multiple_Choice)){
 //            if (checkCorrectAnswerMultipleChoice(questionId)){
-//                UserAnswer userAnswer=userAnswerRepository.findByUserAndQuestion(user,question);
+//                UserAnswerEntity userAnswer=userAnswerRepository.findByUserAndQuestion(user,question);
 //                int n=question.getAnswers().size();
 //                score.put("scoreAnswer",question.getQuestionScore()/n*userAnswer.getAnswers().size());
 //            }
 //            else{
 //                score.put("scoreAnswer",0);
 //            }
-            return score;
+            scoreAnswerResponse.setScoreAnswer(scoreAnswerMultipleChoice(questionId));
         }
-        else if (Objects.equals(question.getQuestionType(),QuestionType.T_F_Not_Given))
+        else if (Objects.equals(question.getQuestionType(), QuestionTypeEnum.T_F_Not_Given))
         {
-            UserAnswer userAnswer=userAnswerRepository.findByUserAndQuestion(user,question);
-            if(userAnswer.getAnswers().get(0).isCorrectAnswer()){
-                score.put("scoreAnswer",userAnswer.getQuestion().getQuestionScore());
-            }
-            else {
-                score.put("scoreAnswer",0);
-            }
-            return score;
+            UserAnswerEntity userAnswer=userAnswerRepository.findByUserAndQuestion(user,question);
+            if(userAnswer.getAnswers().get(0).getCorrectAnswer())
+                scoreAnswerResponse.setScoreAnswer(userAnswer.getQuestion().getQuestionScore());
+
         }
-        else if(Objects.equals(question.getQuestionType(),QuestionType.Matching)){
-            score.put("scoreAnswer", scoreAnswerMatching(questionId));
-            return score;
-        }
-        score.put("scoreAnswer",0);
-        return score;
+        else if(Objects.equals(question.getQuestionType(), QuestionTypeEnum.Matching))
+            scoreAnswerResponse.setScoreAnswer(scoreAnswerMatching(questionId).getScoreAnswer());
+
+        return scoreAnswerResponse;
     }
 
 
-    public Map<String, String> createUserMatchingAnswer(AnswerMatchingRequest request) {
-        User user=userService.currentUser();
-        if(Objects.isNull(user)){
-            throw new ResourceNotFoundException("User not found");
-        }
+    public UserAnswerMatchingEntity createUserMatchingAnswer(AnswerMatchingQuestionRequest request) {
 
-        Question question = questionRepository.findByQuestionId(request.getQuestionId())
-                .orElseThrow(
-                        () -> new ResourceNotFoundException("Question not found")
-                );
+        UserEntity user=userService.currentUser();
 
-        Map<String,String> answerMap=new HashMap<>();
+        QuestionEntity question = questionService.getQuestionById(request.getQuestionId());
 
-        UserAnswerMatching userAnswerMatching=new UserAnswerMatching();
-        userAnswerMatching.setQuestion(question);
-        userAnswerMatching.setUser(user);
-        userAnswerMatching.setContentLeft(request.getContentLeft());
-        userAnswerMatching.setContentRight(request.getContentRight());
-        userAnswerMatchingRepository.save(userAnswerMatching);
+        UserAnswerMatchingEntity userAnswerMatching = UserAnswerMatchingEntity.builder()
+                .question(question)
+                .user(user)
+                .contentLeft(request.getContentLeft())
+                .contentRight(request.getContentRight())
+                .build();
 
-        answerMap.put(userAnswerMatching.getContentLeft(),userAnswerMatching.getContentRight());
-        return answerMap;
-
+        return userAnswerMatchingRepository.save(userAnswerMatching);
     }
 
 

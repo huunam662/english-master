@@ -1,9 +1,9 @@
 package com.example.englishmaster_be.Controller;
 
-import com.example.englishmaster_be.DTO.Posts.SavePostDto;
-import com.example.englishmaster_be.DTO.Posts.FilterPostDto;
-import com.example.englishmaster_be.DTO.Posts.SelectPostDto;
-import com.example.englishmaster_be.DTO.Posts.UpdatePostDto;
+import com.example.englishmaster_be.Model.Request.Posts.PostRequest;
+import com.example.englishmaster_be.Model.Request.Posts.FilterPostRequest;
+import com.example.englishmaster_be.Model.Request.Posts.SelectPostRequest;
+import com.example.englishmaster_be.Model.Request.Posts.UpdatePostRequest;
 import com.example.englishmaster_be.Service.IPostsService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(path = "/api/posts", produces = MediaType.APPLICATION_JSON_VALUE)
-@Tag(name = "Post")
+@RequestMapping(path = "/posts", produces = MediaType.APPLICATION_JSON_VALUE)
+@Tag(name = "Posts")
 public class PostsController {
 
     private final IPostsService postService;
@@ -24,12 +24,12 @@ public class PostsController {
     }
 
     @PostMapping("/")
-    public Object createPost(@RequestBody SavePostDto dto) {
+    public Object createPost(@RequestBody PostRequest dto) {
         return postService.createPost(dto);
     }
 
     @PatchMapping("/{id}")
-    public Object updatePost(@PathVariable("id") UUID id, @RequestBody UpdatePostDto dto) {
+    public Object updatePost(@PathVariable("id") UUID id, @RequestBody UpdatePostRequest dto) {
         return postService.updatePost(id, dto);
     }
 
@@ -45,12 +45,12 @@ public class PostsController {
 
 
     @GetMapping("/")
-    public Object getPosts(@ParameterObject SelectPostDto dto) {
+    public Object getPosts(@ParameterObject SelectPostRequest dto) {
         return postService.getAllPosts(dto);
     }
 
     @GetMapping("/post-category/{slug}")
-    public Object getPostsByCategory(@PathVariable("slug") String slug, @ParameterObject FilterPostDto dto) {
+    public Object getPostsByCategory(@PathVariable("slug") String slug, @ParameterObject FilterPostRequest dto) {
         return postService.getPostByPostCategorySlug(slug, dto);
     }
 
@@ -60,7 +60,7 @@ public class PostsController {
     }
 
     @GetMapping("/search")
-    public Object searchPost(@ParameterObject FilterPostDto dto) {
+    public Object searchPost(@ParameterObject FilterPostRequest dto) {
         return postService.searchPost(dto);
     }
 

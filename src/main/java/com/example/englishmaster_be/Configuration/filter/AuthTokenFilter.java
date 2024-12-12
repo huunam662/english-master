@@ -2,22 +2,17 @@ package com.example.englishmaster_be.Configuration.filter;
 
 import com.example.englishmaster_be.Configuration.jwt.JwtUtils;
 import com.example.englishmaster_be.Exception.Error;
-import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
+import com.example.englishmaster_be.Common.dto.response.ExceptionResponseModel;
+import com.example.englishmaster_be.Exception.CustomException;
 import com.example.englishmaster_be.Service.IInvalidTokenService;
 import io.swagger.v3.core.util.Json;
-import jakarta.mail.AuthenticationFailedException;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationServiceException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -41,6 +36,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     IInvalidTokenService invalidTokenService;
 
 
+
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -57,14 +53,14 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 String jwt = headerAuth.substring(7);
 
                 if (!jwtUtils.validateJwtToken(jwt) || invalidTokenService.invalidToken(jwt))
-                    throw new AuthenticationServiceException(null);
+                    throw new CustomException(Error.UNAUTHENTICATED);
 
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                 if(!userDetails.isEnabled())
-                    throw new DisabledException(null);
+                    throw new CustomException(Error.ACCOUNT_DISABLED);
 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
@@ -81,8 +77,8 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
             logger.error("Cannot set user authentication: {}", e);
 
-            if(e instanceof DisabledException) {
-                writeExceptionBodyResponse(response, Error.ACCOUNT_DISABLED);
+            if(e instanceof CustomException customException) {
+                writeExceptionBodyResponse(response, customException.getError());
                 return;
             }
 

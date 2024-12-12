@@ -3,12 +3,12 @@ package com.example.englishmaster_be.Service.impl;
 import com.example.englishmaster_be.Common.dto.response.FilterResponse;
 import com.example.englishmaster_be.Common.enums.SortByFeedbackFieldsEnum;
 import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
-import com.example.englishmaster_be.DTO.Feedback.SaveFeedbackDTO;
-import com.example.englishmaster_be.DTO.Feedback.FeedbackFilterRequest;
-import com.example.englishmaster_be.DTO.Feedback.UpdateFeedbackDTO;
+import com.example.englishmaster_be.Model.Request.Feedback.FeedbackRequest;
+import com.example.englishmaster_be.Model.Request.Feedback.FeedbackFilterRequest;
 import com.example.englishmaster_be.Exception.Response.BadRequestException;
-import com.example.englishmaster_be.Model.Feedback;
-import com.example.englishmaster_be.Model.QFeedback;
+import com.example.englishmaster_be.Mapper.FeedbackMapper;
+import com.example.englishmaster_be.entity.FeedbackEntity;
+import com.example.englishmaster_be.entity.QFeedbackEntity;
 import com.example.englishmaster_be.Model.Response.FeedbackResponse;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.*;
@@ -26,7 +26,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -43,9 +43,11 @@ public class FeedbackServiceImpl implements IFeedbackService {
 
 
     @Override
-    public Feedback getFeedbackById(UUID feedbackId) {
+    public FeedbackEntity getFeedbackById(UUID feedbackId) {
         return feedbackRepository.findByFeedbackId(feedbackId)
-                .orElseThrow(() -> new BadRequestException("Feedback not found with ID: " + feedbackId));
+                .orElseThrow(
+                        () -> new BadRequestException("Feedback not found")
+                );
     }
 
 
@@ -55,12 +57,12 @@ public class FeedbackServiceImpl implements IFeedbackService {
             return null;
 
         return switch (sortBy) {
-            case FeedbackId -> sortDirection.isAscending() ? QFeedback.feedback.id.asc() : QFeedback.feedback.id.desc();
-            case Name -> sortDirection.isAscending() ? QFeedback.feedback.name.asc() : QFeedback.feedback.name.desc();
-            case Content -> sortDirection.isAscending() ? QFeedback.feedback.content.asc() : QFeedback.feedback.content.desc();
-            case Description -> sortDirection.isAscending() ? QFeedback.feedback.description.asc() : QFeedback.feedback.description.desc();
-            case CreateAt -> sortDirection.isAscending() ? QFeedback.feedback.createAt.asc() : QFeedback.feedback.createAt.desc();
-            case UpdateAt -> sortDirection.isAscending() ? QFeedback.feedback.updateAt.asc() : QFeedback.feedback.updateAt.desc();
+            case FeedbackId -> sortDirection.isAscending() ? QFeedbackEntity.feedbackEntity.id.asc() : QFeedbackEntity.feedbackEntity.id.desc();
+            case Name -> sortDirection.isAscending() ? QFeedbackEntity.feedbackEntity.name.asc() : QFeedbackEntity.feedbackEntity.name.desc();
+            case Content -> sortDirection.isAscending() ? QFeedbackEntity.feedbackEntity.content.asc() : QFeedbackEntity.feedbackEntity.content.desc();
+            case Description -> sortDirection.isAscending() ? QFeedbackEntity.feedbackEntity.description.asc() : QFeedbackEntity.feedbackEntity.description.desc();
+            case CreateAt -> sortDirection.isAscending() ? QFeedbackEntity.feedbackEntity.createAt.asc() : QFeedbackEntity.feedbackEntity.createAt.desc();
+            case UpdateAt -> sortDirection.isAscending() ? QFeedbackEntity.feedbackEntity.updateAt.asc() : QFeedbackEntity.feedbackEntity.updateAt.desc();
         };
     }
 
@@ -74,23 +76,23 @@ public class FeedbackServiceImpl implements IFeedbackService {
                             .offset((long) (filterRequest.getPage() - 1) * filterRequest.getSize())
                         .build();
 
-        BooleanExpression wherePattern = QFeedback.feedback.isNotNull();
+        BooleanExpression wherePattern = QFeedbackEntity.feedbackEntity.isNotNull();
 
         if (filterRequest.getIsEnable() != null){
 
-            wherePattern = wherePattern.and(QFeedback.feedback.enable.eq(filterRequest.getIsEnable()));
+            wherePattern = wherePattern.and(QFeedbackEntity.feedbackEntity.enable.eq(filterRequest.getIsEnable()));
         }
 
         if (filterRequest.getSearch() != null && !filterRequest.getSearch().isEmpty()) {
 
             String likeExpression = "%" + filterRequest.getSearch().trim().toLowerCase().replaceAll("\\s+", "%") + "%";
 
-            wherePattern = wherePattern.and(QFeedback.feedback.content.likeIgnoreCase(likeExpression));
+            wherePattern = wherePattern.and(QFeedbackEntity.feedbackEntity.content.likeIgnoreCase(likeExpression));
         }
 
         long totalElements = Optional.ofNullable(
                                                 queryFactory
-                                                .select(QFeedback.feedback.updateAt.count())
+                                                .select(QFeedbackEntity.feedbackEntity.updateAt.count())
                                                 .where(wherePattern)
                                                 .fetchOne()
                                             ).orElse(0L);
@@ -99,8 +101,8 @@ public class FeedbackServiceImpl implements IFeedbackService {
         filterResponse.setTotalPages(totalPages);
         filterResponse.withPreviousAndNextPage();
 
-        JPAQuery<Feedback> query = queryFactory
-                                    .selectFrom(QFeedback.feedback)
+        JPAQuery<FeedbackEntity> query = queryFactory
+                                    .selectFrom(QFeedbackEntity.feedbackEntity)
                                     .where(wherePattern);
 
         OrderSpecifier<?> orderSpecifier = buildFeedbackOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
@@ -111,7 +113,7 @@ public class FeedbackServiceImpl implements IFeedbackService {
                 .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
-                query.fetch().stream().map(FeedbackResponse::new).toList()
+                FeedbackMapper.INSTANCE.toFeedbackResponseList(query.fetch())
         );
 
         return filterResponse;
@@ -126,12 +128,12 @@ public class FeedbackServiceImpl implements IFeedbackService {
                 .offset((long) (filterRequest.getPage() - 1) * filterRequest.getSize())
                 .build();
 
-        BooleanExpression wherePattern = QFeedback.feedback.enable.eq(Boolean.TRUE);
+        BooleanExpression wherePattern = QFeedbackEntity.feedbackEntity.enable.eq(Boolean.TRUE);
 
         long totalElements = Optional.ofNullable(
                 queryFactory
-                        .select(QFeedback.feedback.count())
-                        .from(QFeedback.feedback)
+                        .select(QFeedbackEntity.feedbackEntity.count())
+                        .from(QFeedbackEntity.feedbackEntity)
                         .where(wherePattern)
                         .fetchOne()
         ).orElse(0L);
@@ -141,17 +143,17 @@ public class FeedbackServiceImpl implements IFeedbackService {
         filterResponse.setTotalPages(totalPages);
         filterResponse.withPreviousAndNextPage();
 
-        OrderSpecifier<?> orderSpecifier = QFeedback.feedback.updateAt.desc();
+        OrderSpecifier<?> orderSpecifier = QFeedbackEntity.feedbackEntity.updateAt.desc();
 
-        JPAQuery<Feedback> query = queryFactory
-                .selectFrom(QFeedback.feedback)
+        JPAQuery<FeedbackEntity> query = queryFactory
+                .selectFrom(QFeedbackEntity.feedbackEntity)
                 .where(wherePattern)
                 .orderBy(orderSpecifier)
                 .offset(filterResponse.getOffset())
                 .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
-                query.fetch().stream().map(FeedbackResponse::new).toList()
+                FeedbackMapper.INSTANCE.toFeedbackResponseList(query.fetch())
         );
 
         return filterResponse;
@@ -160,56 +162,50 @@ public class FeedbackServiceImpl implements IFeedbackService {
 
     @Transactional
     @Override
-    public FeedbackResponse saveFeedback(SaveFeedbackDTO feedbackDTO) {
+    public FeedbackEntity saveFeedback(FeedbackRequest feedbackRequest) {
 
-        Feedback feedback;
+        FeedbackEntity feedback;
 
-        if(feedbackDTO instanceof UpdateFeedbackDTO updateFeedbackDTO){
-            feedback = getFeedbackById(updateFeedbackDTO.getFeedbackID());
-            feedback.setName(updateFeedbackDTO.getName());
-            feedback.setDescription(updateFeedbackDTO.getDescription());
-            feedback.setContent(updateFeedbackDTO.getContent());
-        }
-        else feedback = Feedback.builder()
-                .name(feedbackDTO.getName())
-                .description(feedbackDTO.getDescription())
-                .content(feedbackDTO.getContent())
+        if(feedbackRequest.getFeedbackId() != null)
+            feedback = getFeedbackById(feedbackRequest.getFeedbackId());
+
+        else feedback = FeedbackEntity.builder()
+                .createAt(LocalDateTime.now())
                 .build();
 
+        FeedbackMapper.INSTANCE.flowToFeedbackEntity(feedbackRequest, feedback);
+        feedback.setEnable(Boolean.TRUE);
 
-        if (feedbackDTO.getAvatar() != null && !feedbackDTO.getAvatar().isEmpty()) {
+        if (feedbackRequest.getAvatar() != null && !feedbackRequest.getAvatar().isEmpty()) {
 
-            Blob blobResultResponse = fileStorageService.save(feedbackDTO.getAvatar());
+            Blob blobResultResponse = fileStorageService.save(feedbackRequest.getAvatar());
 
             feedback.setAvatar(blobResultResponse.getName());
-
         }
 
-        feedback = feedbackRepository.save(feedback);
-
-        return new FeedbackResponse(feedback);
+        return feedbackRepository.save(feedback);
     }
 
     @Transactional
     @Override
-    public void enableFeedback(UUID feedbackId, boolean enable) {
+    public void enableFeedback(UUID feedbackId, Boolean enable) {
         
-        Feedback feedback = getFeedbackById(feedbackId);
+        FeedbackEntity feedback = getFeedbackById(feedbackId);
 
         feedback.setEnable(enable);
 
         feedbackRepository.save(feedback);
         
-        if(enable) MessageResponseHolder.setMessage("Enable Feedback successfully");
+        if(enable) MessageResponseHolder.setMessage("Enable FeedbackEntity successfully");
         
-        else MessageResponseHolder.setMessage("Disable Feedback successfully");
+        else MessageResponseHolder.setMessage("Disable FeedbackEntity successfully");
     }
 
     @Transactional
     @Override
     public void deleteFeedback(UUID feedbackId) {
 
-        Feedback feedback = getFeedbackById(feedbackId);
+        FeedbackEntity feedback = getFeedbackById(feedbackId);
 
         if(feedback.getAvatar() != null)
             fileStorageService.delete(feedback.getAvatar());

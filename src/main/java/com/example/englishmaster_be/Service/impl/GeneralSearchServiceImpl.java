@@ -1,14 +1,11 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.Model.*;
-import com.example.englishmaster_be.Model.Response.FlashCardWordResponse;
-import com.example.englishmaster_be.Model.Response.NewsResponse;
+import com.example.englishmaster_be.Mapper.FlashCardWordMapper;
+import com.example.englishmaster_be.Mapper.NewsMapper;
+import com.example.englishmaster_be.Mapper.TopicMapper;
 import com.example.englishmaster_be.Model.Response.GeneralSearchAllResponse;
-import com.example.englishmaster_be.Model.Response.TopicResponse;
-import com.example.englishmaster_be.Repository.FlashCardWordRepository;
-import com.example.englishmaster_be.Repository.NewsRepository;
-import com.example.englishmaster_be.Repository.TopicRepository;
 import com.example.englishmaster_be.Service.GeneralSearchService;
+import com.example.englishmaster_be.entity.*;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +13,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 
 @Service
@@ -30,32 +26,18 @@ public class GeneralSearchServiceImpl implements GeneralSearchService {
     @Override
     public GeneralSearchAllResponse searchAll(String keyword) {
 
-        QTopic qTopic = QTopic.topic;
+        List<TopicEntity> topics = queryFactory.selectFrom(QTopicEntity.topicEntity).where(QTopicEntity.topicEntity.topicName.containsIgnoreCase(keyword)).fetch();
 
-        List<Topic> topics = queryFactory.selectFrom(qTopic).where(qTopic.topicName.containsIgnoreCase(keyword)).fetch();
+        List<FlashCardWordEntity> flashCardWords = queryFactory.selectFrom(QFlashCardWordEntity.flashCardWordEntity)
+                .where(QFlashCardWordEntity.flashCardWordEntity.word.containsIgnoreCase(keyword)).fetch();
 
-        GeneralSearchAllResponse searchAllResponse = new GeneralSearchAllResponse();
+        List<NewsEntity> newsList = queryFactory.selectFrom(QNewsEntity.newsEntity).where(QNewsEntity.newsEntity.title.containsIgnoreCase(keyword)).fetch();
 
-        searchAllResponse.setTopics(
-                topics.stream().map(TopicResponse::new).toList()
-        );
+        return GeneralSearchAllResponse.builder()
+                .topicList(TopicMapper.INSTANCE.toTopicResponseList(topics))
+                .flashCardWordList(FlashCardWordMapper.INSTANCE.toFlashCardWordResponseList(flashCardWords))
+                .newsList(NewsMapper.INSTANCE.toNewsResponseList(newsList))
+                .build();
 
-        QFlashCardWord qFlashCardWord = QFlashCardWord.flashCardWord;
-
-        List<FlashCardWord> flashCardWords = queryFactory.selectFrom(qFlashCardWord).where(qFlashCardWord.word.containsIgnoreCase(keyword)).fetch();
-
-        searchAllResponse.setFlashCardWords(
-                flashCardWords.stream().map(FlashCardWordResponse::new).toList()
-        );
-
-        QNews qNews = QNews.news;
-
-        List<News> newsList = queryFactory.selectFrom(qNews).where(qNews.title.containsIgnoreCase(keyword)).fetch();
-
-        searchAllResponse.setNewsList(
-                newsList.stream().map(NewsResponse::new).toList()
-        );
-
-        return searchAllResponse;
     }
 }

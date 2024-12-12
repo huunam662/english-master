@@ -1,10 +1,9 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.FlashCard.SaveFlashCardDTO;
-import com.example.englishmaster_be.DTO.FlashCard.UpdateFlashCardDTO;
-import com.example.englishmaster_be.Model.FlashCard;
-import com.example.englishmaster_be.Model.Response.*;
-import com.example.englishmaster_be.Model.User;
+import com.example.englishmaster_be.Model.Request.FlashCard.FlashCardRequest;
+import com.example.englishmaster_be.Mapper.FlashCardMapper;
+import com.example.englishmaster_be.entity.FlashCardEntity;
+import com.example.englishmaster_be.entity.UserEntity;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.IFileStorageService;
 import com.example.englishmaster_be.Service.IFlashCardService;
@@ -19,7 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,64 +36,31 @@ public class FlashCardServiceImpl implements IFlashCardService {
 
 
     @Override
-    public FlashCard getFlashCardToId(UUID flashCardId) {
+    public FlashCardEntity getFlashCardById(UUID flashCardId) {
         return flashCardRepository.findByFlashCardId(flashCardId)
                 .orElseThrow(
-                        () -> new IllegalArgumentException("FlashCard not found with ID: " + flashCardId)
+                        () -> new IllegalArgumentException("FlashCardEntity not found with ID: " + flashCardId)
                 );
     }
 
     @Override
-    public List<FlashCard> getFlashCardToUser(User user) {
+    public List<FlashCardEntity> getFlashCardByUser(UserEntity user) {
         return flashCardRepository.findByUser(user, Sort.by(Sort.Order.desc("updateAt")));
     }
 
     @Override
-    public FlashCardListWordsResponse getWordToFlashCard(UUID flashCardId) {
+    public List<FlashCardEntity> getListFlashCardByCurrentUser() {
 
-        FlashCard flashCard = getFlashCardToId(flashCardId);
+        UserEntity user = userService.currentUser();
 
-        FlashCardListWordsResponse flashCardListWordsResponse = FlashCardListWordsResponse
-                .builder()
-                    .flashCardTitle(flashCard.getFlashCardTitle())
-                    .flashCardDescription(flashCard.getFlashCardDescription())
-                    .flashCardWord(new ArrayList<>())
-                .build();
-
-        flashCard.getFlashCardWords().forEach(word -> {
-
-            FlashCardWordResponse flashCardWordResponse = new FlashCardWordResponse(word);
-
-            flashCardListWordsResponse.getFlashCardWord().add(flashCardWordResponse);
-        });
-
-        return flashCardListWordsResponse;
-    }
-
-    @Override
-    public List<FlashCardResponse> getListFlashCardUser() {
-
-        User user = userService.currentUser();
-
-        List<FlashCard> flashCardList = getFlashCardToUser(user);
-
-        List<FlashCardResponse> flashCardResponseList = new ArrayList<>();
-
-        flashCardList.forEach(flashCard -> {
-
-            FlashCardResponse flashCardResponse = new FlashCardResponse(flashCard);
-
-            flashCardResponseList.add(flashCardResponse);
-        });
-
-        return flashCardResponseList;
+        return getFlashCardByUser(user);
     }
 
     @Transactional
     @Override
     public void delete(UUID flashCardId) {
 
-        FlashCard flashCard = getFlashCardToId(flashCardId);
+        FlashCardEntity flashCard = getFlashCardById(flashCardId);
 
         if(flashCard.getFlashCardImage() != null && !flashCard.getFlashCardImage().isEmpty())
             fileStorageService.delete(flashCard.getFlashCardImage());
@@ -104,38 +70,30 @@ public class FlashCardServiceImpl implements IFlashCardService {
 
     @Transactional
     @Override
-    public FlashCardResponse saveFlashCard(SaveFlashCardDTO createFlashCardDTO) {
+    public FlashCardEntity saveFlashCard(FlashCardRequest flashCardRequest) {
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        FlashCard flashCard;
+        FlashCardEntity flashCard;
 
-        if(createFlashCardDTO instanceof UpdateFlashCardDTO updateFlashCardDTO){
+        if(flashCardRequest.getFlashCardId() != null)
+            flashCard = getFlashCardById(flashCardRequest.getFlashCardId());
 
-            flashCard = getFlashCardToId(updateFlashCardDTO.getFlashCardId());
-            flashCard.setFlashCardTitle(updateFlashCardDTO.getFlashCardTitle());
-            flashCard.setFlashCardDescription(updateFlashCardDTO.getFlashCardDescription());
-            flashCard.setUser(user);
-            flashCard.setUserUpdate(user);
-        }
-        else flashCard = FlashCard.builder()
-                .flashCardTitle(createFlashCardDTO.getFlashCardTitle())
-                .flashCardDescription(createFlashCardDTO.getFlashCardDescription())
-                .user(user)
+        else flashCard = FlashCardEntity.builder()
                 .userCreate(user)
-                .userUpdate(user)
+                .createAt(LocalDateTime.now())
                 .build();
 
-        if(createFlashCardDTO.getFlashCardImage() != null){
+        FlashCardMapper.INSTANCE.flowToFlashCardEntity(flashCardRequest, flashCard);
 
-            Blob blobResponse = fileStorageService.save(createFlashCardDTO.getFlashCardImage());
+        if(flashCardRequest.getFlashCardImage() != null){
+
+            Blob blobResponse = fileStorageService.save(flashCardRequest.getFlashCardImage());
 
             flashCard.setFlashCardImage(blobResponse.getName());
         }
 
-        flashCard = flashCardRepository.save(flashCard);
-
-        return new FlashCardResponse(flashCard);
+        return flashCardRepository.save(flashCard);
     }
 
 }

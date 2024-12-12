@@ -1,18 +1,16 @@
 package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Exception.Response.BadRequestException;
-import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
-import com.example.englishmaster_be.Model.Response.ResponseModel;
-import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.IRefreshTokenService;
 import com.example.englishmaster_be.Service.IUserService;
+import com.example.englishmaster_be.entity.ConfirmationTokenEntity;
+import com.example.englishmaster_be.entity.UserEntity;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -32,31 +30,35 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
     IUserService userService;
 
     @Override
-    public ConfirmationToken findByToken(String token) {
+    public ConfirmationTokenEntity findByToken(String token) {
         return confirmationTokenRepository.findByCodeAndType(token, "REFRESH_TOKEN");
     }
 
     @Override
     public void deleteRefreshToken(String token) {
-        ConfirmationToken confirmationToken = confirmationTokenRepository.findByCodeAndType(token, "REFRESH_TOKEN");
+        ConfirmationTokenEntity confirmationToken = confirmationTokenRepository.findByCodeAndType(token, "REFRESH_TOKEN");
         if(confirmationToken != null){
             confirmationTokenRepository.delete(confirmationToken);
         }
     }
 
     @Override
-    public ConfirmationToken createRefreshToken(String email) {
-        ConfirmationToken confirmationToken  = new ConfirmationToken(userService.findUserByEmail(email));
+    public ConfirmationTokenEntity createRefreshToken(String email) {
 
-        confirmationToken.setCode(UUID.randomUUID().toString());
-        confirmationToken.setType("REFRESH_TOKEN");
+        UserEntity user = userService.currentUser();
 
-        confirmationToken = confirmationTokenRepository.save(confirmationToken);
-        return confirmationToken;
+        ConfirmationTokenEntity confirmationToken = ConfirmationTokenEntity.builder()
+                .createAt(LocalDateTime.now())
+                .user(user)
+                .code(UUID.randomUUID().toString())
+                .type("REFRESH_TOKEN")
+                .build();
+
+        return confirmationTokenRepository.save(confirmationToken);
     }
 
     @Override
-    public void verifyExpiration(ConfirmationToken token) {
+    public void verifyExpiration(ConfirmationTokenEntity token) {
 
         if(token.getCreateAt().plusSeconds(refreshTokenDurationMs/1000).isBefore(LocalDateTime.now()))
             throw new BadRequestException("Refresh token was expired. Please make a new sign in request");
@@ -64,11 +66,11 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
     }
 
     @Override
-    public void deleteAllTokenExpired(User user) {
+    public void deleteAllTokenExpired(UserEntity user) {
         try{
-            List<ConfirmationToken> confirmationTokenList = confirmationTokenRepository.findAllByUserAndType(user, "REFRESH_TOKEN");
+            List<ConfirmationTokenEntity> confirmationTokenList = confirmationTokenRepository.findAllByUserAndType(user, "REFRESH_TOKEN");
 
-            for(ConfirmationToken confirmationToken : confirmationTokenList){
+            for(ConfirmationTokenEntity confirmationToken : confirmationTokenList){
                 if(confirmationToken.getCreateAt().plusSeconds(refreshTokenDurationMs/1000).isBefore(LocalDateTime.now())){
 
                     confirmationTokenRepository.delete(confirmationToken);

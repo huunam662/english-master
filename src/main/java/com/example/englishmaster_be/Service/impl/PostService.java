@@ -1,10 +1,10 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.PostCategory.SavePostCategoryDto;
-import com.example.englishmaster_be.DTO.Posts.SavePostDto;
-import com.example.englishmaster_be.DTO.Posts.FilterPostDto;
-import com.example.englishmaster_be.DTO.Posts.SelectPostDto;
-import com.example.englishmaster_be.DTO.Posts.UpdatePostDto;
+import com.example.englishmaster_be.Model.Request.PostCategory.PostCategoryRequest;
+import com.example.englishmaster_be.Model.Request.Posts.PostRequest;
+import com.example.englishmaster_be.Model.Request.Posts.FilterPostRequest;
+import com.example.englishmaster_be.Model.Request.Posts.SelectPostRequest;
+import com.example.englishmaster_be.Model.Request.Posts.UpdatePostRequest;
 import com.example.englishmaster_be.Service.IPostsService;
 import com.example.englishmaster_be.Value.MicroserviceValue;
 import jakarta.persistence.EntityNotFoundException;
@@ -12,10 +12,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -57,11 +54,11 @@ public class PostService implements IPostsService {
     }
 
     @Override
-    public Object createPost(SavePostDto dto) {
+    public Object createPost(PostRequest dto) {
         String createUrl = microserviceValue.getURL() + microserviceValue.getPrefix() + microserviceValue.getCreateEndpoint();
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-API-KEY", microserviceValue.getAPI_KEY());
-        HttpEntity<SavePostDto> requestEntity = new HttpEntity<>(dto, headers);
+        HttpEntity<PostRequest> requestEntity = new HttpEntity<>(dto, headers);
         Map<String, Object> response = getResponse(createUrl, HttpMethod.POST, requestEntity);
         if (response.containsKey("responseData")) {
             return response.get("responseData");
@@ -70,11 +67,11 @@ public class PostService implements IPostsService {
     }
 
     @Override
-    public Object updatePost(UUID id, UpdatePostDto dto) {
+    public Object updatePost(UUID id, UpdatePostRequest dto) {
         String createUrl = microserviceValue.getURL() + microserviceValue.getPrefix() + microserviceValue.getUpdateEndpoint().replace("{id}", id.toString());
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-API-KEY", microserviceValue.getAPI_KEY());
-        HttpEntity<UpdatePostDto> requestEntity = new HttpEntity<>(dto, headers);
+        HttpEntity<UpdatePostRequest> requestEntity = new HttpEntity<>(dto, headers);
         Map<String, Object> response = getResponse(createUrl, HttpMethod.PATCH, requestEntity);
         if (response.containsKey("responseData")) {
             return response.get("responseData");
@@ -87,7 +84,7 @@ public class PostService implements IPostsService {
         String deleteUrl = microserviceValue.getURL() + microserviceValue.getPrefix() + microserviceValue.getDeleteEndpoint().replace("{id}", id.toString());
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-API-KEY", microserviceValue.getAPI_KEY());
-        HttpEntity<SavePostCategoryDto> requestEntity = new HttpEntity<>(headers);
+        HttpEntity<PostCategoryRequest> requestEntity = new HttpEntity<>(headers);
         Map<String, Object> response = getResponse(deleteUrl, HttpMethod.DELETE, requestEntity);
         if (response.containsKey("responseData")) {
             return response.get("responseData");
@@ -96,11 +93,11 @@ public class PostService implements IPostsService {
     }
 
     @Override
-    public Object getAllPosts(SelectPostDto dto) {
+    public Object getAllPosts(SelectPostRequest dto) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(microserviceValue.getURL() + microserviceValue.getPrefix() + microserviceValue.getGetAllEndpoint());
         String getAllUrl = parseToUrlDynamic(builder, dto);
         getAllUrl = getAllUrl.replace("%20", " ");
-        HttpEntity<SelectPostDto> requestEntity = new HttpEntity<>(new HttpHeaders());
+        HttpEntity<SelectPostRequest> requestEntity = new HttpEntity<>(new HttpHeaders());
         Map<String, Object> response = getResponse(getAllUrl, HttpMethod.GET, requestEntity);
         if (response.containsKey("responseData")) {
             return response.get("responseData");
@@ -109,12 +106,12 @@ public class PostService implements IPostsService {
     }
 
     @Override
-    public Object getPostByPostCategorySlug(String slug, FilterPostDto dto) {
+    public Object getPostByPostCategorySlug(String slug, FilterPostRequest dto) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(microserviceValue.getURL() + microserviceValue.getPrefix() + microserviceValue.getGetByPostCategorySlugEndpoint().replace("{slug}", slug));
         String getByCateSlugUrl = parseToUrlDynamic(builder, dto);
         log.warn(getByCateSlugUrl);
         getByCateSlugUrl = getByCateSlugUrl.replace("%20", " ");
-        HttpEntity<FilterPostDto> requestEntity = new HttpEntity<>(new HttpHeaders());
+        HttpEntity<FilterPostRequest> requestEntity = new HttpEntity<>(new HttpHeaders());
         Map<String, Object> response = getResponse(getByCateSlugUrl, HttpMethod.GET, requestEntity);
         if (response.containsKey("responseData")) {
             return response.get("responseData");
@@ -128,7 +125,7 @@ public class PostService implements IPostsService {
         Map<String, Object> response = getResponse(getBySlugUrl, HttpMethod.GET, new HttpEntity<>(new HttpHeaders()));
         if (response.containsKey("responseData")) {
             if (response.get("responseData") == null) {
-                throw new EntityNotFoundException("Post not found");
+                throw new EntityNotFoundException("PostEntity not found");
             }
             return response.get("responseData");
         }
@@ -136,11 +133,11 @@ public class PostService implements IPostsService {
     }
 
     @Override
-    public Object searchPost(FilterPostDto dto) {
+    public Object searchPost(FilterPostRequest dto) {
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(microserviceValue.getURL() + microserviceValue.getPrefix() + microserviceValue.getSearchEndpoint());
         String searchUrl = parseToUrlDynamic(builder, dto);
         searchUrl = searchUrl.replace("%20", " ");
-        HttpEntity<FilterPostDto> requestEntity = new HttpEntity<>(dto, new HttpHeaders());
+        HttpEntity<FilterPostRequest> requestEntity = new HttpEntity<>(dto, new HttpHeaders());
         Map<String, Object> response = getResponse(searchUrl, HttpMethod.GET, requestEntity);
         if (response.containsKey("responseData")) {
             return response.get("responseData");
@@ -161,7 +158,7 @@ public class PostService implements IPostsService {
 
     private String parseToUrlDynamic(UriComponentsBuilder builder, Object dto) {
         Map<String, Object> params = new HashMap<>();
-        if (dto instanceof FilterPostDto filterDto) {
+        if (dto instanceof FilterPostRequest filterDto) {
             params.put("status", filterDto.getStatus());
             params.put("excludeSlug", filterDto.getExcludeSlug());
             params.put("order", filterDto.getOrder());
@@ -171,7 +168,7 @@ public class PostService implements IPostsService {
             params.put("postCategorySlug", filterDto.getPostCategorySlug());
             params.put("minDate", filterDto.getMinDate());
             params.put("maxDate", filterDto.getMaxDate());
-        } else if (dto instanceof SelectPostDto selectDto) {
+        } else if (dto instanceof SelectPostRequest selectDto) {
             params.put("status", selectDto.getStatus());
             params.put("excludeSlug", selectDto.getExcludeSlug());
             params.put("order", selectDto.getOrder());

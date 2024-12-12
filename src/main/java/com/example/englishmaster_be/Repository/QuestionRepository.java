@@ -1,6 +1,8 @@
 package com.example.englishmaster_be.Repository;
 
-import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.entity.PartEntity;
+import com.example.englishmaster_be.entity.QuestionEntity;
+import com.example.englishmaster_be.entity.TopicEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,21 +11,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface QuestionRepository extends JpaRepository<Question, UUID> {
+public interface QuestionRepository extends JpaRepository<QuestionEntity, UUID> {
 
-    Optional<Question> findByQuestionId(UUID questionId);
+    Optional<QuestionEntity> findByQuestionId(UUID questionId);
 
-    List<Question> findAllByQuestionGroup(Question question);
+    List<QuestionEntity> findAllByQuestionGroupParent(QuestionEntity question);
 
-    Page<Question> findAllByQuestionGroupAndPart(Question question, Part part, Pageable pageable);
+    Page<QuestionEntity> findAllByQuestionGroupParentAndPart(QuestionEntity question, PartEntity part, Pageable pageable);
 
-    List<Question> findByTopicsAndPart(Topic topic, Part part);
+    List<QuestionEntity> findByTopicsAndPart(TopicEntity topic, PartEntity part);
 
-    Page<Question> findAll(Pageable pageable);
+    Page<QuestionEntity> findAll(Pageable pageable);
 
-    int countByQuestionGroup(Question question);
+    int countByQuestionGroupParent(QuestionEntity question);
 
-    boolean existsByQuestionGroup(Question question);
+    boolean existsByQuestionGroupParent(QuestionEntity question);
 
 
 

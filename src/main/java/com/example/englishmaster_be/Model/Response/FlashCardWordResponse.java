@@ -1,13 +1,11 @@
 package com.example.englishmaster_be.Model.Response;
 
-import com.example.englishmaster_be.Model.FlashCardWord;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.Objects;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
@@ -36,42 +34,14 @@ public class FlashCardWordResponse {
 
     String define;
 
-    String createAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+    LocalDateTime createAt;
 
-    String updateAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+    LocalDateTime updateAt;
 
     UserBasicResponse userCreate;
 
     UserBasicResponse userUpdate;
-
-    public FlashCardWordResponse(FlashCardWord flashCardWord) {
-
-        if(Objects.isNull(flashCardWord)) return;
-
-        this.image = flashCardWord.getImage();
-        this.wordId = flashCardWord.getWordId();
-        this.flashCardId = flashCardWord.getFlashCard().getFlashCardId();
-        this.word = flashCardWord.getWord();
-        this.type = flashCardWord.getType();
-        this.spelling = flashCardWord.getSpelling();
-        this.example = flashCardWord.getExample();
-        this.note = flashCardWord.getNote();
-        this.define = flashCardWord.getDefine();
-
-        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
-        this.createAt = sdf.format(Timestamp.valueOf(flashCardWord.getCreateAt()));
-        this.updateAt = sdf.format(Timestamp.valueOf(flashCardWord.getUpdateAt()));
-
-        userCreate = UserBasicResponse.builder()
-                .userId(flashCardWord.getUserCreate().getUserId())
-                .name(flashCardWord.getUserCreate().getName())
-                .build();
-
-        userUpdate = UserBasicResponse.builder()
-                .userId(flashCardWord.getUserUpdate().getUserId())
-                .name(flashCardWord.getUserUpdate().getName())
-                .build();
-
-    }
 
 }

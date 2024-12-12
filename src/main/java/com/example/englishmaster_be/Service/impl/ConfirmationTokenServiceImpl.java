@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.ConfirmationToken.SaveConfirmationTokenDTO;
+import com.example.englishmaster_be.Model.Request.ConfirmationToken.ConfirmationTokenRequest;
 import com.example.englishmaster_be.Mapper.ConfirmationTokenMapper;
-import com.example.englishmaster_be.Model.ConfirmationToken;
+import com.example.englishmaster_be.entity.ConfirmationTokenEntity;
 import com.example.englishmaster_be.Model.Response.ConfirmationTokenResponse;
 import com.example.englishmaster_be.Repository.ConfirmationTokenRepository;
 import com.example.englishmaster_be.Service.IConfirmationTokenService;
@@ -27,12 +27,12 @@ public class ConfirmationTokenServiceImpl implements IConfirmationTokenService {
 
     @Transactional
     @Override
-    public ConfirmationTokenResponse createConfirmationToken(SaveConfirmationTokenDTO createConfirmationTokenDTO) {
+    public ConfirmationTokenResponse createConfirmationToken(ConfirmationTokenRequest confirmationTokenRequest) {
 
-        ConfirmationToken confirmationToken = ConfirmationTokenMapper.INSTANCE.toConfirmationToken(createConfirmationTokenDTO);
+        ConfirmationTokenEntity confirmationToken = ConfirmationTokenMapper.INSTANCE.toConfirmationTokenEntity(confirmationTokenRequest);
 
         confirmationToken.setType("ACTIVE");
-        confirmationToken.setUser(createConfirmationTokenDTO.getUser());
+        confirmationToken.setUser(confirmationTokenRequest.getUser());
         confirmationToken.setCode(UUID.randomUUID().toString());
         confirmationToken.setCreateAt(LocalDateTime.now());
         confirmationToken = confirmationTokenRepository.save(confirmationToken);

@@ -23,6 +23,6 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes("/api");
-        registry.enableSimpleBroker("/notification", "/Comment", "/Topic");
+        registry.enableSimpleBroker("/notification", "/CommentEntity", "/TopicEntity");
     }
 }

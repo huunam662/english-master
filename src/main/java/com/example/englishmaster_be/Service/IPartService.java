@@ -1,32 +1,31 @@
 package com.example.englishmaster_be.Service;
 
-import com.example.englishmaster_be.DTO.Part.SavePartDTO;
-import com.example.englishmaster_be.DTO.UploadMultiFileDTO;
-import com.example.englishmaster_be.DTO.UploadTextDTO;
-import com.example.englishmaster_be.Model.Part;
-import com.example.englishmaster_be.Model.Response.PackResponse;
-import com.example.englishmaster_be.Model.Response.PartResponse;
-import org.springframework.web.multipart.MultipartFile;
+import com.example.englishmaster_be.Model.Request.Part.PartRequest;
+import com.example.englishmaster_be.Model.Request.UploadMultiFileRequest;
+import com.example.englishmaster_be.Model.Request.UploadTextRequest;
+import com.example.englishmaster_be.entity.PartEntity;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface IPartService {
 
-    PartResponse savePart(SavePartDTO savePartDTO);
+    PartEntity savePart(PartRequest partRequest);
 
-    List<PartResponse> getListPart();
+    PartEntity getPartToId(UUID partId);
 
-    Part getPartToId(UUID partId);
+    PartEntity getPartToName(String partName);
 
-    Part getPartToName(String partName);
+    PartEntity uploadFilePart(UUID partId, UploadMultiFileRequest uploadMultiFileRequest);
 
-    boolean notExistedPart(Part part);
+    PartEntity uploadTextPart(UUID partId, UploadTextRequest uploadTextRequest);
+
+    List<PartEntity> getListPart();
+
+    boolean isExistedPartNameWithDiff(PartEntity part, String partName);
+
+    boolean isExistedPartName(String partName);
 
     void deletePart(UUID partId);
-
-    PartResponse uploadFilePart(UUID partId, UploadMultiFileDTO uploadMultiFileDTO);
-
-    PartResponse uploadTextPart(UUID partId, UploadTextDTO uploadTextDTO);
 
 }

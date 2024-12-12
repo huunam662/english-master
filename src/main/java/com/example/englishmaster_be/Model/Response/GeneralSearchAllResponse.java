@@ -13,9 +13,9 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class GeneralSearchAllResponse {
 
-    List<TopicResponse> topics;
+    List<TopicResponse> topicList;
 
-    List<FlashCardWordResponse> flashCardWords;
+    List<FlashCardWordResponse> flashCardWordList;
 
     List<NewsResponse> newsList;
 

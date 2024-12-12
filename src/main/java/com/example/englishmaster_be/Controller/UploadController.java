@@ -1,27 +1,22 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.DTO.DeleteRequestDTO;
-import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
-import com.example.englishmaster_be.Model.Response.DeleteResponse;
-import com.example.englishmaster_be.Model.Response.ResponseModel;
+import com.example.englishmaster_be.Model.Request.DeleteRequestDTO;
 import com.example.englishmaster_be.Service.IUploadService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
 import java.util.UUID;
 
 @Tag(name = "Upload")
 @RestController
-@RequestMapping("/api/v1/upload")
+@RequestMapping("/v1/upload")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UploadController {
