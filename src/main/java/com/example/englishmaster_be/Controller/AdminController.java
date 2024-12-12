@@ -2,9 +2,10 @@ package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Common.dto.response.FilterResponse;
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.DTO.User.UserFilterRequest;
-import com.example.englishmaster_be.Model.Response.*;
+import com.example.englishmaster_be.Model.Request.User.UserFilterRequest;
+import com.example.englishmaster_be.Model.Response.CountMockTestTopicResponse;
 import com.example.englishmaster_be.Service.*;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
@@ -16,8 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Admin")
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/admin")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AdminController {
@@ -28,7 +30,7 @@ public class AdminController {
 
     @GetMapping(value = "/getAllUser")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("List User successfully")
+    @MessageResponse("List UserEntity successfully")
     public FilterResponse<?> getAllUser(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) int page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) int size,
@@ -58,7 +60,7 @@ public class AdminController {
 
     @DeleteMapping(value = "/{userId:.+}/deleteUser")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Delete account of User successfully")
+    @MessageResponse("Delete account of UserEntity successfully")
     public void deleteUser(@PathVariable UUID userId) {
 
         userService.deleteUser(userId);
@@ -66,7 +68,7 @@ public class AdminController {
 
     @GetMapping(value = "/countMockTestOfTopic")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("List Topic and count mock test successfully")
+    @MessageResponse("List TopicEntity and count mock test successfully")
     public List<CountMockTestTopicResponse> countMockTestOfTopic(
             @RequestParam(value = "date", required = false) String date,
             @RequestParam(value = "pack") UUID packId

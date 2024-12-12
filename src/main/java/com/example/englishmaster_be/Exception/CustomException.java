@@ -1,20 +1,18 @@
 package com.example.englishmaster_be.Exception;
 
+import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.Setter;
+import lombok.experimental.FieldDefaults;
 
-@Setter
 @Getter
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CustomException extends RuntimeException {
 
-    private final Error error;
+    Error error;
 
     public CustomException(Error error) {
         super(error.getMessage());
         this.error = error;
     }
-
-
-
 
 }

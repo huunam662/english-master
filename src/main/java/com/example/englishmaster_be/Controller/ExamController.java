@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Model.Response.UserAccessResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,12 +10,12 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "Exam")
 @RestController
-@RequestMapping("/api/test")
+@RequestMapping("/exam")
 public class ExamController {
 
     @GetMapping("/user")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("User access")
+    @MessageResponse("UserEntity access")
     public UserAccessResponse userAccess() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -24,7 +23,7 @@ public class ExamController {
         String username = authentication.getName();
 
         return UserAccessResponse.builder()
-                .content("User Content. " + username)
+                .content("UserEntity ContentEntity. " + username)
                 .build();
     }
 }

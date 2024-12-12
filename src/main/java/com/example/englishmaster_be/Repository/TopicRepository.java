@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.Repository;
 
-import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.entity.PackEntity;
+import com.example.englishmaster_be.entity.TopicEntity;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,19 +11,19 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public interface TopicRepository extends JpaRepository<Topic, UUID>, QuerydslPredicateExecutor<Topic> {
-    Page<Topic> findAll(Pageable pageable);
+public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, QuerydslPredicateExecutor<TopicEntity> {
+    Page<TopicEntity> findAll(Pageable pageable);
 
-    List<Topic> findAllByPack(Pack pack);
-    @Query("SELECT t FROM Topic t WHERE LOWER(t.topicName) LIKE LOWER(CONCAT('%', :query, '%'))")
-    List<Topic> findTopicsByQuery(@Param("query") String query, Pageable pageable);
+    List<TopicEntity> findAllByPack(PackEntity pack);
+    @Query("SELECT t FROM TopicEntity t WHERE LOWER(t.topicName) LIKE LOWER(CONCAT('%', :query, '%'))")
+    List<TopicEntity> findTopicsByQuery(@Param("query") String query, Pageable pageable);
 
-    @Query("SELECT t FROM Topic t WHERE t.startTime = :startTime")
-    List<Topic> findByStartTime(@Param("startTime") LocalDateTime startTime);
+    @Query("SELECT t FROM TopicEntity t WHERE t.startTime = :startTime")
+    List<TopicEntity> findByStartTime(@Param("startTime") LocalDateTime startTime);
 
-    Optional<Topic> findByTopicId(UUID topicId);
+    Optional<TopicEntity> findByTopicId(UUID topicId);
 
-    @Query("SELECT t.topicImage FROM Topic t order by t.topicId")
+    @Query("SELECT t.topicImage FROM TopicEntity t order by t.topicId")
     List<String> findAllTopicImages();
 }
 

@@ -1,10 +1,13 @@
 package com.example.englishmaster_be.Model.Response;
 
-import com.example.englishmaster_be.DTO.Type.QuestionType;
-import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.Common.enums.QuestionTypeEnum;
+import com.example.englishmaster_be.entity.QuestionEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
+
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -12,88 +15,20 @@ import java.util.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class QuestionResponse {
+public class QuestionResponse extends QuestionBasicResponse{
 
-    UUID questionId;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    QuestionBasicResponse questionGroupParent;
 
-    UUID partId;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    List<QuestionBasicResponse> questionGroupChildren;
 
-    UUID answerCorrect;
-
-    String questionContent;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
-    LocalDateTime createAt;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
-    LocalDateTime updateAt;
-
-    List<QuestionResponse> questionGroup;
-
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     List<AnswerResponse> listAnswer;
 
-    int questionScore;
-
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     List<ContentResponse> contentList;
-
-    QuestionType questionType;
-
-
-    public QuestionResponse(Question question) {
-
-        this.questionId = question.getQuestionId();
-        this.questionContent = question.getQuestionContent();
-        this.questionScore = question.getQuestionScore();
-        this.partId = question.getPart().getPartId();
-        this.createAt = question.getCreateAt();
-        this.updateAt = question.getUpdateAt();
-        this.questionType= question.getQuestionType();
-
-        if (Objects.nonNull(question.getAnswers())) {
-            this.listAnswer = question.getAnswers().stream().map(
-                    AnswerResponse::new
-            ).toList();
-        }
-
-        if (Objects.nonNull(question.getContentCollection())) {
-
-            this.contentList = question.getContentCollection().stream().map(
-                    ContentResponse::new
-            ).toList();
-
-        }
-
-    }
-
-    public QuestionResponse(Question question, Answer answerCorrect) {
-
-        if(Objects.nonNull(answerCorrect))
-            this.answerCorrect = answerCorrect.getAnswerId();
-
-        this.questionId = question.getQuestionId();
-        this.questionContent = question.getQuestionContent();
-        this.questionScore = question.getQuestionScore();
-        this.partId = question.getPart().getPartId();
-        this.createAt = question.getCreateAt();
-        this.updateAt = question.getUpdateAt();
-        this.questionType = question.getQuestionType();
-
-        // Xử lý danh sách câu trả lời
-        if (Objects.nonNull(question.getAnswers())) {
-            this.listAnswer = question.getAnswers()
-                    .stream()
-                    .map(AnswerResponse::new)  // Chuyển đổi sang AnswerResponse
-                    .sorted(Comparator.comparing(AnswerResponse::getAnswerId))  // Sắp xếp theo AnswerId
-                    .toList();
-        }
-
-        if (Objects.nonNull(question.getContentCollection())) {
-            this.contentList = question.getContentCollection().stream().map(
-                    ContentResponse::new
-            ).toList();
-        }
-    }
 
 }

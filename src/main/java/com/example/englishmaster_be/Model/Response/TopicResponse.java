@@ -1,14 +1,11 @@
 package com.example.englishmaster_be.Model.Response;
 
-import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.entity.PartEntity;
+import com.example.englishmaster_be.entity.TopicEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.json.simple.JSONObject;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,57 +54,10 @@ public class TopicResponse {
 
     UserBasicResponse userUpdate;
 
-    List<UUID> listPart;
+    List<UUID> parts;
 
     Integer numberQuestion;
 
-    Boolean isEnable;
-
-
-    public TopicResponse(Topic topic) {
-
-        if(Objects.isNull(topic)) return;
-
-        if(Objects.nonNull(topic.getPack())) {
-            this.packId = topic.getPack().getPackId();
-            this.packName = topic.getPack().getPackName();
-        }
-
-        this.topicId = topic.getTopicId();
-        this.topicName = topic.getTopicName();
-        this.topicImage = topic.getTopicImage();
-        this.topicDescription = topic.getTopicDescription();
-        this.topicType = topic.getTopicType();
-        this.numberQuestion = topic.getNumberQuestion();
-        this.workTime = topic.getWorkTime();
-        this.isEnable = topic.getEnable();
-
-        this.listPart = Objects.nonNull(topic.getParts())
-                ? topic.getParts().stream().map(Part::getPartId).toList()
-                : new ArrayList<>();
-
-        if(Objects.nonNull(topic.getStartTime()))
-            this.startTime = topic.getStartTime();
-        if(Objects.nonNull(topic.getEndTime()))
-            this.endTime = topic.getEndTime();
-        if(Objects.nonNull(topic.getCreateAt()))
-            this.createAt = topic.getCreateAt();
-        if(Objects.nonNull(topic.getUpdateAt()))
-            this.updateAt = topic.getUpdateAt();
-        if(Objects.nonNull(topic.getStatus()))
-            this.statusId = topic.getStatus().getStatusId();
-
-        if(Objects.nonNull(topic.getUserCreate()))
-            userCreate = UserBasicResponse.builder()
-                    .userId(topic.getUserCreate().getUserId())
-                    .name(topic.getUserCreate().getName())
-                    .build();
-
-        if (Objects.nonNull(topic.getUserUpdate()))
-            userUpdate = UserBasicResponse.builder()
-                    .userId(topic.getUserUpdate().getUserId())
-                    .name(topic.getUserUpdate().getName())
-                    .build();
-    }
+    Boolean enable;
 
 }

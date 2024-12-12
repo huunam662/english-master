@@ -1,12 +1,20 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.DTO.Answer.AnswerBlankRequest;
-import com.example.englishmaster_be.DTO.Answer.AnswerMatchingRequest;
-import com.example.englishmaster_be.DTO.Answer.UserAnswerRequest;
-import com.example.englishmaster_be.Model.Response.ResponseModel;
-import com.example.englishmaster_be.Model.UserAnswer;
-import com.example.englishmaster_be.Model.UserBlankAnswer;
+import com.example.englishmaster_be.Mapper.AnswerMatchingMapper;
+import com.example.englishmaster_be.Mapper.UserAnswerMapper;
+import com.example.englishmaster_be.Mapper.UserBlankAnswerMapper;
+import com.example.englishmaster_be.Model.Request.Answer.AnswerBlankRequest;
+import com.example.englishmaster_be.Model.Request.Answer.AnswerMatchingQuestionRequest;
+import com.example.englishmaster_be.Model.Request.Answer.UserAnswerRequest;
+import com.example.englishmaster_be.Common.dto.response.ResponseModel;
+import com.example.englishmaster_be.Model.Response.AnswerMatchingBasicResponse;
+import com.example.englishmaster_be.Model.Response.ScoreAnswerResponse;
+import com.example.englishmaster_be.Model.Response.UserAnswerResponse;
+import com.example.englishmaster_be.Model.Response.UserBlankAnswerResponse;
+import com.example.englishmaster_be.entity.UserAnswerEntity;
+import com.example.englishmaster_be.entity.UserAnswerMatchingEntity;
+import com.example.englishmaster_be.entity.UserBlankAnswerEntity;
 import com.example.englishmaster_be.Service.impl.UserAnswerService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -19,9 +27,9 @@ import java.util.Map;
 import java.util.UUID;
 
 
-@Tag(name = "User Answer")
+@Tag(name = "UserEntity AnswerEntity")
 @RestController
-@RequestMapping("/api/user-answer")
+@RequestMapping("/user-answer")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserAnswerController {
@@ -31,7 +39,7 @@ public class UserAnswerController {
 
 
     @GetMapping("/check-blank")
-    @MessageResponse("Answer Checking")
+    @MessageResponse("AnswerEntity Checking")
     public void checkAnswer(
             @RequestParam(value = "user_id") UUID userId,
             @RequestParam(value = "question_id") UUID questionId
@@ -41,8 +49,8 @@ public class UserAnswerController {
     }
 
     @GetMapping("/check-multiple-choice")
-    @MessageResponse("Answer Checking")
-    public void checkAnswer1(
+    @MessageResponse("AnswerEntity Checking")
+    public void checkAnswerMultipleChoice(
             @RequestParam(value = "user_id") UUID userId,
             @RequestParam(value = "question_id") UUID questionId
     ){
@@ -52,7 +60,7 @@ public class UserAnswerController {
 
     @GetMapping("/check-correct")
     @MessageResponse("Check answer successfully")
-    public Map<String, Object> checkCorrectAnswer(
+    public ScoreAnswerResponse checkCorrectAnswer(
             @RequestParam(value = "user_id") UUID userId,
             @RequestParam(value = "question_id") UUID questionId
     ) {
@@ -62,39 +70,30 @@ public class UserAnswerController {
 
 
     @PostMapping("/create-user-answer")
-    public ResponseEntity<ResponseModel> createUserAnswer(@RequestBody UserAnswerRequest request) {
-        UserAnswer answer = userAnswerService.createUserAnswer(request);
-        ResponseModel responseModel = ResponseModel.builder()
-                .message("Create user answer successfully")
-                .status(HttpStatus.OK)
-                .responseData(answer)
-                .build();
+    @MessageResponse("Create user answer successfully")
+    public UserAnswerResponse createUserAnswer(@RequestBody UserAnswerRequest userAnswerRequest) {
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseModel);
+        UserAnswerEntity answer = userAnswerService.saveUserAnswer(userAnswerRequest);
+
+        return UserAnswerMapper.INSTANCE.toUserAnswerResponse(answer);
     }
 
     @PostMapping("/create-user-answer-blank")
-    public ResponseEntity<ResponseModel> createUserAnswerBlank(@RequestBody AnswerBlankRequest request) {
-        UserBlankAnswer answer = userAnswerService.createUserBlankAnswer(request);
-        ResponseModel responseModel = ResponseModel.builder()
-                .message("Create user answer successfully")
-                .status(HttpStatus.OK)
-                .responseData(answer)
-                .build();
+    @MessageResponse("Create user answer successfully")
+    public UserBlankAnswerResponse createUserAnswerBlank(@RequestBody AnswerBlankRequest request) {
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseModel);
+        UserBlankAnswerEntity answer = userAnswerService.createUserBlankAnswer(request);
+
+        return UserBlankAnswerMapper.INSTANCE.toUserBlankAnswerResponse(answer);
     }
 
     @PostMapping("/create-user-answer-matching")
-    public ResponseEntity<ResponseModel> createUserAnswerMatching(@RequestBody AnswerMatchingRequest request) {
-        Map<String, String> map= userAnswerService.createUserMatchingAnswer(request);
-        ResponseModel responseModel = ResponseModel.builder()
-                .message("Create user answer successfully")
-                .responseData(map)
-                .status(HttpStatus.OK)
-                .build();
+    @MessageResponse("Create user answer successfully")
+    public AnswerMatchingBasicResponse createUserAnswerMatching(@RequestBody AnswerMatchingQuestionRequest request) {
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseModel);
+        UserAnswerMatchingEntity userAnswerMatchingEntity = userAnswerService.createUserMatchingAnswer(request);
+
+        return AnswerMatchingMapper.INSTANCE.toAnswerMatchingBasicResponse(userAnswerMatchingEntity);
     }
 
 

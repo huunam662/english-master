@@ -2,33 +2,33 @@ package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Common.dto.response.FilterResponse;
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.DTO.Post.PostFilterRequest;
-import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
-import com.example.englishmaster_be.Model.Response.ResponseModel;
-import com.example.englishmaster_be.DTO.Post.SavePostDTO;
-import com.example.englishmaster_be.Model.*;
-import com.example.englishmaster_be.Model.Response.*;
+import com.example.englishmaster_be.Mapper.CommentMapper;
+import com.example.englishmaster_be.Mapper.PostMapper;
+import com.example.englishmaster_be.Model.Request.Post.PostFilterRequest;
+import com.example.englishmaster_be.Model.Request.Post.PostRequest;
+import com.example.englishmaster_be.Model.Response.CommentResponse;
+import com.example.englishmaster_be.Model.Response.PostResponse;
 import com.example.englishmaster_be.Service.*;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.example.englishmaster_be.entity.CommentEntity;
+import com.example.englishmaster_be.entity.PostEntity;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Post")
 @RestController
-@RequestMapping("/api/post")
+@RequestMapping("/post")
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PostController {
 
 
@@ -37,7 +37,7 @@ public class PostController {
 
 
     @GetMapping(value = "/listPost")
-    @MessageResponse("List Post successfully")
+    @MessageResponse("List PostEntity successfully")
     public FilterResponse<?> listPost(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) int page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) int size,
@@ -57,30 +57,38 @@ public class PostController {
 
     @PostMapping(value = "/createPost")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Create Post successfully")
-    public PostResponse createPost(@RequestBody SavePostDTO savePostDTO){
+    @MessageResponse("Create PostEntity successfully")
+    public PostResponse createPost(@RequestBody PostRequest postRequest){
 
-        return postService.savePost(null, savePostDTO);
+        PostEntity post = postService.savePost(postRequest);
+
+        return PostMapper.INSTANCE.toPostResponse(post);
     }
 
     @PatchMapping(value = "/{postId:.+}/updatePost")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Update Post successfully")
-    public PostResponse updatePost(@PathVariable UUID postId, @RequestBody SavePostDTO updatePostDTO){
+    @MessageResponse("Update PostEntity successfully")
+    public PostResponse updatePost(@PathVariable UUID postId, @RequestBody PostRequest postRequest){
 
-        return postService.savePost(postId, updatePostDTO);
+        postRequest.setPostId(postId);
+
+        PostEntity post = postService.savePost(postRequest);
+
+        return PostMapper.INSTANCE.toPostResponse(post);
     }
 
     @GetMapping(value = "/{postId:.+}/getAllCommentToPost")
-    @MessageResponse("Show list Comment successfully")
+    @MessageResponse("Show list CommentEntity successfully")
     public List<CommentResponse> getListCommentToPostId(@PathVariable UUID postId){
 
-        return postService.getListCommentToPostId(postId);
+        List<CommentEntity> commentEntityList = postService.getListCommentToPostId(postId);
+
+        return CommentMapper.INSTANCE.toCommentResponseList(commentEntityList);
     }
 
     @DeleteMapping(value = "/{postId:.+}/deletePost")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Delete Post successfully")
+    @MessageResponse("Delete PostEntity successfully")
     public void deletePost(@PathVariable UUID postId){
 
         postService.deletePost(postId);

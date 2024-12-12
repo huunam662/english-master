@@ -1,8 +1,7 @@
 package com.example.englishmaster_be.Service;
 
-import com.example.englishmaster_be.DTO.FlashCard.SaveFlashCardWordDTO;
-import com.example.englishmaster_be.Model.*;
-import com.example.englishmaster_be.Model.Response.FlashCardWordResponse;
+import com.example.englishmaster_be.Model.Request.FlashCard.FlashCardWordRequest;
+import com.example.englishmaster_be.entity.FlashCardWordEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -13,9 +12,9 @@ public interface IFlashCardWordService {
 
     List<String> searchByFlashCardWord(String keyWord);
 
-    FlashCardWord getWordToID(UUID wordId);
+    FlashCardWordEntity getFlashCardWordById(UUID flashCardWordId);
 
-    FlashCardWordResponse saveWordToFlashCard(SaveFlashCardWordDTO createFlashCardWordDTO);
+    FlashCardWordEntity saveFlashCardWord(FlashCardWordRequest flashCardWordRequest);
 
 }
 

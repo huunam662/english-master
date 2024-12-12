@@ -1,26 +1,27 @@
 package com.example.englishmaster_be.Service;
 
 
-import com.example.englishmaster_be.DTO.Answer.SaveAnswerDTO;
-import com.example.englishmaster_be.Model.*;
-import com.example.englishmaster_be.Model.Response.AnswerResponse;
+import com.example.englishmaster_be.Model.Request.Answer.AnswerRequest;
+import com.example.englishmaster_be.entity.AnswerEntity;
+import com.example.englishmaster_be.entity.MockTestEntity;
+import com.example.englishmaster_be.entity.QuestionEntity;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface IAnswerService {
 
-    Answer saveAnswer(SaveAnswerDTO answer);
+    AnswerEntity saveAnswer(AnswerRequest answerRequest);
 
-    boolean existQuestion(Answer answer, Question question);
+    boolean existQuestion(AnswerEntity answer, QuestionEntity question);
 
-    Answer findAnswerToId(UUID answerID);
+    AnswerEntity getAnswerById(UUID answerID);
 
     void deleteAnswer(UUID answerId);
 
-    Answer correctAnswer(Question question);
+    AnswerEntity correctAnswer(QuestionEntity question);
 
-    Answer choiceAnswer(Question question, MockTest mockTest);
+    AnswerEntity choiceAnswer(QuestionEntity question, MockTestEntity mockTest);
 
-    List<AnswerResponse> getListAnswerByQuestionId(UUID questionId);
+    List<AnswerEntity> getListAnswerByQuestionId(UUID questionId);
 }

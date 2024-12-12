@@ -13,7 +13,7 @@ import lombok.experimental.SuperBuilder;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FilterRequest {
 
-    int page;
+    Integer page;
 
     String search;
 

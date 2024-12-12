@@ -1,11 +1,13 @@
 package com.example.englishmaster_be.Model.Response;
 
-import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.entity.PackEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -22,22 +24,10 @@ public class PackResponse {
 
     String packName;
 
-    String createAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+    LocalDateTime createAt;
 
-    String updateAt;
-
-    public PackResponse(Pack pack) {
-
-        if(Objects.isNull(pack)) return;
-
-        this.packId = pack.getPackId();
-        this.packName = pack.getPackName();
-
-        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
-        if(Objects.nonNull(pack.getCreateAt()))
-            this.createAt = sdf.format(Timestamp.valueOf(pack.getCreateAt()));
-        if(Objects.nonNull(pack.getUpdateAt()))
-            this.updateAt = sdf.format(Timestamp.valueOf(pack.getUpdateAt()));
-    }
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+    LocalDateTime updateAt;
 
 }

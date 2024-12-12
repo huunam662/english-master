@@ -1,10 +1,12 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.DTO.Answer.*;
-import com.example.englishmaster_be.Model.Response.*;
-import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.Model.Request.Answer.AnswerRequest;
+import com.example.englishmaster_be.Mapper.AnswerMapper;
+import com.example.englishmaster_be.Model.Response.AnswerResponse;
+import com.example.englishmaster_be.Model.Response.CheckCorrectAnswerResponse;
 import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.entity.AnswerEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +18,7 @@ import java.util.UUID;
 
 @Tag(name = "Answer")
 @RestController
-@RequestMapping("/api/answer")
+@RequestMapping("/answer")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AnswerController {
@@ -27,28 +29,28 @@ public class AnswerController {
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
     @MessageResponse("Save answer successfully")
-    public AnswerResponse createAnswer(@RequestBody SaveAnswerDTO createAnswerDTO) {
+    public AnswerResponse createAnswer(@RequestBody AnswerRequest answerRequest) {
 
-        Answer answer = answerService.saveAnswer(createAnswerDTO);
+        AnswerEntity answer = answerService.saveAnswer(answerRequest);
 
-        return new AnswerResponse(answer);
+        return AnswerMapper.INSTANCE.toAnswerResponse(answer);
     }
 
     @PutMapping(value = "/{answerId:.+}/update")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @MessageResponse("Save answer successfully")
-    public AnswerResponse updateAnswer(@PathVariable UUID answerId, @RequestBody UpdateAnswerDTO updateAnswerDTO) {
+    public AnswerResponse updateAnswer(@PathVariable UUID answerId, @RequestBody AnswerRequest answerRequest) {
 
-        updateAnswerDTO.setAnswerId(answerId);
+        answerRequest.setAnswerId(answerId);
 
-        Answer answer = answerService.saveAnswer(updateAnswerDTO);
+        AnswerEntity answer = answerService.saveAnswer(answerRequest);
 
-        return new AnswerResponse(answer);
+        return AnswerMapper.INSTANCE.toAnswerResponse(answer);
     }
 
     @DeleteMapping(value = "/{answerId:.+}/delete")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Delete Answer successfully")
+    @MessageResponse("Delete AnswerEntity successfully")
     public void deleteAnswer(@PathVariable UUID answerId) {
 
         answerService.deleteAnswer(answerId);
@@ -56,25 +58,22 @@ public class AnswerController {
 
     @GetMapping(value = "/{answerId:.+}/getDetailAnswer")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Detail Answer successfully")
+    @MessageResponse("Detail AnswerEntity successfully")
     public AnswerResponse getDetailAnswer(@PathVariable UUID answerId) {
 
-        Answer answer = answerService.findAnswerToId(answerId);
+        AnswerEntity answer = answerService.getAnswerById(answerId);
 
-        return new AnswerResponse(answer);
+        return AnswerMapper.INSTANCE.toAnswerResponse(answer);
     }
 
     @GetMapping(value = "/{answerId:.+}/checkCorrect")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Check Answer successfully")
+    @MessageResponse("Check AnswerEntity successfully")
     public CheckCorrectAnswerResponse checkCorrectAnswer(@PathVariable UUID answerId) {
 
-        Answer answer = answerService.findAnswerToId(answerId);
+        AnswerEntity answer = answerService.getAnswerById(answerId);
 
-        return CheckCorrectAnswerResponse.builder()
-                .correctAnswer(answer.isCorrectAnswer())
-                .scoreAnswer(answer.getQuestion().getQuestionScore())
-                .build();
+        return AnswerMapper.INSTANCE.toCheckCorrectAnswerResponse(answer);
     }
 
 }

@@ -1,16 +1,15 @@
 package com.example.englishmaster_be.Repository;
 
-import com.example.englishmaster_be.Model.ResultMockTest;
+import com.example.englishmaster_be.entity.ResultMockTestEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.UUID;
 
 
-public interface ResultMockTestRepository extends JpaRepository<ResultMockTest, UUID>, QuerydslPredicateExecutor<ResultMockTest> {
+public interface ResultMockTestRepository extends JpaRepository<ResultMockTestEntity, UUID>, QuerydslPredicateExecutor<ResultMockTestEntity> {
 
-    List<ResultMockTest> findByMockTest_MockTestId(UUID mockTestId);
+    List<ResultMockTestEntity> findByMockTest_MockTestId(UUID mockTestId);
 
 }

@@ -45,7 +45,7 @@ public class DictionaryServiceImpl implements IDictionaryService {
 
     @SneakyThrows
     @Override
-    public Object searchWords(String word) {
+    public JsonNode searchWords(String word) {
 
         String encodedWord = URLEncoder.encode(word, StandardCharsets.UTF_8)
                 .replace("+", "%20");
@@ -78,7 +78,7 @@ public class DictionaryServiceImpl implements IDictionaryService {
 
     @SneakyThrows
     @Override
-    public Object getImage(String word) {
+    public JsonNode getImage(String word) {
 
         String apiUrl = "https://api.unsplash.com/search/photos?query=" + word;
 

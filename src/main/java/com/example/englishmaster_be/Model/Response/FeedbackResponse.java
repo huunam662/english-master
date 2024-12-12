@@ -1,11 +1,10 @@
 package com.example.englishmaster_be.Model.Response;
 
-import com.example.englishmaster_be.Model.Feedback;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
-import java.util.Objects;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 
@@ -27,31 +26,12 @@ public class FeedbackResponse {
 
     String content;
 
-    String createAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+    LocalDateTime createAt;
 
-    String updateAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+    LocalDateTime updateAt;
 
-    boolean isEnable;
-
-    public FeedbackResponse(Feedback Feedback) {
-
-        if(Objects.isNull(Feedback)) return;
-
-        this.FeedbackId = Feedback.getId();
-        this.name = Feedback.getName();
-        this.content = Feedback.getContent();
-        this.description = Feedback.getDescription();
-        this.avatar = Feedback.getAvatar();
-        this.isEnable = Feedback.isEnable();
-
-        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
-
-        if(Objects.nonNull(Feedback.getCreateAt()))
-            this.createAt = sdf.format(Timestamp.valueOf(Feedback.getCreateAt()));
-        if(Objects.nonNull(Feedback.getUpdateAt()))
-            this.updateAt = sdf.format(Timestamp.valueOf(Feedback.getUpdateAt()));
-
-    }
-
+    Boolean enable;
 
 }

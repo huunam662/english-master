@@ -1,45 +1,48 @@
 package com.example.englishmaster_be.Service;
 
 import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.DTO.MockTest.MockTestFilterRequest;
-import com.example.englishmaster_be.DTO.MockTest.SaveMockTestDTO;
-import com.example.englishmaster_be.Model.Response.*;
-import com.example.englishmaster_be.Model.*;
-import org.springframework.http.ResponseEntity;
+import com.example.englishmaster_be.Model.Request.MockTest.MockTestFilterRequest;
+import com.example.englishmaster_be.Model.Request.MockTest.MockTestRequest;
+import com.example.englishmaster_be.Model.Response.DetailMockTestResponse;
+import com.example.englishmaster_be.Model.Response.MockTestResponse;
+import com.example.englishmaster_be.Model.Response.PartMockTestResponse;
+import com.example.englishmaster_be.Model.Response.QuestionMockTestResponse;
+import com.example.englishmaster_be.entity.DetailMockTestEntity;
+import com.example.englishmaster_be.entity.MockTestEntity;
+import com.example.englishmaster_be.entity.TopicEntity;
+import com.example.englishmaster_be.entity.UserEntity;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface IMockTestService {
 
-    MockTestResponse saveMockTest(SaveMockTestDTO saveMockTestDTO);
+    MockTestEntity saveMockTest(MockTestRequest mockTestRequest);
 
-    List<MockTest> getTop10MockTest(int index);
+    List<MockTestEntity> getTop10MockTest(int index);
 
-    List<MockTest> getTop10MockTestToUser(int index, User user);
+    List<MockTestEntity> getTop10MockTestToUser(int index, UserEntity user);
 
-    MockTest findMockTestToId(UUID mockTestId);
+    MockTestEntity findMockTestToId(UUID mockTestId);
 
-    MockTest findMockTestById(UUID mockTestId);
+    MockTestEntity findMockTestById(UUID mockTestId);
 
-    List<DetailMockTest> getTop10DetailToCorrect(int index, boolean isCorrect ,MockTest mockTest);
+    List<DetailMockTestEntity> getTop10DetailToCorrect(int index, boolean isCorrect , MockTestEntity mockTest);
 
     int countCorrectAnswer(UUID mockTestId);
 
-    List<MockTest> getAllMockTestByYearMonthAndDay(Topic topic, String year, String month, String day);
+    List<MockTestEntity> getAllMockTestByYearMonthAndDay(TopicEntity topic, String year, String month, String day);
 
-    List<MockTest> getAllMockTestToTopic(Topic topic);
+    List<MockTestEntity> getAllMockTestToTopic(TopicEntity topic);
 
     FilterResponse<?> getListMockTestOfAdmin(MockTestFilterRequest filterRequest);
 
-    List<MockTestResponse> getListMockTestToUser(int index, UUID userId);
+    List<MockTestEntity> getListMockTestToUser(int index, UUID userId);
 
-    List<DetailMockTestResponse> addAnswerToMockTest(UUID mockTestId, List<UUID> listAnswerId);
+    List<DetailMockTestEntity> addAnswerToMockTest(UUID mockTestId, List<UUID> listAnswerId);
 
-    List<DetailMockTestResponse> getListCorrectAnswer(int index, boolean isCorrect, UUID mockTestId);
+    List<DetailMockTestEntity> getListCorrectAnswer(int index, boolean isCorrect, UUID mockTestId);
 
     void sendEmailToMock(@PathVariable UUID mockTestId);
 

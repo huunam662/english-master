@@ -1,24 +1,21 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.Part.SavePartDTO;
-import com.example.englishmaster_be.DTO.Part.UpdatePartDTO;
-import com.example.englishmaster_be.DTO.UploadMultiFileDTO;
-import com.example.englishmaster_be.DTO.UploadTextDTO;
+import com.example.englishmaster_be.Model.Request.Part.PartRequest;
+import com.example.englishmaster_be.Model.Request.UploadMultiFileRequest;
+import com.example.englishmaster_be.Model.Request.UploadTextRequest;
 import com.example.englishmaster_be.Exception.CustomException;
 import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Exception.Response.BadRequestException;
 import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.Mapper.PartMapper;
-import com.example.englishmaster_be.Model.Part;
-import com.example.englishmaster_be.Model.Response.PartResponse;
-import com.example.englishmaster_be.Model.User;
+import com.example.englishmaster_be.entity.PartEntity;
+import com.example.englishmaster_be.entity.UserEntity;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.IFileStorageService;
 import com.example.englishmaster_be.Service.IPartService;
 import com.example.englishmaster_be.Service.IUserService;
 import com.google.cloud.storage.Blob;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +23,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -45,57 +41,60 @@ public class PartServiceImpl implements IPartService {
 
     @Transactional
     @Override
-    public PartResponse savePart(SavePartDTO savePartDTO) {
+    public PartEntity savePart(PartRequest partRequest) {
 
-        Part partEntity;
+        UserEntity user = userService.currentUser();
 
-        String messageBadRequestException = "Create Part fail: The Part name is already exist";
+        PartEntity partEntity;
 
-        if(savePartDTO instanceof UpdatePartDTO updatePartDTO){
+        String messageBadRequestException = "Create PartEntity fail: The PartEntity name is already exist";
 
-            partEntity = getPartToId(updatePartDTO.getPartId());
+        if(partRequest.getPartId() != null){
 
-            if(
-                    !partEntity.getPartName().equalsIgnoreCase(updatePartDTO.getPartName())
-                    && notExistedPart(partEntity)
-            ) throw new BadRequestException(messageBadRequestException);
+            partEntity = getPartToId(partRequest.getPartId());
+
+            if(isExistedPartNameWithDiff(partEntity, partRequest.getPartName()))
+                throw new BadRequestException(messageBadRequestException);
         }
         else{
 
-            partEntity = PartMapper.INSTANCE.savePartDtoToPartEntity(savePartDTO);
-
-            if(notExistedPart(partEntity))
+            if(isExistedPartName(partRequest.getPartName()))
                 throw new BadRequestException(messageBadRequestException);
 
-            partEntity.setCreateAt(LocalDateTime.now());
+            partEntity = PartEntity.builder()
+                    .createAt(LocalDateTime.now())
+                    .userCreate(user)
+                    .build();
         }
 
-        User user = userService.currentUser();
+        if(partRequest.getFile() != null && !partRequest.getFile().isEmpty()){
 
-        partEntity = PartMapper.INSTANCE.savePartDtoToPartEntity(savePartDTO);
+            Blob blobResponse = fileStorageService.save(partRequest.getFile());
 
-        partEntity.setPartName(partEntity.getPartName().toUpperCase());
-        partEntity.setPartType(partEntity.getPartType().toUpperCase());
-        partEntity.setUserCreate(user);
-        partEntity.setUserUpdate(user);
+            String fileName = blobResponse.getName();
+            String contentType = blobResponse.getContentType();
+
+            partEntity.setContentData(fileName);
+            partEntity.setContentType(contentType);
+        }
+
+        PartMapper.INSTANCE.flowToPartEntity(partRequest, partEntity);
+
         partEntity.setUpdateAt(LocalDateTime.now());
+        partEntity.setUserUpdate(user);
 
-        partEntity = partRepository.save(partEntity);
-
-        return PartMapper.INSTANCE.partEntityToPartResponse(partEntity);
+        return partRepository.save(partEntity);
     }
 
 
     @Override
-    public List<PartResponse> getListPart() {
+    public List<PartEntity> getListPart() {
 
-        List<Part> partList = partRepository.findAll();
-
-        return PartMapper.INSTANCE.partEntityListToPartResponseList(partList);
+        return partRepository.findAll();
     }
 
     @Override
-    public Part getPartToId(UUID partId) {
+    public PartEntity getPartToId(UUID partId) {
         return partRepository.findByPartId(partId)
                 .orElseThrow(
                         () -> new CustomException(Error.PART_NOT_FOUND)
@@ -103,32 +102,33 @@ public class PartServiceImpl implements IPartService {
     }
 
     @Override
-    public Part getPartToName(String partName) {
+    public PartEntity getPartToName(String partName) {
 
-        List<Part> listPart = partRepository.findAll();
+        List<PartEntity> listPart = partRepository.findAll();
 
         return listPart.stream().filter(
                 part -> part.getPartName().substring(0, 6).equalsIgnoreCase(partName)
-        ).findFirst().orElse(null);
+        ).findFirst().orElseThrow(
+                () -> new CustomException(Error.PART_NOT_FOUND)
+        );
     }
 
     @Override
-    public boolean notExistedPart(Part part) {
+    public boolean isExistedPartNameWithDiff(PartEntity part, String partName) {
 
-        List<Part> partList = partRepository.findAll();
-
-        for (Part partCheck : partList)
-            if (partCheck.getPartName().equalsIgnoreCase(part.getPartName()))
-                return true;
-
-        return false;
+        return partRepository.isExistedPartNameWithDiff(part, partName);
     }
 
+    @Override
+    public boolean isExistedPartName(String partName) {
+
+        return partRepository.findByPartName(partName).isPresent();
+    }
 
     @Override
     public void deletePart(UUID partId) {
 
-        Part partEntity = getPartToId(partId);
+        PartEntity partEntity = getPartToId(partId);
 
         partRepository.delete(partEntity);
     }
@@ -136,13 +136,20 @@ public class PartServiceImpl implements IPartService {
 
     @Transactional
     @Override
-    public PartResponse uploadFilePart(UUID partId, UploadMultiFileDTO uploadMultiFileDTO) {
+    public PartEntity uploadFilePart(UUID partId, UploadMultiFileRequest uploadMultiFileRequest) {
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        Part partEntity = getPartToId(partId);
+        PartEntity partEntity = getPartToId(partId);
 
-        for(MultipartFile file : uploadMultiFileDTO.getContentData()){
+        if(
+                uploadMultiFileRequest == null
+                        || uploadMultiFileRequest.getContentData() == null
+                        || uploadMultiFileRequest.getContentData().isEmpty()
+        ) throw new CustomException(Error.NULL_OR_EMPTY_FILE);
+
+
+        for(MultipartFile file : uploadMultiFileRequest.getContentData()){
 
             if(file == null || file.isEmpty()) continue;
 
@@ -157,27 +164,23 @@ public class PartServiceImpl implements IPartService {
             partEntity.setUpdateAt(LocalDateTime.now());
         }
 
-        partEntity = partRepository.save(partEntity);
-
-        return PartMapper.INSTANCE.partEntityToPartResponse(partEntity);
+        return partRepository.save(partEntity);
     }
 
 
     @Transactional
     @Override
-    public PartResponse uploadTextPart(UUID partId, UploadTextDTO uploadTextDTO) {
+    public PartEntity uploadTextPart(UUID partId, UploadTextRequest uploadTextDTO) {
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        Part partEntity = getPartToId(partId);
+        PartEntity partEntity = getPartToId(partId);
 
         partEntity.setContentData(uploadTextDTO.getContentData());
         partEntity.setContentType(uploadTextDTO.getContentType());
         partEntity.setUserUpdate(user);
         partEntity.setUpdateAt(LocalDateTime.now());
 
-        partEntity = partRepository.save(partEntity);
-
-        return PartMapper.INSTANCE.partEntityToPartResponse(partEntity);
+        return partRepository.save(partEntity);
     }
 }

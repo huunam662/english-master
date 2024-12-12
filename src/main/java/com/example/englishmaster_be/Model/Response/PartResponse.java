@@ -1,15 +1,10 @@
 package com.example.englishmaster_be.Model.Response;
 
-import com.example.englishmaster_be.Model.Part;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.springframework.cglib.core.Local;
 
-import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Objects;
 import java.util.UUID;
 
 
@@ -33,12 +28,16 @@ public class PartResponse {
 
     String contentData;
 
+    Integer totalQuestion;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
     LocalDateTime createAt;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
     LocalDateTime updateAt;
 
-    int totalQuestion;
+    UserBasicResponse userCreate;
+
+    UserBasicResponse userUpdate;
 
 }

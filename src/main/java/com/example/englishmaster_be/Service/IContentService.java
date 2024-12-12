@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Service;
 
-import com.example.englishmaster_be.DTO.Content.SaveContentDTO;
-import com.example.englishmaster_be.Model.Content;
+import com.example.englishmaster_be.Model.Request.Content.ContentRequest;
+import com.example.englishmaster_be.entity.ContentEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -9,15 +9,15 @@ import java.util.UUID;
 
 public interface IContentService {
 
-    void delete(UUID contentId);
+    void deleteContent(UUID contentId);
 
-    Content getContentByTopicIdAndCode(UUID topicId, String code);
+    ContentEntity getContentByTopicIdAndCode(UUID topicId, String code);
 
-    Content getContentToContentId(UUID contentId);
+    ContentEntity getContentByContentId(UUID contentId);
 
-    Content getContentByContentData(String contentData);
+    ContentEntity getContentByContentData(String contentData);
 
-    Content saveContent(SaveContentDTO createContentDTO);
+    ContentEntity saveContent(ContentRequest contentRequest);
 
     List<String> getImageCdnLink();
 

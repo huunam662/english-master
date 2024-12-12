@@ -1,21 +1,16 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
-import com.example.englishmaster_be.DTO.Type.SaveTypeDTO;
+import com.example.englishmaster_be.Mapper.TypeMapper;
+import com.example.englishmaster_be.Model.Request.Type.TypeRequest;
 import com.example.englishmaster_be.Model.Response.TypeResponse;
-import com.example.englishmaster_be.Model.Response.ResponseModel;
-import com.example.englishmaster_be.Model.Type;
 import com.example.englishmaster_be.Service.ITypeService;
+import com.example.englishmaster_be.entity.TypeEntity;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.json.simple.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -24,7 +19,7 @@ import java.util.UUID;
 
 @Tag(name = "Type")
 @RestController
-@RequestMapping("/api/type")
+@RequestMapping("/type")
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -34,26 +29,44 @@ public class TypeController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getAllTypes")
-    @MessageResponse("List Type successfully")
+    @MessageResponse("List Type List successfully")
     public List<TypeResponse> getAllTypes() {
 
-        return typeService.getAllTypes();
+        List<TypeEntity> typeEntityList = typeService.getAllTypes();
+
+        return TypeMapper.INSTANCE.toTypeResponseList(typeEntityList);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getType/{id}")
-    @MessageResponse("Type successfully")
+    @MessageResponse("Get Type successfully")
     public TypeResponse getType(@PathVariable("id") UUID id) {
 
-        return typeService.getTypeById(id);
+        TypeEntity typeEntity = typeService.getTypeById(id);
+
+        return TypeMapper.INSTANCE.toTypeResponse(typeEntity);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{typeId}/updateType")
+    @MessageResponse("Create Type successfully")
+    public TypeResponse updateType(@PathVariable("typeId") UUID typeId, @RequestBody TypeRequest typeRequest) {
+
+        typeRequest.setTypeId(typeId);
+
+        TypeEntity typeEntity = typeService.saveType(typeRequest);
+
+        return TypeMapper.INSTANCE.toTypeResponse(typeEntity);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/createType")
     @MessageResponse("Create Type successfully")
-    public TypeResponse createType(@RequestBody SaveTypeDTO createTypeDTO) {
+    public TypeResponse createType(@RequestBody TypeRequest typeRequest) {
 
-        return typeService.createType(createTypeDTO);
+        TypeEntity typeEntity = typeService.saveType(typeRequest);
+
+        return TypeMapper.INSTANCE.toTypeResponse(typeEntity);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

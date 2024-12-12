@@ -1,34 +1,32 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
+import com.example.englishmaster_be.Mapper.AnswerMapper;
 import com.example.englishmaster_be.Mapper.QuestionMapper;
-import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
-import com.example.englishmaster_be.Model.Response.ResponseModel;
-import com.example.englishmaster_be.DTO.Answer.SaveListAnswerDTO;
-import com.example.englishmaster_be.Helper.GetExtension;
-import com.example.englishmaster_be.DTO.Question.*;
-import com.example.englishmaster_be.DTO.*;
-import com.example.englishmaster_be.Model.*;
-import com.example.englishmaster_be.Model.Response.*;
-import com.example.englishmaster_be.Repository.AnswerRepository;
+import com.example.englishmaster_be.Model.Request.Question.GroupQuestionRequest;
+import com.example.englishmaster_be.Model.Request.Question.QuestionRequest;
+import com.example.englishmaster_be.Model.Request.UploadMultiFileRequest;
+import com.example.englishmaster_be.Model.Response.AnswerResponse;
+import com.example.englishmaster_be.Model.Response.QuestionBasicResponse;
+import com.example.englishmaster_be.Model.Response.QuestionGroupResponse;
+import com.example.englishmaster_be.Model.Response.QuestionResponse;
 import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.entity.AnswerEntity;
+import com.example.englishmaster_be.entity.QuestionEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Tag(name = "Question")
 @RestController
-@RequestMapping("/api/question")
+@RequestMapping("/question")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class QuestionController {
@@ -40,64 +38,88 @@ public class QuestionController {
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Create Question successfully")
+    @MessageResponse("Create QuestionEntity successfully")
     public QuestionResponse createQuestion(
-            @ModelAttribute SaveQuestionDTO saveQuestionDTO
+            @ModelAttribute QuestionRequest questionRequest
     ) {
 
-        return questionService.saveQuestion(saveQuestionDTO);
+        QuestionEntity question = questionService.saveQuestion(questionRequest);
+
+        return QuestionMapper.INSTANCE.toQuestionResponse(question);
     }
+
+    @PutMapping(value = "/{questionId:.+}/editQuestion")
+    @PreAuthorize("hasRole('ADMIN')")
+    @MessageResponse("Update QuestionEntity to TopicEntity successfully")
+    public QuestionResponse editQuestion(
+            @PathVariable UUID questionId,
+            @ModelAttribute QuestionRequest questionRequest
+    ) {
+
+        questionRequest.setQuestionId(questionId);
+
+        QuestionEntity question = questionService.saveQuestion(questionRequest);
+
+        return QuestionMapper.INSTANCE.toQuestionResponse(question);
+    }
+
 
     @PutMapping(value = "/{questionId:.+}/uploadfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Upload Question successfully")
-    public QuestionResponse uploadFileQuestion(
+    @MessageResponse("Upload QuestionEntity successfully")
+    public QuestionBasicResponse uploadFileQuestion(
             @PathVariable UUID questionId,
-            @ModelAttribute UploadMultiFileDTO uploadMultiFileDTO
+            @ModelAttribute UploadMultiFileRequest uploadMultiFileRequest
     ) {
 
-        return questionService.uploadFileQuestion(questionId, uploadMultiFileDTO);
+        QuestionEntity question = questionService.uploadFileQuestion(questionId, uploadMultiFileRequest);
+
+        return QuestionMapper.INSTANCE.toQuestionBasicResponse(question);
     }
 
     @PutMapping(value = "/{questionId:.+}/updatefile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Update file Question successfully")
-    public QuestionResponse updateFileQuestion(
+    @MessageResponse("Update file QuestionEntity successfully")
+    public QuestionBasicResponse updateFileQuestion(
             @PathVariable UUID questionId,
             @RequestParam("oldFileName") String oldFileName,
             @RequestPart MultipartFile newFile
     ) {
 
-        return questionService.updateFileQuestion(questionId, oldFileName, newFile);
+        QuestionEntity question = questionService.updateFileQuestion(questionId, oldFileName, newFile);
+
+        return QuestionMapper.INSTANCE.toQuestionBasicResponse(question);
     }
 
     @PostMapping(value = "/create/groupQuestion")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Create Question successfully")
+    @MessageResponse("Create QuestionEntity successfully")
     public QuestionResponse createGroupQuestion(
-            @RequestBody SaveGroupQuestionDTO createGroupQuestionDTO
+            @RequestBody GroupQuestionRequest groupQuestionRequest
     ) {
 
-        return questionService.createGroupQuestion(createGroupQuestionDTO);
+        QuestionEntity question = questionService.createGroupQuestion(groupQuestionRequest);
+
+        return QuestionMapper.INSTANCE.toQuestionResponse(question);
     }
 
 
     @GetMapping(value = "/{partId:.+}/listTop10Question")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("List top 10 Question successfully")
-    public List<QuestionResponse> getTop10Question(
+    @MessageResponse("List top 10 QuestionEntity successfully")
+    public List<QuestionBasicResponse> getTop10Question(
             @PathVariable UUID partId,
             @RequestParam int indexp
     ) {
 
-        List<Question> questionList = questionService.getTop10Question(indexp, partId);
+        List<QuestionEntity> questionList = questionService.getTop10Question(indexp, partId);
 
-        return QuestionMapper.INSTANCE.toQuestionResponseList(questionList);
+        return QuestionMapper.INSTANCE.toQuestionBasicResponseList(questionList);
     }
 
     @GetMapping(value = "/{questionId:.+}/checkQuestionGroup")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Question has Question group")
+    @MessageResponse("QuestionEntity has QuestionEntity group")
     public void checkQuestionGroup(@PathVariable UUID questionId) {
 
         questionService.checkQuestionGroup(questionId);
@@ -105,47 +127,39 @@ public class QuestionController {
 
     @GetMapping(value = "/{questionId:.+}/listQuestionGroup")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("List Question group successfully")
-    public List<QuestionGroupResponse> getQuestionGroupToQuestion(@PathVariable UUID questionId) {
+    @MessageResponse("List QuestionEntity group successfully")
+    public List<QuestionResponse> getQuestionGroupToQuestion(@PathVariable UUID questionId) {
 
-        return questionService.getQuestionGroupToQuestion(questionId);
+        List<QuestionEntity> questionEntityList = questionService.getQuestionGroupListByQuestionId(questionId);
+
+        return QuestionMapper.INSTANCE.toQuestionGroupChildrenResponseList(questionEntityList);
     }
 
     @GetMapping(value = "/{questionId:.+}/listAnswer")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("List Answer to Question successfully")
+    @MessageResponse("List AnswerEntity to QuestionEntity successfully")
     public List<AnswerResponse> getAnswerToQuestion(@PathVariable UUID questionId) {
 
-        return answerService.getListAnswerByQuestionId(questionId);
+        List<AnswerEntity> answerList = answerService.getListAnswerByQuestionId(questionId);
+
+        return AnswerMapper.INSTANCE.toAnswerResponseList(answerList);
     }
 
     @DeleteMapping(value = "/{questionId:.+}/deleteQuestion")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Delete Question successfully")
+    @MessageResponse("Delete QuestionEntity successfully")
     public void deleteQuestion(@PathVariable UUID questionId) {
 
         questionService.deleteQuestion(questionId);
     }
 
-    @PutMapping(value = "/{questionId:.+}/editQuestion")
-    @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Update Question to Topic successfully")
-    public QuestionResponse editQuestion(
-            @PathVariable UUID questionId,
-            @ModelAttribute UpdateQuestionDTO updateQuestionDTO
-    ) {
-
-        updateQuestionDTO.setUpdateQuestionId(questionId);
-
-        return questionService.saveQuestion(updateQuestionDTO);
-    }
 
     @GetMapping(value = "/{questionId:.+}/content")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Show Content Question successfully")
+    @MessageResponse("Show ContentEntity QuestionEntity successfully")
     public QuestionResponse getContentToQuestion(@PathVariable UUID questionId) {
 
-        Question question = questionService.getQuestionById(questionId);
+        QuestionEntity question = questionService.getQuestionById(questionId);
 
         return QuestionMapper.INSTANCE.toQuestionResponse(question);
     }

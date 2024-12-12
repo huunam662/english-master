@@ -20,7 +20,7 @@ import java.util.List;
 
 @Tag(name = "File")
 @RestController
-@RequestMapping("/api/file")
+@RequestMapping("/file")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FileController {

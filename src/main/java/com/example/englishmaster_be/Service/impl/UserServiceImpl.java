@@ -4,19 +4,21 @@ import com.example.englishmaster_be.Common.dto.response.FilterResponse;
 import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
 import com.example.englishmaster_be.Configuration.jwt.JwtUtils;
 import com.example.englishmaster_be.Common.enums.RoleEnum;
-import com.example.englishmaster_be.DTO.*;
-import com.example.englishmaster_be.DTO.ConfirmationToken.SaveConfirmationTokenDTO;
-import com.example.englishmaster_be.DTO.User.ChangePassDTO;
-import com.example.englishmaster_be.DTO.User.ChangeProfileDTO;
-import com.example.englishmaster_be.DTO.User.UserFilterRequest;
+import com.example.englishmaster_be.Exception.CustomException;
+import com.example.englishmaster_be.Mapper.MockTestMapper;
+import com.example.englishmaster_be.Mapper.TopicMapper;
+import com.example.englishmaster_be.Model.Request.*;
+import com.example.englishmaster_be.Model.Request.ConfirmationToken.ConfirmationTokenRequest;
+import com.example.englishmaster_be.Model.Request.User.ChangePasswordRequest;
+import com.example.englishmaster_be.Model.Request.User.ChangeProfileRequest;
+import com.example.englishmaster_be.Model.Request.User.UserFilterRequest;
 import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Exception.Response.BadRequestException;
-import com.example.englishmaster_be.Exception.Response.ResponseNotFoundException;
 import com.example.englishmaster_be.Mapper.UserMapper;
-import com.example.englishmaster_be.Model.*;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.entity.*;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -59,6 +61,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserServiceImpl implements IUserService {
+
 
     @Value("${masterE.linkFE}")
     static String linkFE;
@@ -106,28 +109,29 @@ public class UserServiceImpl implements IUserService {
 
 
     @Transactional
+    @SneakyThrows
     @Override
     public void registerUser(UserRegisterDTO userRegisterDTO) {
 
-        User user = userRepository.findByEmail(userRegisterDTO.getEmail()).orElse(null);
+        UserEntity user = userRepository.findByEmail(userRegisterDTO.getEmail()).orElse(null);
 
-        if (user != null && !user.isEnabled())
+        if (user != null && !user.getEnabled())
             userRepository.delete(user);
 
-        user = UserMapper.INSTANCE.toEntity(userRegisterDTO);
+        user = UserMapper.INSTANCE.toUserEntity(userRegisterDTO);
         user.setPassword(passwordEncoder.encode(userRegisterDTO.getPassword()));
         user.setRole(roleRepository.findByRoleName(RoleEnum.USER.name()));
 
         user = userRepository.save(user);
 
         ConfirmationTokenResponse confirmationTokenResponse = confirmationTokenService.createConfirmationToken(
-                SaveConfirmationTokenDTO.builder().user(user).build()
+                ConfirmationTokenRequest.builder().user(user).build()
         );
 
         try {
             sendConfirmationEmail(user.getEmail(), confirmationTokenResponse.getCode());
         } catch (IOException | MessagingException e) {
-            throw new ResponseNotFoundException("Failed to send confirmation email");
+            throw new CustomException(Error.SEND_EMAIL_FAILURE);
         }
     }
 
@@ -135,18 +139,18 @@ public class UserServiceImpl implements IUserService {
     @Override
     public void confirmRegister(String confirmationToken) {
 
-        ConfirmationToken confirmToken = confirmationTokenRepository.findByCodeAndType(confirmationToken, "ACTIVE");
+        ConfirmationTokenEntity confirmToken = confirmationTokenRepository.findByCodeAndType(confirmationToken, "ACTIVE");
 
         if (confirmToken == null)
             throw new BadRequestException("Invalid verification code");
 
-        if (confirmToken.getUser().isEnabled())
+        if (confirmToken.getUser().getEnabled())
             throw new BadRequestException("Account has been verified");
 
         if ((confirmToken.getCreateAt().plusMinutes(5)).isBefore(LocalDateTime.now()))
             throw new BadRequestException("Verification code has expired, Please register again");
 
-        User user = confirmToken.getUser();
+        UserEntity user = confirmToken.getUser();
 
         user.setEnabled(Boolean.TRUE);
 
@@ -167,13 +171,16 @@ public class UserServiceImpl implements IUserService {
 
         String jwt = jwtUtils.generateJwtToken(userDetails);
 
-        User user = findUser(userDetails);
+        UserEntity user = findUser(userDetails);
 
         refreshTokenService.deleteAllTokenExpired(user);
 
-        ConfirmationToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getUsername());
+        ConfirmationTokenEntity refreshToken = refreshTokenService.createRefreshToken(userDetails.getUsername());
 
-        return new AuthResponse(jwt, refreshToken.getCode());
+        return AuthResponse.builder()
+                .accessToken(jwt)
+                .refreshToken(refreshToken.getCode())
+                .build();
     }
 
     @Transactional
@@ -284,7 +291,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public String confirmForgetPassword(String token) {
 
-        ConfirmationToken confirmToken = confirmationTokenRepository.findByCodeAndType(token, "RESET_PASSWORD");
+        ConfirmationTokenEntity confirmToken = confirmationTokenRepository.findByCodeAndType(token, "RESET_PASSWORD");
 
         if (confirmToken == null)
             throw new BadRequestException("Invalid reset code");
@@ -300,7 +307,7 @@ public class UserServiceImpl implements IUserService {
 
         String refresh = refreshTokenDTO.getRequestRefresh();
 
-        ConfirmationToken token = refreshTokenService.findByToken(refresh);
+        ConfirmationTokenEntity token = refreshTokenService.findByToken(refresh);
 
         if (token == null)
             throw new BadRequestException("Refresh token isn't existed");
@@ -314,52 +321,31 @@ public class UserServiceImpl implements IUserService {
                 .build();
     }
 
-    @Override
-    public InformationUserResponse informationCurrentUser() {
-
-        User currentUser = currentUser();
-
-        return informationUserOf(currentUser);
-    }
-
-    @Override
-    public InformationUserResponse informationUserOf(User user) {
-
-        return InformationUserResponse.builder()
-                .user(new UserResponse(user))
-                .role(user.getRole().getRoleName())
-                .build();
-    }
-
     @Transactional
     @Override
-    public InformationUserResponse changeProfile(ChangeProfileDTO changeProfileDTO) {
+    public UserEntity changeProfile(ChangeProfileRequest changeProfileRequest) {
 
-        User user = currentUser();
+        UserEntity user = currentUser();
 
-        if (changeProfileDTO.getAvatar() != null && !changeProfileDTO.getAvatar().isEmpty()) {
+        if (changeProfileRequest.getAvatar() != null && !changeProfileRequest.getAvatar().isEmpty()) {
             if (user.getAvatar() != null && !user.getAvatar().isEmpty() && user.getAvatar().startsWith("https://s3.meu-solutions.com/"))
                 contentRepository.deleteByContentData(user.getAvatar());
 
-            String avatarPathResponse = uploadService.upload(changeProfileDTO.getAvatar(), "/", false, null, null);
+            String avatarPathResponse = uploadService.upload(changeProfileRequest.getAvatar(), "/", false, null, null);
 
             user.setAvatar(avatarPathResponse);
         }
 
-        user.setName(changeProfileDTO.getName());
-        user.setAddress(changeProfileDTO.getAddress());
-        user.setPhone(changeProfileDTO.getPhone());
+        UserMapper.INSTANCE.flowToUserEntity(changeProfileRequest, user);
 
-        user = userRepository.save(user);
-
-        return informationUserOf(user);
+        return userRepository.save(user);
     }
 
     @Transactional
     @Override
-    public void changePass(ChangePassDTO changePassDTO) {
+    public void changePass(ChangePasswordRequest changePassDTO) {
 
-        User user = currentUser();
+        UserEntity user = currentUser();
 
         String regex = "^(?=.*[0-9])"
                 + "(?=.*[a-z])(?=.*[A-Z])"
@@ -406,24 +392,24 @@ public class UserServiceImpl implements IUserService {
                 .offset((long) (filterRequest.getPage() - 1) * filterRequest.getSize())
                 .build();
 
-        User user = currentUser();
+        UserEntity user = currentUser();
 
-        JPAQuery<Topic> queryMockTest = queryFactory.select(QMockTest.mockTest.topic)
-                                                    .from(QMockTest.mockTest)
-                                                    .where(QMockTest.mockTest.user.userId.eq(user.getUserId()))
-                                                    .groupBy(QMockTest.mockTest.topic);
+        JPAQuery<TopicEntity> queryMockTest = queryFactory.select(QMockTestEntity.mockTestEntity.topic)
+                                                    .from(QMockTestEntity.mockTestEntity)
+                                                    .where(QMockTestEntity.mockTestEntity.user.userId.eq(user.getUserId()))
+                                                    .groupBy(QMockTestEntity.mockTestEntity.topic);
 
-        List<Topic> listTopicUser = queryMockTest.fetch();
+        List<TopicEntity> listTopicUser = queryMockTest.fetch();
 
-        BooleanExpression wherePatternOfTopic = QTopic.topic.in(listTopicUser);
+        BooleanExpression wherePatternOfTopic = QTopicEntity.topicEntity.in(listTopicUser);
 
         long totalElements = Optional.ofNullable(
-                queryFactory.select(QTopic.topic.count())
-                            .from(QTopic.topic)
+                queryFactory.select(QTopicEntity.topicEntity.count())
+                            .from(QTopicEntity.topicEntity)
                             .where(wherePatternOfTopic)
                             .fetchOne()
                         ).orElse(0L);
-        long totalPages = (long)Math.ceil((double) totalElements / filterResponse.getPageSize());
+        long totalPages = (long) Math.ceil((double) totalElements / filterResponse.getPageSize());
         filterResponse.setTotalElements(totalElements);
         filterResponse.setTotalPages(totalPages);
         filterResponse.withPreviousAndNextPage();
@@ -431,11 +417,11 @@ public class UserServiceImpl implements IUserService {
         OrderSpecifier<?> orderSpecifier;
 
         if (Sort.Direction.DESC.equals(filterRequest.getSortDirection()))
-            orderSpecifier = QTopic.topic.updateAt.desc();
-        else orderSpecifier = QTopic.topic.updateAt.asc();
+            orderSpecifier = QTopicEntity.topicEntity.updateAt.desc();
+        else orderSpecifier = QTopicEntity.topicEntity.updateAt.asc();
 
-        JPAQuery<Topic> query = queryFactory
-                                .selectFrom(QTopic.topic)
+        JPAQuery<TopicEntity> query = queryFactory
+                                .selectFrom(QTopicEntity.topicEntity)
                                 .where(wherePatternOfTopic)
                                 .orderBy(orderSpecifier)
                                 .offset(filterResponse.getOffset())
@@ -445,15 +431,15 @@ public class UserServiceImpl implements IUserService {
                 query.fetch().stream().map(
                         topic -> {
                             ExamResultResponse examResultResponse = ExamResultResponse.builder()
-                                    .topic(new TopicResponse(topic))
+                                    .topic(TopicMapper.INSTANCE.toTopicResponse(topic))
                                     .build();
 
-                            JPAQuery<MockTest> queryListMockTest = queryFactory.selectFrom(QMockTest.mockTest)
-                                    .where(QMockTest.mockTest.user.userId.eq(user.getUserId()))
-                                    .where(QMockTest.mockTest.topic.eq(topic));
+                            JPAQuery<MockTestEntity> queryListMockTest = queryFactory.selectFrom(QMockTestEntity.mockTestEntity)
+                                    .where(QMockTestEntity.mockTestEntity.user.userId.eq(user.getUserId()))
+                                    .where(QMockTestEntity.mockTestEntity.topic.eq(topic));
 
                             examResultResponse.setListMockTest(
-                                    queryListMockTest.fetch().stream().map(MockTestResponse::new).toList()
+                                    MockTestMapper.INSTANCE.toMockTestResponseList(queryListMockTest.fetch())
                             );
 
                             return examResultResponse;
@@ -484,19 +470,19 @@ public class UserServiceImpl implements IUserService {
     @Override
     public void deleteUser(UUID userId) {
 
-        User userEntity = findUserById(userId);
+        UserEntity userEntity = findUserById(userId);
 
         userRepository.delete(userEntity);
     }
 
 
     @Override
-    public User findUser(UserDetails userDetails) {
+    public UserEntity findUser(UserDetails userDetails) {
         return findUserByEmail(userDetails.getUsername());
     }
 
     @Override
-    public User currentUser() {
+    public UserEntity currentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails)
             return findUser(userDetails);
@@ -505,16 +491,16 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public User findUserByEmail(String email) {
+    public UserEntity findUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(
-                () -> new BadRequestException("User not found")
+                () -> new BadRequestException("UserEntity not found")
         );
     }
 
     @Override
-    public User findUserById(UUID userId) {
+    public UserEntity findUserById(UUID userId) {
         return userRepository.findById(userId).orElseThrow(
-                () -> new BadRequestException("User not found")
+                () -> new BadRequestException("UserEntity not found")
         );
     }
 
@@ -537,12 +523,12 @@ public class UserServiceImpl implements IUserService {
     @Override
     public boolean updatePassword(String otp, String newPassword) {
 
-        Otp otpRecord = otpRepository.findById(otp).orElse(null);
+        OtpEntity otpRecord = otpRepository.findById(otp).orElse(null);
 
         if (otpRecord == null || !"Verified".equals(otpRecord.getStatus()))
             return false;
 
-        User user = userRepository.findByEmail(otpRecord.getEmail()).orElse(null);
+        UserEntity user = userRepository.findByEmail(otpRecord.getEmail()).orElse(null);
 
         if (user == null) return false;
 
@@ -587,15 +573,15 @@ public class UserServiceImpl implements IUserService {
                 .offset((long) (filterRequest.getPage() - 1) * filterRequest.getSize())
                 .build();
 
-        BooleanExpression wherePattern = QUser.user.role.roleName.notEqualsIgnoreCase(RoleEnum.ADMIN.name());
+        BooleanExpression wherePattern = QUserEntity.userEntity.role.roleName.notEqualsIgnoreCase(RoleEnum.ADMIN.name());
 
         if (filterRequest.getEnable() != null)
-            wherePattern.and(QUser.user.isEnabled.eq(filterRequest.getEnable()));
+            wherePattern.and(QUserEntity.userEntity.enabled.eq(filterRequest.getEnable()));
 
         long totalElements = Optional.ofNullable(
                                                 queryFactory
-                                                .select(QUser.user.count())
-                                                .from(QUser.user)
+                                                .select(QUserEntity.userEntity.count())
+                                                .from(QUserEntity.userEntity)
                                                 .where(wherePattern)
                                                 .fetchOne()
                                         ).orElse(0L);
@@ -608,19 +594,19 @@ public class UserServiceImpl implements IUserService {
         OrderSpecifier<?> orderSpecifier;
 
         if (Sort.Direction.DESC.equals(filterRequest.getSortDirection()))
-            orderSpecifier = QUser.user.updateAt.desc();
+            orderSpecifier = QUserEntity.userEntity.updateAt.desc();
         else
-            orderSpecifier = QUser.user.updateAt.asc();
+            orderSpecifier = QUserEntity.userEntity.updateAt.asc();
 
-        JPAQuery<User> query = queryFactory
-                .selectFrom(QUser.user)
+        JPAQuery<UserEntity> query = queryFactory
+                .selectFrom(QUserEntity.userEntity)
                 .where(wherePattern)
                 .orderBy(orderSpecifier)
                 .offset(filterResponse.getOffset())
                 .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
-                query.fetch().stream().map(UserResponse::new).toList()
+                UserMapper.INSTANCE.toUserResponseList(query.fetch())
         );
 
         return filterResponse;
@@ -633,28 +619,28 @@ public class UserServiceImpl implements IUserService {
         if(enable == null)
             throw new BadRequestException("The enable parameter is required");
 
-        User user = findUserById(userId);
+        UserEntity user = findUserById(userId);
 
         user.setEnabled(enable);
         userRepository.save(user);
 
         if (enable)
-            MessageResponseHolder.setMessage("Enable account of User successfully");
+            MessageResponseHolder.setMessage("Enable account of UserEntity successfully");
         else
-            MessageResponseHolder.setMessage("Disable account of User successfully");
+            MessageResponseHolder.setMessage("Disable account of UserEntity successfully");
 
     }
 
     @Override
     public List<CountMockTestTopicResponse> getCountMockTestOfTopic(String date, UUID packId) {
 
-        Pack pack = packService.findPackById(packId);
+        PackEntity pack = packService.getPackById(packId);
 
-        List<Topic> listTopic = topicService.getAllTopicToPack(pack);
+        List<TopicEntity> listTopic = topicService.getAllTopicToPack(pack);
 
         return listTopic.stream().map(topic -> {
 
-            List<MockTest> mockTests;
+            List<MockTestEntity> mockTests;
 
             if(date == null) mockTests = mockTestService.getAllMockTestToTopic(topic);
             else{

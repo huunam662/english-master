@@ -1,28 +1,32 @@
 package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Common.dto.response.FilterResponse;
+import com.example.englishmaster_be.Common.enums.StatusEnum;
 import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
 import com.example.englishmaster_be.Common.enums.RoleEnum;
-import com.example.englishmaster_be.Constant.StatusConstant;
-import com.example.englishmaster_be.DTO.Answer.SaveListAnswerDTO;
-import com.example.englishmaster_be.DTO.Question.SaveQuestionDTO;
-import com.example.englishmaster_be.DTO.Topic.SaveListQuestionDTO;
-import com.example.englishmaster_be.DTO.Topic.SaveTopicDTO;
-import com.example.englishmaster_be.DTO.Topic.TopicFilterRequest;
-import com.example.englishmaster_be.DTO.Topic.UpdateTopicDTO;
-import com.example.englishmaster_be.DTO.UploadFileDTO;
+import com.example.englishmaster_be.Mapper.AnswerMapper;
+import com.example.englishmaster_be.Mapper.QuestionMapper;
+import com.example.englishmaster_be.Model.Request.Answer.AnswerBasicRequest;
+import com.example.englishmaster_be.Model.Request.Question.QuestionRequest;
+import com.example.englishmaster_be.Model.Request.Topic.ListQuestionRequest;
+import com.example.englishmaster_be.Model.Request.Topic.TopicRequest;
+import com.example.englishmaster_be.Model.Request.Topic.TopicFilterRequest;
+import com.example.englishmaster_be.Model.Request.UploadFileRequest;
 import com.example.englishmaster_be.Exception.Response.BadRequestException;
 import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.Mapper.PartMapper;
 import com.example.englishmaster_be.Mapper.TopicMapper;
-import com.example.englishmaster_be.Model.*;
-import com.example.englishmaster_be.Model.Response.*;
-import com.example.englishmaster_be.Model.Response.excel.CreateListQuestionByExcelFileResponse;
-import com.example.englishmaster_be.Model.Response.excel.CreateQuestionByExcelFileResponse;
-import com.example.englishmaster_be.Model.Response.excel.CreateTopicByExcelFileResponse;
+import com.example.englishmaster_be.Model.Response.PartResponse;
+import com.example.englishmaster_be.Model.Response.QuestionBasicResponse;
+import com.example.englishmaster_be.Model.Response.QuestionResponse;
+import com.example.englishmaster_be.Model.Response.TopicResponse;
+import com.example.englishmaster_be.Model.Response.excel.ListQuestionByExcelFileResponse;
+import com.example.englishmaster_be.Model.Response.excel.QuestionByExcelFileResponse;
+import com.example.englishmaster_be.Model.Response.excel.TopicByExcelFileResponse;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.*;
 import com.example.englishmaster_be.Util.LinkUtil;
+import com.example.englishmaster_be.entity.*;
 import com.google.cloud.storage.Blob;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -37,15 +41,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 @Slf4j
 @Service
@@ -67,8 +70,6 @@ public class TopicServiceImpl implements ITopicService {
 
     IQuestionService questionService;
 
-    ICommentService commentService;
-
     IStatusService statusService;
 
     IUserService userService;
@@ -85,46 +86,47 @@ public class TopicServiceImpl implements ITopicService {
 
     IContentService contentService;
 
+    ITopicService topicService;
+
 
     @Transactional
     @Override
-    public TopicResponse saveTopic(SaveTopicDTO saveTopicDTO) {
+    public TopicEntity saveTopic(TopicRequest topicRequest) {
 
-        Topic topic;
+        TopicEntity topic;
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        Pack pack = packService.findPackById(saveTopicDTO.getTopicPackId());
+        PackEntity pack = packService.getPackById(topicRequest.getPackId());
 
-        if(saveTopicDTO instanceof UpdateTopicDTO updateTopicDTO){
+        if(topicRequest.getTopicId() != null){
 
-            topic = findTopicById(updateTopicDTO.getUpdateTopicId());
+            topic = getTopicById(topicRequest.getTopicId());
 
             if (
-                    updateTopicDTO.getTopicImage() != null
-                    && !updateTopicDTO.getTopicImage().isEmpty()
+                    topicRequest.getTopicImage() != null
+                    && !topicRequest.getTopicImage().isEmpty()
                     && topic.getTopicImage() != null
                     && fileStorageService.load(topic.getTopicImage()) != null
-            ) {
-                fileStorageService.delete(topic.getTopicImage());
-            }
+            ) fileStorageService.delete(topic.getTopicImage());
+
         }
         else{
-            topic = Topic.builder()
+            topic = TopicEntity.builder()
                     .createAt(LocalDateTime.now())
                     .userCreate(user)
                     .build();
         }
 
-        TopicMapper.INSTANCE.updateTopicEntity(saveTopicDTO, topic);
+        TopicMapper.INSTANCE.flowToTopicEntity(topicRequest, topic);
 
-        topic.setStatus(statusService.getStatusByName(StatusConstant.ACTIVE));
+        topic.setStatus(statusService.getStatusByName(StatusEnum.ACTIVE));
         topic.setUserUpdate(user);
         topic.setPack(pack);
 
-        if(saveTopicDTO.getListPart() != null){
+        if(topicRequest.getListPart() != null){
 
-            List<Part> partList = saveTopicDTO.getListPart().stream()
+            List<PartEntity> partList = topicRequest.getListPart().stream()
                     .filter(Objects::nonNull)
                     .map(partService::getPartToId)
                     .toList();
@@ -132,64 +134,98 @@ public class TopicServiceImpl implements ITopicService {
             topic.setParts(partList);
         }
 
-        if(saveTopicDTO.getTopicImage() != null && !saveTopicDTO.getTopicImage().isEmpty()){
+        if(topicRequest.getTopicImage() != null && !topicRequest.getTopicImage().isEmpty()){
 
-            Blob blobResponse = fileStorageService.save(saveTopicDTO.getTopicImage());
+            Blob blobResponse = fileStorageService.save(topicRequest.getTopicImage());
 
             String fileName = blobResponse.getName();
 
             topic.setTopicImage(fileName);
         }
 
-        topic = topicRepository.save(topic);
-
-        return new TopicResponse(topic);
+        return topicRepository.save(topic);
     }
 
     @Transactional
     @SneakyThrows
     @Override
-    public TopicResponse saveTopicByExcelFile(MultipartFile file, String url) {
+    public TopicEntity updateTopicByExcelFile(UUID topicId, MultipartFile file, String url) {
 
-        CreateTopicByExcelFileResponse createTopicByExcelFileDTO = excelService.parseCreateTopicDTO(file);
+        // Parse dữ liệu từ file
+        TopicByExcelFileResponse topicByExcelFileResponse = excelService.parseCreateTopicDTO(file);
 
-        SaveTopicDTO saveTopicDTO = TopicMapper.INSTANCE.toSaveTopicDTO(createTopicByExcelFileDTO);
+        UserEntity user = userService.currentUser();
 
-        log.warn(createTopicByExcelFileDTO.getTopicImageName());
+        // Tìm pack dựa trên ID từ Request
+        PackEntity pack = packService.getPackById(topicByExcelFileResponse.getPackId());
 
-        TopicResponse topicResponse = saveTopic(saveTopicDTO);
+        // Tạo đối tượng TopicEntity
+        TopicEntity topic = getTopicById(topicId);
+        topic.setUserUpdate(user);
+        topic.setUpdateAt(LocalDateTime.now());
 
-        if (createTopicByExcelFileDTO.getTopicImageName() == null || createTopicByExcelFileDTO.getTopicImageName().isEmpty()) {
+        TopicMapper.INSTANCE.flowToTopicEntity(topicByExcelFileResponse, topic);
 
-            Topic topic = findTopicById(topicResponse.getTopicId());
+        // Cập nhật các thông tin liên quan đến số lượng câu hỏi, người tạo và trạng thái
+        topic.setPack(pack);
+        topic.setStatus(statusService.getStatusByName(StatusEnum.ACTIVE));
 
+        // Xử lý ảnh chủ đề
+        if (topicByExcelFileResponse.getTopicImageName() == null || topicByExcelFileResponse.getTopicImageName().isEmpty())
             topic.setTopicImage(url);
 
-            topic = topicRepository.save(topic);
+        // Lưu topic vào cơ sở dữ liệu
+        topic = topicRepository.save(topic);
 
-            topicResponse = new TopicResponse(topic);
+        // Thêm các phần vào topic
+        topicByExcelFileResponse.getListPart().forEach(partId -> addPartToTopic(topicId, partId));
+
+        // Tạo response với thông tin của topic
+
+        return topic;
+
+    }
+
+    @Transactional
+    @SneakyThrows
+    @Override
+    public TopicEntity saveTopicByExcelFile(MultipartFile file, String url) {
+
+        TopicByExcelFileResponse topicByExcelFileResponse = excelService.parseCreateTopicDTO(file);
+
+        TopicRequest topicRequest = TopicMapper.INSTANCE.toTopicRequest(topicByExcelFileResponse);
+
+        log.warn(topicByExcelFileResponse.getTopicImageName());
+
+        TopicEntity topicEntity = saveTopic(topicRequest);
+
+        if (topicByExcelFileResponse.getTopicImageName() == null || topicByExcelFileResponse.getTopicImageName().isEmpty()) {
+
+            topicEntity.setTopicImage(url);
+
+            topicEntity = topicRepository.save(topicEntity);
         }
 
-        return topicResponse;
+        return topicEntity;
     }
 
     @Transactional
     @Override
-    public TopicResponse uploadFileImage(UUID topicId, UploadFileDTO uploadFileDTO) {
+    public TopicEntity uploadFileImage(UUID topicId, UploadFileRequest uploadFileRequest) {
 
-        if(uploadFileDTO == null) throw new BadRequestException("Object required non null");
+        if(uploadFileRequest == null) throw new BadRequestException("Object required non null");
 
-        if(uploadFileDTO.getContentData() == null || uploadFileDTO.getContentData().isEmpty())
+        if(uploadFileRequest.getContentData() == null || uploadFileRequest.getContentData().isEmpty())
             throw new BadRequestException("File required non empty or null content");
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        Topic topic = findTopicById(topicId);
+        TopicEntity topic = getTopicById(topicId);
 
         if(topic.getTopicImage() != null && !topic.getTopicImage().isEmpty())
             fileStorageService.delete(topic.getTopicImage());
 
-        Blob blobResponse = fileStorageService.save(uploadFileDTO.getContentData());
+        Blob blobResponse = fileStorageService.save(uploadFileRequest.getContentData());
 
         String fileName = blobResponse.getName();
 
@@ -197,27 +233,26 @@ public class TopicServiceImpl implements ITopicService {
         topic.setUserUpdate(user);
         topic.setUpdateAt(LocalDateTime.now());
 
-        topic = topicRepository.save(topic);
-
-        return new TopicResponse(topic);
+        return topicRepository.save(topic);
     }
 
     @Override
-    public Topic findTopicById(UUID topicId) {
+    public TopicEntity getTopicById(UUID topicId) {
+
         return topicRepository.findByTopicId(topicId)
                 .orElseThrow(
-                        () -> new IllegalArgumentException("Topic not found with ID: " + topicId)
+                        () -> new IllegalArgumentException("TopicEntity not found with ID: " + topicId)
                 );
     }
 
     @Override
-    public List<Topic> get5TopicName(String keyword) {
+    public List<TopicEntity> get5TopicName(String keyword) {
         return topicRepository.findTopicsByQuery(keyword, PageRequest.of(0, 5, Sort.by(Sort.Order.asc("topicName").ignoreCase())));
 
     }
 
     @Override
-    public List<Topic> getAllTopicToPack(Pack pack) {
+    public List<TopicEntity> getAllTopicToPack(PackEntity pack) {
         return topicRepository.findAllByPack(pack);
     }
 
@@ -225,18 +260,18 @@ public class TopicServiceImpl implements ITopicService {
     @Override
     public List<PartResponse> getPartToTopic(UUID topicId) {
 
-        Topic topic = findTopicById(topicId);
+        TopicEntity topic = getTopicById(topicId);
 
         Pageable pageable = PageRequest.of(0, 7, Sort.by(Sort.Order.asc("partName")));
 
-        Page<Part> page = partRepository.findByTopics(topic, pageable);
+        Page<PartEntity> page = partRepository.findByTopics(topic, pageable);
 
         return page.getContent().stream().map(
                 partItem -> {
 
                     int totalQuestion = totalQuestion(partItem, topicId);
 
-                    PartResponse partResponse = PartMapper.INSTANCE.partEntityToPartResponse(partItem);
+                    PartResponse partResponse = PartMapper.INSTANCE.toPartResponse(partItem);
                     partResponse.setTotalQuestion(totalQuestion);
 
                     return partResponse;
@@ -245,28 +280,32 @@ public class TopicServiceImpl implements ITopicService {
     }
 
     @Override
-    public List<Question> getQuestionOfPartToTopic(UUID topicId, UUID partId) {
-        Topic topic = topicRepository.findByTopicId(topicId)
-                .orElseThrow(() -> new IllegalArgumentException("Topic not found with ID: " + topicId));
-        Part part = partRepository.findByPartId(partId)
-                .orElseThrow(() -> new IllegalArgumentException("Part not found with ID: " + partId));
-        List<Question> listQuestion = questionRepository.findByTopicsAndPart(topic, part);
+    public List<QuestionEntity> getQuestionOfPartToTopic(UUID topicId, UUID partId) {
+
+        TopicEntity topic = topicService.getTopicById(topicId);
+
+        PartEntity part = partService.getPartToId(partId);
+
+        List<QuestionEntity> listQuestion = questionRepository.findByTopicsAndPart(topic, part);
+
         Collections.shuffle(listQuestion);
+
         return listQuestion;
     }
 
 
     @Override
     public void addPartToTopic(UUID topicId, UUID partId) {
-        Topic topic = topicRepository.findByTopicId(topicId)
-                .orElseThrow(() -> new IllegalArgumentException("Topic not found with ID: " + topicId));
-        Part part = partRepository.findByPartId(partId)
-                .orElseThrow(() -> new IllegalArgumentException("Part not found with ID: " + partId));
 
-        if (topic.getParts() == null) {
+        TopicEntity topic = topicService.getTopicById(topicId);
+
+        PartEntity part = partService.getPartToId(partId);
+
+        if (topic.getParts() == null)
             topic.setParts(new ArrayList<>());
-        }
+
         topic.getParts().add(part);
+
         topicRepository.save(topic);
     }
 
@@ -274,12 +313,11 @@ public class TopicServiceImpl implements ITopicService {
     @Override
     public void deletePartToTopic(UUID topicId, UUID partId) {
 
-        Topic topic = topicRepository.findByTopicId(topicId)
-                .orElseThrow(() -> new IllegalArgumentException("Topic not found with ID: " + topicId));
-        Part part = partRepository.findByPartId(partId)
-                .orElseThrow(() -> new IllegalArgumentException("Part not found with ID: " + partId));
+        TopicEntity topic = topicService.getTopicById(topicId);
 
-        for (Part partTopic : topic.getParts()) {
+        PartEntity part = partService.getPartToId(partId);
+
+        for (PartEntity partTopic : topic.getParts()) {
             if (partTopic.equals(part)) {
                 topic.getParts().remove(part);
                 topicRepository.save(topic);
@@ -291,8 +329,8 @@ public class TopicServiceImpl implements ITopicService {
     }
 
     @Override
-    public boolean existQuestionInTopic(Topic topic, Question question) {
-        for (Question questionItem : topic.getQuestions()) {
+    public boolean existQuestionInTopic(TopicEntity topic, QuestionEntity question) {
+        for (QuestionEntity questionItem : topic.getQuestions()) {
             if (questionItem.equals(question)) {
                 return true;
             }
@@ -301,8 +339,8 @@ public class TopicServiceImpl implements ITopicService {
     }
 
     @Override
-    public boolean existPartInTopic(Topic topic, Part part) {
-        for (Part partItem : topic.getParts()) {
+    public boolean existPartInTopic(TopicEntity topic, PartEntity part) {
+        for (PartEntity partItem : topic.getParts()) {
             if (partItem.equals(part)) {
                 return false;
             }
@@ -314,7 +352,7 @@ public class TopicServiceImpl implements ITopicService {
     @Override
     public void deleteTopic(UUID topicId) {
 
-        Topic topic = findTopicById(topicId);
+        TopicEntity topic = getTopicById(topicId);
 
         if(topic.getTopicImage() != null && !topic.getTopicImage().isEmpty())
             fileStorageService.delete(topic.getTopicImage());
@@ -323,19 +361,20 @@ public class TopicServiceImpl implements ITopicService {
     }
 
     @Override
-    public int totalQuestion(Part part, UUID topicId) {
-        int total = 0;
-        Topic topic = topicRepository.findByTopicId(topicId)
-                .orElseThrow(() -> new IllegalArgumentException("Topic not found with ID: " + topicId));
+    public int totalQuestion(PartEntity part, UUID topicId) {
 
-        for (Question question : topic.getQuestions()) {
+        TopicEntity topic = topicService.getTopicById(topicId);
+
+        int total = 0;
+
+        for (QuestionEntity question : topic.getQuestions()) {
             if (question.getPart().getPartId() == part.getPartId()) {
+
                 boolean check = questionService.checkQuestionGroup(question.getQuestionId());
-                if (check) {
-                    total = total + questionService.countQuestionToQuestionGroup(question);
-                } else {
-                    total++;
-                }
+
+                if (check) total = total + questionService.countQuestionToQuestionGroup(question);
+
+                else total++;
             }
         }
         return total;
@@ -344,36 +383,20 @@ public class TopicServiceImpl implements ITopicService {
     @Override
     public List<String> get5SuggestTopic(String query) {
 
-        List<Topic> topics = get5TopicName(query);
+        List<TopicEntity> topics = get5TopicName(query);
 
         return topics.stream()
                 .filter(
                         topic -> topic != null && !topic.getTopicName().isEmpty()
-                ).map(Topic::getTopicName)
+                )
+                .map(TopicEntity::getTopicName)
                 .toList();
     }
 
     @Override
-    public List<TopicResponse> getTopicsByStartTime(LocalDateTime startTime) {
+    public List<TopicEntity> getTopicsByStartTime(LocalDateTime startTime) {
 
-        List<Topic> topics = topicRepository.findByStartTime(startTime);
-
-        return TopicMapper.INSTANCE.toListTopicResponses(topics);
-    }
-
-    @Override
-    public TopicResponse getTopic(UUID id) {
-
-        if (id == null)
-            throw new BadRequestException("Topic ID is required");
-
-        JPAQuery<Topic> query = queryFactory.selectFrom(QTopic.topic)
-                .where(QTopic.topic.topicId.eq(id));
-        Topic topic = query.fetchOne();
-
-        if (topic == null) throw new BadRequestException("Topic not found");
-
-        return new TopicResponse(topic);
+        return topicRepository.findByStartTime(startTime);
     }
 
     @Override
@@ -390,38 +413,38 @@ public class TopicServiceImpl implements ITopicService {
     }
 
     @Override
-    public List<CommentResponse> listComment(UUID topicId) {
+    public List<CommentEntity> listComment(UUID topicId) {
 
-        Topic topic = findTopicById(topicId);
+        TopicEntity topic = getTopicById(topicId);
 
         if(topic.getComments() == null) return new ArrayList<>();
 
         return topic.getComments().stream()
                 .sorted(
-                        Comparator.comparing(Comment::getCreateAt).reversed()
-                ).map(comment ->
-                        new CommentResponse(comment, commentService.checkCommentParent(comment))
-                ).toList();
+                        Comparator.comparing(CommentEntity::getCreateAt).reversed()
+                )
+                .toList();
     }
 
     @Transactional
     @Override
     public void enableTopic(UUID topicId, boolean enable) {
 
-        Topic topic = findTopicById(topicId);
+        TopicEntity topic = getTopicById(topicId);
 
         topic.setEnable(enable);
+
         topic.setUpdateAt(LocalDateTime.now());
 
-        String statusName = enable ? StatusConstant.ACTIVE : StatusConstant.DEACTIVATE;
+        StatusEnum statusName = enable ? StatusEnum.ACTIVE : StatusEnum.DEACTIVATE;
 
-        Status statusUpdate = statusService.getStatusByName(statusName);
+        StatusEntity statusUpdate = statusService.getStatusByName(statusName);
 
         topic.setStatus(statusUpdate);
 
         topicRepository.save(topic);
 
-        MessageResponseHolder.setMessage(enable ? "Topic enabled successfully" : "Topic disabled successfully");
+        MessageResponseHolder.setMessage(enable ? "TopicEntity enabled successfully" : "TopicEntity disabled successfully");
 
     }
 
@@ -431,36 +454,37 @@ public class TopicServiceImpl implements ITopicService {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        String userRole = authentication.getAuthorities().iterator().next().getAuthority();
+        String userRole = authentication.getAuthorities().iterator().next().getAuthority().split("ROLE_")[1];
 
-        List<Question> questionList = getQuestionOfPartToTopic(topicId, partId);
+        List<QuestionEntity> questionList = getQuestionOfPartToTopic(topicId, partId);
 
         List<QuestionResponse> questionResponseList = new ArrayList<>();
 
-        for (Question question : questionList) {
+        for (QuestionEntity question : questionList) {
 
-            QuestionResponse questionResponse = new QuestionResponse(question);
+            QuestionResponse questionResponse = QuestionMapper.INSTANCE.toQuestionResponse(question);
 
             if (questionService.checkQuestionGroup(question.getQuestionId())) {
 
-                List<Question> questionGroupList = questionService.listQuestionGroup(question);
+                List<QuestionEntity> questionGroupList = questionService.listQuestionGroup(question);
 
-                List<QuestionResponse> questionGroupResponseList = new ArrayList<>();
+                questionResponse.setQuestionGroupChildren(new ArrayList<>());
 
-                for (Question questionGroup : questionGroupList) {
-                    QuestionResponse questionGroupResponse;
-                    if (userRole.equals(RoleEnum.ADMIN)) {
-                        Answer answerCorrect = answerService.correctAnswer(questionGroup);
-                        questionGroupResponse = new QuestionResponse(questionGroup, answerCorrect);
-                    } else {
-                        questionGroupResponse = new QuestionResponse(questionGroup);
+                for (QuestionEntity questionGroup : questionGroupList) {
+
+                    QuestionResponse questionGroupResponse = QuestionMapper.INSTANCE.toQuestionResponse(questionGroup);
+
+                    if (userRole.equals(RoleEnum.ADMIN.name())) {
+                        AnswerEntity answerCorrect = answerService.correctAnswer(questionGroup);
+                        questionGroupResponse.setAnswerCorrect(answerCorrect.getAnswerId());
                     }
-                    questionGroupResponseList.add(questionGroupResponse);
-                    questionResponse.setQuestionGroup(questionGroupResponseList);
+
+                    questionResponse.getQuestionGroupChildren().add(questionGroupResponse);
                 }
             } else {
-                if (userRole.equals(RoleEnum.ADMIN)) {
-                    Answer answerCorrect = answerService.correctAnswer(question);
+                if (userRole.equals(RoleEnum.ADMIN.name())) {
+
+                    AnswerEntity answerCorrect = answerService.correctAnswer(question);
                     questionResponse.setAnswerCorrect(answerCorrect.getAnswerId());
                 }
             }
@@ -478,11 +502,11 @@ public class TopicServiceImpl implements ITopicService {
     @Override
     public void deleteQuestionToTopic(UUID topicId, UUID questionId) {
 
-        Question question = questionService.getQuestionById(questionId);
+        QuestionEntity question = questionService.getQuestionById(questionId);
 
-        Topic topic = findTopicById(topicId);
+        TopicEntity topic = getTopicById(topicId);
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
         if(!existQuestionInTopic(topic, question))
             throw new BadRequestException("Question don't have in Topic");
@@ -502,9 +526,9 @@ public class TopicServiceImpl implements ITopicService {
     @SneakyThrows
     public void addAllPartsToTopicByExcelFile(UUID topicId, MultipartFile file) {
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        CreateListQuestionByExcelFileResponse excelFileDTO = excelService.parseAllPartsDTO(topicId, file);
+        ListQuestionByExcelFileResponse excelFileDTO = excelService.parseAllPartsDTO(topicId, file);
 
         processQuestions(excelFileDTO, topicId, user);
     }
@@ -523,9 +547,9 @@ public class TopicServiceImpl implements ITopicService {
                             + "]"
             );
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        CreateListQuestionByExcelFileResponse excelFileDTO;
+        ListQuestionByExcelFileResponse excelFileDTO;
 
         if(partName == 1 || partName == 2)
             excelFileDTO = excelService.parseListeningPart12DTO(topicId, file, partName);
@@ -543,50 +567,48 @@ public class TopicServiceImpl implements ITopicService {
     @SneakyThrows
     public void addListQuestionPart5ToTopicByExcelFile(UUID topicId, MultipartFile file) {
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        CreateListQuestionByExcelFileResponse excelFileDTO = excelService.parseReadingPart5DTO(topicId, file);
+        ListQuestionByExcelFileResponse excelFileDTO = excelService.parseReadingPart5DTO(topicId, file);
 
         processQuestions(excelFileDTO, topicId, user);
 
     }
 
     @Transactional
-    protected Question saveQuestionFromExcelTemplate(CreateQuestionByExcelFileResponse createQuestionDTO, User user) {
+    protected QuestionEntity saveQuestionFromExcelTemplate(QuestionByExcelFileResponse questionByExcelFileResponse, UserEntity user) {
 
-        Part part = partService.getPartToId(createQuestionDTO.getPartId());
+        PartEntity part = partService.getPartToId(questionByExcelFileResponse.getPartId());
 
-        Question question = Question.builder()
-                .questionContent(createQuestionDTO.getQuestionContent())
-                .questionScore(createQuestionDTO.getQuestionScore())
-                .questionExplainEn(createQuestionDTO.getQuestionExplainEn())
-                .questionExplainVn(createQuestionDTO.getQuestionExplainVn())
+        QuestionEntity question = QuestionEntity.builder()
                 .userCreate(user)
                 .userUpdate(user)
                 .part(part)
                 .build();
 
+        QuestionMapper.INSTANCE.flowToQuestionEntity(questionByExcelFileResponse, question);
+
         return questionRepository.save(question);
     }
 
-    protected void processAnswers(List<SaveListAnswerDTO> listAnswerDTO, Question question, User user) {
+    protected void processAnswers(List<AnswerBasicRequest> answerBasicRequestList, QuestionEntity question, UserEntity user) {
 
-        if(listAnswerDTO == null || listAnswerDTO.isEmpty()) return;
+        if(answerBasicRequestList == null || answerBasicRequestList.isEmpty()) return;
 
         if (question.getAnswers() == null)
             question.setAnswers(new ArrayList<>());
 
-        listAnswerDTO.forEach(answerDTO -> {
+        answerBasicRequestList.forEach(answerBasicRequest -> {
 
-            Answer answer = Answer.builder()
+            AnswerEntity answer = AnswerEntity.builder()
                     .question(question)
-                    .answerContent(answerDTO.getContentAnswer())
-                    .correctAnswer(answerDTO.isCorrectAnswer())
                     .userCreate(user)
                     .userUpdate(user)
                     .build();
 
-            answerRepository.save(answer);
+            AnswerMapper.INSTANCE.flowToAnswerEntity(answerBasicRequest, answer);
+
+            answer = answerRepository.save(answer);
 
             question.getAnswers().add(answer);
         });
@@ -594,10 +616,10 @@ public class TopicServiceImpl implements ITopicService {
     }
 
     @Transactional
-    protected void processContent(String contentImage, String contentAudio, Question question, User user) {
+    protected void processContent(String contentImage, String contentAudio, QuestionEntity question, UserEntity user) {
         if (contentImage != null) {
 
-            Content content = contentService.getContentByContentData(contentImage);
+            ContentEntity content = contentService.getContentByContentData(contentImage);
 
             content.setUserUpdate(user);
 
@@ -612,7 +634,7 @@ public class TopicServiceImpl implements ITopicService {
 
         if (contentAudio != null) {
 
-            Content content = contentService.getContentByContentData(contentAudio);
+            ContentEntity content = contentService.getContentByContentData(contentAudio);
 
             if (question.getContentCollection() == null)
                 question.setContentCollection(new ArrayList<>());
@@ -626,24 +648,24 @@ public class TopicServiceImpl implements ITopicService {
 
 
     @Transactional
-    protected void processQuestions(CreateListQuestionByExcelFileResponse excelFileDTO, UUID topicId, User user) {
+    protected void processQuestions(ListQuestionByExcelFileResponse listQuestionByExcelFileResponse, UUID topicId, UserEntity user) {
 
-        for (CreateQuestionByExcelFileResponse createQuestionDTO : excelFileDTO.getQuestions()) {
+        for (QuestionByExcelFileResponse questionByExcelFileResponse : listQuestionByExcelFileResponse.getQuestions()) {
 
             // Tạo câu hỏi và lưu nó trước khi xử lý câu trả lời
 
-            Question question = saveQuestionFromExcelTemplate(createQuestionDTO, user);
+            QuestionEntity question = saveQuestionFromExcelTemplate(questionByExcelFileResponse, user);
 
             // Xử lý câu trả lời
-            processAnswers(createQuestionDTO.getListAnswer(), question, user);
+            processAnswers(questionByExcelFileResponse.getListAnswer(), question, user);
 
             // Tương tự cho questionChild
-            if (createQuestionDTO.getListQuestionChild() != null && !createQuestionDTO.getListQuestionChild().isEmpty()) {
-                for (CreateQuestionByExcelFileResponse createQuestionChildDTO : createQuestionDTO.getListQuestionChild()) {
+            if (questionByExcelFileResponse.getListQuestionChild() != null && !questionByExcelFileResponse.getListQuestionChild().isEmpty()) {
+                for (QuestionByExcelFileResponse createQuestionChildDTO : questionByExcelFileResponse.getListQuestionChild()) {
 
-                    Question questionChild = saveQuestionFromExcelTemplate(createQuestionChildDTO, user);
+                    QuestionEntity questionChild = saveQuestionFromExcelTemplate(createQuestionChildDTO, user);
 
-                    questionChild.setQuestionGroup(question);
+                    questionChild.setQuestionGroupParent(question);
 
                     questionChild = questionRepository.save(questionChild); // Lưu câu hỏi con trước
 
@@ -652,84 +674,98 @@ public class TopicServiceImpl implements ITopicService {
                 }
             }
 
-            // Xử lý Content
-            processContent(createQuestionDTO.getContentImage(), createQuestionDTO.getContentAudio(), question, user);
+            // Xử lý ContentEntity
+            processContent(questionByExcelFileResponse.getContentImage(), questionByExcelFileResponse.getContentAudio(), question, user);
 
-            // Lưu câu hỏi đã cập nhật với Content
+            // Lưu câu hỏi đã cập nhật với ContentEntity
             questionRepository.save(question);
 
-            // Xử lý Topic
-            Topic topic = findTopicById(topicId);
+            // Xử lý TopicEntity
+            TopicEntity topic = getTopicById(topicId);
 
-            Part part = question.getPart();
+            PartEntity part = question.getPart();
 
             if (existPartInTopic(topic, part))
-                MessageResponseHolder.setMessage("Part of Question don't have in Topic");
+                MessageResponseHolder.setMessage("PartEntity of QuestionEntity don't have in TopicEntity");
             else {
                 topic.setUserUpdate(user);
                 topic.setUpdateAt(LocalDateTime.now());
                 topic.getQuestions().add(question);
                 topicRepository.save(topic);
-                MessageResponseHolder.setMessage("Add Question to Topic successfully");
+                MessageResponseHolder.setMessage("Add QuestionEntity to TopicEntity successfully");
             }
         }
     }
 
     @Transactional
     @Override
-    public void addListQuestionToTopic(UUID topicId, SaveListQuestionDTO createQuestionDTOList) {
+    public void addListQuestionToTopic(UUID topicId, ListQuestionRequest listQuestionRequest) {
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        for (SaveQuestionDTO createQuestionDTO : createQuestionDTOList.getListQuestion()) {
-            Question question = new Question();
-            question.setQuestionContent(createQuestionDTO.getQuestionContent());
-            question.setQuestionScore(createQuestionDTO.getQuestionScore());
-            question.setUserCreate(user);
-            question.setUserUpdate(user);
+        for (QuestionRequest questionRequest : listQuestionRequest.getListQuestion()) {
 
-            Part part = partService.getPartToId(createQuestionDTO.getPartId());
-            question.setPart(part);
-            questionRepository.save(question);
+            PartEntity part = partService.getPartToId(questionRequest.getPartId());
 
+            QuestionEntity question = QuestionEntity.builder()
+                    .userCreate(user)
+                    .userUpdate(user)
+                    .part(part)
+                    .build();
 
-            if (createQuestionDTO.getListAnswer() != null && !createQuestionDTO.getListAnswer().isEmpty()) {
-                for (SaveListAnswerDTO createListAnswerDTO : createQuestionDTO.getListAnswer()) {
-                    Answer answer = new Answer();
-                    answer.setQuestion(question);
-                    answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
-                    answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
-                    answer.setUserUpdate(user);
-                    answer.setUserCreate(user);
+            QuestionMapper.INSTANCE.flowToQuestionEntity(questionRequest, question);
+
+            question = questionRepository.save(question);
+
+            if (questionRequest.getListAnswer() != null && !questionRequest.getListAnswer().isEmpty()) {
+                for (AnswerBasicRequest answerBasicRequest : questionRequest.getListAnswer()) {
+
+                    AnswerEntity answer = AnswerEntity.builder()
+                            .question(question)
+                            .userCreate(user)
+                            .userUpdate(user)
+                            .build();
+
+                    AnswerMapper.INSTANCE.flowToAnswerEntity(answerBasicRequest, answer);
 
                     answerRepository.save(answer);
                 }
             }
 
-            if (createQuestionDTO.getListQuestionChild() != null && !createQuestionDTO.getListQuestionChild().isEmpty()) {
-                for (SaveQuestionDTO createQuestionChildDTO : createQuestionDTO.getListQuestionChild()) {
-                    Question questionChild = new Question();
-                    questionChild.setQuestionGroup(question);
-                    questionChild.setQuestionContent(createQuestionChildDTO.getQuestionContent());
-                    questionChild.setQuestionScore(createQuestionChildDTO.getQuestionScore());
-                    questionChild.setPart(question.getPart());
-                    questionChild.setUserCreate(user);
-                    questionChild.setUserUpdate(user);
+            if (questionRequest.getListQuestionChild() != null && !questionRequest.getListQuestionChild().isEmpty()) {
+                for (QuestionRequest questionRequestItem : questionRequest.getListQuestionChild()) {
 
-                    questionRepository.save(questionChild);
+                    QuestionEntity questionChild = QuestionEntity.builder()
+                            .questionGroupParent(question)
+                            .part(part)
+                            .userCreate(user)
+                            .userUpdate(user)
+                            .build();
 
-                    for (SaveListAnswerDTO createListAnswerDTO : createQuestionChildDTO.getListAnswer()) {
-                        Answer answer = new Answer();
+                    QuestionMapper.INSTANCE.flowToQuestionEntity(questionRequestItem, questionChild);
+
+                    questionChild = questionRepository.save(questionChild);
+
+
+                    if (questionChild.getAnswers() == null)
+                        questionChild.setAnswers(new ArrayList<>());
+
+                    for (AnswerBasicRequest answerBasicRequest : questionRequestItem.getListAnswer()) {
+
+                        AnswerEntity answer = AnswerEntity.builder()
+                                .question(questionChild)
+                                .userCreate(user)
+                                .userUpdate(user)
+                                .build();
+
                         answer.setQuestion(questionChild);
-                        answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
-                        answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
                         answer.setUserUpdate(user);
                         answer.setUserCreate(user);
 
-                        answerRepository.save(answer);
-                        if (questionChild.getAnswers() == null) {
-                            questionChild.setAnswers(new ArrayList<>());
-                        }
+                        AnswerMapper.INSTANCE.flowToAnswerEntity(answerBasicRequest, answer);
+
+                        answer = answerRepository.save(answer);
+
                         questionChild.getAnswers().add(answer);
                     }
 
@@ -738,15 +774,19 @@ public class TopicServiceImpl implements ITopicService {
 
             }
 
-            if (createQuestionDTO.getContentImage() != null && !createQuestionDTO.getContentImage().isEmpty()) {
+            if (questionRequest.getContentImage() != null && !questionRequest.getContentImage().isEmpty()) {
 
-                Blob blobResponse = fileStorageService.save(createQuestionDTO.getContentImage());
+                Blob blobResponse = fileStorageService.save(questionRequest.getContentImage());
 
                 String fileName = blobResponse.getName();
 
-                Content content = new Content(question, GetExtension.typeFile(fileName), fileName);
-                content.setUserCreate(user);
-                content.setUserUpdate(user);
+                ContentEntity content = ContentEntity.builder()
+                        .contentData(fileName)
+                        .contentType(GetExtension.typeFile(fileName))
+                        .question(question)
+                        .userCreate(user)
+                        .userUpdate(user)
+                        .build();
 
                 if (question.getContentCollection() == null)
                     question.setContentCollection(new ArrayList<>());
@@ -755,15 +795,19 @@ public class TopicServiceImpl implements ITopicService {
 
                 contentRepository.save(content);
             }
-            if (createQuestionDTO.getContentAudio() != null && !createQuestionDTO.getContentAudio().isEmpty()) {
+            if (questionRequest.getContentAudio() != null && !questionRequest.getContentAudio().isEmpty()) {
 
-                Blob blobResponse = fileStorageService.save(createQuestionDTO.getContentAudio());
+                Blob blobResponse = fileStorageService.save(questionRequest.getContentAudio());
 
                 String fileName = blobResponse.getName();
 
-                Content content = new Content(question, GetExtension.typeFile(fileName), fileName);
-                content.setUserCreate(user);
-                content.setUserUpdate(user);
+                ContentEntity content = ContentEntity.builder()
+                        .contentData(fileName)
+                        .contentType(GetExtension.typeFile(fileName))
+                        .question(question)
+                        .userCreate(user)
+                        .userUpdate(user)
+                        .build();
 
                 if (question.getContentCollection() == null)
                     question.setContentCollection(new ArrayList<>());
@@ -775,10 +819,10 @@ public class TopicServiceImpl implements ITopicService {
 
             questionRepository.save(question);
 
-            Topic topic = findTopicById(topicId);
+            TopicEntity topic = getTopicById(topicId);
 
             if (existPartInTopic(topic, part))
-                MessageResponseHolder.setMessage("Part of Question don't have in Topic");
+                MessageResponseHolder.setMessage("Part of Question haven't in Topic");
             else {
                 topic.setUserUpdate(user);
                 topic.setUpdateAt(LocalDateTime.now());
@@ -792,15 +836,15 @@ public class TopicServiceImpl implements ITopicService {
 
     @Transactional
     @Override
-    public QuestionResponse addQuestionToTopic(UUID topicId, SaveQuestionDTO createQuestionDTO) {
+    public QuestionResponse addQuestionToTopic(UUID topicId, QuestionRequest questionRequest) {
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        Part part = partService.getPartToId(createQuestionDTO.getPartId());
+        PartEntity part = partService.getPartToId(questionRequest.getPartId());
 
-        Question question = Question.builder()
-                .questionContent(createQuestionDTO.getQuestionContent())
-                .questionScore(createQuestionDTO.getQuestionScore())
+        QuestionEntity question = QuestionEntity.builder()
+                .questionContent(questionRequest.getQuestionContent())
+                .questionScore(questionRequest.getQuestionScore())
                 .userCreate(user)
                 .userUpdate(user)
                 .part(part)
@@ -808,47 +852,55 @@ public class TopicServiceImpl implements ITopicService {
 
         question = questionRepository.saveAndFlush(question);
 
-        if (createQuestionDTO.getListAnswer() != null && !createQuestionDTO.getListAnswer().isEmpty()) {
-            for (SaveListAnswerDTO createListAnswerDTO : createQuestionDTO.getListAnswer()) {
-                Answer answer = new Answer();
-                answer.setQuestion(question);
-                answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
-                answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
-                answer.setUserUpdate(user);
-                answer.setUserCreate(user);
+        if (question.getAnswers() == null)
+            question.setAnswers(new ArrayList<>());
+
+        if (questionRequest.getListAnswer() != null && !questionRequest.getListAnswer().isEmpty()) {
+            for (AnswerBasicRequest answerBasicRequest : questionRequest.getListAnswer()) {
+
+                AnswerEntity answer = AnswerEntity.builder()
+                        .question(question)
+                        .userCreate(user)
+                        .userUpdate(user)
+                        .build();
+
+                AnswerMapper.INSTANCE.flowToAnswerEntity(answerBasicRequest, answer);
 
                 answerRepository.save(answer);
-                if (question.getAnswers() == null) {
-                    question.setAnswers(new ArrayList<>());
-                }
+
                 question.getAnswers().add(answer);
             }
         }
 
-        if (createQuestionDTO.getListQuestionChild() != null && !createQuestionDTO.getListQuestionChild().isEmpty()) {
-            for (SaveQuestionDTO createQuestionChildDTO : createQuestionDTO.getListQuestionChild()) {
-                Question questionChild = new Question();
-                questionChild.setQuestionGroup(question);
-                questionChild.setQuestionContent(createQuestionChildDTO.getQuestionContent());
-                questionChild.setQuestionScore(createQuestionChildDTO.getQuestionScore());
-                questionChild.setPart(question.getPart());
-                questionChild.setUserCreate(user);
-                questionChild.setUserUpdate(user);
+        if (questionRequest.getListQuestionChild() != null && !questionRequest.getListQuestionChild().isEmpty()) {
+            for (QuestionRequest questionRequestItem : questionRequest.getListQuestionChild()) {
 
-                questionRepository.save(questionChild);
+                QuestionEntity questionChild = QuestionEntity.builder()
+                        .questionGroupParent(question)
+                        .part(question.getPart())
+                        .userCreate(user)
+                        .userUpdate(user)
+                        .build();
 
-                for (SaveListAnswerDTO createListAnswerDTO : createQuestionChildDTO.getListAnswer()) {
-                    Answer answer = new Answer();
-                    answer.setQuestion(questionChild);
-                    answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
-                    answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
-                    answer.setUserUpdate(user);
-                    answer.setUserCreate(user);
+                QuestionMapper.INSTANCE.flowToQuestionEntity(questionRequestItem, questionChild);
 
-                    answerRepository.save(answer);
-                    if (questionChild.getAnswers() == null) {
-                        questionChild.setAnswers(new ArrayList<>());
-                    }
+                questionChild = questionRepository.save(questionChild);
+
+                if (questionChild.getAnswers() == null)
+                    questionChild.setAnswers(new ArrayList<>());
+
+                for (AnswerBasicRequest answerBasicRequest : questionRequestItem.getListAnswer()) {
+
+                    AnswerEntity answer = AnswerEntity.builder()
+                            .question(questionChild)
+                            .userCreate(user)
+                            .userUpdate(user)
+                            .build();
+
+                    AnswerMapper.INSTANCE.flowToAnswerEntity(answerBasicRequest, answer);
+
+                    answer = answerRepository.save(answer);
+
                     questionChild.getAnswers().add(answer);
                 }
 
@@ -857,48 +909,57 @@ public class TopicServiceImpl implements ITopicService {
 
         }
 
-        if (createQuestionDTO.getContentImage() != null && !createQuestionDTO.getContentImage().isEmpty()) {
+        if (question.getContentCollection() == null)
+            question.setContentCollection(new ArrayList<>());
 
-            Blob blobResponse = fileStorageService.save(createQuestionDTO.getContentImage());
+        if (questionRequest.getContentImage() != null && !questionRequest.getContentImage().isEmpty()) {
+
+            Blob blobResponse = fileStorageService.save(questionRequest.getContentImage());
 
             String fileName = blobResponse.getName();
 
-            Content content = new Content(question, GetExtension.typeFile(fileName), fileName);
-            content.setUserCreate(user);
-            content.setUserUpdate(user);
-
-            if (question.getContentCollection() == null)
-                question.setContentCollection(new ArrayList<>());
+            ContentEntity content = ContentEntity.builder()
+                    .contentData(fileName)
+                    .contentType(GetExtension.typeFile(fileName))
+                    .question(question)
+                    .userCreate(user)
+                    .userUpdate(user)
+                    .build();
 
             question.getContentCollection().add(content);
+
             contentRepository.save(content);
 
         }
-        if (createQuestionDTO.getContentAudio() != null && !createQuestionDTO.getContentAudio().isEmpty()) {
 
-            Blob blobResponse = fileStorageService.save(createQuestionDTO.getContentAudio());
+        if (questionRequest.getContentAudio() != null && !questionRequest.getContentAudio().isEmpty()) {
+
+            Blob blobResponse = fileStorageService.save(questionRequest.getContentAudio());
 
             String fileName = blobResponse.getName();
 
-            Content content = new Content(question, GetExtension.typeFile(fileName), fileName);
-            content.setUserCreate(user);
-            content.setUserUpdate(user);
+            ContentEntity content = ContentEntity.builder()
+                    .contentData(fileName)
+                    .contentType(GetExtension.typeFile(fileName))
+                    .question(question)
+                    .userCreate(user)
+                    .userUpdate(user)
+                    .build();
 
-            if (question.getContentCollection() == null)
-                question.setContentCollection(new ArrayList<>());
 
             question.getContentCollection().add(content);
-            contentRepository.save(content);
 
+            contentRepository.save(content);
         }
 
         question = questionRepository.saveAndFlush(question);
 
-        Topic topic = findTopicById(topicId);
+        TopicEntity topic = getTopicById(topicId);
 
-        if(existPartInTopic(topic, part)) {
+        if (existPartInTopic(topic, part)){
+
             MessageResponseHolder.setMessage("Part of Question don't have in Topic");
-            return null;
+            return QuestionMapper.INSTANCE.toQuestionResponse(question);
         }
         else {
             topic.setUserUpdate(user);
@@ -906,27 +967,29 @@ public class TopicServiceImpl implements ITopicService {
             topic.getQuestions().add(question);
             topicRepository.save(topic);
 
-            Question question1 = questionService.getQuestionById(question.getQuestionId());
-            QuestionResponse questionResponse = new QuestionResponse(question1);
+            QuestionEntity question1 = questionService.getQuestionById(question.getQuestionId());
+            QuestionResponse questionResponse = QuestionMapper.INSTANCE.toQuestionResponse(question1);
 
             if (questionService.checkQuestionGroup(question1.getQuestionId())) {
-                List<Question> questionGroupList = questionService.listQuestionGroup(question1);
-                List<QuestionResponse> questionGroupResponseList = new ArrayList<>();
+                List<QuestionEntity> questionGroupList = questionService.listQuestionGroup(question1);
+                List<QuestionBasicResponse> questionGroupResponseList = new ArrayList<>();
 
-                for (Question questionGroup : questionGroupList) {
-                    QuestionResponse questionGroupResponse;
+                for (QuestionEntity questionGroup : questionGroupList) {
 
-                    Answer answerCorrect = answerService.correctAnswer(questionGroup);
-                    questionGroupResponse = new QuestionResponse(questionGroup, answerCorrect);
+                    AnswerEntity answerCorrect = answerService.correctAnswer(questionGroup);
+                    QuestionBasicResponse questionGroupResponse = QuestionMapper.INSTANCE.toQuestionBasicResponse(questionGroup);
+                    questionGroupResponse.setAnswerCorrect(answerCorrect.getAnswerId());
                     questionGroupResponseList.add(questionGroupResponse);
-                    questionResponse.setQuestionGroup(questionGroupResponseList);
                 }
+
+                questionResponse.setQuestionGroupChildren(questionGroupResponseList);
             } else {
-                Answer answerCorrect = answerService.correctAnswer(question1);
+                AnswerEntity answerCorrect = answerService.correctAnswer(question1);
                 questionResponse.setAnswerCorrect(answerCorrect.getAnswerId());
             }
 
-            MessageResponseHolder.setMessage("Add Question to Topic successfully");
+            MessageResponseHolder.setMessage("Add QuestionEntity to TopicEntity successfully");
+
             return questionResponse;
         }
     }
@@ -940,7 +1003,7 @@ public class TopicServiceImpl implements ITopicService {
                 .offset((long) (filterRequest.getPage() - 1) * filterRequest.getSize())
                 .build();
 
-        BooleanExpression wherePattern = QTopic.topic.isNotNull();
+        BooleanExpression wherePattern = QTopicEntity.topicEntity.isNotNull();
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -950,24 +1013,24 @@ public class TopicServiceImpl implements ITopicService {
                     auth -> auth.getAuthority().equals("ROLE_" + RoleEnum.USER.name())
                                 );
 
-            if(isUser) wherePattern = wherePattern.and(QTopic.topic.enable.eq(Boolean.TRUE));
+            if(isUser) wherePattern = wherePattern.and(QTopicEntity.topicEntity.enable.eq(Boolean.TRUE));
 
         }
 
         if (filterRequest.getPackId() != null)
-            wherePattern = wherePattern.and(QTopic.topic.pack.packId.eq(filterRequest.getPackId()));
+            wherePattern = wherePattern.and(QTopicEntity.topicEntity.pack.packId.eq(filterRequest.getPackId()));
 
         if (filterRequest.getSearch() != null && !filterRequest.getSearch().isEmpty())
-            wherePattern = wherePattern.and(QTopic.topic.topicName.lower().like("%" + filterRequest.getSearch().toLowerCase() + "%"));
+            wherePattern = wherePattern.and(QTopicEntity.topicEntity.topicName.lower().like("%" + filterRequest.getSearch().toLowerCase() + "%"));
 
 
         if (filterRequest.getType() != null && !filterRequest.getType().isEmpty())
-            wherePattern = wherePattern.and(QTopic.topic.topicType.lower().like(filterRequest.getType().toLowerCase()));
+            wherePattern = wherePattern.and(QTopicEntity.topicEntity.topicType.lower().like(filterRequest.getType().toLowerCase()));
 
         long totalElements = Optional.ofNullable(
                             queryFactory
-                                    .select(QTopic.topic.count())
-                                    .from(QTopic.topic)
+                                    .select(QTopicEntity.topicEntity.count())
+                                    .from(QTopicEntity.topicEntity)
                                     .where(wherePattern)
                                     .fetchOne()
                 ).orElse(0L);
@@ -980,24 +1043,24 @@ public class TopicServiceImpl implements ITopicService {
 
         if ("name".equalsIgnoreCase(filterRequest.getSortBy())) {
             if (Sort.Direction.DESC.equals(filterRequest.getSortDirection()))
-                orderSpecifier = QTopic.topic.topicName.lower().desc();
+                orderSpecifier = QTopicEntity.topicEntity.topicName.lower().desc();
             else
-                orderSpecifier = QTopic.topic.topicName.lower().asc();
+                orderSpecifier = QTopicEntity.topicEntity.topicName.lower().asc();
 
         } else if ("updateAt".equalsIgnoreCase(filterRequest.getSortBy())) {
             if (Sort.Direction.DESC.equals(filterRequest.getSortDirection()))
-                orderSpecifier = QTopic.topic.updateAt.desc();
+                orderSpecifier = QTopicEntity.topicEntity.updateAt.desc();
             else
-                orderSpecifier = QTopic.topic.updateAt.asc();
+                orderSpecifier = QTopicEntity.topicEntity.updateAt.asc();
 
         } else {
             if (Sort.Direction.DESC.equals(filterRequest.getSortDirection()))
-                orderSpecifier = QTopic.topic.updateAt.desc();
+                orderSpecifier = QTopicEntity.topicEntity.updateAt.desc();
             else
-                orderSpecifier = QTopic.topic.updateAt.asc();
+                orderSpecifier = QTopicEntity.topicEntity.updateAt.asc();
         }
 
-        JPAQuery<Topic> query = queryFactory.selectFrom(QTopic.topic)
+        JPAQuery<TopicEntity> query = queryFactory.selectFrom(QTopicEntity.topicEntity)
                                             .where(wherePattern)
                                             .orderBy(orderSpecifier)
                                             .offset(filterResponse.getOffset())

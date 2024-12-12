@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.PostCategory.SavePostCategoryDto;
-import com.example.englishmaster_be.DTO.PostCategory.UpdatePostCategoryDto;
+import com.example.englishmaster_be.Model.Request.PostCategory.PostCategoryRequest;
 import com.example.englishmaster_be.Service.IPostCategoryService;
 import com.example.englishmaster_be.Value.MicroserviceValue;
 import jakarta.persistence.EntityNotFoundException;
@@ -9,10 +8,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -51,11 +47,11 @@ public class PostCategoryService implements IPostCategoryService {
     }
 
     @Override
-    public Object createPostCategory(SavePostCategoryDto dto) {
+    public Object createPostCategory(PostCategoryRequest dto) {
         String createUrl = microserviceValue.getURL() + microserviceValue.getPrefix() + microserviceValue.getCreateEndpoint();
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-API-KEY", microserviceValue.getAPI_KEY());
-        HttpEntity<SavePostCategoryDto> requestEntity = new HttpEntity<>(dto, headers);
+        HttpEntity<PostCategoryRequest> requestEntity = new HttpEntity<>(dto, headers);
         Map<String, Object> response = getResponse(createUrl, HttpMethod.POST, requestEntity);
         if (response.containsKey("responseData")) {
             return response.get("responseData");
@@ -81,7 +77,7 @@ public class PostCategoryService implements IPostCategoryService {
         Map<String, Object> response = getResponse(getByIdUrl, HttpMethod.GET, requestEntity);
         if (response.containsKey("responseData")) {
             if (response.get("responseData") == null) {
-                throw new EntityNotFoundException("Post category not found");
+                throw new EntityNotFoundException("PostEntity category not found");
             }
             return response.get("responseData");
         }
@@ -89,11 +85,11 @@ public class PostCategoryService implements IPostCategoryService {
     }
 
     @Override
-    public Object updatePostCategory(UUID id, UpdatePostCategoryDto dto) {
-        String createUrl = microserviceValue.getURL() + microserviceValue.getPrefix() + microserviceValue.getUpdateEndpoint().replace("{id}", id.toString());
+    public Object updatePostCategory(PostCategoryRequest dto) {
+        String createUrl = microserviceValue.getURL() + microserviceValue.getPrefix() + microserviceValue.getUpdateEndpoint().replace("{id}", dto.getId().toString());
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-API-KEY", microserviceValue.getAPI_KEY());
-        HttpEntity<SavePostCategoryDto> requestEntity = new HttpEntity<>(dto, headers);
+        HttpEntity<PostCategoryRequest> requestEntity = new HttpEntity<>(dto, headers);
         Map<String, Object> response = getResponse(createUrl, HttpMethod.PATCH, requestEntity);
         if (response.containsKey("responseData")) {
             return response.get("responseData");
@@ -108,7 +104,7 @@ public class PostCategoryService implements IPostCategoryService {
         Map<String, Object> response = getResponse(getByIdUrl, HttpMethod.GET, requestEntity);
         if (response.containsKey("responseData")) {
             if (response.get("responseData") == null) {
-                throw new EntityNotFoundException("Post category not found");
+                throw new EntityNotFoundException("PostEntity category not found");
             }
             return response.get("responseData");
         }
@@ -120,7 +116,7 @@ public class PostCategoryService implements IPostCategoryService {
         String deleteUrl = microserviceValue.getURL() + microserviceValue.getPrefix() + microserviceValue.getDeleteEndpoint().replace("{id}", id.toString());
         HttpHeaders headers = new HttpHeaders();
         headers.set("X-API-KEY", microserviceValue.getAPI_KEY());
-        HttpEntity<SavePostCategoryDto> requestEntity = new HttpEntity<>(headers);
+        HttpEntity<PostCategoryRequest> requestEntity = new HttpEntity<>(headers);
         Map<String, Object> response = getResponse(deleteUrl, HttpMethod.DELETE, requestEntity);
         if (response.containsKey("responseData")) {
             return response.get("responseData");

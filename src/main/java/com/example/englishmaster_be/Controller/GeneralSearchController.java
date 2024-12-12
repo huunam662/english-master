@@ -7,27 +7,24 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Map;
-
 @Tag(name = "General search")
 @RestController
-@RequestMapping("/api/search")
+@RequestMapping("/search")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class GeneralSearchController{
 
     GeneralSearchService generalSearchService;
 
+
     @GetMapping("/searchAll")
     @MessageResponse("Search successfully")
-    public GeneralSearchAllResponse searchAll(@RequestParam("keyword") String keyword){
+    public GeneralSearchAllResponse searchAll(@RequestParam(value = "keyword", defaultValue = "") String keyword){
 
        return generalSearchService.searchAll(keyword);
     }

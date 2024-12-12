@@ -1,19 +1,19 @@
 package com.example.englishmaster_be.Mapper;
 
-import com.example.englishmaster_be.DTO.ConfirmationToken.SaveConfirmationTokenDTO;
-import com.example.englishmaster_be.Model.ConfirmationToken;
+import com.example.englishmaster_be.Model.Request.ConfirmationToken.ConfirmationTokenRequest;
+import com.example.englishmaster_be.entity.ConfirmationTokenEntity;
 import com.example.englishmaster_be.Model.Response.ConfirmationTokenResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
 
-@Mapper(componentModel = "spring")
+@Mapper
 public interface ConfirmationTokenMapper {
 
     ConfirmationTokenMapper INSTANCE = Mappers.getMapper(ConfirmationTokenMapper.class);
 
-    ConfirmationToken toConfirmationToken(SaveConfirmationTokenDTO createConfirmationTokenDTO);
+    ConfirmationTokenEntity toConfirmationTokenEntity(ConfirmationTokenRequest confirmationTokenRequest);
 
-    ConfirmationTokenResponse toConfirmationTokenResponse(ConfirmationToken confirmationToken);
+    ConfirmationTokenResponse toConfirmationTokenResponse(ConfirmationTokenEntity confirmationToken);
 }
 

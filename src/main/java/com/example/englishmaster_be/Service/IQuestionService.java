@@ -1,16 +1,11 @@
 package com.example.englishmaster_be.Service;
 
-import com.example.englishmaster_be.DTO.Question.SaveGroupQuestionDTO;
-import com.example.englishmaster_be.DTO.Question.SaveQuestionDTO;
-import com.example.englishmaster_be.DTO.UploadFileDTO;
-import com.example.englishmaster_be.DTO.UploadMultiFileDTO;
-import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.Model.Request.Question.GroupQuestionRequest;
+import com.example.englishmaster_be.Model.Request.Question.QuestionRequest;
+import com.example.englishmaster_be.Model.Request.UploadMultiFileRequest;
 import com.example.englishmaster_be.Model.Response.QuestionGroupResponse;
 import com.example.englishmaster_be.Model.Response.QuestionResponse;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import com.example.englishmaster_be.entity.QuestionEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -19,26 +14,26 @@ import java.util.UUID;
 
 public interface IQuestionService {
 
-    QuestionResponse saveQuestion(SaveQuestionDTO saveQuestionDTO);
+    QuestionEntity saveQuestion(QuestionRequest questionRequest);
 
-    Question getQuestionById(UUID questionId);
+    QuestionEntity getQuestionById(UUID questionId);
 
-    QuestionResponse uploadFileQuestion(UUID questionId, UploadMultiFileDTO uploadMultiFileDTO);
+    QuestionEntity uploadFileQuestion(UUID questionId, UploadMultiFileRequest uploadMultiFileDTO);
 
-    QuestionResponse updateFileQuestion(UUID questionId, String oldFileName, MultipartFile newFile);
+    QuestionEntity updateFileQuestion(UUID questionId, String oldFileName, MultipartFile newFile);
 
-    QuestionResponse createGroupQuestion(SaveGroupQuestionDTO createGroupQuestionDTO);
+    QuestionEntity createGroupQuestion(GroupQuestionRequest createGroupQuestionDTO);
 
-    List<Question> getTop10Question(int index, UUID partId);
+    List<QuestionEntity> getTop10Question(int index, UUID partId);
 
-    int countQuestionToQuestionGroup(Question question);
+    int countQuestionToQuestionGroup(QuestionEntity question);
 
     boolean checkQuestionGroup(UUID questionId);
 
-    List<Question> listQuestionGroup(Question question);
+    List<QuestionEntity> listQuestionGroup(QuestionEntity question);
 
     void deleteQuestion(UUID questionId);
 
-    List<QuestionGroupResponse> getQuestionGroupToQuestion(UUID questionId);
+    List<QuestionEntity> getQuestionGroupListByQuestionId(UUID questionId);
 
 }

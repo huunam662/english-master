@@ -1,27 +1,27 @@
 package com.example.englishmaster_be.Service;
 
-import com.example.englishmaster_be.DTO.Posts.SavePostDto;
-import com.example.englishmaster_be.DTO.Posts.FilterPostDto;
-import com.example.englishmaster_be.DTO.Posts.SelectPostDto;
-import com.example.englishmaster_be.DTO.Posts.UpdatePostDto;
+import com.example.englishmaster_be.Model.Request.Posts.PostRequest;
+import com.example.englishmaster_be.Model.Request.Posts.FilterPostRequest;
+import com.example.englishmaster_be.Model.Request.Posts.SelectPostRequest;
+import com.example.englishmaster_be.Model.Request.Posts.UpdatePostRequest;
 
 import java.util.UUID;
 
 public interface IPostsService {
 
-    Object createPost(SavePostDto dto);
+    Object createPost(PostRequest dto);
 
-    Object updatePost(UUID id, UpdatePostDto dto);
+    Object updatePost(UUID id, UpdatePostRequest dto);
 
     Object deletePost(UUID id);
 
-    Object getAllPosts(SelectPostDto dto);
+    Object getAllPosts(SelectPostRequest dto);
 
-    Object getPostByPostCategorySlug(String slug, FilterPostDto dto);
+    Object getPostByPostCategorySlug(String slug, FilterPostRequest dto);
 
     Object getPostBySlug(String slug);
 
-    Object searchPost(FilterPostDto dto);
+    Object searchPost(FilterPostRequest dto);
 
     Object getById(UUID id);
 

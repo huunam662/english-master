@@ -1,10 +1,9 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.Model.Otp;
+import com.example.englishmaster_be.entity.OtpEntity;
 import com.example.englishmaster_be.Repository.OtpRepository;
 import com.example.englishmaster_be.Service.IOtpService;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,7 @@ public class OtpServiceImpl implements IOtpService {
 
         String otpCode = String.format("%06d", new Random().nextInt(999999));
 
-        Otp otpObj = new Otp();
+        OtpEntity otpObj = new OtpEntity();
 
         otpObj.setOtp(otpCode);
         otpObj.setEmail(email);
@@ -46,11 +45,11 @@ public class OtpServiceImpl implements IOtpService {
     @Override
     public boolean validateOtp(String otp) {
 
-        Optional<Otp> otpObj = otpRepository.findById(otp);
+        Optional<OtpEntity> otpObj = otpRepository.findById(otp);
 
         if (otpObj.isEmpty()) return false;
 
-        Otp foundOtp = otpObj.get();
+        OtpEntity foundOtp = otpObj.get();
 
         return foundOtp.getExpirationTime().isBefore(LocalDateTime.now());
     }
@@ -58,9 +57,9 @@ public class OtpServiceImpl implements IOtpService {
     @Transactional
     @Override
     public void updateOtpStatusToVerified(String otp) {
-        Optional<Otp> otpObj = otpRepository.findById(otp);
+        Optional<OtpEntity> otpObj = otpRepository.findById(otp);
         if (otpObj.isPresent()) {
-            Otp foundOtp = otpObj.get();
+            OtpEntity foundOtp = otpObj.get();
             foundOtp.setStatus("Verified");
             otpRepository.save(foundOtp);
         }
@@ -68,8 +67,8 @@ public class OtpServiceImpl implements IOtpService {
     @Override
     public void deleteOtp(String otp) {
 
-        Otp otpEntity = otpRepository.findById(otp).orElseThrow(
-                () -> new RuntimeException("Otp not found")
+        OtpEntity otpEntity = otpRepository.findById(otp).orElseThrow(
+                () -> new RuntimeException("OtpEntity not found")
         );
 
         otpRepository.delete(otpEntity);
