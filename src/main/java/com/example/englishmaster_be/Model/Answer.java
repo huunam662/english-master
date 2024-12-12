@@ -10,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -59,9 +60,17 @@ public class Answer implements Serializable {
     @JoinColumn(name = "question_id", referencedColumnName = "id")
     Question question;
 
+    @ManyToMany
+    @JoinTable(
+            name = "user_answer_answers",
+            joinColumns = @JoinColumn(name = "answer_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_answer_id")
+    )
+    private Set<UserAnswer> userAnswers;
+
     public Answer(SaveAnswerDTO createAnswerDTO) {
 
-        if(Objects.isNull(createAnswerDTO)) return;
+        if (Objects.isNull(createAnswerDTO)) return;
 
         this.answerContent = createAnswerDTO.getContentAnswer();
         this.correctAnswer = createAnswerDTO.isCorrectAnswer();
