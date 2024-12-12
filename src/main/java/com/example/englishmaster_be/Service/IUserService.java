@@ -2,12 +2,10 @@ package com.example.englishmaster_be.Service;
 
 import com.example.englishmaster_be.Common.dto.response.FilterResponse;
 import com.example.englishmaster_be.Model.Request.*;
-import com.example.englishmaster_be.Model.Request.User.ChangePasswordRequest;
 import com.example.englishmaster_be.Model.Request.User.ChangeProfileRequest;
 import com.example.englishmaster_be.Model.Request.User.UserFilterRequest;
 import com.example.englishmaster_be.Model.Response.AuthResponse;
 import com.example.englishmaster_be.Model.Response.CountMockTestTopicResponse;
-import com.example.englishmaster_be.Model.Response.InformationUserResponse;
 import com.example.englishmaster_be.entity.UserEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.List;
@@ -16,25 +14,25 @@ import java.util.UUID;
 
 public interface IUserService {
 
-    void registerUser(UserRegisterDTO userRegisterDTO);
+    void registerUser(UserRegisterRequest userRegisterDTO);
 
     void confirmRegister(String confirmationToken);
 
-    AuthResponse login(UserLoginDTO userLoginDTO);
+    AuthResponse login(UserLoginRequest userLoginDTO);
 
     void forgotPassword(String email);
 
     void verifyOtp(String otp);
 
-    void changePassword(ChangePasswordDTO changePasswordDTO);
+    void changePassword(ChangePasswordRequest changePasswordDTO);
 
     String confirmForgetPassword(String token);
 
-    AuthResponse refreshToken(RefreshTokenDTO refreshTokenDTO);
+    AuthResponse refreshToken(RefreshTokenRequest refreshTokenDTO);
 
     UserEntity changeProfile(ChangeProfileRequest changeProfileRequest);
 
-    void changePass(ChangePasswordRequest changePassDTO);
+    void changePass(com.example.englishmaster_be.Model.Request.User.ChangePasswordRequest changePassDTO);
 
     FilterResponse<?> getExamResultsUser(UserFilterRequest filterRequest);
 
@@ -50,7 +48,7 @@ public interface IUserService {
 
     UserEntity findUserById(UUID userId);
 
-    void logoutUserOf(UserLogoutDTO userLogoutDTO);
+    void logoutUserOf(UserLogoutRequest userLogoutDTO);
 
     boolean logoutUser();
 

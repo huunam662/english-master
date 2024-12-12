@@ -15,10 +15,4 @@ public class ListQuestionByExcelFileResponse {
 
     List<QuestionByExcelFileResponse> questions;
 
-    @Override
-    public String toString() {
-        return "CreateListQuestionByExcelFileDTO{" +
-                "questions=" + questions +
-                '}';
-    }
 }

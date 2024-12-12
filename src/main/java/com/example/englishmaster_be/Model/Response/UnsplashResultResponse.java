@@ -1,18 +1,16 @@
-package com.example.englishmaster_be.Model.Request;
+package com.example.englishmaster_be.Model.Response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserLogoutDTO {
+public class UnsplashResultResponse {
 
-    String accessToken;
-
-    String refreshToken;
+    String urls;
 
 }

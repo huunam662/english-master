@@ -1,9 +1,9 @@
 package com.example.englishmaster_be.Configuration.filter;
 
+import com.example.englishmaster_be.Common.enums.ErrorEnum;
 import com.example.englishmaster_be.Configuration.jwt.JwtUtils;
-import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Common.dto.response.ExceptionResponseModel;
-import com.example.englishmaster_be.Exception.CustomException;
+import com.example.englishmaster_be.Exception.template.CustomException;
 import com.example.englishmaster_be.Service.IInvalidTokenService;
 import io.swagger.v3.core.util.Json;
 import jakarta.servlet.FilterChain;
@@ -53,14 +53,14 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 String jwt = headerAuth.substring(7);
 
                 if (!jwtUtils.validateJwtToken(jwt) || invalidTokenService.invalidToken(jwt))
-                    throw new CustomException(Error.UNAUTHENTICATED);
+                    throw new CustomException(ErrorEnum.UNAUTHENTICATED);
 
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                 if(!userDetails.isEnabled())
-                    throw new CustomException(Error.ACCOUNT_DISABLED);
+                    throw new CustomException(ErrorEnum.ACCOUNT_DISABLED);
 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
@@ -82,13 +82,13 @@ public class AuthTokenFilter extends OncePerRequestFilter {
                 return;
             }
 
-            writeExceptionBodyResponse(response, Error.UNAUTHENTICATED);
+            writeExceptionBodyResponse(response, ErrorEnum.UNAUTHENTICATED);
         }
     }
 
 
     @SneakyThrows
-    private void writeExceptionBodyResponse(HttpServletResponse response, Error error){
+    private void writeExceptionBodyResponse(HttpServletResponse response, ErrorEnum error){
 
         response.setStatus(error.getStatusCode().value());
         response.setCharacterEncoding(StandardCharsets.UTF_8.name());

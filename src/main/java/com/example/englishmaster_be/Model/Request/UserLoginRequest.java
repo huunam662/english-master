@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserLoginDTO {
+public class UserLoginRequest {
 
     @Schema(description = "Email of the UserEntity", example = "admin@meuenglish.com")
     String email;

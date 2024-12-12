@@ -1,9 +1,9 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.Model.Request.DeleteRequestDTO;
-import com.example.englishmaster_be.Exception.CustomException;
-import com.example.englishmaster_be.Exception.Error;
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
+import com.example.englishmaster_be.Model.Request.DeleteRequestRequest;
+import com.example.englishmaster_be.Exception.template.CustomException;
+import com.example.englishmaster_be.Common.enums.ErrorEnum;
+import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.Value.UploadValue;
 import com.example.englishmaster_be.entity.ContentEntity;
@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
@@ -105,7 +104,7 @@ public class UploadServiceImpl implements IUploadService {
             return url;
         } else {
             String errorMessage = jsonResponse.path("message").asText("Upload failed");
-            throw new RuntimeException("Error: " + errorMessage);
+            throw new RuntimeException("ErrorEnum: " + errorMessage);
         }
 
 
@@ -126,14 +125,14 @@ public class UploadServiceImpl implements IUploadService {
             contentRepository.save(content);
             return url;
         } else {
-            throw new CustomException(Error.CODE_EXISTED_IN_TOPIC);
+            throw new CustomException(ErrorEnum.CODE_EXISTED_IN_TOPIC);
         }
     }
 
 
     @Transactional
     @Override
-    public DeleteResponse delete(DeleteRequestDTO dto) {
+    public DeleteResponse delete(DeleteRequestRequest dto) {
         String path = extractPathFromFilepath(dto.getFilepath());
         String encodedPath = Base64.getEncoder().encodeToString(path.getBytes(StandardCharsets.UTF_8));
         String url = uploadValue.getDeleteApiUrl() + encodedPath;

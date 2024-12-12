@@ -4,16 +4,15 @@ import com.example.englishmaster_be.Common.dto.response.FilterResponse;
 import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
 import com.example.englishmaster_be.Configuration.jwt.JwtUtils;
 import com.example.englishmaster_be.Common.enums.RoleEnum;
-import com.example.englishmaster_be.Exception.CustomException;
+import com.example.englishmaster_be.Exception.template.CustomException;
 import com.example.englishmaster_be.Mapper.MockTestMapper;
 import com.example.englishmaster_be.Mapper.TopicMapper;
 import com.example.englishmaster_be.Model.Request.*;
 import com.example.englishmaster_be.Model.Request.ConfirmationToken.ConfirmationTokenRequest;
-import com.example.englishmaster_be.Model.Request.User.ChangePasswordRequest;
 import com.example.englishmaster_be.Model.Request.User.ChangeProfileRequest;
 import com.example.englishmaster_be.Model.Request.User.UserFilterRequest;
-import com.example.englishmaster_be.Exception.Error;
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
+import com.example.englishmaster_be.Common.enums.ErrorEnum;
+import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.Mapper.UserMapper;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Repository.*;
@@ -111,7 +110,7 @@ public class UserServiceImpl implements IUserService {
     @Transactional
     @SneakyThrows
     @Override
-    public void registerUser(UserRegisterDTO userRegisterDTO) {
+    public void registerUser(UserRegisterRequest userRegisterDTO) {
 
         UserEntity user = userRepository.findByEmail(userRegisterDTO.getEmail()).orElse(null);
 
@@ -131,7 +130,7 @@ public class UserServiceImpl implements IUserService {
         try {
             sendConfirmationEmail(user.getEmail(), confirmationTokenResponse.getCode());
         } catch (IOException | MessagingException e) {
-            throw new CustomException(Error.SEND_EMAIL_FAILURE);
+            throw new CustomException(ErrorEnum.SEND_EMAIL_FAILURE);
         }
     }
 
@@ -158,7 +157,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public AuthResponse login(UserLoginDTO userLoginDTO) {
+    public AuthResponse login(UserLoginRequest userLoginDTO) {
 
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(userLoginDTO.getEmail(), userLoginDTO.getPassword())
@@ -167,7 +166,7 @@ public class UserServiceImpl implements IUserService {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         if(!userDetails.isEnabled())
-            throw new DisabledException(Error.ACCOUNT_DISABLED.getMessage());
+            throw new DisabledException(ErrorEnum.ACCOUNT_DISABLED.getMessage());
 
         String jwt = jwtUtils.generateJwtToken(userDetails);
 
@@ -256,7 +255,7 @@ public class UserServiceImpl implements IUserService {
 
     @Transactional
     @Override
-    public void changePassword(ChangePasswordDTO changePasswordDTO) {
+    public void changePassword(ChangePasswordRequest changePasswordDTO) {
 
         String otp = changePasswordDTO.getCode();
         String newPassword = changePasswordDTO.getNewPass();
@@ -303,7 +302,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public AuthResponse refreshToken(RefreshTokenDTO refreshTokenDTO) {
+    public AuthResponse refreshToken(RefreshTokenRequest refreshTokenDTO) {
 
         String refresh = refreshTokenDTO.getRequestRefresh();
 
@@ -343,7 +342,7 @@ public class UserServiceImpl implements IUserService {
 
     @Transactional
     @Override
-    public void changePass(ChangePasswordRequest changePassDTO) {
+    public void changePass(com.example.englishmaster_be.Model.Request.User.ChangePasswordRequest changePassDTO) {
 
         UserEntity user = currentUser();
 
@@ -451,7 +450,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public void logoutUserOf(UserLogoutDTO userLogoutDTO) {
+    public void logoutUserOf(UserLogoutRequest userLogoutDTO) {
 
         boolean logoutSuccessfully = logoutUser();
 

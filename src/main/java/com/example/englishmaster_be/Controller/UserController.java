@@ -4,7 +4,6 @@ import com.example.englishmaster_be.Common.dto.response.FilterResponse;
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
 import com.example.englishmaster_be.Mapper.UserMapper;
 import com.example.englishmaster_be.Model.Request.*;
-import com.example.englishmaster_be.Model.Request.User.ChangePasswordRequest;
 import com.example.englishmaster_be.Model.Request.User.ChangeProfileRequest;
 import com.example.englishmaster_be.Model.Request.User.UserFilterRequest;
 import com.example.englishmaster_be.Model.Response.AuthResponse;
@@ -37,7 +36,7 @@ public class UserController {
     @PostMapping("/register")
     @MessageResponse("Sent a confirmation mail")
     public void register(
-            @Valid @RequestBody UserRegisterDTO registerDTO
+            @Valid @RequestBody UserRegisterRequest registerDTO
     ) {
 
         userService.registerUser(registerDTO);
@@ -52,7 +51,7 @@ public class UserController {
 
     @PostMapping("/login")
     @MessageResponse("login successfully")
-    public AuthResponse login(@RequestBody UserLoginDTO loginDTO) {
+    public AuthResponse login(@RequestBody UserLoginRequest loginDTO) {
 
         return userService.login(loginDTO);
     }
@@ -73,7 +72,7 @@ public class UserController {
 
     @PostMapping("/changePassword")
     @MessageResponse("Update your password successfully")
-    public void changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+    public void changePassword(@RequestBody ChangePasswordRequest changePasswordDTO) {
 
         userService.changePassword(changePasswordDTO);
     }
@@ -89,7 +88,7 @@ public class UserController {
 
     @PostMapping("/refreshToken")
     @MessageResponse("Created new access token")
-    public AuthResponse refreshToken(@RequestBody RefreshTokenDTO refreshTokenDTO) {
+    public AuthResponse refreshToken(@RequestBody RefreshTokenRequest refreshTokenDTO) {
 
         return userService.refreshToken(refreshTokenDTO);
     }
@@ -119,7 +118,7 @@ public class UserController {
     @PatchMapping(value = "/changePass")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @MessageResponse("Change pass UserEntity successfully")
-    public void changePass(@RequestBody ChangePasswordRequest changePassDTO) {
+    public void changePass(@RequestBody com.example.englishmaster_be.Model.Request.User.ChangePasswordRequest changePassDTO) {
 
         userService.changePass(changePassDTO);
     }
@@ -147,7 +146,7 @@ public class UserController {
 
     @PostMapping("/logout")
     @MessageResponse("Logout successfully")
-    public void logoutUser(@RequestBody UserLogoutDTO userLogoutDTO) {
+    public void logoutUser(@RequestBody UserLogoutRequest userLogoutDTO) {
 
         userService.logoutUserOf(userLogoutDTO);
     }

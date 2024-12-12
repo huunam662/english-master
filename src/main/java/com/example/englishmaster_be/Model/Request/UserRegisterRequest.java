@@ -1,13 +1,10 @@
 package com.example.englishmaster_be.Model.Request;
 
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.Objects;
 
 @Getter
 @Setter
@@ -15,7 +12,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserRegisterDTO {
+public class UserRegisterRequest {
 
 	@Email(message = "Email is not in correct format.")
 	String email;
@@ -33,10 +30,4 @@ public class UserRegisterDTO {
 	@NotBlank(message = "Please enter your name.")
 	String name;
 
-	@AssertTrue(message = "Password and confirm password do not match.")
-	boolean isPasswordMatching() {
-		return Objects.nonNull(password)
-				&& Objects.nonNull(confirmPassword)
-				&& password.equals(confirmPassword);
-	}
 }

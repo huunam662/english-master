@@ -19,13 +19,12 @@ public interface TopicMapper {
 
     TopicRequest toTopicRequest(TopicByExcelFileResponse topicByExcelFileResponse);
 
-    @Mapping(target = "parts", qualifiedByName = {"toListPartId"})
+    @Mapping(target = "parts", expression = "java(toListPartId(topicEntity.getParts()))")
     @Mapping(target = "packId", source = "pack.packId")
     @Mapping(target = "statusId", source = "status.statusId")
     @Mapping(target = "numberQuestion", defaultValue = "0")
     TopicResponse toTopicResponse(TopicEntity topicEntity);
 
-    @Named("toListPartId")
     default List<UUID> toListPartId(List<PartEntity> parts){
 
         if(parts == null) return null;

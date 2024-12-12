@@ -1,13 +1,13 @@
 package com.example.englishmaster_be.Service.impl;
 
+import com.example.englishmaster_be.Common.enums.ErrorEnum;
 import com.example.englishmaster_be.Common.enums.PartEnum;
 import com.example.englishmaster_be.Model.Request.Answer.AnswerBasicRequest;
-import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Model.Response.excel.QuestionByExcelFileResponse;
 import com.example.englishmaster_be.Model.Response.excel.ListQuestionByExcelFileResponse;
 import com.example.englishmaster_be.Model.Response.excel.TopicByExcelFileResponse;
-import com.example.englishmaster_be.Exception.CustomException;
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
+import com.example.englishmaster_be.Exception.template.CustomException;
+import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.Repository.ContentRepository;
 import com.example.englishmaster_be.Repository.PartRepository;
 import com.example.englishmaster_be.Service.IExcelService;
@@ -56,7 +56,7 @@ public class ExcelServiceImpl implements IExcelService {
             throw new BadRequestException("Please select a file to upload");
 
         if(ExcelUtil.isExcelFile(file))
-            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
+            throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
 
@@ -81,7 +81,7 @@ public class ExcelServiceImpl implements IExcelService {
                     .build();
 
         } catch (Exception e) {
-            throw new CustomException(Error.CAN_NOT_CREATE_TOPIC_BY_EXCEL);
+            throw new CustomException(ErrorEnum.CAN_NOT_CREATE_TOPIC_BY_EXCEL);
         }
 
     }
@@ -97,7 +97,7 @@ public class ExcelServiceImpl implements IExcelService {
             throw new BadRequestException("Invalid PartEntity Value. It must be either 1 or 2");
 
         if (ExcelUtil.isExcelFile(file))
-            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
+            throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
 
@@ -118,8 +118,8 @@ public class ExcelServiceImpl implements IExcelService {
             // Cập nhật thông tin cho câu hỏi lớn
             questionBig.setContentAudio(contentAudioLink);
             questionBig.setQuestionScore(scoreBig);
-            UUID partId = part == 1 ? partRepository.findByPartName(PartEnum.PART_1.getContent()).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId()
-                    : partRepository.findByPartName(PartEnum.PART_2.getContent()).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId();
+            UUID partId = part == 1 ? partRepository.findByPartName(PartEnum.PART_1.getContent()).orElseThrow(() -> new CustomException(ErrorEnum.PART_NOT_FOUND)).getPartId()
+                    : partRepository.findByPartName(PartEnum.PART_2.getContent()).orElseThrow(() -> new CustomException(ErrorEnum.PART_NOT_FOUND)).getPartId();
             questionBig.setPartId(partId);
 
             // Lấy các câu hỏi con từ sheet
@@ -160,7 +160,7 @@ public class ExcelServiceImpl implements IExcelService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            throw new CustomException(part == 1 ? Error.CAN_NOT_CREATE_PART_1_BY_EXCEL : Error.CAN_NOT_CREATE_PART_2_BY_EXCEL);
+            throw new CustomException(part == 1 ? ErrorEnum.CAN_NOT_CREATE_PART_1_BY_EXCEL : ErrorEnum.CAN_NOT_CREATE_PART_2_BY_EXCEL);
         }
     }
 
@@ -173,7 +173,7 @@ public class ExcelServiceImpl implements IExcelService {
             throw new BadRequestException("Please select a file to upload");
 
         if(ExcelUtil.isExcelFile(file))
-            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
+            throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(5);
@@ -183,7 +183,7 @@ public class ExcelServiceImpl implements IExcelService {
             List<QuestionByExcelFileResponse> listQuestionDTOMini = new ArrayList<>();
             int scoreBig = (int) getNumericCellValue(sheet.getRow(1).getCell(1));
             questionBig.setQuestionScore(scoreBig);
-            questionBig.setPartId(partRepository.findByPartName(PartEnum.PART_5.getContent()).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId());
+            questionBig.setPartId(partRepository.findByPartName(PartEnum.PART_5.getContent()).orElseThrow(() -> new CustomException(ErrorEnum.PART_NOT_FOUND)).getPartId());
             for (int i = 3; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
                 if (row != null) {
@@ -208,7 +208,7 @@ public class ExcelServiceImpl implements IExcelService {
             resultDTO.setQuestions(listQuestionDTO);
             return resultDTO;
         } catch (Exception e) {
-            throw new CustomException(Error.CAN_NOT_CREATE_TOPIC_BY_EXCEL);
+            throw new CustomException(ErrorEnum.CAN_NOT_CREATE_TOPIC_BY_EXCEL);
         }
     }
 
@@ -223,7 +223,7 @@ public class ExcelServiceImpl implements IExcelService {
             throw new BadRequestException("Invalid PartEntity Value. It must be either 3 or 4");
 
         if(ExcelUtil.isExcelFile(file))
-            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
+            throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
 
@@ -284,7 +284,7 @@ public class ExcelServiceImpl implements IExcelService {
             return result;
         } catch (Exception e) {
 
-            throw new CustomException(part == 3 ? Error.CAN_NOT_CREATE_PART_3_BY_EXCEL : Error.CAN_NOT_CREATE_PART_4_BY_EXCEL);
+            throw new CustomException(part == 3 ? ErrorEnum.CAN_NOT_CREATE_PART_3_BY_EXCEL : ErrorEnum.CAN_NOT_CREATE_PART_4_BY_EXCEL);
         }
     }
 
@@ -296,7 +296,7 @@ public class ExcelServiceImpl implements IExcelService {
             throw new BadRequestException("Please select a file to upload");
 
         if (ExcelUtil.isExcelFile(file))
-            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
+            throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
 
         if (part != 6 && part != 7)
             throw new BadRequestException("Invalid PartEntity Value. It must be either 6 or 7");
@@ -357,7 +357,7 @@ public class ExcelServiceImpl implements IExcelService {
             return result;
         } catch (Exception e) {
 
-            throw new CustomException(part == 6 ? Error.CAN_NOT_CREATE_PART_6_BY_EXCEL : Error.CAN_NOT_CREATE_PART_7_BY_EXCEL);
+            throw new CustomException(part == 6 ? ErrorEnum.CAN_NOT_CREATE_PART_6_BY_EXCEL : ErrorEnum.CAN_NOT_CREATE_PART_7_BY_EXCEL);
         }
     }
 
@@ -369,7 +369,7 @@ public class ExcelServiceImpl implements IExcelService {
             throw new BadRequestException("Please select a file to upload");
 
         if (ExcelUtil.isExcelFile(file))
-            throw new CustomException(Error.FILE_IMPORT_IS_NOT_EXCEL);
+            throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
 
         ListQuestionByExcelFileResponse result = new ListQuestionByExcelFileResponse();
         List<QuestionByExcelFileResponse> allQuestions = new ArrayList<>();
@@ -467,7 +467,7 @@ public class ExcelServiceImpl implements IExcelService {
         List<UUID> uuidList = new ArrayList<>();
 
         for (String part : listPart) {
-            UUID uuid = partRepository.findByPartName(part).orElseThrow(() -> new CustomException(Error.PART_NOT_FOUND)).getPartId();
+            UUID uuid = partRepository.findByPartName(part).orElseThrow(() -> new CustomException(ErrorEnum.PART_NOT_FOUND)).getPartId();
             uuidList.add(uuid);
         }
 

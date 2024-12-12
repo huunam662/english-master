@@ -4,7 +4,6 @@ package com.example.englishmaster_be.Configuration.global.response;
 import com.example.englishmaster_be.Common.dto.response.ExceptionResponseModel;
 import com.example.englishmaster_be.Common.dto.response.ResponseModel;
 import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
-import com.example.englishmaster_be.Exception.Response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.NonNull;

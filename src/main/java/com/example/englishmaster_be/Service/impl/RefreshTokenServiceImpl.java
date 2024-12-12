@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
+import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.IRefreshTokenService;
 import com.example.englishmaster_be.Service.IUserService;

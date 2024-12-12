@@ -1,5 +1,6 @@
-package com.example.englishmaster_be.Exception;
+package com.example.englishmaster_be.Exception.template;
 
+import com.example.englishmaster_be.Common.enums.ErrorEnum;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
@@ -8,9 +9,9 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CustomException extends RuntimeException {
 
-    Error error;
+    ErrorEnum error;
 
-    public CustomException(Error error) {
+    public CustomException(ErrorEnum error) {
         super(error.getMessage());
         this.error = error;
     }

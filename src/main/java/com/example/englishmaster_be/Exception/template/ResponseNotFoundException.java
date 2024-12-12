@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Exception.Response;
+package com.example.englishmaster_be.Exception.template;
 
 public class ResponseNotFoundException extends RuntimeException{
     public ResponseNotFoundException(String message) {

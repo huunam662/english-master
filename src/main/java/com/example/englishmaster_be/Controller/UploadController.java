@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Model.Request.DeleteRequestDTO;
+import com.example.englishmaster_be.Model.Request.DeleteRequestRequest;
 import com.example.englishmaster_be.Service.IUploadService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -39,7 +39,7 @@ public class UploadController {
     @DeleteMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)
     @MessageResponse("Successfully delete file")
     @SneakyThrows
-    public void deleteFile(@RequestBody DeleteRequestDTO dto) {
+    public void deleteFile(@RequestBody DeleteRequestRequest dto) {
 
         uploadService.delete(dto);
     }

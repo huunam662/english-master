@@ -5,7 +5,7 @@ import com.example.englishmaster_be.Common.enums.SortByFeedbackFieldsEnum;
 import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
 import com.example.englishmaster_be.Model.Request.Feedback.FeedbackRequest;
 import com.example.englishmaster_be.Model.Request.Feedback.FeedbackFilterRequest;
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
+import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.Mapper.FeedbackMapper;
 import com.example.englishmaster_be.entity.FeedbackEntity;
 import com.example.englishmaster_be.entity.QFeedbackEntity;

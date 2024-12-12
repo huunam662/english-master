@@ -12,7 +12,7 @@ import com.example.englishmaster_be.Model.Request.Topic.ListQuestionRequest;
 import com.example.englishmaster_be.Model.Request.Topic.TopicRequest;
 import com.example.englishmaster_be.Model.Request.Topic.TopicFilterRequest;
 import com.example.englishmaster_be.Model.Request.UploadFileRequest;
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
+import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.Mapper.PartMapper;
 import com.example.englishmaster_be.Mapper.TopicMapper;

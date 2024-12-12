@@ -2,7 +2,7 @@ package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
 import com.example.englishmaster_be.Model.Request.Content.ContentRequest;
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
+import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.Mapper.ContentMapper;
 import com.example.englishmaster_be.entity.ContentEntity;
 import com.example.englishmaster_be.entity.QuestionEntity;

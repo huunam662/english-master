@@ -3,9 +3,9 @@ package com.example.englishmaster_be.Service.impl;
 import com.example.englishmaster_be.Common.enums.StatusEnum;
 import com.example.englishmaster_be.Mapper.StatusMapper;
 import com.example.englishmaster_be.Model.Request.Status.StatusRequest;
-import com.example.englishmaster_be.Exception.CustomException;
-import com.example.englishmaster_be.Exception.Error;
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
+import com.example.englishmaster_be.Exception.template.CustomException;
+import com.example.englishmaster_be.Common.enums.ErrorEnum;
+import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.entity.QStatusEntity;
 import com.example.englishmaster_be.Service.ITypeService;
 import com.example.englishmaster_be.entity.StatusEntity;
@@ -103,7 +103,7 @@ public class StatusServiceImpl implements IStatusService {
     public StatusEntity getStatusById(UUID statusId) {
 
         return statusRepository.findById(statusId).orElseThrow(
-                () -> new CustomException(Error.STATUS_NOT_FOUND)
+                () -> new CustomException(ErrorEnum.STATUS_NOT_FOUND)
         );
     }
 
@@ -111,7 +111,7 @@ public class StatusServiceImpl implements IStatusService {
     public StatusEntity getStatusByName(StatusEnum statusName) {
 
         return statusRepository.findByStatusName(statusName).orElseThrow(
-                () -> new CustomException(Error.STATUS_NOT_FOUND)
+                () -> new CustomException(ErrorEnum.STATUS_NOT_FOUND)
         );
     }
 
