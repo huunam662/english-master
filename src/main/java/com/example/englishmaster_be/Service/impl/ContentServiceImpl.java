@@ -1,15 +1,18 @@
 package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
-import com.example.englishmaster_be.DTO.Content.SaveContentDTO;
-import com.example.englishmaster_be.DTO.Content.UpdateContentDTO;
+import com.example.englishmaster_be.Model.Request.Content.ContentRequest;
 import com.example.englishmaster_be.Exception.Response.BadRequestException;
-import com.example.englishmaster_be.Model.Content;
+import com.example.englishmaster_be.Mapper.ContentMapper;
+import com.example.englishmaster_be.entity.ContentEntity;
+import com.example.englishmaster_be.entity.QuestionEntity;
 import com.example.englishmaster_be.Model.Response.CloudiaryUploadFileResponse;
+import com.example.englishmaster_be.entity.UserEntity;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.ICloudinaryService;
 import com.example.englishmaster_be.Service.IContentService;
 import com.example.englishmaster_be.Service.IQuestionService;
+import com.example.englishmaster_be.Service.IUserService;
 import com.example.englishmaster_be.Util.LinkUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,66 +37,72 @@ public class ContentServiceImpl implements IContentService {
 
     IQuestionService questionService;
 
+    IUserService userService;
+
 
     @Transactional
     @Override
-    public void delete(UUID contentId) {
+    public void deleteContent(UUID contentId) {
 
-        Content content = getContentToContentId(contentId);
+        ContentEntity content = getContentByContentId(contentId);
 
         contentRepository.delete(content);
     }
 
     @Override
-    public Content getContentToContentId(UUID contentId) {
+    public ContentEntity getContentByContentId(UUID contentId) {
         return contentRepository.findByContentId(contentId)
                 .orElseThrow(
-                        () -> new IllegalArgumentException("Content not found with ID: " + contentId)
+                        () -> new IllegalArgumentException("ContentEntity not found with ID: " + contentId)
                 );
     }
 
     @Override
-    public Content getContentByContentData(String contentData) {
+    public ContentEntity getContentByContentData(String contentData) {
 
         return contentRepository.findByContentData(contentData).orElseThrow(
-                () -> new BadRequestException("Get Content failed, content not found")
+                () -> new BadRequestException("Get ContentEntity failed, content not found")
         );
     }
 
     @Override
-    public Content getContentByTopicIdAndCode(UUID topicId, String code) {
+    public ContentEntity getContentByTopicIdAndCode(UUID topicId, String code) {
 
         return contentRepository.findContentByTopicIdAndCode(topicId, code).orElseThrow(
-                () -> new BadRequestException("Get Content failed, content not found")
+                () -> new BadRequestException("Get ContentEntity failed, content not found")
         );
     }
 
 
     @Transactional
     @Override
-    public Content saveContent(SaveContentDTO createContentDTO) {
+    public ContentEntity saveContent(ContentRequest contentRequest) {
 
-        Content content;
+        UserEntity user = userService.currentUser();
 
-        if(createContentDTO instanceof UpdateContentDTO updateContentDTO) {
+        QuestionEntity question = questionService.getQuestionById(contentRequest.getQuestionId());
 
-            content = getContentToContentId(updateContentDTO.getContentId());
-            content.setContentType(updateContentDTO.getContentType());
-            content.setCode(updateContentDTO.getCode());
-            content.setTopicId(updateContentDTO.getTopicId());
-        }
-        else content = Content.builder()
-                .contentType(createContentDTO.getContentType())
-                .code(createContentDTO.getCode())
-                .topicId(createContentDTO.getTopicId())
+        ContentEntity content;
+
+        if(contentRequest.getContentId() != null)
+            content = getContentByContentId(contentRequest.getContentId());
+
+        else content = ContentEntity.builder()
+                .createAt(LocalDateTime.now())
+                .userCreate(user)
                 .build();
 
-        content.setQuestion(questionService.getQuestionById(createContentDTO.getQuestionId()));
+        ContentMapper.INSTANCE.flowToContentEntity(contentRequest, content);
 
-        if(createContentDTO.getFile() != null){
+        content.setQuestion(question);
+        content.setUpdateAt(LocalDateTime.now());
+        content.setUserUpdate(user);
 
-            CloudiaryUploadFileResponse cloudiaryUploadFileResponse = cloudinaryService.uploadFile(createContentDTO.getFile());
+        if(contentRequest.getFile() != null){
 
+            CloudiaryUploadFileResponse cloudiaryUploadFileResponse = cloudinaryService.uploadFile(contentRequest.getFile());
+
+            content.setContentType(cloudiaryUploadFileResponse.getType());
             content.setContentData(cloudiaryUploadFileResponse.getUrl());
 
         }

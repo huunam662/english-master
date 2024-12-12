@@ -1,6 +1,8 @@
 package com.example.englishmaster_be.Configuration;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.AccessLevel;
+import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,12 +11,14 @@ import jakarta.persistence.PersistenceContext;
 
 
 @Configuration
+@FieldDefaults(level = AccessLevel.PUBLIC)
 public class QuerydslConfig {
+
     @PersistenceContext
     private EntityManager entityManager;
 
     @Bean
-    public JPAQueryFactory jpaQueryFactory() {
+    JPAQueryFactory jpaQueryFactory() {
         return new JPAQueryFactory(entityManager);
     }
 }

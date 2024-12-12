@@ -1,6 +1,9 @@
 package com.example.englishmaster_be.Model.Response;
 
-import com.example.englishmaster_be.Model.Status;
+import com.example.englishmaster_be.Common.enums.StatusEnum;
+import com.example.englishmaster_be.entity.StatusEntity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -17,21 +20,11 @@ public class StatusResponse {
 
     UUID statusId;
 
-    UUID typeId;
+    @Enumerated(EnumType.STRING)
+    StatusEnum statusName;
 
-    String statusName;
+    Boolean flag;
 
-    boolean flag;
+    TypeResponse type;
 
-    public StatusResponse(Status status) {
-
-        if(Objects.isNull(status)) return;
-
-        this.statusId = status.getStatusId();
-        this.statusName = status.getStatusName();
-        this.flag = status.isFlag();
-
-        if(Objects.nonNull(status.getType()))
-            this.typeId = status.getType().getTypeId();
-    }
 }

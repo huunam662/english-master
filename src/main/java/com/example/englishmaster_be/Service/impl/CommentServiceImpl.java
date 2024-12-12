@@ -1,13 +1,12 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.Comment.SaveCommentDTO;
-import com.example.englishmaster_be.DTO.Comment.UpdateCommentDTO;
+import com.example.englishmaster_be.Model.Request.Comment.CommentRequest;
 import com.example.englishmaster_be.Exception.Response.BadRequestException;
-import com.example.englishmaster_be.Model.Comment;
-import com.example.englishmaster_be.Model.Post;
-import com.example.englishmaster_be.Model.Response.CommentResponse;
-import com.example.englishmaster_be.Model.Topic;
-import com.example.englishmaster_be.Model.User;
+import com.example.englishmaster_be.Mapper.CommentMapper;
+import com.example.englishmaster_be.entity.CommentEntity;
+import com.example.englishmaster_be.entity.PostEntity;
+import com.example.englishmaster_be.entity.TopicEntity;
+import com.example.englishmaster_be.entity.UserEntity;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.ICommentService;
 import com.example.englishmaster_be.Service.IPostService;
@@ -43,111 +42,91 @@ public class CommentServiceImpl implements ICommentService {
     IPostService postService;
 
 
-    @Transactional
-    @Override
-    public void save(Comment comment) {
-        commentRepository.save(comment);
-    }
-
-    @Transactional
-    @Override
-    public void deleteComment(Comment comment) {
-        commentRepository.delete(comment);
-    }
 
     @Override
-    public boolean checkCommentParent(Comment comment) {
+    public boolean checkCommentParent(CommentEntity comment) {
+
         return commentRepository.existsByCommentParent(comment);
     }
 
     @Override
-    public List<Comment> findAllByCommentParent(Comment commentParent) {
+    public List<CommentEntity> findAllByCommentParent(CommentEntity commentParent) {
         if(!commentRepository.existsByCommentParent(commentParent))
             return new ArrayList<>();
 
-        return commentRepository.findAllByCommentParent(commentParent).stream().toList();
+        return commentRepository.findAllByCommentParent(commentParent);
     }
 
     @Override
-    public Comment findCommentToId(UUID commentID) {
+    public CommentEntity getCommentById(UUID commentID) {
         return commentRepository.findByCommentId(commentID)
                 .orElseThrow(
-                        () -> new IllegalArgumentException("Comment not found with ID: " + commentID)
+                        () -> new IllegalArgumentException("CommentEntity not found with ID: " + commentID)
                 );
     }
 
     @Override
-    public List<CommentResponse> getListCommentByCommentId(UUID commentId) {
+    public List<CommentEntity> getListCommentByCommentId(UUID commentId) {
 
-        Comment comment = findCommentToId(commentId);
+        CommentEntity comment = getCommentById(commentId);
 
-        List<Comment> commentList = findAllByCommentParent(comment);
-
-        return commentList.stream().map(
-                commentItem -> new CommentResponse(
-                        commentItem, checkCommentParent(commentItem)
-                )
-        ).toList();
+        return findAllByCommentParent(comment);
     }
 
     @Transactional
     @Override
-    public CommentResponse createCommentToTopic(UUID topicId, SaveCommentDTO createCommentDTO) {
+    public CommentEntity saveCommentToTopic(UUID topicId, CommentRequest commentRequest) {
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        Topic topic = topicService.findTopicById(topicId);
+        TopicEntity topic = topicService.getTopicById(topicId);
 
-        Comment comment = Comment.builder()
+        CommentEntity comment = CommentEntity.builder()
                 .userComment(user)
                 .topic(topic)
-                .content(createCommentDTO.getCommentContent())
+                .content(commentRequest.getCommentContent())
                 .build();
 
         comment = commentRepository.save(comment);
 
-        CommentResponse commentResponse = new CommentResponse(comment, checkCommentParent(comment));
+        messagingTemplate.convertAndSend("/CommentEntity/TopicEntity/" + topicId, CommentMapper.INSTANCE.toCommentResponse(comment));
 
-        messagingTemplate.convertAndSend("/Comment/Topic/"+topicId, commentResponse);
-
-        return commentResponse;
+        return comment;
     }
 
     @Transactional
     @Override
-    public CommentResponse createCommentToPost(UUID postId, SaveCommentDTO createCommentDTO) {
+    public CommentEntity saveCommentToPost(UUID postId, CommentRequest commentRequest) {
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        Post post = postService.findPostById(postId);
+        PostEntity post = postService.getPostById(postId);
 
-        Comment comment = Comment.builder()
+        CommentEntity comment = CommentEntity.builder()
                 .userComment(user)
                 .post(post)
-                .content(createCommentDTO.getCommentContent())
+                .content(commentRequest.getCommentContent())
                 .build();
 
         comment = commentRepository.save(comment);
 
-        CommentResponse commentResponse = new CommentResponse(comment, checkCommentParent(comment));
+        messagingTemplate.convertAndSend("/CommentEntity/PostEntity/" + postId, CommentMapper.INSTANCE.toCommentResponse(comment));
 
-        messagingTemplate.convertAndSend("/Comment/Post/"+postId, commentResponse);
-
-        return commentResponse;
+        return comment;
     }
 
     @Transactional
     @Override
-    public CommentResponse createCommentToComment(UUID commentId, SaveCommentDTO createCommentDTO) {
+    public CommentEntity saveCommentToComment(UUID commentId, CommentRequest commentRequest) {
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        Comment commentParent = findCommentToId(commentId);
+        CommentEntity commentParent = getCommentById(commentId);
 
-        Comment comment = Comment.builder()
+        CommentEntity comment = CommentEntity.builder()
                 .userComment(user)
                 .commentParent(commentParent)
-                .content(createCommentDTO.getCommentContent())
+                .content(commentRequest.getCommentContent())
                 .build();
 
         if(commentParent.getTopic() != null)
@@ -158,50 +137,46 @@ public class CommentServiceImpl implements ICommentService {
 
         comment = commentRepository.save(comment);
 
-        CommentResponse commentResponse = new CommentResponse(comment, checkCommentParent(comment));
+        messagingTemplate.convertAndSend("/CommentEntity/commentParent/" + commentId, CommentMapper.INSTANCE.toCommentResponse(comment));
 
-        messagingTemplate.convertAndSend("/Comment/commentParent/"+commentId, commentResponse);
-
-        return commentResponse;
+        return comment;
     }
 
     @Transactional
     @Override
-    public CommentResponse updateComment(UpdateCommentDTO updateCommentDTO) {
+    public CommentEntity saveComment(UUID updateCommentId, CommentRequest commentRequest) {
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        Comment comment = findCommentToId(updateCommentDTO.getCommentId());
+        CommentEntity comment = getCommentById(updateCommentId);
 
         if(!comment.getUserComment().getUserId().equals(user.getUserId()))
-            throw new BadRequestException("Don't update Comment");
+            throw new BadRequestException("Don't update CommentEntity");
 
-        comment.setContent(updateCommentDTO.getCommentContent());
+        comment.setContent(commentRequest.getCommentContent());
         comment.setUpdateAt(LocalDateTime.now());
 
         comment  = commentRepository.save(comment);
 
-        CommentResponse commentResponse = new CommentResponse(comment, checkCommentParent(comment));
+        messagingTemplate.convertAndSend("/CommentEntity/updateComment/" + updateCommentId.toString(), CommentMapper.INSTANCE.toCommentResponse(comment));
 
-        messagingTemplate.convertAndSend("/Comment/updateComment/"+commentResponse.getCommentId(), commentResponse);
-
-        return commentResponse;
+        return comment;
     }
 
     @Transactional
     @Override
     public void deleteComment(UUID commentId) {
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        Comment comment = findCommentToId(commentId);
+        CommentEntity comment = getCommentById(commentId);
 
         if(!comment.getUserComment().getUserId().equals(user.getUserId()))
-            throw new BadRequestException("Don't update Comment");
+            throw new BadRequestException("Don't update CommentEntity");
 
         commentRepository.delete(comment);
 
-        messagingTemplate.convertAndSend("/Comment/deleteComment/"+commentId, commentId);
+        messagingTemplate.convertAndSend("/CommentEntity/deleteComment/"+commentId, commentId);
 
     }
 }

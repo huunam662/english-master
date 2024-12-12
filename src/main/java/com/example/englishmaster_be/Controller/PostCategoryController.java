@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.Controller;
 
-import com.example.englishmaster_be.DTO.PostCategory.SavePostCategoryDto;
-import com.example.englishmaster_be.DTO.PostCategory.UpdatePostCategoryDto;
+import com.example.englishmaster_be.Model.Request.PostCategory.PostCategoryRequest;
 import com.example.englishmaster_be.Service.IPostCategoryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
@@ -10,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping(path = "/api/post-category", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/post-category")
 @Tag(name = "Post Category")
 public class PostCategoryController {
 
@@ -22,7 +21,7 @@ public class PostCategoryController {
 
 
     @PostMapping("/")
-    public Object createPostCategory(@RequestBody SavePostCategoryDto dto) {
+    public Object createPostCategory(@RequestBody PostCategoryRequest dto) {
         return postCategoryService.createPostCategory(dto);
     }
 
@@ -42,8 +41,11 @@ public class PostCategoryController {
     }
 
     @PatchMapping("/{id}")
-    public Object updatePostCategory(@PathVariable("id") UUID id,@RequestBody UpdatePostCategoryDto dto) {
-        return postCategoryService.updatePostCategory(id, dto);
+    public Object updatePostCategory(@PathVariable("id") UUID id, @RequestBody PostCategoryRequest dto) {
+
+        dto.setId(id);
+
+        return postCategoryService.updatePostCategory(dto);
     }
 
     @DeleteMapping("/{id}")

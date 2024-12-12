@@ -1,17 +1,16 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.Constant.StatusConstant;
-import com.example.englishmaster_be.DTO.Status.SaveStatusDTO;
-import com.example.englishmaster_be.DTO.Status.UpdateStatusDTO;
+import com.example.englishmaster_be.Common.enums.StatusEnum;
+import com.example.englishmaster_be.Mapper.StatusMapper;
+import com.example.englishmaster_be.Model.Request.Status.StatusRequest;
 import com.example.englishmaster_be.Exception.CustomException;
 import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Exception.Response.BadRequestException;
-import com.example.englishmaster_be.Model.QStatus;
-import com.example.englishmaster_be.Model.Response.StatusResponse;
-import com.example.englishmaster_be.Model.Status;
-import com.example.englishmaster_be.Model.Type;
+import com.example.englishmaster_be.entity.QStatusEntity;
+import com.example.englishmaster_be.Service.ITypeService;
+import com.example.englishmaster_be.entity.StatusEntity;
+import com.example.englishmaster_be.entity.TypeEntity;
 import com.example.englishmaster_be.Repository.StatusRepository;
-import com.example.englishmaster_be.Repository.TypeRepository;
 import com.example.englishmaster_be.Service.IStatusService;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -21,10 +20,10 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
@@ -35,69 +34,73 @@ public class StatusServiceImpl implements IStatusService {
 
     StatusRepository statusRepository;
 
-    TypeRepository typeRepository;
+    ITypeService typeService;
 
+
+    @Transactional
     @Override
-    public StatusResponse saveStatus(SaveStatusDTO statusDTO) {
+    public StatusEntity saveStatus(StatusRequest statusRequest) {
 
-        Status status;
+        StatusEntity status;
 
-        Type type = typeRepository.findById(statusDTO.getTypeId()).orElseThrow(
-                () -> new BadRequestException("Type not found")
-        );
+        TypeEntity type = typeService.getTypeById(statusRequest.getTypeId());
 
-        if(statusDTO instanceof UpdateStatusDTO updateStatusDTO){
+        String messageException = "StatusEntity is already exist";
 
-            status = getStatusById(updateStatusDTO.getUpdateStatusId());
+        if(statusRequest.getStatusId() != null) {
 
-            status.setFlag(statusDTO.isFlag());
-            status.setStatusName(statusDTO.getStatusName());
-            status.setType(type);
+            status = getStatusById(statusRequest.getStatusId());
+
+            if(isExistedByStatusNameWithDiff(status, statusRequest.getStatusName()))
+                throw new BadRequestException(messageException);
         }
         else{
-            status = statusRepository.findByStatusName(statusDTO.getStatusName()).orElse(null);
 
-            if(status != null) throw new BadRequestException("Status is already exist");
+            if(isExistedByStatusName(statusRequest.getStatusName()))
+                throw new BadRequestException(messageException);
 
-            status = Status.builder()
-                    .statusName(statusDTO.getStatusName())
-                    .flag(statusDTO.isFlag())
-                    .type(type)
-                    .build();
-
+            status = StatusEntity.builder().build();
         }
 
-        status = statusRepository.save(status);
+        StatusMapper.INSTANCE.flowToStatusEntity(statusRequest, status);
+        status.setType(type);
 
-        return StatusResponse.builder()
-                .statusId(status.getStatusId())
-                .statusName(status.getStatusName())
-                .flag(status.isFlag())
-                .typeId(status.getType().getTypeId())
-                .build();
+        return statusRepository.save(status);
     }
 
     @Override
-    public List<StatusResponse> getAllStatusByType(UUID typeId) {
-        QStatus status = QStatus.status;
+    public boolean isExistedByStatusNameWithDiff(StatusEntity status, StatusEnum statusName) {
 
-        JPAQuery<Status> query = queryFactory.selectFrom(status)
+        return statusRepository.isExistedByStatusNameWithDiff(status, statusName);
+    }
+
+    @Override
+    public boolean isExistedByStatusName(StatusEnum statusName) {
+
+        return statusRepository.findByStatusName(statusName).isPresent();
+    }
+
+    @Override
+    public List<StatusEntity> getAllStatusByType(UUID typeId) {
+
+        QStatusEntity status = QStatusEntity.statusEntity;
+
+        JPAQuery<StatusEntity> query = queryFactory.selectFrom(status)
                 .where(status.type.typeId.eq(typeId));
 
-        List<Status> statusList = query.fetch();
-
-        return statusList.stream()
-                .map(StatusResponse::new)
-                .collect(Collectors.toList());
+        return query.fetch();
     }
 
     @Override
     public void deleteStatus(UUID statusId) {
-        statusRepository.deleteById(statusId);
+
+        StatusEntity status = getStatusById(statusId);
+
+        statusRepository.delete(status);
     }
 
     @Override
-    public Status getStatusById(UUID statusId) {
+    public StatusEntity getStatusById(UUID statusId) {
 
         return statusRepository.findById(statusId).orElseThrow(
                 () -> new CustomException(Error.STATUS_NOT_FOUND)
@@ -105,7 +108,7 @@ public class StatusServiceImpl implements IStatusService {
     }
 
     @Override
-    public Status getStatusByName(String statusName) {
+    public StatusEntity getStatusByName(StatusEnum statusName) {
 
         return statusRepository.findByStatusName(statusName).orElseThrow(
                 () -> new CustomException(Error.STATUS_NOT_FOUND)

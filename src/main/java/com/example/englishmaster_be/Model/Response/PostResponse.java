@@ -1,10 +1,12 @@
 package com.example.englishmaster_be.Model.Response;
 
-import com.example.englishmaster_be.Model.Post;
+import com.example.englishmaster_be.entity.PostEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -19,37 +21,21 @@ public class PostResponse {
 
     UUID postId;
 
-    UUID userId;
+    UUID userPostId;
 
-    String userName;
+    String username;
 
     String userAvatar;
 
     String content;
 
-    String createAt;
+    Integer numberComment;
 
-    String updateAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+    LocalDateTime createAt;
 
-    int numberComment;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+    LocalDateTime updateAt;
 
-    public PostResponse(Post post) {
-
-        if(Objects.isNull(post)) return;
-
-        this.postId = post.getPostId();
-        this.userName = post.getUserPost().getName();
-        this.userId = post.getUserPost().getUserId();
-        this.content = post.getContent();
-
-        this.numberComment = Objects.nonNull(post.getComments()) ? post.getComments().size() : 0;
-        this.userAvatar = Objects.nonNull(post.getUserPost().getAvatar()) ? post.getUserPost().getAvatar() : null;
-
-        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
-        if(Objects.nonNull(post.getCreateAt()))
-            this.createAt = sdf.format(Timestamp.valueOf(post.getCreateAt()));
-        if(Objects.nonNull(post.getUpdateAt()))
-            this.updateAt = sdf.format(Timestamp.valueOf(post.getUpdateAt()));
-    }
 
 }

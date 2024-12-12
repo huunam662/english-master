@@ -1,9 +1,10 @@
 package com.example.englishmaster_be.Model.Response;
 
-import com.example.englishmaster_be.Model.Content;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import java.util.Objects;
+
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 
@@ -27,19 +28,14 @@ public class ContentResponse {
 
     String code;
 
+    UserBasicResponse userCreate;
 
-    public ContentResponse(Content content) {
+    UserBasicResponse userUpdate;
 
-        if(Objects.isNull(content)) return;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+    LocalDateTime createdAt;
 
-        this.contentId = content.getContentId();
-        this.contentType = content.getContentType();
-        this.contentData = content.getContentData();
-        this.topicId = content.getTopicId();
-        this.code = content.getCode();
-
-        if(Objects.nonNull(content.getQuestion()))
-            this.questionId = content.getQuestion().getQuestionId();
-    }
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+    LocalDateTime updatedAt;
 
 }

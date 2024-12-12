@@ -1,15 +1,17 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.MockTest.SaveResultMockTestDTO;
-import com.example.englishmaster_be.Model.*;
-import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
-import com.example.englishmaster_be.Model.Response.ResponseModel;
-import com.example.englishmaster_be.Model.Response.ResultMockTestResponse;
+import com.example.englishmaster_be.Mapper.ResultMockTestMapper;
+import com.example.englishmaster_be.Model.Request.MockTest.ResultMockTestRequest;
 import com.example.englishmaster_be.Repository.ResultMockTestRepository;
 import com.example.englishmaster_be.Service.IMockTestService;
 import com.example.englishmaster_be.Service.IPartService;
 import com.example.englishmaster_be.Service.IResultMockTestService;
 import com.example.englishmaster_be.Service.IUserService;
+import com.example.englishmaster_be.entity.MockTestEntity;
+import com.example.englishmaster_be.entity.PartEntity;
+import com.example.englishmaster_be.entity.ResultMockTestEntity;
+import com.example.englishmaster_be.entity.UserEntity;
+import com.example.englishmaster_be.entity.QResultMockTestEntity;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import lombok.AccessLevel;
@@ -17,15 +19,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
@@ -44,75 +43,60 @@ public class ResultMockTestServiceImpl implements IResultMockTestService {
 
     @Transactional
     @Override
-    public ResultMockTestResponse createResultMockTest(SaveResultMockTestDTO resultMockTest) {
+    public ResultMockTestEntity saveResultMockTest(ResultMockTestRequest resultMockTest) {
 
-        try{
+        UserEntity user = userService.currentUser();
 
-            ResultMockTest mockTest = new ResultMockTest(resultMockTest);
+        PartEntity part = partService.getPartToId(resultMockTest.getPartId());
 
-            User user = userService.currentUser();
+        MockTestEntity mockTest = mockTestService.findMockTestToId(resultMockTest.getMockTestId());
 
-            mockTest.setPart(partService.getPartToId(resultMockTest.getPartId()));
-            mockTest.setMockTest(mockTestService.findMockTestToId(resultMockTest.getMockTestId()));
+        ResultMockTestEntity resultMockTestEntity;
 
-            mockTest.setUserCreate(user);
-            mockTest.setUserUpdate(user);
+        if(resultMockTest.getResultMockTestId() != null)
+            resultMockTestEntity = getResultMockTestById(resultMockTest.getResultMockTestId());
 
-            mockTest = resultMockTestRepository.save(mockTest);
+        else resultMockTestEntity = ResultMockTestEntity.builder()
+                .createAt(LocalDateTime.now())
+                .userCreate(user)
+                .build();
 
-            return new ResultMockTestResponse(mockTest);
-        }
-        catch (Exception e){
-            throw new RuntimeException("Create result mock test failed");
-        }
+        resultMockTestEntity.setUpdateAt(LocalDateTime.now());
+        resultMockTestEntity.setUserUpdate(user);
+        resultMockTestEntity.setPart(part);
+        resultMockTestEntity.setMockTest(mockTest);
 
+        ResultMockTestMapper.INSTANCE.flowToResultMockTest(resultMockTest, resultMockTestEntity);
+
+        return resultMockTestRepository.save(resultMockTestEntity);
     }
 
     @Override
-    public List<ResultMockTestResponse> getAllResultMockTests() {
-        try {
+    public List<ResultMockTestEntity> getAllResultMockTests() {
 
-            List<ResultMockTest> resultMockTests = resultMockTestRepository.findAll();
-
-            return resultMockTests.stream().map(
-                    resultMockTest -> new ResultMockTestResponse(resultMockTest)
-            ).toList();
-        }
-        catch (Exception e){
-            throw new RuntimeException("Get list result mock tests failed");
-        }
+        return resultMockTestRepository.findAll();
     }
 
     @Override
-    public List<ResultMockTestResponse> getResultMockTestsByPartIdAndMockTestId(UUID partId, UUID mockTestId) {
+    public List<ResultMockTestEntity> getResultMockTestsByPartIdAndMockTestId(UUID partId, UUID mockTestId) {
 
-        try {
+        BooleanBuilder builder = new BooleanBuilder().and(QResultMockTestEntity.resultMockTestEntity.part.isNotNull());
 
-            QResultMockTest qResultMockTest = QResultMockTest.resultMockTest;
+        if (partId != null)
+            builder.and(QResultMockTestEntity.resultMockTestEntity.part.partId.eq(partId));
 
-            BooleanBuilder builder = new BooleanBuilder();
+        if (mockTestId != null)
+            builder.and(QResultMockTestEntity.resultMockTestEntity.mockTest.mockTestId.eq(mockTestId));
 
-            if (partId != null)
-                builder.and(qResultMockTest.part.partId.eq(partId));
+        Predicate predicate = builder.getValue();
 
-            if (mockTestId != null)
-                builder.and(qResultMockTest.mockTest.mockTestId.eq(mockTestId));
+        Iterable<ResultMockTestEntity> resultMockTestIterable = resultMockTestRepository.findAll(predicate);
 
-            Predicate predicate = builder.getValue();
-
-            return ((List<ResultMockTest>) resultMockTestRepository.findAll(predicate))
-                    .stream()
-                    .map(ResultMockTestResponse::new)
-                    .collect(Collectors.toList());
-        }
-        catch (Exception e){
-            throw new RuntimeException("Get result mock test failed");
-        }
-
+        return StreamSupport.stream(resultMockTestIterable.spliterator(), false).toList();
     }
 
     @Override
-    public ResultMockTest getResultMockTestById(UUID id) {
+    public ResultMockTestEntity getResultMockTestById(UUID id) {
         return resultMockTestRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Result mock test not found")
         );
@@ -121,7 +105,7 @@ public class ResultMockTestServiceImpl implements IResultMockTestService {
     @Override
     public void deleteResultMockTestById(UUID id) {
 
-        ResultMockTest resultMockTest = getResultMockTestById(id);
+        ResultMockTestEntity resultMockTest = getResultMockTestById(id);
 
         resultMockTestRepository.delete(resultMockTest);
     }

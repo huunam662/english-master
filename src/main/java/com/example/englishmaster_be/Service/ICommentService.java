@@ -1,34 +1,28 @@
 package com.example.englishmaster_be.Service;
 
-import com.example.englishmaster_be.DTO.Comment.SaveCommentDTO;
-import com.example.englishmaster_be.DTO.Comment.UpdateCommentDTO;
-import com.example.englishmaster_be.Model.*;
-import com.example.englishmaster_be.Model.Response.CommentResponse;
+import com.example.englishmaster_be.Model.Request.Comment.CommentRequest;
+import com.example.englishmaster_be.entity.CommentEntity;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface ICommentService {
 
-    void save(Comment comment);
+    boolean checkCommentParent(CommentEntity comment);
 
-    void deleteComment(Comment comment);
+    CommentEntity getCommentById(UUID commentID);
 
-    Comment findCommentToId(UUID commentId);
+    List<CommentEntity> findAllByCommentParent(CommentEntity commentParent);
 
-    boolean checkCommentParent(Comment comment);
+    List<CommentEntity> getListCommentByCommentId(UUID commentId);
 
-    List<Comment> findAllByCommentParent(Comment commentParent);
+    CommentEntity saveCommentToTopic(UUID topicId, CommentRequest commentRequest);
 
-    List<CommentResponse> getListCommentByCommentId(UUID commentId);
+    CommentEntity saveCommentToPost(UUID postId, CommentRequest commentRequest);
 
-    CommentResponse createCommentToTopic(UUID topicId, SaveCommentDTO createCommentDTO);
+    CommentEntity saveCommentToComment(UUID commentId, CommentRequest createCommentDTO);
 
-    CommentResponse createCommentToPost(UUID postId, SaveCommentDTO createCommentDTO);
-
-    CommentResponse createCommentToComment(UUID commentId, SaveCommentDTO createCommentDTO);
-
-    CommentResponse updateComment(UpdateCommentDTO updateCommentDTO);
+    CommentEntity saveComment(UUID updateCommentId, CommentRequest commentRequest);
 
     void deleteComment(UUID commentId);
 }

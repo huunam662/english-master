@@ -1,12 +1,13 @@
 package com.example.englishmaster_be.Service;
 
 import com.example.englishmaster_be.Model.Response.DictionarySuggestionResponse;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public interface IDictionaryService {
 
-    Object searchWords(String word);
+    JsonNode searchWords(String word);
 
-    Object getImage(String word);
+    JsonNode getImage(String word);
 
     DictionarySuggestionResponse getSuggestions(String word);
 

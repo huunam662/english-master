@@ -1,19 +1,18 @@
 package com.example.englishmaster_be.Service;
 
-import com.example.englishmaster_be.DTO.PostCategory.SavePostCategoryDto;
-import com.example.englishmaster_be.DTO.PostCategory.UpdatePostCategoryDto;
+import com.example.englishmaster_be.Model.Request.PostCategory.PostCategoryRequest;
 
 import java.util.UUID;
 
 public interface IPostCategoryService {
 
-    Object createPostCategory(SavePostCategoryDto dto);
+    Object createPostCategory(PostCategoryRequest dto);
 
     Object getAllPostCategory();
 
     Object getPostCategoryById(UUID id);
 
-    Object updatePostCategory(UUID id, UpdatePostCategoryDto dto);
+    Object updatePostCategory(PostCategoryRequest dto);
 
     Object getPostCategoryBySlug(String slug);
 

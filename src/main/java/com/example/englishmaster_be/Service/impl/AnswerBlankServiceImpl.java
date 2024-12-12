@@ -1,15 +1,11 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.Answer.AnswerBlankRequest;
-import com.example.englishmaster_be.DTO.Answer.UserAnswerRequest;
-import com.example.englishmaster_be.Exception.Response.ResponseNotFoundException;
-import com.example.englishmaster_be.Model.AnswerBlank;
-import com.example.englishmaster_be.Model.Question;
-import com.example.englishmaster_be.Model.Response.AnswerBlankResponse;
-import com.example.englishmaster_be.Model.Response.QuestionBlankResponse;
+import com.example.englishmaster_be.Model.Request.Answer.AnswerBlankRequest;
+import com.example.englishmaster_be.entity.AnswerBlankEntity;
+import com.example.englishmaster_be.entity.QuestionEntity;
 import com.example.englishmaster_be.Repository.AnswerBlankRepository;
-import com.example.englishmaster_be.Repository.QuestionRepository;
 import com.example.englishmaster_be.Service.IAnswerBlankService;
+import com.example.englishmaster_be.Service.IQuestionService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +13,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-
 import java.util.*;
 
 @Service
@@ -25,53 +20,31 @@ import java.util.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AnswerBlankServiceImpl implements IAnswerBlankService {
 
-    AnswerBlankRepository repository;
+    AnswerBlankRepository answerBlankRepository;
 
-    QuestionRepository questionRepository;
+    IQuestionService questionService;
 
     @Override
-    public List<QuestionBlankResponse> getAnswerWithQuestionBlank(UUID questionId){
-        Question question=questionRepository.findByQuestionId(questionId)
-                .orElseThrow(
-                        ()-> new ResponseNotFoundException("Not found Question with"+ questionId)
-                );
+    public List<AnswerBlankEntity> getAnswerBlankListByQuestionBlank(UUID questionId){
 
-        List<AnswerBlank> questionBlanks=repository.findByQuestion(question);
+        QuestionEntity question = questionService.getQuestionById(questionId);
 
-        List<QuestionBlankResponse> questionBlankResponses = new ArrayList<>();
-
-        questionBlanks.forEach(questionBlankItem -> {
-
-            QuestionBlankResponse questionBlank = QuestionBlankResponse.builder()
-                    .position(questionBlankItem.getPosition())
-                    .answer(questionBlankItem.getAnswer())
-                    .build();
-
-            questionBlankResponses.add(questionBlank);
-
-        });
-
-       return questionBlankResponses;
+        return answerBlankRepository.findByQuestion(question);
     }
 
 
-    @Override
     @Transactional
-    public AnswerBlankResponse createAnswerBlank(AnswerBlankRequest request) {
+    @Override
+    public AnswerBlankEntity saveAnswerBlank(AnswerBlankRequest request) {
 
-        Question question = questionRepository.findByQuestionId(request.getQuestionId())
-                .orElseThrow(
-                        ()-> new ResponseNotFoundException("Not found question with"+ request.getQuestionId())
-                );
+        QuestionEntity question = questionService.getQuestionById(request.getQuestionId());
 
-        AnswerBlank answerBlank = AnswerBlank.builder()
+        AnswerBlankEntity answerBlank = AnswerBlankEntity.builder()
                 .question(question)
                 .position(request.getPosition())
                 .answer(request.getContent())
                 .build();
 
-        answerBlank = repository.save(answerBlank);
-
-        return new AnswerBlankResponse(answerBlank);
+        return answerBlankRepository.save(answerBlank);
     }
 }

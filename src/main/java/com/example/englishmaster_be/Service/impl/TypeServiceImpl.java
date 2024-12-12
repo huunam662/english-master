@@ -1,10 +1,10 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.Type.SaveTypeDTO;
+import com.example.englishmaster_be.Mapper.TypeMapper;
+import com.example.englishmaster_be.Model.Request.Type.TypeRequest;
 import com.example.englishmaster_be.Exception.Response.BadRequestException;
-import com.example.englishmaster_be.Model.QType;
-import com.example.englishmaster_be.Model.Response.TypeResponse;
-import com.example.englishmaster_be.Model.Type;
+import com.example.englishmaster_be.entity.QTypeEntity;
+import com.example.englishmaster_be.entity.TypeEntity;
 import com.example.englishmaster_be.Repository.TypeRepository;
 import com.example.englishmaster_be.Service.ITypeService;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -15,10 +15,10 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
@@ -30,54 +30,49 @@ public class TypeServiceImpl implements ITypeService {
     JPAQueryFactory queryFactory;
 
     @Override
-    public List<TypeResponse> getAllTypes() {
+    public List<TypeEntity> getAllTypes() {
 
-        QType type = QType.type;
+        QTypeEntity type = QTypeEntity.typeEntity;
 
-        JPAQuery<Type> query = queryFactory.selectFrom(type);
+        JPAQuery<TypeEntity> query = queryFactory.selectFrom(type);
 
-        List<Type> typeList = query.fetch();
-
-        return typeList.stream()
-                .map(TypeResponse::new)
-                .collect(Collectors.toList());
+        return query.fetch();
     }
 
-    public TypeResponse getTypeById(UUID id) {
+    public TypeEntity getTypeById(UUID id) {
 
-        QType type = QType.type;
+        QTypeEntity type = QTypeEntity.typeEntity;
 
-        Type result = queryFactory.selectFrom(type)
+        TypeEntity result = queryFactory.selectFrom(type)
                 .where(type.typeId.eq(id))
                 .fetchOne();
 
-        if (result == null) throw new BadRequestException("Type not found");
-
-        return new TypeResponse(result);
+        return Optional.ofNullable(result).orElseThrow(
+                () -> new BadRequestException("Type not found")
+        );
     }
 
     @Override
-    public TypeResponse createType(SaveTypeDTO createTypeDTO) {
+    public TypeEntity saveType(TypeRequest typeRequest) {
 
-        Type type = Type.builder()
-                .typeName(createTypeDTO.getTypeName())
-                .nameSlug(createTypeDTO.getNameSlug())
-                .build();
+        TypeEntity typeEntity;
 
-        typeRepository.save(type);
+        if(typeRequest.getTypeId() != null) {
+            typeEntity = getTypeById(typeRequest.getTypeId());
 
-        return TypeResponse.builder()
-                .typeId(type.getTypeId())
-                .typeName(createTypeDTO.getTypeName())
-                .nameSlug(createTypeDTO.getNameSlug())
-                .build();
+            TypeMapper.INSTANCE.flowToTypeEntity(typeRequest, typeEntity);
+        }
+        else typeEntity = TypeMapper.INSTANCE.toTypeEntity(typeRequest);
+
+        return typeRepository.save(typeEntity);
+
     }
 
     @Override
     public void deleteTypeById(UUID id) {
 
-        Type type = typeRepository.findById(id).orElseThrow(
-                () -> new BadRequestException("Type not found")
+        TypeEntity type = typeRepository.findById(id).orElseThrow(
+                () -> new BadRequestException("TypeEntity not found")
         );
 
         typeRepository.delete(type);

@@ -13,19 +13,19 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FilterResponse<T> {
 
-    int pageNumber = 0;
+    Integer pageNumber = 0;
 
-    int pageSize = 0;
+    Integer pageSize = 0;
 
-    long offset = 0;
+    Long offset = 0L;
 
-    long totalPages = 0;
+    Long totalPages = 0L;
 
-    long totalElements = 0;
+    Long totalElements = 0L;
 
-    boolean hasPreviousPage = false;
+    Boolean hasPreviousPage = Boolean.FALSE;
 
-    boolean hasNextPage = false;
+    Boolean hasNextPage = Boolean.FALSE;
 
     List<T> content = null;
 

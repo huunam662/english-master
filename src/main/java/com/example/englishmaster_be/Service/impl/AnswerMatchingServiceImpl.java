@@ -1,64 +1,69 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.Answer.AnswerMatchingRequest;
-import com.example.englishmaster_be.Exception.Response.ResourceNotFoundException;
-import com.example.englishmaster_be.Model.AnswerMatching;
-import com.example.englishmaster_be.Model.Question;
-import com.example.englishmaster_be.Model.User;
+import com.example.englishmaster_be.Model.Request.Answer.AnswerMatchingQuestionRequest;
+import com.example.englishmaster_be.entity.AnswerMatchingEntity;
+import com.example.englishmaster_be.entity.QuestionEntity;
+import com.example.englishmaster_be.Model.Response.AnswerMatchingBasicResponse;
 import com.example.englishmaster_be.Repository.AnswerMatchingRepository;
 import com.example.englishmaster_be.Service.IAnswerMatching;
+import com.example.englishmaster_be.Service.IQuestionService;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AnswerMatchingServiceImpl implements IAnswerMatching {
-    private final AnswerMatchingRepository answerMatchingRepository;
-    private final UserServiceImpl userService;
-    private final QuestionServiceImpl questionService;
+
+    AnswerMatchingRepository answerMatchingRepository;
+
+    IQuestionService questionService;
+
 
     @Override
-    public AnswerMatching createAnswerMatching(AnswerMatchingRequest request) {
-        User user=userService.currentUser();
+    public AnswerMatchingEntity saveAnswerMatching(AnswerMatchingQuestionRequest answerMatchingQuestionRequest) {
 
-        if(Objects.isNull(user)){
-            throw new ResourceNotFoundException("User not found");
-        }
+        QuestionEntity question = questionService.getQuestionById(answerMatchingQuestionRequest.getQuestionId());
 
-        Question question= questionService.getQuestionById(request.getQuestionId());
-
-        if(Objects.isNull(question)){
-            throw new ResourceNotFoundException("Question not found");
-        }
-
-        AnswerMatching answerMatching=new AnswerMatching();
+        AnswerMatchingEntity answerMatching = new AnswerMatchingEntity();
         answerMatching.setQuestion(question);
-        answerMatching.setContentLeft(request.getContentLeft());
-        answerMatching.setContentRight(request.getContentRight());
+        answerMatching.setContentLeft(answerMatchingQuestionRequest.getContentLeft());
+        answerMatching.setContentRight(answerMatchingQuestionRequest.getContentRight());
+
         return answerMatchingRepository.save(answerMatching);
     }
 
     @Override
-    public Map<String,String> getListAnswerMatching(UUID questionId) {
-        Question question=questionService.getQuestionById(questionId);
+    public List<AnswerMatchingBasicResponse> getListAnswerMatchingWithShuffle(UUID questionId) {
 
-        if(Objects.isNull(question)){
-            throw new ResourceNotFoundException("Question not found");
-        }
-        List<AnswerMatching> answerMatchings= answerMatchingRepository.findAllByQuestion(question);
-        List<String> contentLeft= new ArrayList<>(answerMatchings.stream().map(AnswerMatching::getContentLeft).toList());
-        List<String> contentRight= new ArrayList<>(answerMatchings.stream().map(AnswerMatching::getContentRight).toList());
+        QuestionEntity question = questionService.getQuestionById(questionId);
+
+        List<AnswerMatchingEntity> answerMatchingList = answerMatchingRepository.findAllByQuestion(question);
+
+        List<String> contentLeft = answerMatchingList.stream().map(AnswerMatchingEntity::getContentLeft).collect(Collectors.toList());
+        List<String> contentRight = answerMatchingList.stream().map(AnswerMatchingEntity::getContentRight).collect(Collectors.toList());
 
         Collections.shuffle(contentLeft);
         Collections.shuffle(contentRight);
-        Map<String,String> map=new HashMap<>();
-        for(int i=0; i<contentLeft.size(); i++){
-            map.put(contentLeft.get(i),contentRight.get(i));
-        }
-        return map;
+
+        List<AnswerMatchingBasicResponse> answerMatchingShuffleResponseList = new ArrayList<>();
+
+        for(int i = 0; i < contentLeft.size(); i++)
+            answerMatchingShuffleResponseList.add(
+                    AnswerMatchingBasicResponse.builder()
+                            .contentLeft(contentLeft.get(i))
+                            .contentRight(contentRight.get(i))
+                            .build()
+            );
+
+        return answerMatchingShuffleResponseList;
 
     }
 }

@@ -1,16 +1,15 @@
 package com.example.englishmaster_be.Service;
 
-import com.example.englishmaster_be.DTO.Answer.AnswerBlankRequest;
-import com.example.englishmaster_be.Model.Response.AnswerBlankResponse;
-import com.example.englishmaster_be.Model.Response.QuestionBlankResponse;
+import com.example.englishmaster_be.Model.Request.Answer.AnswerBlankRequest;
+import com.example.englishmaster_be.entity.AnswerBlankEntity;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface IAnswerBlankService {
 
-    List<QuestionBlankResponse> getAnswerWithQuestionBlank(UUID questionId);
+    List<AnswerBlankEntity> getAnswerBlankListByQuestionBlank(UUID questionId);
 
-    AnswerBlankResponse createAnswerBlank(AnswerBlankRequest request);
+    AnswerBlankEntity saveAnswerBlank(AnswerBlankRequest request);
 
 }

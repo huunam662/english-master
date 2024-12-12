@@ -1,23 +1,27 @@
 package com.example.englishmaster_be.Service;
 
-import com.example.englishmaster_be.DTO.Status.SaveStatusDTO;
-import com.example.englishmaster_be.DTO.Status.UpdateStatusDTO;
+import com.example.englishmaster_be.Common.enums.StatusEnum;
+import com.example.englishmaster_be.Model.Request.Status.StatusRequest;
 import com.example.englishmaster_be.Model.Response.StatusResponse;
-import com.example.englishmaster_be.Model.Status;
+import com.example.englishmaster_be.entity.StatusEntity;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface IStatusService {
 
-    StatusResponse saveStatus(SaveStatusDTO statusDTO);
+    StatusEntity saveStatus(StatusRequest statusRequest);
 
-    List<StatusResponse> getAllStatusByType(UUID typeId);
+    List<StatusEntity> getAllStatusByType(UUID typeId);
+
+    boolean isExistedByStatusNameWithDiff(StatusEntity status, StatusEnum statusName);
+
+    boolean isExistedByStatusName(StatusEnum statusName);
 
     void deleteStatus(UUID statusId);
 
-    Status getStatusById(UUID statusId);
+    StatusEntity getStatusById(UUID statusId);
 
-    Status getStatusByName(String statusName);
+    StatusEntity getStatusByName(StatusEnum statusName);
 
 }

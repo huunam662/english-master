@@ -1,46 +1,38 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.Answer.SaveListAnswerDTO;
-import com.example.englishmaster_be.DTO.Question.SaveGroupQuestionDTO;
-import com.example.englishmaster_be.DTO.Question.SaveQuestionDTO;
-import com.example.englishmaster_be.DTO.Question.UpdateQuestionDTO;
-import com.example.englishmaster_be.DTO.Topic.SaveListQuestionDTO;
-import com.example.englishmaster_be.DTO.UploadFileDTO;
-import com.example.englishmaster_be.DTO.UploadMultiFileDTO;
+import com.example.englishmaster_be.Exception.CustomException;
+import com.example.englishmaster_be.Exception.Error;
+import com.example.englishmaster_be.Model.Request.Answer.AnswerBasicRequest;
+import com.example.englishmaster_be.Model.Request.Question.GroupQuestionRequest;
+import com.example.englishmaster_be.Model.Request.Question.QuestionRequest;
+import com.example.englishmaster_be.Model.Request.UploadMultiFileRequest;
 import com.example.englishmaster_be.Exception.Response.BadRequestException;
 import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.Mapper.QuestionMapper;
-import com.example.englishmaster_be.Model.*;
-import com.example.englishmaster_be.Model.Response.QuestionGroupResponse;
-import com.example.englishmaster_be.Model.Response.QuestionResponse;
 import com.example.englishmaster_be.Repository.AnswerRepository;
 import com.example.englishmaster_be.Repository.ContentRepository;
 import com.example.englishmaster_be.Repository.PartRepository;
 import com.example.englishmaster_be.Repository.QuestionRepository;
 import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.entity.*;
 import com.google.cloud.storage.Blob;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
@@ -69,48 +61,48 @@ public class QuestionServiceImpl implements IQuestionService {
 
     @Transactional
     @Override
-    public QuestionResponse saveQuestion(SaveQuestionDTO saveQuestionDTO) {
+    public QuestionEntity saveQuestion(QuestionRequest questionRequest) {
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        Part part = partService.getPartToId(saveQuestionDTO.getPartId());
+        PartEntity part = partService.getPartToId(questionRequest.getPartId());
 
-        Question question;
+        QuestionEntity question;
 
-        if(saveQuestionDTO instanceof UpdateQuestionDTO updateQuestionDTO){
+        if(questionRequest.getQuestionId() != null){
 
-            question = getQuestionById(updateQuestionDTO.getUpdateQuestionId());
+            question = getQuestionById(questionRequest.getQuestionId());
 
-            question.setQuestionContent(updateQuestionDTO.getQuestionContent());
-            question.setQuestionScore(updateQuestionDTO.getQuestionScore());
+            question.setQuestionContent(questionRequest.getQuestionContent());
+            question.setQuestionScore(questionRequest.getQuestionScore());
             question.setUserUpdate(user);
 
             questionRepository.save(question);
 
-            if (updateQuestionDTO.getListAnswer() != null && !updateQuestionDTO.getListAnswer().isEmpty()) {
-                for (SaveListAnswerDTO createListAnswerDTO : updateQuestionDTO.getListAnswer()) {
-                    Answer answer = answerService.findAnswerToId(createListAnswerDTO.getIdAnswer());
+            if (questionRequest.getListAnswer() != null && !questionRequest.getListAnswer().isEmpty()) {
+                for (AnswerBasicRequest listAnswerRequest : questionRequest.getListAnswer()) {
+                    AnswerEntity answer = answerService.getAnswerById(listAnswerRequest.getAnswerId());
                     answer.setQuestion(question);
-                    answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
-                    answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
+                    answer.setAnswerContent(listAnswerRequest.getAnswerContent());
+                    answer.setCorrectAnswer(listAnswerRequest.getCorrectAnswer());
                     answer.setUserUpdate(user);
 
                     answerRepository.save(answer);
                 }
             }
 
-            if (updateQuestionDTO.getListQuestionChild() != null && !updateQuestionDTO.getListQuestionChild().isEmpty()) {
-                for (SaveQuestionDTO createQuestionChildDTO : updateQuestionDTO.getListQuestionChild()) {
-                    Question questionChild = getQuestionById(createQuestionChildDTO.getQuestionId());
-                    questionChild.setQuestionContent(createQuestionChildDTO.getQuestionContent());
-                    questionChild.setQuestionScore(createQuestionChildDTO.getQuestionScore());
+            if (questionRequest.getListQuestionChild() != null && !questionRequest.getListQuestionChild().isEmpty()) {
+                for (QuestionRequest questionRequestChild : questionRequest.getListQuestionChild()) {
+                    QuestionEntity questionChild = getQuestionById(questionRequestChild.getQuestionId());
+                    questionChild.setQuestionContent(questionRequestChild.getQuestionContent());
+                    questionChild.setQuestionScore(questionRequestChild.getQuestionScore());
                     questionChild.setUserUpdate(user);
 
-                    for (SaveListAnswerDTO createListAnswerDTO : createQuestionChildDTO.getListAnswer()) {
-                        Answer answer = answerService.findAnswerToId(createListAnswerDTO.getIdAnswer());
+                    for (AnswerBasicRequest createListAnswerDTO : questionRequestChild.getListAnswer()) {
+                        AnswerEntity answer = answerService.getAnswerById(createListAnswerDTO.getAnswerId());
                         answer.setQuestion(questionChild);
-                        answer.setAnswerContent(createListAnswerDTO.getContentAnswer());
-                        answer.setCorrectAnswer(createListAnswerDTO.isCorrectAnswer());
+                        answer.setAnswerContent(createListAnswerDTO.getAnswerContent());
+                        answer.setCorrectAnswer(createListAnswerDTO.getCorrectAnswer());
                         answer.setUserUpdate(user);
 
                         answerRepository.save(answer);
@@ -120,113 +112,103 @@ public class QuestionServiceImpl implements IQuestionService {
                 }
             }
 
-            if (updateQuestionDTO.getContentImage() != null && !updateQuestionDTO.getContentImage().isEmpty()) {
-                for (Content content : question.getContentCollection()) {
+            if (questionRequest.getContentImage() != null && !questionRequest.getContentImage().isEmpty()) {
+                for (ContentEntity content : question.getContentCollection()) {
                     if (content.getContentType().equals("IMAGE")) {
                         question.getContentCollection().remove(content);
-                        contentService.delete(content.getContentId());
+                        contentService.deleteContent(content.getContentId());
                         fileStorageService.delete(content.getContentData());
                     }
                 }
-                String filename = fileStorageService.nameFile(updateQuestionDTO.getContentImage());
-                Content content = new Content(question, GetExtension.typeFile(filename), filename);
-                content.setUserUpdate(user);
-                content.setUserCreate(user);
+                String filename = fileStorageService.nameFile(questionRequest.getContentImage());
+                ContentEntity content = ContentEntity.builder()
+                        .question(question)
+                        .contentType(GetExtension.typeFile(filename))
+                        .contentData(filename)
+                        .userCreate(user)
+                        .userUpdate(user)
+                        .createAt(LocalDateTime.now())
+                        .updateAt(LocalDateTime.now())
+                        .build();
 
-                if (question.getContentCollection() == null) {
+                if (question.getContentCollection() == null)
                     question.setContentCollection(new ArrayList<>());
-                }
+
                 question.getContentCollection().add(content);
                 contentRepository.save(content);
-                fileStorageService.save(updateQuestionDTO.getContentImage());
+                fileStorageService.save(questionRequest.getContentImage());
             }
-            if (updateQuestionDTO.getContentAudio() != null && !updateQuestionDTO.getContentAudio().isEmpty()) {
-                for (Content content : question.getContentCollection()) {
+            if (questionRequest.getContentAudio() != null && !questionRequest.getContentAudio().isEmpty()) {
+                for (ContentEntity content : question.getContentCollection()) {
                     if (content.getContentType().equals("AUDIO")) {
                         question.getContentCollection().remove(content);
-                        contentService.delete(content.getContentId());
+                        contentService.deleteContent(content.getContentId());
                         fileStorageService.delete(content.getContentData());
                     }
                 }
-                String filename = fileStorageService.nameFile(updateQuestionDTO.getContentAudio());
-                Content content = new Content(question, GetExtension.typeFile(filename), filename);
-                content.setUserUpdate(user);
-                content.setUserCreate(user);
+                String filename = fileStorageService.nameFile(questionRequest.getContentAudio());
+                ContentEntity content = ContentEntity.builder()
+                        .question(question)
+                        .contentType(GetExtension.typeFile(filename))
+                        .contentData(filename)
+                        .userCreate(user)
+                        .userUpdate(user)
+                        .createAt(LocalDateTime.now())
+                        .updateAt(LocalDateTime.now())
+                        .build();
 
-                if (question.getContentCollection() == null) {
+                if (question.getContentCollection() == null)
                     question.setContentCollection(new ArrayList<>());
-                }
+
                 question.getContentCollection().add(content);
                 contentRepository.save(content);
-                fileStorageService.save(updateQuestionDTO.getContentAudio());
+                fileStorageService.save(questionRequest.getContentAudio());
             }
 
             questionRepository.save(question);
 
-            Question question1 = getQuestionById(updateQuestionDTO.getUpdateQuestionId());
-            QuestionResponse questionResponse = new QuestionResponse(question1);
-
-            if (checkQuestionGroup(question1.getQuestionId())) {
-
-                List<Question> questionGroupList = listQuestionGroup(question1);
-                List<QuestionResponse> questionGroupResponseList = new ArrayList<>();
-
-                for (Question questionGroup : questionGroupList) {
-                    QuestionResponse questionGroupResponse;
-
-                    Answer answerCorrect = answerService.correctAnswer(questionGroup);
-                    questionGroupResponse = new QuestionResponse(questionGroup, answerCorrect);
-                    questionGroupResponseList.add(questionGroupResponse);
-                    questionResponse.setQuestionGroup(questionGroupResponseList);
-                }
-            } else {
-                Answer answerCorrect = answerService.correctAnswer(question1);
-                questionResponse.setAnswerCorrect(answerCorrect.getAnswerId());
-            }
-
-            return questionResponse;
+            return getQuestionById(questionRequest.getQuestionId());
         }
         else{
 
-            question = QuestionMapper.INSTANCE.toQuestionEntity(saveQuestionDTO);
+            question = QuestionMapper.INSTANCE.toQuestionEntity(questionRequest);
             question.setCreateAt(LocalDateTime.now());
             question.setUserCreate(user);
             question.setUserUpdate(user);
             question.setPart(part);
-            question = questionRepository.save(question);
 
-            return QuestionMapper.INSTANCE.toQuestionResponse(question);
+            return questionRepository.save(question);
         }
     }
 
     @Override
-    public Question getQuestionById(UUID questionId) {
+    public QuestionEntity getQuestionById(UUID questionId) {
         return questionRepository.findByQuestionId(questionId)
                 .orElseThrow(
-                        () -> new IllegalArgumentException("Question not found with ID: " + questionId)
+                        () -> new IllegalArgumentException("QuestionEntity not found with ID: " + questionId)
                 );
     }
 
 
     @Override
-    public List<Question> getTop10Question(int index, UUID partId) {
+    public List<QuestionEntity> getTop10Question(int index, UUID partId) {
 
-        Part part = partRepository.findByPartId(partId)
+        PartEntity part = partRepository.findByPartId(partId)
                 .orElseThrow(
-                        () -> new IllegalArgumentException("Part not found with ID: " + partId)
+                        () -> new IllegalArgumentException("PartEntity not found with ID: " + partId)
                 );
 
         Pageable pageable = PageRequest.of(index, 10, Sort.by(Sort.Order.desc("updateAt")));
 
-        Page<Question> questionPage= questionRepository.findAllByQuestionGroupAndPart(null, part, pageable);
+        Page<QuestionEntity> questionPage= questionRepository.findAllByQuestionGroupParentAndPart(null, part, pageable);
 
         return questionPage.getContent();
     }
 
     @Override
-    public int countQuestionToQuestionGroup(Question question) {
+    public int countQuestionToQuestionGroup(QuestionEntity question) {
         int total = 0;
-        for(Question questionChild: listQuestionGroup(question)){
+        for(QuestionEntity questionChild: listQuestionGroup(question)){
             total++;
         }
         return total;
@@ -235,35 +217,31 @@ public class QuestionServiceImpl implements IQuestionService {
     @Override
     public boolean checkQuestionGroup(UUID questionId) {
 
-        Question question = getQuestionById(questionId);
+        QuestionEntity question = getQuestionById(questionId);
 
-        boolean isExistedQuestionGroup = questionRepository.existsByQuestionGroup(question);
-
-        if(!isExistedQuestionGroup) throw new BadRequestException("Question doesn't have Question group");
-
-        return true;
+        return questionRepository.existsByQuestionGroupParent(question);
     }
 
     @Override
-    public List<Question> listQuestionGroup(Question question) {
-        return questionRepository.findAllByQuestionGroup(question);
+    public List<QuestionEntity> listQuestionGroup(QuestionEntity question) {
+        return questionRepository.findAllByQuestionGroupParent(question);
     }
 
     @Override
     public void deleteQuestion(UUID questionId) {
 
-        Question question = getQuestionById(questionId);
+        QuestionEntity question = getQuestionById(questionId);
 
         questionRepository.delete(question);
     }
 
     @Transactional
     @Override
-    public QuestionResponse uploadFileQuestion(UUID questionId, UploadMultiFileDTO uploadMultiFileDTO) {
+    public QuestionEntity uploadFileQuestion(UUID questionId, UploadMultiFileRequest uploadMultiFileDTO) {
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        Question question = getQuestionById(questionId);
+        QuestionEntity question = getQuestionById(questionId);
 
         if(question.getContentCollection() == null)
             question.setContentCollection(new ArrayList<>());
@@ -276,7 +254,7 @@ public class QuestionServiceImpl implements IQuestionService {
 
             String fileName = blobResponse.getName();
 
-            Content content = Content.builder()
+            ContentEntity content = ContentEntity.builder()
                     .contentData(fileName)
                     .contentType(GetExtension.getExtension(fileName))
                     .userCreate(user)
@@ -287,23 +265,24 @@ public class QuestionServiceImpl implements IQuestionService {
             question.getContentCollection().add(content);
         }
 
-        question = questionRepository.save(question);
-
-        return QuestionMapper.INSTANCE.toQuestionResponse(question);
+        return questionRepository.save(question);
     }
 
     @Transactional
     @Override
-    public QuestionResponse updateFileQuestion(UUID questionId, String oldFileName, MultipartFile newFile) {
+    public QuestionEntity updateFileQuestion(UUID questionId, String oldFileName, MultipartFile newFile) {
 
-        User user = userService.currentUser();
+        if(newFile == null || newFile.isEmpty())
+            throw new CustomException(Error.NULL_OR_EMPTY_FILE);
 
-        Question question = getQuestionById(questionId);
+        UserEntity user = userService.currentUser();
 
-        Content content = question.getContentCollection().stream().filter(
+        QuestionEntity question = getQuestionById(questionId);
+
+        ContentEntity content = question.getContentCollection().stream().filter(
                 contentItem -> contentItem.getContentData().equals(oldFileName)
         ).findFirst().orElseThrow(
-                () -> new BadRequestException("Content not found with content image name: " + oldFileName)
+                () -> new BadRequestException("ContentEntity not found with content image name: " + oldFileName)
         );
 
         fileStorageService.delete(content.getContentData());
@@ -320,38 +299,32 @@ public class QuestionServiceImpl implements IQuestionService {
         question.setUpdateAt(LocalDateTime.now());
         question.setUserUpdate(user);
 
-        question = questionRepository.save(question);
-
-        return QuestionMapper.INSTANCE.toQuestionResponse(question);
+        return questionRepository.save(question);
     }
 
     @Transactional
     @Override
-    public QuestionResponse createGroupQuestion(SaveGroupQuestionDTO createGroupQuestionDTO) {
+    public QuestionEntity createGroupQuestion(GroupQuestionRequest createGroupQuestionDTO) {
 
-        Question question = QuestionMapper.INSTANCE.toQuestionEntity(createGroupQuestionDTO);
+        QuestionEntity question = QuestionMapper.INSTANCE.toQuestionEntity(createGroupQuestionDTO);
 
-        Question questionGroup = getQuestionById(createGroupQuestionDTO.getQuestionGroupId());
+        QuestionEntity questionGroup = getQuestionById(createGroupQuestionDTO.getQuestionGroupId());
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        question.setQuestionGroup(questionGroup);
+        question.setQuestionGroupParent(questionGroup);
         question.setPart(questionGroup.getPart());
         question.setUserCreate(user);
         question.setUserUpdate(user);
 
-        question = questionRepository.save(question);
-
-        return QuestionMapper.INSTANCE.toQuestionResponse(question);
+        return questionRepository.save(question);
     }
 
     @Override
-    public List<QuestionGroupResponse> getQuestionGroupToQuestion(UUID questionId) {
+    public List<QuestionEntity> getQuestionGroupListByQuestionId(UUID questionId) {
 
-        Question question = getQuestionById(questionId);
+        QuestionEntity question = getQuestionById(questionId);
 
-        List<Question> questionGroupList = listQuestionGroup(question);
-
-        return QuestionMapper.INSTANCE.toQuestionGroupResponseList(questionGroupList);
+        return listQuestionGroup(question);
     }
 }

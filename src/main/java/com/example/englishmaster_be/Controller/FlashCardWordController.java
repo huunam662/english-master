@@ -1,10 +1,11 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.DTO.FlashCard.UpdateFlashCardWordDTO;
-import com.example.englishmaster_be.DTO.FlashCard.SaveFlashCardWordDTO;
+import com.example.englishmaster_be.Model.Request.FlashCard.FlashCardWordRequest;
+import com.example.englishmaster_be.Mapper.FlashCardWordMapper;
 import com.example.englishmaster_be.Model.Response.FlashCardWordResponse;
 import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.entity.FlashCardWordEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +21,7 @@ import java.util.UUID;
 
 @Tag(name = "Flash card word")
 @RestController
-@RequestMapping("/api/flashCardWord")
+@RequestMapping("/flashCardWord")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FlashCardWordController {
@@ -39,22 +40,26 @@ public class FlashCardWordController {
     @PostMapping(value = "/{flashCardId:.+}/addWordToFlashCard", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @MessageResponse("Create word for flashcard successfully")
-    public FlashCardWordResponse addWordToFlashCard(@PathVariable UUID flashCardId, @ModelAttribute SaveFlashCardWordDTO createFlashCardWordDTO){
+    public FlashCardWordResponse addWordToFlashCard(@PathVariable UUID flashCardId, @ModelAttribute FlashCardWordRequest flashCardWordRequest){
 
-        createFlashCardWordDTO.setFlashCardId(flashCardId);
+        flashCardWordRequest.setFlashCardId(flashCardId);
 
-        return flashCardWordService.saveWordToFlashCard(createFlashCardWordDTO);
+        FlashCardWordEntity flashCardWord = flashCardWordService.saveFlashCardWord(flashCardWordRequest);
+
+        return FlashCardWordMapper.INSTANCE.toFlashCardWordResponse(flashCardWord);
     }
 
 
     @PutMapping(value = "/{flashCardWordId:.+}/updateWord", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @MessageResponse("Update flashcard word successfully")
-    public FlashCardWordResponse updateWord(@PathVariable UUID flashCardWordId, @ModelAttribute UpdateFlashCardWordDTO updateFlashCardWordDTO){
+    public FlashCardWordResponse updateWord(@PathVariable UUID flashCardWordId, @ModelAttribute FlashCardWordRequest flashCardWordRequest){
 
-        updateFlashCardWordDTO.setFlashCardWordId(flashCardWordId);
+        flashCardWordRequest.setFlashCardWordId(flashCardWordId);
 
-        return flashCardWordService.saveWordToFlashCard(updateFlashCardWordDTO);
+        FlashCardWordEntity flashCardWord = flashCardWordService.saveFlashCardWord(flashCardWordRequest);
+
+        return FlashCardWordMapper.INSTANCE.toFlashCardWordResponse(flashCardWord);
     }
 
     @GetMapping("/searchByWord")

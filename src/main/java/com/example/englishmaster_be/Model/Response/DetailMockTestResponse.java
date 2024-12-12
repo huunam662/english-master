@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Model.Response;
 
-import com.example.englishmaster_be.Model.DetailMockTest;
-import com.example.englishmaster_be.Model.Question;
+import com.example.englishmaster_be.entity.DetailMockTestEntity;
+import com.example.englishmaster_be.entity.QuestionEntity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -16,28 +16,14 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class DetailMockTestResponse {
 
+    UUID detailMockTestId;
+
     UUID answerId;
 
     String answerContent;
 
-    boolean correctAnswer;
+    Boolean correctAnswer;
 
-    int scoreAnswer;
-
-    public DetailMockTestResponse(DetailMockTest detailMockTest) {
-
-        if(Objects.isNull(detailMockTest)) return;
-
-        this.answerId = detailMockTest.getDetailMockTestId();
-
-        if(Objects.nonNull(detailMockTest.getAnswer())) {
-            this.answerContent = detailMockTest.getAnswer().getAnswerContent();
-            this.correctAnswer = detailMockTest.getAnswer().isCorrectAnswer();
-
-            Question question = detailMockTest.getAnswer().getQuestion();
-
-            this.scoreAnswer = Objects.nonNull(question) ? question.getQuestionScore() : 0;
-        }
-    }
+    Integer scoreAnswer;
 
 }

@@ -1,15 +1,15 @@
 package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.DTO.Post.PostFilterRequest;
-import com.example.englishmaster_be.DTO.Post.SavePostDTO;
+import com.example.englishmaster_be.Mapper.PostMapper;
+import com.example.englishmaster_be.Model.Request.Post.PostFilterRequest;
+import com.example.englishmaster_be.Model.Request.Post.PostRequest;
 import com.example.englishmaster_be.Exception.Response.BadRequestException;
-import com.example.englishmaster_be.Model.Comment;
-import com.example.englishmaster_be.Model.Post;
-import com.example.englishmaster_be.Model.QPost;
-import com.example.englishmaster_be.Model.Response.CommentResponse;
+import com.example.englishmaster_be.entity.CommentEntity;
+import com.example.englishmaster_be.entity.PostEntity;
+import com.example.englishmaster_be.entity.QPostEntity;
 import com.example.englishmaster_be.Model.Response.PostResponse;
-import com.example.englishmaster_be.Model.User;
+import com.example.englishmaster_be.entity.UserEntity;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.*;
 import com.querydsl.core.types.OrderSpecifier;
@@ -21,8 +21,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,15 +38,14 @@ public class PostServiceImpl implements IPostService {
 
     IUserService userService;
 
-    ICommentService commentService;
 
 
     @Override
-    public Post findPostById(UUID postId) {
+    public PostEntity getPostById(UUID postId) {
 
         return postRepository.findByPostId(postId)
                 .orElseThrow(
-                        () -> new BadRequestException("Post not found")
+                        () -> new BadRequestException("PostEntity not found")
                 );
     }
 
@@ -61,7 +58,7 @@ public class PostServiceImpl implements IPostService {
                 .offset((long) (filterRequest.getPage() - 1) * filterRequest.getSize())
                 .build();
 
-        long totalElements = Optional.ofNullable(queryFactory.select(QPost.post.count()).from(QPost.post).fetchOne()).orElse(0L);
+        long totalElements = Optional.ofNullable(queryFactory.select(QPostEntity.postEntity.count()).from(QPostEntity.postEntity).fetchOne()).orElse(0L);
         long totalPages = (long)Math.ceil((double) totalElements / filterResponse.getPageSize());
         filterResponse.setTotalElements(totalElements);
         filterResponse.setTotalPages(totalPages);
@@ -70,17 +67,17 @@ public class PostServiceImpl implements IPostService {
         OrderSpecifier<?> orderSpecifier;
 
         if(Sort.Direction.DESC.equals(filterRequest.getSortDirection()))
-            orderSpecifier = QPost.post.updateAt.desc();
+            orderSpecifier = QPostEntity.postEntity.updateAt.desc();
         else
-            orderSpecifier = QPost.post.updateAt.asc();
+            orderSpecifier = QPostEntity.postEntity.updateAt.asc();
 
-        JPAQuery<Post> query = queryFactory.selectFrom(QPost.post)
+        JPAQuery<PostEntity> query = queryFactory.selectFrom(QPostEntity.postEntity)
                                             .orderBy(orderSpecifier)
                                             .offset(filterResponse.getOffset())
                                             .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
-                query.fetch().stream().map(PostResponse::new).toList()
+                PostMapper.INSTANCE.toPostResponseList(query.fetch())
         );
 
         return filterResponse;
@@ -89,43 +86,41 @@ public class PostServiceImpl implements IPostService {
 
     @Transactional
     @Override
-    public PostResponse savePost(UUID updatePostId, SavePostDTO savePostDTO) {
+    public PostEntity savePost(PostRequest postRequest) {
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        Post post;
+        PostEntity post;
 
-        if(updatePostId != null) {
-            post = findPostById(updatePostId);
+        if(postRequest.getPostId() != null) {
+
+            post = getPostById(postRequest.getPostId());
 
             if(!post.getUserPost().getUserId().equals(user.getUserId()))
-                throw new BadRequestException("Don't update Post");
+                throw new BadRequestException("Don't update PostEntity");
 
         }
-        else post = Post.builder()
+        else post = PostEntity.builder()
                 .userPost(user)
                 .createAt(LocalDateTime.now())
                 .build();
 
-        post.setContent(savePostDTO.getContent());
+        post.setContent(postRequest.getContent());
         post.setUpdateAt(LocalDateTime.now());
 
-        post = postRepository.save(post);
-
-        return new PostResponse(post);
+        return postRepository.save(post);
     }
 
     @Override
-    public List<CommentResponse> getListCommentToPostId(UUID postId) {
+    public List<CommentEntity> getListCommentToPostId(UUID postId) {
 
-        Post post = findPostById(postId);
+        PostEntity post = getPostById(postId);
 
         if(post.getComments() == null) return new ArrayList<>();
 
         return post.getComments().stream()
                 .filter(Objects::nonNull)
-                .sorted(Comparator.comparing(Comment::getCreateAt).reversed())
-                .map(comment -> new CommentResponse(comment, commentService.checkCommentParent(comment)))
+                .sorted(Comparator.comparing(CommentEntity::getCreateAt).reversed())
                 .toList();
 
     }
@@ -135,13 +130,12 @@ public class PostServiceImpl implements IPostService {
     @Override
     public void deletePost(UUID postId) {
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        Post post = findPostById(postId);
+        PostEntity post = getPostById(postId);
 
         if(!post.getUserPost().getUserId().equals(user.getUserId()))
-            throw new BadRequestException("Don't delete Post");
-
+            throw new BadRequestException("Don't delete PostEntity");
 
         postRepository.delete(post);
 

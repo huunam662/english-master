@@ -3,18 +3,27 @@ package com.example.englishmaster_be.Controller;
 import com.example.englishmaster_be.Common.dto.response.FilterResponse;
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
 import com.example.englishmaster_be.Exception.Error;
-import com.example.englishmaster_be.Constant.StatusConstant;
-import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
-import com.example.englishmaster_be.Model.Response.ResponseModel;
+import com.example.englishmaster_be.Common.dto.response.ExceptionResponseModel;
+import com.example.englishmaster_be.Common.dto.response.ResponseModel;
 import com.example.englishmaster_be.Exception.CustomException;
-import com.example.englishmaster_be.DTO.Question.SaveQuestionDTO;
-import com.example.englishmaster_be.DTO.Topic.*;
-import com.example.englishmaster_be.DTO.UploadFileDTO;
-import com.example.englishmaster_be.Model.*;
-import com.example.englishmaster_be.Model.Response.*;
-import com.example.englishmaster_be.Model.Response.excel.CreateTopicByExcelFileResponse;
+import com.example.englishmaster_be.Mapper.CommentMapper;
+import com.example.englishmaster_be.Mapper.TopicMapper;
+import com.example.englishmaster_be.Model.Request.Question.QuestionRequest;
+import com.example.englishmaster_be.Model.Request.Topic.ListQuestionRequest;
+import com.example.englishmaster_be.Model.Request.Topic.TopicRequest;
+import com.example.englishmaster_be.Model.Request.Topic.TopicFilterRequest;
+import com.example.englishmaster_be.Model.Request.UploadFileRequest;
+import com.example.englishmaster_be.Model.Response.CommentResponse;
+import com.example.englishmaster_be.Model.Response.PartResponse;
+import com.example.englishmaster_be.Model.Response.QuestionResponse;
+import com.example.englishmaster_be.Model.Response.TopicResponse;
+import com.example.englishmaster_be.Model.Response.excel.TopicByExcelFileResponse;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.entity.CommentEntity;
+import com.example.englishmaster_be.entity.PackEntity;
+import com.example.englishmaster_be.entity.TopicEntity;
+import com.example.englishmaster_be.entity.UserEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.*;
 import lombok.AccessLevel;
@@ -32,154 +41,91 @@ import java.util.*;
 
 @Tag(name = "Topic")
 @RestController
-@RequestMapping("/api/topic")
+@RequestMapping("/topic")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TopicController {
 
     ITopicService topicService;
 
-    IUserService userService;
-
-    IPackService packService;
-
-    TopicRepository topicRepository;
-
-    StatusRepository statusRepository;
-
-    IExcelService excelService;
-
-
 
     @GetMapping(value = "/{topicId:.+}/inforTopic")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Show list Topic successfully")
+    @MessageResponse("Show list TopicEntity successfully")
     public TopicResponse getInformationTopic(@PathVariable UUID topicId) {
 
-        Topic topic = topicService.findTopicById(topicId);
+        TopicEntity topic = topicService.getTopicById(topicId);
 
-        return new TopicResponse(topic);
+        return TopicMapper.INSTANCE.toTopicResponse(topic);
     }
 
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Create Topic successfully")
-    public TopicResponse createTopic(@ModelAttribute SaveTopicDTO saveTopicDTO) {
+    @MessageResponse("Create TopicEntity successfully")
+    public TopicResponse createTopic(@ModelAttribute TopicRequest topicRequest) {
 
-        return topicService.saveTopic(saveTopicDTO);
+        TopicEntity topic = topicService.saveTopic(topicRequest);
+
+        return TopicMapper.INSTANCE.toTopicResponse(topic);
     }
 
     @PostMapping(value = "/createTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Create Topic successfully")
+    @MessageResponse("Create TopicEntity successfully")
     public TopicResponse createTopicByExcelFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam("url") String url
     ) {
 
-        return topicService.saveTopicByExcelFile(file, url);
+        TopicEntity topic = topicService.saveTopicByExcelFile(file, url);
+
+        return TopicMapper.INSTANCE.toTopicResponse(topic);
     }
 
 
     @PutMapping(value = "/{topicId:.+}/updateTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ResponseModel> updateTopicByExcelFile(@PathVariable String topicId, @RequestParam("file") MultipartFile file, @RequestParam("url") String url) {
-        ResponseModel responseModel = new ResponseModel();
-        try {
-            // Parse dữ liệu từ file
-            CreateTopicByExcelFileResponse createTopicByExcelFileDTO = excelService.parseCreateTopicDTO(file);
+    @MessageResponse("Update TopicEntity successfully")
+    public TopicResponse updateTopicByExcelFile(@PathVariable UUID topicId, @RequestParam("file") MultipartFile file, @RequestParam("url") String url) {
 
-            User user = userService.currentUser();
+        TopicEntity topic = topicService.updateTopicByExcelFile(topicId, file, url);
 
-            // Tìm pack dựa trên ID từ DTO
-            Pack pack = packService.findPackById(createTopicByExcelFileDTO.getTopicPackId());
-            if (pack == null) {
-                throw new Exception("Pack not found with ID: " + createTopicByExcelFileDTO.getTopicPackId());
-            }
-
-            // Tạo đối tượng Topic
-            Topic topic = new Topic(
-                    createTopicByExcelFileDTO.getTopicName(),
-                    null,
-                    createTopicByExcelFileDTO.getTopicDescription(),
-                    createTopicByExcelFileDTO.getTopicType(),
-                    createTopicByExcelFileDTO.getWorkTime(),
-                    createTopicByExcelFileDTO.getStartTime(),
-                    createTopicByExcelFileDTO.getEndTime()
-            );
-
-            topic.setPack(pack);
-
-            // Xử lý ảnh chủ đề
-            if (createTopicByExcelFileDTO.getTopicImageName() == null || createTopicByExcelFileDTO.getTopicImageName().isEmpty()) {
-                topic.setTopicImage(url);
-            }
-
-            // Cập nhật các thông tin liên quan đến số lượng câu hỏi, người tạo và trạng thái
-            topic.setNumberQuestion(createTopicByExcelFileDTO.getNumberQuestion());
-            topic.setUserCreate(user);  // Gán người tạo
-            topic.setUserUpdate(user);  // Gán người cập nhật
-            topic.setStatus(statusRepository.findByStatusName(StatusConstant.ACTIVE)
-                    .orElseThrow(() -> new CustomException(Error.STATUS_NOT_FOUND)));
-
-            // Lưu topic vào cơ sở dữ liệu
-            topicRepository.save(topic);
-
-            // Thêm các phần vào topic
-            createTopicByExcelFileDTO.getListPart().forEach(partId -> topicService.addPartToTopic(topic.getTopicId(), partId));
-
-            // Tạo response với thông tin của topic
-            TopicResponse topicResponse = new TopicResponse(topic);
-            responseModel.setMessage("Create Topic successfully");
-            responseModel.setResponseData(topicResponse);
-
-            return ResponseEntity.status(HttpStatus.OK).body(responseModel);
-        } catch (CustomException ce) {
-            // Xử lý lỗi do người dùng không hợp lệ hoặc các lỗi tùy chỉnh khác
-            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Create Topic failed: " + ce.getMessage());
-            exceptionResponseModel.setStatus(HttpStatus.BAD_REQUEST);
-            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.BAD_REQUEST));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(exceptionResponseModel);
-        } catch (Exception e) {
-            // Xử lý các lỗi không mong muốn
-            ExceptionResponseModel exceptionResponseModel = new ExceptionResponseModel();
-            exceptionResponseModel.setMessage("Create Topic failed: " + e.getMessage());
-            exceptionResponseModel.setStatus(HttpStatus.INTERNAL_SERVER_ERROR);
-            exceptionResponseModel.setViolations(String.valueOf(HttpStatus.EXPECTATION_FAILED));
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(exceptionResponseModel);
-        }
+        return TopicMapper.INSTANCE.toTopicResponse(topic);
     }
 
 
 
     @PutMapping(value = "/{topicId:.+}/updateTopic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Update Topic successfully")
-    public TopicResponse updateTopic(@PathVariable UUID topicId, @ModelAttribute UpdateTopicDTO updateTopicDTO) {
+    @MessageResponse("Update TopicEntity successfully")
+    public TopicResponse updateTopic(@PathVariable UUID topicId, @ModelAttribute TopicRequest topicRequest) {
 
-        updateTopicDTO.setUpdateTopicId(topicId);
+        topicRequest.setTopicId(topicId);
 
-        return topicService.saveTopic(updateTopicDTO);
+        TopicEntity topic = topicService.saveTopic(topicRequest);
+
+        return TopicMapper.INSTANCE.toTopicResponse(topic);
     }
 
     @PutMapping(value = "/{topicId:.+}/uploadImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Upload Topic file successfully")
-    public TopicResponse uploadFileImage(@PathVariable UUID topicId, @ModelAttribute UploadFileDTO uploadFileDTO) {
+    @MessageResponse("Upload TopicEntity file successfully")
+    public TopicResponse uploadFileImage(@PathVariable UUID topicId, @ModelAttribute UploadFileRequest uploadFileDTO) {
 
-        return topicService.uploadFileImage(topicId, uploadFileDTO);
+        TopicEntity topic = topicService.uploadFileImage(topicId, uploadFileDTO);
+
+        return TopicMapper.INSTANCE.toTopicResponse(topic);
     }
 
     @DeleteMapping(value = "/{topicId:.+}/delete")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Delete Topic successfully")
+    @MessageResponse("Delete TopicEntity successfully")
     public void deleteTopic(@PathVariable UUID topicId) {
 
         topicService.deleteTopic(topicId);
     }
 
     @GetMapping(value = "/listTopic")
-    @MessageResponse("Show list Topic successfully")
+    @MessageResponse("Show list TopicEntity successfully")
     public FilterResponse<?> getAllTopic(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) int page,
             @RequestParam(value = "size", defaultValue = "12") @Min(1) @Max(100) int size,
@@ -204,15 +150,17 @@ public class TopicController {
     }
 
     @GetMapping("/getTopic")
-    @MessageResponse("Get Topic successfully")
+    @MessageResponse("Get TopicEntity successfully")
     public TopicResponse getTopic(@RequestParam("id") UUID id) {
 
-        return topicService.getTopic(id);
+        TopicEntity topic = topicService.getTopicById(id);
+
+        return TopicMapper.INSTANCE.toTopicResponse(topic);
     }
 
 
     @GetMapping(value = "/suggestTopic")
-    @MessageResponse("Show list 5 Topic name successfully")
+    @MessageResponse("Show list 5 TopicEntity name successfully")
     public List<String> get5SuggestTopic(@RequestParam(value = "query") String query) {
 
         return topicService.get5SuggestTopic(query);
@@ -221,7 +169,7 @@ public class TopicController {
 
     @PostMapping(value = "/{topicId:.+}/addPart")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Add Part to Topic successfully")
+    @MessageResponse("Add PartEntity to TopicEntity successfully")
     public void addPartToTopic(@PathVariable UUID topicId, @RequestParam UUID partId) {
 
         topicService.addPartToTopic(topicId, partId);
@@ -229,7 +177,7 @@ public class TopicController {
 
     @DeleteMapping(value = "/{topicId:.+}/deletePart")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Delete Part to Topic successfully")
+    @MessageResponse("Delete PartEntity to TopicEntity successfully")
     public void deletePartToTopic(@PathVariable UUID topicId, @RequestParam UUID partId) {
 
         topicService.deletePartToTopic(topicId, partId);
@@ -237,14 +185,14 @@ public class TopicController {
 
     @PostMapping(value = "/{topicId:.+}/addQuestion")
     @PreAuthorize("hasRole('ADMIN')")
-    public QuestionResponse addQuestionToTopic(@PathVariable UUID topicId, @ModelAttribute SaveQuestionDTO createQuestionDTO) {
+    public QuestionResponse addQuestionToTopic(@PathVariable UUID topicId, @ModelAttribute QuestionRequest createQuestionDTO) {
 
         return topicService.addQuestionToTopic(topicId, createQuestionDTO);
     }
 
     @PostMapping(value = "/{topicId:.+}/addListQuestion", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public void addListQuestionToTopic(@PathVariable UUID topicId, @ModelAttribute("listQuestion") SaveListQuestionDTO createQuestionDTOList) {
+    public void addListQuestionToTopic(@PathVariable UUID topicId, @ModelAttribute("listQuestion") ListQuestionRequest createQuestionDTOList) {
 
         topicService.addListQuestionToTopic(topicId, createQuestionDTOList);
     }
@@ -303,7 +251,7 @@ public class TopicController {
 
     @DeleteMapping(value = "/{topicId:.+}/deleteQuestion")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Delete Question to Topic successfully")
+    @MessageResponse("Delete QuestionEntity to TopicEntity successfully")
     public void deleteQuestionToTopic(
             @PathVariable UUID topicId,
             @RequestParam UUID questionId
@@ -315,7 +263,7 @@ public class TopicController {
 
     @GetMapping(value = "/{topicId:.+}/listPart")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Show Part to Topic successfully")
+    @MessageResponse("Show PartEntity to TopicEntity successfully")
     public List<PartResponse> getPartToTopic(@PathVariable UUID topicId) {
 
         return topicService.getPartToTopic(topicId);
@@ -323,7 +271,7 @@ public class TopicController {
 
     @GetMapping(value = "/{topicId:.+}/listQuestionToPart")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Show Question of Part to Topic successfully")
+    @MessageResponse("Show QuestionEntity of PartEntity to TopicEntity successfully")
     public List<QuestionResponse> getQuestionOfToTopic(@PathVariable UUID topicId, @RequestParam UUID partId) {
 
         return topicService.getQuestionOfToTopic(topicId, partId);
@@ -340,20 +288,24 @@ public class TopicController {
 
     @GetMapping(value = "/{topicId:.+}/listComment")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Show list Comment successfully")
+    @MessageResponse("Show list CommentEntity successfully")
     public List<CommentResponse> listComment(@PathVariable UUID topicId) {
 
-        return topicService.listComment(topicId);
+        List<CommentEntity> commentEntityList = topicService.listComment(topicId);
+
+        return CommentMapper.INSTANCE.toCommentResponseList(commentEntityList);
     }
 
 
     @GetMapping("/searchByStartTime")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Topic retrieved successfully")
+    @MessageResponse("TopicEntity retrieved successfully")
     public List<TopicResponse> getTopicByStartTime(
             @RequestParam @DateTimeFormat(pattern ="yyyy-MM-dd") LocalDateTime startDate
     ){
 
-        return topicService.getTopicsByStartTime(startDate);
+        List<TopicEntity> topicEntityList = topicService.getTopicsByStartTime(startDate);
+
+        return TopicMapper.INSTANCE.toTopicResponseList(topicEntityList);
     }
 }

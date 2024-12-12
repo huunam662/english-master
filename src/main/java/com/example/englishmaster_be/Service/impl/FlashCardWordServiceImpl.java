@@ -1,12 +1,11 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.FlashCard.SaveFlashCardWordDTO;
-import com.example.englishmaster_be.DTO.FlashCard.UpdateFlashCardWordDTO;
-import com.example.englishmaster_be.Model.FlashCard;
-import com.example.englishmaster_be.Model.FlashCardWord;
-import com.example.englishmaster_be.Model.QFlashCardWord;
-import com.example.englishmaster_be.Model.Response.FlashCardWordResponse;
-import com.example.englishmaster_be.Model.User;
+import com.example.englishmaster_be.Model.Request.FlashCard.FlashCardWordRequest;
+import com.example.englishmaster_be.Mapper.FlashCardWordMapper;
+import com.example.englishmaster_be.entity.FlashCardEntity;
+import com.example.englishmaster_be.entity.FlashCardWordEntity;
+import com.example.englishmaster_be.entity.QFlashCardWordEntity;
+import com.example.englishmaster_be.entity.UserEntity;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.*;
 import com.google.cloud.storage.Blob;
@@ -21,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -44,24 +42,24 @@ public class FlashCardWordServiceImpl implements IFlashCardWordService {
 
 
     @Override
-    public FlashCardWord getWordToID(UUID wordId) {
+    public FlashCardWordEntity getFlashCardWordById(UUID flashCardWordId) {
 
-        return flashCardWordRepository.findById(wordId)
+        return flashCardWordRepository.findById(flashCardWordId)
                 .orElseThrow(
-                        () -> new IllegalArgumentException("FlashCard word not found with ID: " + wordId)
+                        () -> new IllegalArgumentException("FlashCardEntity word not found with ID: " + flashCardWordId)
                 );
     }
 
     @Override
     public List<String> searchByFlashCardWord(String keyWord) {
 
-        OrderSpecifier<?> orderSpecifier = QFlashCardWord.flashCardWord.word.asc();
+        OrderSpecifier<?> orderSpecifier = QFlashCardWordEntity.flashCardWordEntity.word.asc();
 
         String likePattern = "%" + keyWord.trim().toLowerCase().replaceAll("\\s+", "%") + "%";
 
-        BooleanExpression queryConditionPattern = QFlashCardWord.flashCardWord.word.likeIgnoreCase(likePattern);
+        BooleanExpression queryConditionPattern = QFlashCardWordEntity.flashCardWordEntity.word.likeIgnoreCase(likePattern);
 
-        JPAQuery<FlashCardWord> query = jpaQueryFactory.selectFrom(QFlashCardWord.flashCardWord);
+        JPAQuery<FlashCardWordEntity> query = jpaQueryFactory.selectFrom(QFlashCardWordEntity.flashCardWordEntity);
 
         int offsetKey = 0;
         int limitKey = 0;
@@ -71,63 +69,50 @@ public class FlashCardWordServiceImpl implements IFlashCardWordService {
                 .offset(offsetKey)
                 .limit(limitKey);
 
-        return query.fetch().stream().map(FlashCardWord::getWord).toList();
+        return query.fetch().stream().map(FlashCardWordEntity::getWord).toList();
     }
 
     @Transactional
     @Override
     public void delete(UUID flashCardWordId) {
 
-        FlashCardWord flashCardWord = getWordToID(flashCardWordId);
+        FlashCardWordEntity flashCardWord = getFlashCardWordById(flashCardWordId);
 
         flashCardWordRepository.delete(flashCardWord);
     }
 
     @Transactional
     @Override
-    public FlashCardWordResponse saveWordToFlashCard(SaveFlashCardWordDTO createFlashCardWordDTO) {
+    public FlashCardWordEntity saveFlashCardWord(FlashCardWordRequest flashCardWordRequest) {
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        FlashCardWord flashCardWord;
+        FlashCardWordEntity flashCardWord;
 
-        if(createFlashCardWordDTO instanceof UpdateFlashCardWordDTO updateFlashCardWordDTO){
+        if(flashCardWordRequest.getFlashCardWordId() != null)
+            flashCardWord = getFlashCardWordById(flashCardWordRequest.getFlashCardWordId());
 
-            flashCardWord = getWordToID(updateFlashCardWordDTO.getFlashCardWordId());
-
-            flashCardWord.setWord(updateFlashCardWordDTO.getWord());
-            flashCardWord.setDefine(updateFlashCardWordDTO.getDefine());
-            flashCardWord.setType(updateFlashCardWordDTO.getType());
-            flashCardWord.setSpelling(updateFlashCardWordDTO.getSpelling());
-            flashCardWord.setExample(updateFlashCardWordDTO.getExample());
-            flashCardWord.setExample(updateFlashCardWordDTO.getExample());
-            flashCardWord.setNote(updateFlashCardWordDTO.getNote());
-        }
         else {
 
-            FlashCard flashCard = flashCardService.getFlashCardToId(createFlashCardWordDTO.getFlashCardId());
+            FlashCardEntity flashCard = flashCardService.getFlashCardById(flashCardWordRequest.getFlashCardId());
 
-            flashCardWord = FlashCardWord.builder()
-                    .word(createFlashCardWordDTO.getWord())
-                    .define(createFlashCardWordDTO.getDefine())
-                    .type(createFlashCardWordDTO.getType())
-                    .spelling(createFlashCardWordDTO.getSpelling())
-                    .example(createFlashCardWordDTO.getExample())
-                    .note(createFlashCardWordDTO.getNote())
+            flashCardWord = FlashCardWordEntity.builder()
                     .flashCard(flashCard)
+                    .createAt(LocalDateTime.now())
+                    .userCreate(user)
                     .build();
         }
 
-        flashCardWord.setUserCreate(user);
+        FlashCardWordMapper.INSTANCE.flowToFlashCardWordEntity(flashCardWordRequest, flashCardWord);
         flashCardWord.setUserUpdate(user);
         flashCardWord.setUpdateAt(LocalDateTime.now());
 
-        if(createFlashCardWordDTO.getImage() != null){
+        if(flashCardWordRequest.getImage() != null){
 
-            Blob blobResponse = fileStorageService.save(createFlashCardWordDTO.getImage());
+            Blob blobResponse = fileStorageService.save(flashCardWordRequest.getImage());
             flashCardWord.setImage(blobResponse.getName());
         }
 
-        return new FlashCardWordResponse(flashCardWord);
+        return flashCardWordRepository.save(flashCardWord);
     }
 }

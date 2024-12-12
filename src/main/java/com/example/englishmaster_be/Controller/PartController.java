@@ -2,12 +2,13 @@ package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
 import com.example.englishmaster_be.Mapper.PartMapper;
-import com.example.englishmaster_be.DTO.Part.SavePartDTO;
-import com.example.englishmaster_be.DTO.Part.UpdatePartDTO;
-import com.example.englishmaster_be.DTO.*;
-import com.example.englishmaster_be.Model.*;
+import com.example.englishmaster_be.Model.Request.Part.PartRequest;
+import com.example.englishmaster_be.Model.Request.UploadMultiFileRequest;
+import com.example.englishmaster_be.Model.Request.UploadTextRequest;
 import com.example.englishmaster_be.Model.Response.PartResponse;
 import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.entity.PackEntity;
+import com.example.englishmaster_be.entity.PartEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ import java.util.UUID;
 
 @Tag(name = "Part")
 @RestController
-@RequestMapping("/api/part")
+@RequestMapping("/part")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PartController {
@@ -31,56 +32,66 @@ public class PartController {
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Create Part successfully")
+    @MessageResponse("Create PartEntity successfully")
     public PartResponse createPart(
-            @RequestBody SavePartDTO savePartDTO
+            @ModelAttribute PartRequest partRequest
     ) {
 
-        return partService.savePart(savePartDTO);
+        PartEntity part = partService.savePart(partRequest);
+
+        return PartMapper.INSTANCE.toPartResponse(part);
     }
 
     @PutMapping(value = "/{partId:.+}/update")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Update Part successfully")
+    @MessageResponse("Update PartEntity successfully")
     public PartResponse updatePart(
             @PathVariable UUID partId,
-            @RequestBody UpdatePartDTO updatePartDTO
+            @ModelAttribute PartRequest partRequest
     ) {
 
-        updatePartDTO.setPartId(partId);
+        partRequest.setPartId(partId);
 
-        return partService.savePart(updatePartDTO);
+        PartEntity part = partService.savePart(partRequest);
+
+        return PartMapper.INSTANCE.toPartResponse(part);
     }
 
     @PutMapping(value = "/{partId:.+}/uploadfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Upload file Part successfully")
+    @MessageResponse("Upload file PartEntity successfully")
     public PartResponse uploadFilePart(
             @PathVariable UUID partId,
-            @ModelAttribute UploadMultiFileDTO uploadMultiFileDTO
+            @ModelAttribute UploadMultiFileRequest uploadMultiFileRequest
     ) {
 
-        return partService.uploadFilePart(partId, uploadMultiFileDTO);
+        PartEntity part = partService.uploadFilePart(partId, uploadMultiFileRequest);
+
+        return PartMapper.INSTANCE.toPartResponse(part);
     }
 
     @PutMapping(value = "/{partId:.+}/uploadText")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Upload file Part successfully")
-    public PartResponse uploadTextPart(@PathVariable UUID partId, @RequestBody UploadTextDTO uploadTextDTO) {
+    @MessageResponse("Upload file PartEntity successfully")
+    public PartResponse uploadTextPart(@PathVariable UUID partId, @RequestBody UploadTextRequest uploadTextRequest) {
 
-        return partService.uploadTextPart(partId, uploadTextDTO);
+        PartEntity part = partService.uploadTextPart(partId, uploadTextRequest);
+
+        return PartMapper.INSTANCE.toPartResponse(part);
     }
 
     @GetMapping(value = "/listPart")
-    @MessageResponse("Show Part successfully")
+    @MessageResponse("Show PartEntity successfully")
     public List<PartResponse> getAllPart() {
 
-        return partService.getListPart();
+        List<PartEntity> partEntityList = partService.getListPart();
+
+        return PartMapper.INSTANCE.toPartResponseList(partEntityList);
     }
 
     @DeleteMapping(value = "/{partId:.+}/delete")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Delete Part successfully")
+    @MessageResponse("Delete PartEntity successfully")
     public void deletePart(@PathVariable UUID partId) {
 
         partService.deletePart(partId);
@@ -88,13 +99,13 @@ public class PartController {
 
 
     @GetMapping(value = "/{partId:.+}/content")
-    @MessageResponse("Show information Part successfully")
+    @MessageResponse("Show information PartEntity successfully")
     public PartResponse getPartToId(
             @PathVariable UUID partId
     ) {
 
-        Part partEntity = partService.getPartToId(partId);
+        PartEntity partEntity = partService.getPartToId(partId);
 
-        return PartMapper.INSTANCE.partEntityToPartResponse(partEntity);
+        return PartMapper.INSTANCE.toPartResponse(partEntity);
     }
 }

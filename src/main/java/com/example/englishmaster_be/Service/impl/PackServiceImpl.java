@@ -1,24 +1,21 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.Pack.PackDTO;
+import com.example.englishmaster_be.Model.Request.Pack.PackRequest;
 import com.example.englishmaster_be.Exception.Response.BadRequestException;
-import com.example.englishmaster_be.Model.*;
-import com.example.englishmaster_be.Model.Response.PackResponse;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.entity.PackEntity;
+import com.example.englishmaster_be.entity.UserEntity;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
@@ -30,32 +27,30 @@ public class PackServiceImpl implements IPackService {
     IUserService userService;
 
     @Override
-    public PackResponse createPack(PackDTO packDTO) {
+    public PackEntity createPack(PackRequest packRequest) {
 
-        Pack isExistedPack = checkPack(packDTO.getPackName());
+        PackEntity isExistedPack = checkPack(packRequest.getPackName());
 
         if(isExistedPack != null)
             throw new BadRequestException("Create pack fail: The pack name is already exist");
 
-        User user = userService.currentUser();
+        UserEntity user = userService.currentUser();
 
-        Pack pack = Pack.builder()
-                .packName(packDTO.getPackName())
+        PackEntity pack = PackEntity.builder()
+                .packName(packRequest.getPackName())
                 .createAt(LocalDateTime.now())
                 .updateAt(LocalDateTime.now())
                 .userCreate(user)
                 .userUpdate(user)
                 .build();
 
-        pack = packRepository.save(pack);
-
-        return new PackResponse(pack);
+        return packRepository.save(pack);
     }
 
     @Override
-    public Pack checkPack(String packName) {
+    public PackEntity checkPack(String packName) {
 
-        List<Pack> packList = packRepository.findAll();
+        List<PackEntity> packList = packRepository.findAll();
 
         return packList.stream()
                 .filter(
@@ -64,19 +59,24 @@ public class PackServiceImpl implements IPackService {
     }
 
     @Override
-    public Pack findPackById(UUID packId) {
+    public PackEntity getPackById(UUID packId) {
 
         return packRepository.findByPackId(packId)
                 .orElseThrow(
-                        () -> new IllegalArgumentException("Pack not found with ID: " + packId)
+                        () -> new BadRequestException("PackEntity not found")
                 );
     }
 
     @Override
-    public List<PackResponse> getListPack() {
+    public PackEntity getPackByName(String packName) {
+        return packRepository.findByPackName(packName).orElseThrow(
+                () -> new BadRequestException("PackEntity not found with name: " + packName)
+        );
+    }
 
-        List<Pack> packList = packRepository.findAll();
+    @Override
+    public List<PackEntity> getListPack() {
 
-        return packList.stream().map(PackResponse::new).toList();
+        return packRepository.findAll();
     }
 }

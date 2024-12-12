@@ -1,7 +1,10 @@
 package com.example.englishmaster_be.Model.Response;
 
-import com.example.englishmaster_be.Model.Answer;
-import com.example.englishmaster_be.Model.Question;
+import com.example.englishmaster_be.Mapper.AnswerMapper;
+import com.example.englishmaster_be.Mapper.ContentMapper;
+import com.example.englishmaster_be.entity.AnswerEntity;
+import com.example.englishmaster_be.entity.QuestionEntity;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.json.simple.JSONArray;
@@ -9,6 +12,7 @@ import org.json.simple.JSONObject;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -33,86 +37,46 @@ public class QuestionMockTestResponse {
 
     String questionContent;
 
-    String createAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+    LocalDateTime createAt;
 
-    String updateAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
+    LocalDateTime updateAt;
+
+    Integer questionScore;
 
     List<QuestionMockTestResponse> questionGroup;
 
     List<AnswerResponse> listAnswer;
 
-    int questionScore;
+    List<ContentBasicResponse> contentList;
 
-    JSONArray contentList;
+    public QuestionMockTestResponse(QuestionEntity question, AnswerEntity answerChoice, AnswerEntity answerCorrect) {
 
-    public QuestionMockTestResponse(Question question, Answer answerChoice, Answer answerCorrect) {
+        this(question);
 
         if(Objects.nonNull(answerCorrect))
             this.answerCorrect = answerCorrect.getAnswerId();
 
         if (Objects.nonNull(answerChoice))
             this.answerChoice = answerChoice.getAnswerId();
-
-        this.questionId = question.getQuestionId();
-        this.questionContent = question.getQuestionContent();
-        this.questionScore = question.getQuestionScore();
-        this.partId = question.getPart().getPartId();
-
-        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
-        if(Objects.nonNull(question.getCreateAt()))
-            this.createAt = sdf.format(Timestamp.valueOf(question.getCreateAt()));
-        if(Objects.nonNull(question.getUpdateAt()))
-            this.updateAt = sdf.format(Timestamp.valueOf(question.getUpdateAt()));
-
-        if (Objects.nonNull(question.getAnswers()))
-            this.listAnswer = question.getAnswers().stream().map(AnswerResponse::new).toList();
-
-        this.contentList = new JSONArray();
-
-        if (Objects.nonNull(question.getContentCollection())) {
-
-            question.getContentCollection().forEach(
-                    contentItem -> {
-
-                        JSONObject content = new JSONObject();
-                        content.put("Content Type", contentItem.getContentType());
-                        content.put("Content Data", contentItem.getContentData());
-
-                        this.contentList.add(content);
-                    }
-            );
-        }
-
     }
 
-    public QuestionMockTestResponse(Question question) {
+    public QuestionMockTestResponse(QuestionEntity question) {
 
         this.questionId = question.getQuestionId();
         this.questionContent = question.getQuestionContent();
         this.questionScore = question.getQuestionScore();
         this.partId = question.getPart().getPartId();
-
-        SimpleDateFormat sdf = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
-        this.createAt = sdf.format(Timestamp.valueOf(question.getCreateAt()));
-        this.updateAt = sdf.format(Timestamp.valueOf(question.getUpdateAt()));
+        this.createAt = question.getCreateAt();
+        this.updateAt = question.getUpdateAt();
 
         if (Objects.nonNull(question.getAnswers()))
-            this.listAnswer = question.getAnswers().stream().map(AnswerResponse::new).toList();
+            this.listAnswer = AnswerMapper.INSTANCE.toAnswerResponseList(question.getAnswers());
 
-        this.contentList = new JSONArray();
+        if (Objects.nonNull(question.getContentCollection()))
+            contentList = question.getContentCollection().stream().map(ContentMapper.INSTANCE::toContentBasicResponse).toList();
 
-        if (Objects.nonNull(question.getContentCollection())) {
-            question.getContentCollection().forEach(
-                    contentItem -> {
-
-                        JSONObject content = new JSONObject();
-                        content.put("Content Type", contentItem.getContentType());
-                        content.put("Content Data", contentItem.getContentData());
-
-                        contentList.add(content);
-                    }
-            );
-        }
     }
 
 }

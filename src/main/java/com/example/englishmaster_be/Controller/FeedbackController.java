@@ -3,10 +3,11 @@ package com.example.englishmaster_be.Controller;
 import com.example.englishmaster_be.Common.dto.response.FilterResponse;
 import com.example.englishmaster_be.Common.enums.SortByFeedbackFieldsEnum;
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.DTO.Feedback.FeedbackFilterRequest;
-import com.example.englishmaster_be.DTO.Feedback.UpdateFeedbackDTO;
-import com.example.englishmaster_be.DTO.Feedback.SaveFeedbackDTO;
-import com.example.englishmaster_be.Model.Response.*;
+import com.example.englishmaster_be.Model.Request.Feedback.FeedbackFilterRequest;
+import com.example.englishmaster_be.Model.Request.Feedback.FeedbackRequest;
+import com.example.englishmaster_be.Mapper.FeedbackMapper;
+import com.example.englishmaster_be.Model.Response.FeedbackResponse;
+import com.example.englishmaster_be.entity.FeedbackEntity;
 import com.example.englishmaster_be.Service.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
@@ -23,7 +24,7 @@ import java.util.UUID;
 
 @Tag(name = "Feedback")
 @RestController
-@RequestMapping("/api/Feedback")
+@RequestMapping("/feedback")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FeedbackController {
@@ -33,7 +34,7 @@ public class FeedbackController {
 
     @GetMapping(value = "/listFeedbackAdmin")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("List Feedback successfully")
+    @MessageResponse("List FeedbackEntity successfully")
     public FilterResponse<?> listFeedbackOfAdmin(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
@@ -57,7 +58,7 @@ public class FeedbackController {
     }
 
     @GetMapping(value = "/listFeedbackUser")
-    @MessageResponse("List Feedback successfully")
+    @MessageResponse("List FeedbackEntity successfully")
     public FilterResponse<?> listFeedbackOfUser(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
@@ -76,40 +77,44 @@ public class FeedbackController {
 
     @PostMapping(value = "/createFeedback" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Create Feedback successfully")
+    @MessageResponse("Create FeedbackEntity successfully")
     public FeedbackResponse createFeedback(
-            @ModelAttribute("contentFeedback") SaveFeedbackDTO createFeedbackDTO
+            @ModelAttribute("contentFeedback") FeedbackRequest feedbackRequest
     ){
 
-        return feedbackService.saveFeedback(createFeedbackDTO);
+        FeedbackEntity feedback = feedbackService.saveFeedback(feedbackRequest);
+
+        return FeedbackMapper.INSTANCE.toFeedbackResponse(feedback);
     }
 
     @PatchMapping (value = "/{FeedbackId:.+}/enableFeedback")
     @PreAuthorize("hasRole('ADMIN')")
     public void enableFeedback(
             @PathVariable UUID FeedbackId,
-            @RequestParam(defaultValue = "true") boolean enable
+            @RequestParam(defaultValue = "true") Boolean enable
     ){
         
         feedbackService.enableFeedback(FeedbackId, enable);
     }
 
-    @PatchMapping(value = "/{FeedbackId:.+}/updateFeedback", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/{feedbackId:.+}/updateFeedback", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Update Feedback successfully")
+    @MessageResponse("Update FeedbackEntity successfully")
     public FeedbackResponse updateFeedback(
-            @PathVariable UUID FeedbackId,
-            @ModelAttribute(name = "contentFeedback") UpdateFeedbackDTO updateFeedbackDTO
+            @PathVariable UUID feedbackId,
+            @ModelAttribute(name = "contentFeedback") FeedbackRequest feedbackRequest
     ){
 
-        updateFeedbackDTO.setFeedbackID(FeedbackId);
+        feedbackRequest.setFeedbackId(feedbackId);
 
-        return feedbackService.saveFeedback(updateFeedbackDTO);
+        FeedbackEntity feedback = feedbackService.saveFeedback(feedbackRequest);
+
+        return FeedbackMapper.INSTANCE.toFeedbackResponse(feedback);
     }
 
     @DeleteMapping(value = "/{FeedbackId:.+}/deleteFeedback")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Delete Feedback successfully")
+    @MessageResponse("Delete FeedbackEntity successfully")
     public void deleteFeedback(@PathVariable UUID FeedbackId){
 
         feedbackService.deleteFeedback(FeedbackId);

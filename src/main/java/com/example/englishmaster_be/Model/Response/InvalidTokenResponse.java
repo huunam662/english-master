@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Model.Response;
 
-import com.example.englishmaster_be.Model.InvalidToken;
+import com.example.englishmaster_be.entity.InvalidTokenEntity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -19,7 +19,7 @@ public class InvalidTokenResponse {
 
     LocalDateTime expireTime;
 
-    public InvalidTokenResponse(InvalidToken invalidToken) {
+    public InvalidTokenResponse(InvalidTokenEntity invalidToken) {
 
         if(Objects.isNull(invalidToken)) return;
 

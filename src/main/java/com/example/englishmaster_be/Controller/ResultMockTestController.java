@@ -1,18 +1,15 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
-import com.example.englishmaster_be.DTO.MockTest.SaveResultMockTestDTO;
+import com.example.englishmaster_be.Mapper.ResultMockTestMapper;
+import com.example.englishmaster_be.Model.Request.MockTest.ResultMockTestRequest;
 import com.example.englishmaster_be.Model.Response.ResultMockTestResponse;
-import com.example.englishmaster_be.Model.Response.ResponseModel;
 import com.example.englishmaster_be.Service.IResultMockTestService;
+import com.example.englishmaster_be.entity.ResultMockTestEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +18,7 @@ import java.util.UUID;
 
 @Tag(name = "Result Mock Test")
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/result-mock-test")
 @PreAuthorize("hasRole('ADMIN')||hasRole('USER')")
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -31,23 +28,32 @@ public class ResultMockTestController {
 
     @PostMapping(value = "/create")
     @MessageResponse("Create result mock test successfully")
-    public ResultMockTestResponse createResultMockTest(SaveResultMockTestDTO saveResultMockTestDTO) {
+    public ResultMockTestResponse createResultMockTest(ResultMockTestRequest resultMockTestRequest) {
 
-        return resultMockTestService.createResultMockTest(saveResultMockTestDTO);
+        ResultMockTestEntity resultMockTest = resultMockTestService.saveResultMockTest(resultMockTestRequest);
+
+        return ResultMockTestMapper.INSTANCE.toResultMockTestResponse(resultMockTest);
     }
 
     @GetMapping("/getAllResult")
     @MessageResponse("Get all result mock test successfully")
     public List<ResultMockTestResponse> getAllResult() {
 
-        return resultMockTestService.getAllResultMockTests();
+        List<ResultMockTestEntity> resultMockTestEntityList = resultMockTestService.getAllResultMockTests();
+
+        return ResultMockTestMapper.INSTANCE.toResultMockTestResponseList(resultMockTestEntityList);
     }
 
     @GetMapping("/getResultMockTestByPartAndMockTest")
     @MessageResponse("Get result mock test successfully")
-    public List<ResultMockTestResponse> getResultMockTest(@RequestParam(required = false) UUID partId, @RequestParam(required = false) UUID mockTestId) {
+    public List<ResultMockTestResponse> getResultMockTest(
+            @RequestParam(required = false) UUID partId,
+            @RequestParam(required = false) UUID mockTestId
+    ) {
 
-        return resultMockTestService.getResultMockTestsByPartIdAndMockTestId(partId, mockTestId);
+        List<ResultMockTestEntity> resultMockTestEntityList = resultMockTestService.getResultMockTestsByPartIdAndMockTestId(partId, mockTestId);
+
+        return ResultMockTestMapper.INSTANCE.toResultMockTestResponseList(resultMockTestEntityList);
     }
 
     @DeleteMapping("/delete")

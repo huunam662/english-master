@@ -2,7 +2,7 @@ package com.example.englishmaster_be.Exception;
 
 import com.example.englishmaster_be.Exception.Response.BadRequestException;
 import com.example.englishmaster_be.Exception.Response.ResourceNotFoundException;
-import com.example.englishmaster_be.Model.Response.ExceptionResponseModel;
+import com.example.englishmaster_be.Common.dto.response.ExceptionResponseModel;
 import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.experimental.FieldDefaults;
@@ -18,7 +18,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.context.request.WebRequest;
 
 import java.nio.file.FileAlreadyExistsException;
 import java.rmi.ServerException;
@@ -40,10 +39,8 @@ public class GlobalExceptionHandler {
                 .status(error.getStatusCode())
                 .code(error.getStatusCode().value())
                 .message(error.getMessage())
-                .violations(error.getViolation())
                 .build();
     }
-
 
     @ExceptionHandler({
             ResourceNotFoundException.class,
@@ -61,7 +58,6 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .code(HttpStatus.NOT_FOUND.value())
                 .message(message)
-                .violations("")
                 .build();
     }
 
@@ -126,7 +122,6 @@ public class GlobalExceptionHandler {
                 .status(error.getStatusCode())
                 .code(error.getStatusCode().value())
                 .message(error.getMessage())
-                .violations(error.getViolation())
                 .build();
     }
 

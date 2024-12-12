@@ -1,13 +1,14 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.DTO.DeleteRequestDTO;
+import com.example.englishmaster_be.Model.Request.DeleteRequestDTO;
 import com.example.englishmaster_be.Exception.CustomException;
 import com.example.englishmaster_be.Exception.Error;
 import com.example.englishmaster_be.Exception.Response.BadRequestException;
 import com.example.englishmaster_be.Helper.GetExtension;
-import com.example.englishmaster_be.Model.Content;
+import com.example.englishmaster_be.Value.UploadValue;
+import com.example.englishmaster_be.entity.ContentEntity;
 import com.example.englishmaster_be.Model.Response.DeleteResponse;
-import com.example.englishmaster_be.Model.User;
+import com.example.englishmaster_be.entity.UserEntity;
 import com.example.englishmaster_be.Repository.ContentRepository;
 import com.example.englishmaster_be.Service.IUploadService;
 import com.example.englishmaster_be.Service.IUserService;
@@ -28,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Objects;
@@ -40,18 +40,11 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UploadServiceImpl implements IUploadService {
 
-    @Value("${upload.server.api.upload}")
-    static String uploadApiUrl;
-
-    @Value("${upload.server.token}")
-    static String token;
-
-    @Value("${upload.server.api.delete}")
-    static String deleteApiUrl;
-
     RestTemplate restTemplate;
 
     ContentRepository contentRepository;
+
+    UploadValue uploadValue;
 
     IUserService userService;
 
@@ -63,7 +56,7 @@ public class UploadServiceImpl implements IUploadService {
 
     private HttpHeaders createHttpHeaders(MediaType contentType) {
         HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(token);
+        headers.setBearerAuth(uploadValue.getToken());
         headers.setContentType(contentType);
         return headers;
     }
@@ -77,7 +70,7 @@ public class UploadServiceImpl implements IUploadService {
             throw new BadRequestException("File is null or empty");
         }
         if (file.getContentType() == null) {
-            throw new BadRequestException("Invalid file Type");
+            throw new BadRequestException("Invalid file TypeEntity");
         }
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
@@ -93,7 +86,7 @@ public class UploadServiceImpl implements IUploadService {
         builder.part("isPrivateFile", isPrivateFile);
 
         HttpEntity<?> entity = new HttpEntity<>(builder.build(), headers);
-        ResponseEntity<String> response = restTemplate.exchange(uploadApiUrl, HttpMethod.POST, entity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(uploadValue.getUploadApiUrl(), HttpMethod.POST, entity, String.class);
         if (response.getBody() == null) {
             throw new RuntimeException("Server response is empty");
         }
@@ -119,11 +112,11 @@ public class UploadServiceImpl implements IUploadService {
     }
 
     private String handleSuccessfulUpload(JsonNode jsonResponse, UUID topicId, String code, MultipartFile file) {
-        User currentUser = userService.currentUser();
+        UserEntity currentUser = userService.currentUser();
         String url = jsonResponse.path("responseData").path("url").asText();
         String existsContent = contentRepository.findContentDataByTopicIdAndCode(topicId, code);
         if (existsContent == null) {
-            Content content = new Content();
+            ContentEntity content = new ContentEntity();
             content.setTopicId(topicId);
             content.setCode(code);
             content.setContentType(GetExtension.typeFile(file.getOriginalFilename()));
@@ -143,7 +136,7 @@ public class UploadServiceImpl implements IUploadService {
     public DeleteResponse delete(DeleteRequestDTO dto) {
         String path = extractPathFromFilepath(dto.getFilepath());
         String encodedPath = Base64.getEncoder().encodeToString(path.getBytes(StandardCharsets.UTF_8));
-        String url = deleteApiUrl + encodedPath;
+        String url = uploadValue.getDeleteApiUrl() + encodedPath;
         HttpHeaders headers = createHttpHeaders(MediaType.APPLICATION_JSON);
         ResponseEntity<String> response = sendHttpRequest(url, HttpMethod.DELETE, headers, null);
         if (response.getStatusCode() == HttpStatus.OK) {

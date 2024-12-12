@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.Service.impl;
 
 
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
 import com.example.englishmaster_be.Exception.Response.ResourceNotFoundException;
 import com.example.englishmaster_be.Service.IFileStorageService;
 import com.google.cloud.storage.Blob;
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.nio.file.*;
 import java.time.LocalDateTime;
@@ -99,8 +97,6 @@ public class FileStorageServiceImpl implements IFileStorageService {
         try {
 
             String fileName = nameFile(file);
-
-            delete(fileName);
 
             Bucket bucket = StorageClient.getInstance().bucket(bucketName);
 

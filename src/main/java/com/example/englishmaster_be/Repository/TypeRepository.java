@@ -1,11 +1,10 @@
 package com.example.englishmaster_be.Repository;
 
-import com.example.englishmaster_be.Model.Type;
+import com.example.englishmaster_be.entity.TypeEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
 
 
-public interface TypeRepository extends JpaRepository<Type, UUID> {
+public interface TypeRepository extends JpaRepository<TypeEntity, UUID> {
 }

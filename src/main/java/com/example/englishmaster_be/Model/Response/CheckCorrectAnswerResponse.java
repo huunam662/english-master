@@ -11,8 +11,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class CheckCorrectAnswerResponse {
 
-    boolean correctAnswer;
+    Boolean correctAnswer;
 
-    int scoreAnswer;
+    Integer scoreAnswer;
 
 }
