@@ -61,7 +61,7 @@ public class AnswerEntity {
     QuestionEntity question;
 
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany
     @JoinTable(
             name = "user_answer_answers",
             joinColumns = @JoinColumn(name = "answer_id", referencedColumnName = "id"),

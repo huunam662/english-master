@@ -37,6 +37,6 @@ public class UserAnswerEntity {
     @JoinColumn(name = "user_id")
     UserEntity user;
 
-    @ManyToMany(mappedBy = "userAnswers", fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "userAnswers")
     List<AnswerEntity> answers;
 }
