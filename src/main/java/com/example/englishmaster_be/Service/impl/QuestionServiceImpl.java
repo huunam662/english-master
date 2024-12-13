@@ -76,6 +76,7 @@ public class QuestionServiceImpl implements IQuestionService {
             question.setQuestionContent(questionRequest.getQuestionContent());
             question.setQuestionScore(questionRequest.getQuestionScore());
             question.setUserUpdate(user);
+            question.setHasHints(questionRequest.isHasHints());
 
             questionRepository.save(question);
 
@@ -176,6 +177,7 @@ public class QuestionServiceImpl implements IQuestionService {
             question.setUserCreate(user);
             question.setUserUpdate(user);
             question.setPart(part);
+            question.setHasHints(questionRequest.isHasHints());
 
             return questionRepository.save(question);
         }

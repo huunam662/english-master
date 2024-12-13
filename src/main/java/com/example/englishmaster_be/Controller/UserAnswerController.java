@@ -61,11 +61,10 @@ public class UserAnswerController {
     @GetMapping("/check-correct")
     @MessageResponse("Check answer successfully")
     public ScoreAnswerResponse checkCorrectAnswer(
-            @RequestParam(value = "user_id") UUID userId,
             @RequestParam(value = "question_id") UUID questionId
     ) {
 
-        return userAnswerService.scoreAnswer(questionId, userId);
+        return userAnswerService.scoreAnswer(questionId);
     }
 
 

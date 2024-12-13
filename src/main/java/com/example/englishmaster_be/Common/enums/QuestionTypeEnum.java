@@ -7,7 +7,8 @@ public enum QuestionTypeEnum {
     Essay,
     Short_Answer,
     T_F_Not_Given,
-    Matching;
+    Matching,
+    Label;
 
 
     @Override

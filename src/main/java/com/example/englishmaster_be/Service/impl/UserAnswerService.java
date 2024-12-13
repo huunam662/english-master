@@ -213,7 +213,7 @@ public class UserAnswerService {
         return score;
     }
 
-    public ScoreAnswerResponse scoreAnswer(UUID questionId, UUID userId){
+    public ScoreAnswerResponse scoreAnswerMatching(UUID questionId, UUID userId){
 
         UserEntity user = userService.findUserById(userId);
 
@@ -242,7 +242,39 @@ public class UserAnswerService {
         return scoreAnswerResponse;
     }
 
-    public ScoreAnswerResponse scoreAnswerMatching(UUID questionId){
+    public int scoreAnswerMatching(UUID questionId){
+
+        UserEntity user = userService.currentUser();
+
+        if (Objects.isNull(user))
+            throw new BadRequestException("UserEntity not found");
+
+        QuestionEntity question = questionService.getQuestionById(questionId);
+
+        int score=0;
+        List<UserAnswerMatchingEntity> userAnswerMatchings= userAnswerMatchingRepository.findAllByUserAndQuestion(user,question);
+
+
+        List<AnswerMatchingEntity> answerMatchings= answerMatchingRepository.findAllByQuestion(question);
+        Map<String,String> map=new HashMap<>();
+
+        for(AnswerMatchingEntity matching:answerMatchings){
+            map.put(matching.getContentLeft(),matching.getContentRight());
+        }
+
+        for(UserAnswerMatchingEntity matching:userAnswerMatchings){
+            String contentRight= map.get(matching.getContentLeft());
+            if(contentRight.equalsIgnoreCase(matching.getContentRight())){
+                score+=question.getQuestionScore()/answerMatchings.size();
+            }
+        }
+
+        return score;
+
+    }
+
+
+    public ScoreAnswerResponse scoreAnswer(UUID questionId){
 
         UserEntity user = userService.currentUser();
 
@@ -250,7 +282,7 @@ public class UserAnswerService {
 
         ScoreAnswerResponse scoreAnswerResponse = new ScoreAnswerResponse();
 
-        if(Objects.equals(question.getQuestionType(), QuestionTypeEnum.Fill_In_Blank)){
+        if(Objects.equals(question.getQuestionType(), QuestionTypeEnum.Fill_In_Blank) || Objects.equals(question.getQuestionType(), QuestionTypeEnum.Label)){
 //            if(!checkCorrectAnswerBlank(questionId)){
 //                score.put("scoreAnswer",0);
 //            }
@@ -260,6 +292,7 @@ public class UserAnswerService {
 //                score.put("scoreAnswer",(question.getQuestionScore()/answerBlanks.size())* answers.size());
 //            }
             scoreAnswerResponse.setScoreAnswer(scoreAnswerBlank(questionId));
+            System.out.println(" diem "+scoreAnswerResponse.getScoreAnswer());
         }
         else if(Objects.equals(question.getQuestionType(), QuestionTypeEnum.Multiple_Choice)){
 //            if (checkCorrectAnswerMultipleChoice(questionId)){
@@ -280,7 +313,7 @@ public class UserAnswerService {
 
         }
         else if(Objects.equals(question.getQuestionType(), QuestionTypeEnum.Matching))
-            scoreAnswerResponse.setScoreAnswer(scoreAnswerMatching(questionId).getScoreAnswer());
+            scoreAnswerResponse.setScoreAnswer(scoreAnswerMatching(questionId));
 
         return scoreAnswerResponse;
     }
