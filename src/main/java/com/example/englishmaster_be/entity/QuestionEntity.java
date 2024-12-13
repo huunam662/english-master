@@ -93,7 +93,7 @@ public class QuestionEntity {
     List<LabelEntity> labels;
 
     @Column(name = "has_hints")
-    boolean hasHints;
+    Boolean hasHints;
 
     @PreRemove
     void preRemove(){
