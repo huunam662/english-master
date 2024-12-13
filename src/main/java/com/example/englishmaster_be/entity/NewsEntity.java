@@ -49,4 +49,12 @@ public class NewsEntity {
     @Column(name = "update_at")
     LocalDateTime updateAt = LocalDateTime.now();
 
+    @ManyToOne
+    @JoinColumn(name = "create_by", referencedColumnName = "id")
+    UserEntity userCreate;
+
+    @ManyToOne
+    @JoinColumn(name = "update_by", referencedColumnName = "id")
+    UserEntity userUpdate;
+
 }

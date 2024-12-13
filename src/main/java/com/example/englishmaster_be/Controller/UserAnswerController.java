@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.UUID;
 
 
-@Tag(name = "UserEntity AnswerEntity")
+@Tag(name = "User Answer")
 @RestController
 @RequestMapping("/user-answer")
 @RequiredArgsConstructor
@@ -61,11 +61,10 @@ public class UserAnswerController {
     @GetMapping("/check-correct")
     @MessageResponse("Check answer successfully")
     public ScoreAnswerResponse checkCorrectAnswer(
-            @RequestParam(value = "user_id") UUID userId,
             @RequestParam(value = "question_id") UUID questionId
     ) {
 
-        return userAnswerService.scoreAnswer(questionId, userId);
+        return userAnswerService.scoreAnswer(questionId);
     }
 
 

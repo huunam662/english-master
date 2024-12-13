@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Exception.template.CustomException;
-import com.example.englishmaster_be.Common.enums.ErrorEnum;
+import com.example.englishmaster_be.Common.enums.error.ErrorEnum;
 import com.example.englishmaster_be.Model.Request.Answer.AnswerBasicRequest;
 import com.example.englishmaster_be.Model.Request.Question.GroupQuestionRequest;
 import com.example.englishmaster_be.Model.Request.Question.QuestionRequest;
@@ -76,6 +76,7 @@ public class QuestionServiceImpl implements IQuestionService {
             question.setQuestionContent(questionRequest.getQuestionContent());
             question.setQuestionScore(questionRequest.getQuestionScore());
             question.setUserUpdate(user);
+            question.setHasHints(questionRequest.isHasHints());
 
             questionRepository.save(question);
 
@@ -176,6 +177,7 @@ public class QuestionServiceImpl implements IQuestionService {
             question.setUserCreate(user);
             question.setUserUpdate(user);
             question.setPart(part);
+            question.setHasHints(questionRequest.isHasHints());
 
             return questionRepository.save(question);
         }

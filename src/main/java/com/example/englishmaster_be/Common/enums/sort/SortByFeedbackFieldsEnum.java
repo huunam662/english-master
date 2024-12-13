@@ -1,9 +1,9 @@
-package com.example.englishmaster_be.Common.enums;
+package com.example.englishmaster_be.Common.enums.sort;
 
 
 public enum SortByFeedbackFieldsEnum {
 
-    FeedbackId,
+    None,
     Name,
     Content,
     Description,

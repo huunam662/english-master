@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Exception.handler;
 
-import com.example.englishmaster_be.Common.enums.ErrorEnum;
+import com.example.englishmaster_be.Common.enums.error.ErrorEnum;
 import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.Exception.template.CustomException;
 import com.example.englishmaster_be.Exception.template.RefreshTokenException;

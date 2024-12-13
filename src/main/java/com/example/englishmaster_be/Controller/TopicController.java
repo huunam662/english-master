@@ -131,7 +131,7 @@ public class TopicController {
         TopicFilterRequest filterRequest = TopicFilterRequest.builder()
                 .page(page)
                 .search(search)
-                .size(size)
+                .pageSize(size)
                 .sortBy(sortBy)
                 .packId(packId)
                 .type(type)

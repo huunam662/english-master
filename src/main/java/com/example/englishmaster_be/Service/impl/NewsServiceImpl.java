@@ -56,8 +56,8 @@ public class NewsServiceImpl implements INewsService {
 
         FilterResponse<NewsResponse> filterResponse = FilterResponse.<NewsResponse>builder()
                 .pageNumber(filterRequest.getPage())
-                .pageSize(filterRequest.getSize())
-                .offset((long) (filterRequest.getPage() - 1) * filterRequest.getSize())
+                .pageSize(filterRequest.getPageSize())
+                .offset((long) (filterRequest.getPage() - 1) * filterRequest.getPageSize())
                 .content(new ArrayList<>())
                 .build();
 
@@ -109,7 +109,7 @@ public class NewsServiceImpl implements INewsService {
 
         JPAQuery<NewsEntity> query = queryFactory.selectFrom(QNewsEntity.newsEntity)
                 .orderBy(orderSpecifier)
-                .limit(filterRequest.getSize());
+                .limit(filterRequest.getPageSize());
 
         query.where(QNewsEntity.newsEntity.enable.eq(true));
 

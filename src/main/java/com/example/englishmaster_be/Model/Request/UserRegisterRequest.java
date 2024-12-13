@@ -25,6 +25,10 @@ public class UserRegisterRequest {
 	String password;
 
 	@NotBlank(message = "Please confirm your password.")
+	@Pattern(
+			regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$",
+			message = "Password must contain at least 1 uppercase, 1 lowercase, 1 numeric, 1 special character, and no spaces"
+	)
 	String confirmPassword;
 
 	@NotBlank(message = "Please enter your name.")

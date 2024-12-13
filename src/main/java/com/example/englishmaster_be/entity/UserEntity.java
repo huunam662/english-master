@@ -74,5 +74,4 @@ public class UserEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     List<FlashCardEntity> flashCards;
 
-
 }
