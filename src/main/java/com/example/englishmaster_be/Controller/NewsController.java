@@ -47,7 +47,7 @@ public class NewsController {
         NewsFilterRequest filterRequest = NewsFilterRequest.builder()
                 .page(page)
                 .search(search)
-                .size(size)
+                .pageSize(size)
                 .sortBy(sortBy)
                 .isEnable(isEnable)
                 .sortDirection(sortDirection)
@@ -64,7 +64,7 @@ public class NewsController {
     ){
 
         NewsFilterRequest newsFilterRequest = NewsFilterRequest.builder()
-                .size(size)
+                .pageSize(size)
                 .build();
 
         List<NewsEntity> newsEntityList = newsService.listNewsOfUser(newsFilterRequest);

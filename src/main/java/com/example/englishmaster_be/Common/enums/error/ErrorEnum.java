@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Common.enums;
+package com.example.englishmaster_be.Common.enums.error;
 
 import lombok.AccessLevel;
 import lombok.Getter;

@@ -1,12 +1,13 @@
 package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.Common.enums.SortByFeedbackFieldsEnum;
+import com.example.englishmaster_be.Common.enums.sort.SortByFeedbackFieldsEnum;
 import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
 import com.example.englishmaster_be.Model.Request.Feedback.FeedbackRequest;
 import com.example.englishmaster_be.Model.Request.Feedback.FeedbackFilterRequest;
 import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.Mapper.FeedbackMapper;
+import com.example.englishmaster_be.Util.FeedBackUtil;
 import com.example.englishmaster_be.entity.FeedbackEntity;
 import com.example.englishmaster_be.entity.QFeedbackEntity;
 import com.example.englishmaster_be.Model.Response.FeedbackResponse;
@@ -51,29 +52,14 @@ public class FeedbackServiceImpl implements IFeedbackService {
     }
 
 
-    private OrderSpecifier<?> buildFeedbackOrderSpecifier(SortByFeedbackFieldsEnum sortBy, Sort.Direction sortDirection) {
-
-        if(sortDirection == null || sortBy == null)
-            return null;
-
-        return switch (sortBy) {
-            case FeedbackId -> sortDirection.isAscending() ? QFeedbackEntity.feedbackEntity.id.asc() : QFeedbackEntity.feedbackEntity.id.desc();
-            case Name -> sortDirection.isAscending() ? QFeedbackEntity.feedbackEntity.name.asc() : QFeedbackEntity.feedbackEntity.name.desc();
-            case Content -> sortDirection.isAscending() ? QFeedbackEntity.feedbackEntity.content.asc() : QFeedbackEntity.feedbackEntity.content.desc();
-            case Description -> sortDirection.isAscending() ? QFeedbackEntity.feedbackEntity.description.asc() : QFeedbackEntity.feedbackEntity.description.desc();
-            case CreateAt -> sortDirection.isAscending() ? QFeedbackEntity.feedbackEntity.createAt.asc() : QFeedbackEntity.feedbackEntity.createAt.desc();
-            case UpdateAt -> sortDirection.isAscending() ? QFeedbackEntity.feedbackEntity.updateAt.asc() : QFeedbackEntity.feedbackEntity.updateAt.desc();
-        };
-    }
-
     @Override
     public FilterResponse<?> getListFeedbackOfAdmin(FeedbackFilterRequest filterRequest) {
 
         FilterResponse<FeedbackResponse> filterResponse = FilterResponse.<FeedbackResponse>
                         builder()
                             .pageNumber(filterRequest.getPage())
-                            .pageSize(filterRequest.getSize())
-                            .offset((long) (filterRequest.getPage() - 1) * filterRequest.getSize())
+                            .pageSize(filterRequest.getPageSize())
+                            .offset((long) (filterRequest.getPage() - 1) * filterRequest.getPageSize())
                         .build();
 
         BooleanExpression wherePattern = QFeedbackEntity.feedbackEntity.isNotNull();
@@ -92,7 +78,7 @@ public class FeedbackServiceImpl implements IFeedbackService {
 
         long totalElements = Optional.ofNullable(
                                                 queryFactory
-                                                .select(QFeedbackEntity.feedbackEntity.updateAt.count())
+                                                .select(QFeedbackEntity.feedbackEntity.count())
                                                 .where(wherePattern)
                                                 .fetchOne()
                                             ).orElse(0L);
@@ -103,7 +89,7 @@ public class FeedbackServiceImpl implements IFeedbackService {
                                     .selectFrom(QFeedbackEntity.feedbackEntity)
                                     .where(wherePattern);
 
-        OrderSpecifier<?> orderSpecifier = buildFeedbackOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
+        OrderSpecifier<?> orderSpecifier = FeedBackUtil.buildFeedbackOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
 
         if(orderSpecifier != null) query.orderBy(orderSpecifier);
 
@@ -122,8 +108,8 @@ public class FeedbackServiceImpl implements IFeedbackService {
         FilterResponse<FeedbackResponse> filterResponse = FilterResponse.<FeedbackResponse>
                         builder()
                 .pageNumber(filterRequest.getPage())
-                .pageSize(filterRequest.getSize())
-                .offset((long) (filterRequest.getPage() - 1) * filterRequest.getSize())
+                .pageSize(filterRequest.getPageSize())
+                .offset((long) (filterRequest.getPage() - 1) * filterRequest.getPageSize())
                 .build();
 
         BooleanExpression wherePattern = QFeedbackEntity.feedbackEntity.enable.eq(Boolean.TRUE);
@@ -139,7 +125,7 @@ public class FeedbackServiceImpl implements IFeedbackService {
         long totalPages = (long) Math.ceil((float) totalElements / filterResponse.getPageSize());
         filterResponse.setTotalPages(totalPages);
 
-        OrderSpecifier<?> orderSpecifier = QFeedbackEntity.feedbackEntity.updateAt.desc();
+        OrderSpecifier<?> orderSpecifier = FeedBackUtil.buildFeedbackOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
 
         JPAQuery<FeedbackEntity> query = queryFactory
                 .selectFrom(QFeedbackEntity.feedbackEntity)

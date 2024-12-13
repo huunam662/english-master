@@ -16,7 +16,7 @@ import org.springframework.data.domain.Sort;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class NewsFilterRequest extends FilterRequest {
 
-    int size;
+    String search;
 
     String sortBy;
 

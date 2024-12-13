@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.UUID;
 
 
-@Tag(name = "UserEntity AnswerEntity")
+@Tag(name = "User Answer")
 @RestController
 @RequestMapping("/user-answer")
 @RequiredArgsConstructor

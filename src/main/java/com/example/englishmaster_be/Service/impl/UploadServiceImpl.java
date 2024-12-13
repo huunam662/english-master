@@ -2,12 +2,11 @@ package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Model.Request.DeleteRequestRequest;
 import com.example.englishmaster_be.Exception.template.CustomException;
-import com.example.englishmaster_be.Common.enums.ErrorEnum;
+import com.example.englishmaster_be.Common.enums.error.ErrorEnum;
 import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.Value.UploadValue;
 import com.example.englishmaster_be.entity.ContentEntity;
-import com.example.englishmaster_be.Model.Response.DeleteResponse;
 import com.example.englishmaster_be.entity.UserEntity;
 import com.example.englishmaster_be.Repository.ContentRepository;
 import com.example.englishmaster_be.Service.IUploadService;

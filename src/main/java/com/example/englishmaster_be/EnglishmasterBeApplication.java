@@ -13,7 +13,7 @@ public class EnglishmasterBeApplication {
     public static void main(String[] args) {
         SpringApplication application = new SpringApplication(EnglishmasterBeApplication.class);
         ConfigurableEnvironment environment = new StandardEnvironment();
-        environment.setActiveProfiles("staging");
+        environment.setActiveProfiles("local");
         application.setEnvironment(environment);
         application.run(args);
     }

@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Controller;
 
 import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.Common.enums.SortByFeedbackFieldsEnum;
+import com.example.englishmaster_be.Common.enums.sort.SortByFeedbackFieldsEnum;
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
 import com.example.englishmaster_be.Model.Request.Feedback.FeedbackFilterRequest;
 import com.example.englishmaster_be.Model.Request.Feedback.FeedbackRequest;
@@ -47,7 +47,7 @@ public class FeedbackController {
         FeedbackFilterRequest filterRequest = FeedbackFilterRequest
                 .builder()
                     .page(page)
-                    .size(size)
+                    .pageSize(size)
                     .sortBy(sortBy)
                     .direction(sortDirection)
                     .search(search)
@@ -68,7 +68,7 @@ public class FeedbackController {
         FeedbackFilterRequest filterRequest = FeedbackFilterRequest
                 .builder()
                     .page(page)
-                    .size(size)
+                    .pageSize(size)
                     .search(search)
                 .build();
 

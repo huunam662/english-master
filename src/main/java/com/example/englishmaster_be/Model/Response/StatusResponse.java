@@ -1,13 +1,11 @@
 package com.example.englishmaster_be.Model.Response;
 
 import com.example.englishmaster_be.Common.enums.StatusEnum;
-import com.example.englishmaster_be.entity.StatusEntity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Objects;
 import java.util.UUID;
 
 @Getter

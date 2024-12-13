@@ -999,8 +999,8 @@ public class TopicServiceImpl implements ITopicService {
 
         FilterResponse<TopicResponse> filterResponse = FilterResponse.<TopicResponse>builder()
                 .pageNumber(filterRequest.getPage())
-                .pageSize(filterRequest.getSize())
-                .offset((long) (filterRequest.getPage() - 1) * filterRequest.getSize())
+                .pageSize(filterRequest.getPageSize())
+                .offset((long) (filterRequest.getPage() - 1) * filterRequest.getPageSize())
                 .build();
 
         BooleanExpression wherePattern = QTopicEntity.topicEntity.isNotNull();
@@ -1027,7 +1027,7 @@ public class TopicServiceImpl implements ITopicService {
                                     .where(wherePattern)
                                     .fetchOne()
                 ).orElse(0L);
-        long totalPages = (long) Math.ceil((double) totalElements / filterRequest.getSize());
+        long totalPages = (long) Math.ceil((double) totalElements / filterRequest.getPageSize());
         filterResponse.setTotalPages(totalPages);
 
         OrderSpecifier<?> orderSpecifier;
