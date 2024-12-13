@@ -1,7 +1,10 @@
-package com.example.englishmaster_be.Exception;
+package com.example.englishmaster_be.Exception.handler;
 
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
-import com.example.englishmaster_be.Exception.Response.ResourceNotFoundException;
+import com.example.englishmaster_be.Common.enums.ErrorEnum;
+import com.example.englishmaster_be.Exception.template.BadRequestException;
+import com.example.englishmaster_be.Exception.template.CustomException;
+import com.example.englishmaster_be.Exception.template.RefreshTokenException;
+import com.example.englishmaster_be.Exception.template.ResourceNotFoundException;
 import com.example.englishmaster_be.Common.dto.response.ExceptionResponseModel;
 import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
@@ -32,10 +35,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomException.class)
     public ExceptionResponseModel handleCustomException(CustomException e) {
 
-        Error error = e.getError();
+        ErrorEnum error = e.getError();
 
         return ExceptionResponseModel.builder()
-                .success(Boolean.FALSE)
                 .status(error.getStatusCode())
                 .code(error.getStatusCode().value())
                 .message(error.getMessage())
@@ -54,7 +56,6 @@ public class GlobalExceptionHandler {
             message = ignored.getMessage();
 
         return ExceptionResponseModel.builder()
-                .success(Boolean.FALSE)
                 .status(HttpStatus.NOT_FOUND)
                 .code(HttpStatus.NOT_FOUND.value())
                 .message(message)
@@ -74,7 +75,6 @@ public class GlobalExceptionHandler {
                 .toList();
 
         return ExceptionResponseModel.builder()
-                .success(Boolean.FALSE)
                 .status(HttpStatus.BAD_REQUEST)
                 .code(HttpStatus.BAD_REQUEST.value())
                 .message(message)
@@ -91,7 +91,6 @@ public class GlobalExceptionHandler {
         String message = "Wrong username or password";
 
         return ExceptionResponseModel.builder()
-                .success(Boolean.FALSE)
                 .status(HttpStatus.UNAUTHORIZED)
                 .code(HttpStatus.UNAUTHORIZED.value())
                 .message(message)
@@ -101,10 +100,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(DisabledException.class)
     public ExceptionResponseModel handleDisabledException(DisabledException ignored) {
 
-        Error error = Error.ACCOUNT_DISABLED;
+        ErrorEnum error = ErrorEnum.ACCOUNT_DISABLED;
 
         return ExceptionResponseModel.builder()
-                .success(Boolean.FALSE)
                 .status(error.getStatusCode())
                 .code(error.getStatusCode().value())
                 .message(error.getMessage())
@@ -115,13 +113,22 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpClientErrorException.class)
     public ExceptionResponseModel handleHttpClientErrorException(HttpClientErrorException ignored) {
 
-        Error error = Error.UPLOAD_FILE_FAILURE;
+        ErrorEnum error = ErrorEnum.UPLOAD_FILE_FAILURE;
 
         return ExceptionResponseModel.builder()
-                .success(Boolean.FALSE)
                 .status(error.getStatusCode())
                 .code(error.getStatusCode().value())
                 .message(error.getMessage())
+                .build();
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ExceptionResponseModel handleAuthenticationException(AuthenticationException e) {
+
+        return ExceptionResponseModel.builder()
+                .status(HttpStatus.UNAUTHORIZED)
+                .code(HttpStatus.UNAUTHORIZED.value())
+                .message(e.getMessage())
                 .build();
     }
 
@@ -135,7 +142,6 @@ public class GlobalExceptionHandler {
     public ExceptionResponseModel handleIllegalArgumentException(Exception exception) {
 
         return ExceptionResponseModel.builder()
-                .success(Boolean.FALSE)
                 .status(HttpStatus.BAD_REQUEST)
                 .code(HttpStatus.BAD_REQUEST.value())
                 .message(exception.getMessage())
@@ -146,7 +152,6 @@ public class GlobalExceptionHandler {
     public ExceptionResponseModel handleConflictException(Exception exception) {
 
         return ExceptionResponseModel.builder()
-                .success(Boolean.FALSE)
                 .status(HttpStatus.CONFLICT)
                 .code(HttpStatus.CONFLICT.value())
                 .message(exception.getMessage())
@@ -161,7 +166,6 @@ public class GlobalExceptionHandler {
     public ExceptionResponseModel handleInternalException(Exception exception) {
 
         return ExceptionResponseModel.builder()
-                .success(Boolean.FALSE)
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
                 .message(exception.getMessage())
@@ -171,15 +175,23 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ExceptionResponseModel handleAccessDeniedException(AccessDeniedException exception) {
 
-        Error error = Error.UNAUTHORIZED;
+        ErrorEnum error = ErrorEnum.UNAUTHORIZED;
 
         return ExceptionResponseModel.builder()
-                .success(false)
                 .status(error.getStatusCode())
                 .code(error.getStatusCode().value())
                 .message(error.getMessage())
                 .build();
     }
 
+    @ExceptionHandler(RefreshTokenException.class)
+    public ExceptionResponseModel handleTokenRefreshException(RefreshTokenException ex) {
+
+        return ExceptionResponseModel.builder()
+                .message(ex.getMessage())
+                .status(HttpStatus.FORBIDDEN)
+                .code(HttpStatus.FORBIDDEN.value())
+                .build();
+    }
 
 }

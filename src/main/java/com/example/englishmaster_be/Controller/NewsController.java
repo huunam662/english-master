@@ -34,9 +34,9 @@ public class NewsController {
 
     @GetMapping(value = "/listNewsAdmin")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("List NewsEntity successfully")
+    @MessageResponse("List News successfully")
     public FilterResponse<?> listNewsOfAdmin(
-            @RequestParam(value = "page", defaultValue = "0") @Min(0) Integer page,
+            @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
             @RequestParam(value = "sortBy", defaultValue = "updateAt") String sortBy,
             @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction sortDirection,

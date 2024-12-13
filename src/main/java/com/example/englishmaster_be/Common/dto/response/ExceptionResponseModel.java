@@ -14,5 +14,5 @@ import lombok.experimental.SuperBuilder;
 public class ExceptionResponseModel extends ResponseModel {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    Object errors;
+    Object errors = null;
 }

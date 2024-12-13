@@ -2,9 +2,9 @@
 package com.example.englishmaster_be.Configuration.global.response;
 
 import com.example.englishmaster_be.Common.dto.response.ExceptionResponseModel;
+import com.example.englishmaster_be.Common.dto.response.FilterResponse;
 import com.example.englishmaster_be.Common.dto.response.ResponseModel;
 import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
-import com.example.englishmaster_be.Exception.Response.ApiResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -58,10 +58,6 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
                     returnType.getParameterType().equals(ResponseModel.class)
                     ||
                     returnType.getParameterType().equals(ExceptionResponseModel.class)
-                    ||
-                    returnType.getParameterType().equals(ApiResponse.class)
-                    ||
-                    returnType.getParameterType().equals(ResponseEntity.class)
                 );
     }
 
@@ -82,56 +78,42 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
         System.out.println(returnType.getMethod());
         System.out.println("------- ResponseBodyAdvice -----------");
 
+
         if(body instanceof ExceptionResponseModel exceptionResponseModel) {
 
             response.setStatusCode(exceptionResponseModel.getStatus());
+
+            exceptionResponseModel.setSuccess(Boolean.FALSE);
             exceptionResponseModel.setPath(request.getURI().getPath());
-        }
-        else if(!(body instanceof Resource)) {
 
-            response.setStatusCode(HttpStatus.OK);
-
-            if(body instanceof ResponseModel responseModel){
-                responseModel.setSuccess(Boolean.TRUE);
-                responseModel.setStatus(HttpStatus.OK);
-                responseModel.setCode(HttpStatus.OK.value());
-                responseModel.setPath(request.getURI().getPath());
-            }
-            else if(body instanceof ApiResponse<?> apiResponse){
-                apiResponse.setSuccess(Boolean.TRUE);
-                apiResponse.setStatus(HttpStatus.OK);
-                apiResponse.setCode(HttpStatus.OK.value());
-                apiResponse.setPath(request.getURI().getPath());
-            }
-            else if(body instanceof ResponseEntity<?> responseEntity){
-
-                Object bodyEntity = responseEntity.getBody();
-
-                if(bodyEntity instanceof ExceptionResponseModel exceptionResponseModel){
-                    response.setStatusCode(exceptionResponseModel.getStatus());
-                    exceptionResponseModel.setCode(exceptionResponseModel.getStatus().value());
-                    exceptionResponseModel.setPath(request.getURI().getPath());
-                    exceptionResponseModel.setSuccess(Boolean.FALSE);
-                }
-                else if(bodyEntity instanceof ResponseModel responseModel){
-                    responseModel.setSuccess(Boolean.TRUE);
-                    responseModel.setStatus(HttpStatus.OK);
-                    responseModel.setCode(HttpStatus.OK.value());
-                    responseModel.setPath(request.getURI().getPath());
-                }
-
-                body = bodyEntity;
-            }
-            else body = ResponseModel.builder()
-                    .success(Boolean.TRUE)
-                    .status(HttpStatus.OK)
-                    .code(HttpStatus.OK.value())
-                    .message(MessageResponseHolder.getMessage())
-                    .path(request.getURI().getPath())
-                    .responseData(body)
-                    .build();
+            return exceptionResponseModel;
         }
 
-        return body;
+        response.setStatusCode(HttpStatus.OK);
+
+        if(body instanceof Resource) return body;
+
+        if(body instanceof ResponseModel responseModel)
+            body = responseModel.getResponseData();
+
+        else if(body instanceof ResponseEntity<?> responseEntity)
+            body = responseEntity.getBody();
+
+        else if(body instanceof FilterResponse<?> filterResponse){
+
+            if(filterResponse.getContent() != null)
+                filterResponse.setContentLength(filterResponse.getContent().size());
+
+            filterResponse.withPreviousAndNextPage();
+        }
+
+        return ResponseModel.builder()
+                .success(Boolean.TRUE)
+                .status(HttpStatus.OK)
+                .code(HttpStatus.OK.value())
+                .message(MessageResponseHolder.getMessage())
+                .path(request.getURI().getPath())
+                .responseData(body)
+                .build();
     }
 }

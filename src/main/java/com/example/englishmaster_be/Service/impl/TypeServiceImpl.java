@@ -2,7 +2,7 @@ package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Mapper.TypeMapper;
 import com.example.englishmaster_be.Model.Request.Type.TypeRequest;
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
+import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.entity.QTypeEntity;
 import com.example.englishmaster_be.entity.TypeEntity;
 import com.example.englishmaster_be.Repository.TypeRepository;

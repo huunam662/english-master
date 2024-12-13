@@ -5,7 +5,7 @@ import com.example.englishmaster_be.Common.enums.SortByFeedbackFieldsEnum;
 import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
 import com.example.englishmaster_be.Model.Request.Feedback.FeedbackRequest;
 import com.example.englishmaster_be.Model.Request.Feedback.FeedbackFilterRequest;
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
+import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.Mapper.FeedbackMapper;
 import com.example.englishmaster_be.entity.FeedbackEntity;
 import com.example.englishmaster_be.entity.QFeedbackEntity;
@@ -97,9 +97,7 @@ public class FeedbackServiceImpl implements IFeedbackService {
                                                 .fetchOne()
                                             ).orElse(0L);
         long totalPages = (long) Math.ceil((float) totalElements / filterResponse.getPageSize());
-        filterResponse.setTotalElements(totalElements);
         filterResponse.setTotalPages(totalPages);
-        filterResponse.withPreviousAndNextPage();
 
         JPAQuery<FeedbackEntity> query = queryFactory
                                     .selectFrom(QFeedbackEntity.feedbackEntity)
@@ -139,9 +137,7 @@ public class FeedbackServiceImpl implements IFeedbackService {
         ).orElse(0L);
 
         long totalPages = (long) Math.ceil((float) totalElements / filterResponse.getPageSize());
-        filterResponse.setTotalElements(totalElements);
         filterResponse.setTotalPages(totalPages);
-        filterResponse.withPreviousAndNextPage();
 
         OrderSpecifier<?> orderSpecifier = QFeedbackEntity.feedbackEntity.updateAt.desc();
 

@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Exception;
+package com.example.englishmaster_be.Exception.template;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;

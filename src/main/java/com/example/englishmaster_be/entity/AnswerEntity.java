@@ -60,7 +60,6 @@ public class AnswerEntity {
     @JoinColumn(name = "question_id", referencedColumnName = "id")
     QuestionEntity question;
 
-
     @ManyToMany
     @JoinTable(
             name = "user_answer_answers",

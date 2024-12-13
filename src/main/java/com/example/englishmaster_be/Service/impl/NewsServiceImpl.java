@@ -80,9 +80,7 @@ public class NewsServiceImpl implements INewsService {
                     queryFactory.select(QNewsEntity.newsEntity.count()).from(QNewsEntity.newsEntity).where(wherePattern).fetchOne()
                 ).orElse(0L);
         long totalPages = (long) Math.ceil((float) totalElements / filterResponse.getPageSize());
-        filterResponse.setTotalElements(totalElements);
         filterResponse.setTotalPages(totalPages);
-        filterResponse.withPreviousAndNextPage();
 
         OrderSpecifier<?> orderSpecifier;
 

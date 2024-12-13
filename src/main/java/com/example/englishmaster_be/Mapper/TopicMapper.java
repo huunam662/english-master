@@ -19,13 +19,12 @@ public interface TopicMapper {
 
     TopicRequest toTopicRequest(TopicByExcelFileResponse topicByExcelFileResponse);
 
-    @Mapping(target = "parts", qualifiedByName = {"toListPartId"})
+    @Mapping(target = "parts", expression = "java(toListPartId(topicEntity.getParts()))")
     @Mapping(target = "packId", source = "pack.packId")
     @Mapping(target = "statusId", source = "status.statusId")
     @Mapping(target = "numberQuestion", defaultValue = "0")
     TopicResponse toTopicResponse(TopicEntity topicEntity);
 
-    @Named("toListPartId")
     default List<UUID> toListPartId(List<PartEntity> parts){
 
         if(parts == null) return null;
@@ -33,7 +32,6 @@ public interface TopicMapper {
         return parts.stream().filter(Objects::nonNull).map(PartEntity::getPartId).toList();
     }
 
-    @IterableMapping(elementTargetType = TopicResponse.class)
     List<TopicResponse> toTopicResponseList(List<TopicEntity> topicEntityList);
 
     @Mapping(target = "topicImage", ignore = true)

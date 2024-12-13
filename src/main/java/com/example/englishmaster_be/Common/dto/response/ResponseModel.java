@@ -26,9 +26,6 @@ public class ResponseModel {
     Integer code;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    String violations;
-
-    @JsonInclude(JsonInclude.Include.NON_NULL)
     Object responseData;
 
     @Builder.ObtainVia

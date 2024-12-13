@@ -13,7 +13,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UnsplashSearchResponse {
 
-    List<UnsplashResult> results;
+    List<UnsplashResultResponse> results;
 
 }
 

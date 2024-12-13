@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Model.Request.Answer.AnswerRequest;
-import com.example.englishmaster_be.Exception.CustomException;
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
+import com.example.englishmaster_be.Exception.template.CustomException;
+import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.Mapper.AnswerMapper;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.IAnswerService;
@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.englishmaster_be.Exception.Error;
+import com.example.englishmaster_be.Common.enums.ErrorEnum;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -87,7 +87,7 @@ public class AnswerServiceImpl implements IAnswerService {
     public AnswerEntity getAnswerById(UUID answerID) {
 
         return answerRepository.findByAnswerId(answerID)
-                .orElseThrow(() -> new CustomException(Error.ANSWER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(ErrorEnum.ANSWER_NOT_FOUND));
     }
 
     @Transactional
@@ -104,7 +104,7 @@ public class AnswerServiceImpl implements IAnswerService {
 
         return answerRepository.findByQuestionAndCorrectAnswer(question, Boolean.TRUE)
                 .orElseThrow(
-                        () -> new CustomException(Error.ANSWER_BY_CORRECT_QUESTION_NOT_FOUND)
+                        () -> new CustomException(ErrorEnum.ANSWER_BY_CORRECT_QUESTION_NOT_FOUND)
                 );
     }
 

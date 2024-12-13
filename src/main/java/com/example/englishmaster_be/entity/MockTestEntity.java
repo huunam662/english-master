@@ -1,16 +1,13 @@
 package com.example.englishmaster_be.entity;
 
-import com.example.englishmaster_be.Model.Request.MockTest.MockTestRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import java.io.Serializable;
 import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 

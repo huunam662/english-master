@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.entity;
 
+import com.example.englishmaster_be.Common.enums.RoleEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
@@ -27,7 +28,8 @@ public class RoleEntity {
     UUID roleId;
 
     @Column(name = "role_name")
-    String roleName;
+    @Enumerated(EnumType.STRING)
+    RoleEnum roleName;
 
     @Column(name = "role_description")
     String roleDescription;

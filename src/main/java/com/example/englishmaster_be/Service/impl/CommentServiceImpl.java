@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Model.Request.Comment.CommentRequest;
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
+import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.Mapper.CommentMapper;
 import com.example.englishmaster_be.entity.CommentEntity;
 import com.example.englishmaster_be.entity.PostEntity;

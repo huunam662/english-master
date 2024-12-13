@@ -5,9 +5,9 @@ import com.example.englishmaster_be.Configuration.global.thread.MessageResponseH
 import com.example.englishmaster_be.Mapper.MockTestMapper;
 import com.example.englishmaster_be.Model.Request.MockTest.MockTestFilterRequest;
 import com.example.englishmaster_be.Model.Request.MockTest.MockTestRequest;
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
+import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.Mapper.PartMapper;
-import com.example.englishmaster_be.Exception.CustomException;
+import com.example.englishmaster_be.Exception.template.CustomException;
 import com.example.englishmaster_be.Model.Response.*;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.*;
@@ -30,7 +30,7 @@ import org.springframework.data.domain.*;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import com.example.englishmaster_be.Exception.Error;
+import com.example.englishmaster_be.Common.enums.ErrorEnum;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileCopyUtils;
 import java.io.IOException;
@@ -72,7 +72,7 @@ public class MockTestServiceImpl implements IMockTestService {
 
         return mockTestRepository.findByMockTestId(mockTestId)
                 .orElseThrow(
-                        () -> new CustomException(Error.MOCK_TEST_NOT_FOUND)
+                        () -> new CustomException(ErrorEnum.MOCK_TEST_NOT_FOUND)
                 );
     }
 
@@ -123,7 +123,7 @@ public class MockTestServiceImpl implements IMockTestService {
 
         return mockTestRepository.findByMockTestId(mockTestId)
                 .orElseThrow(
-                        () -> new CustomException(Error.MOCK_TEST_NOT_FOUND)
+                        () -> new CustomException(ErrorEnum.MOCK_TEST_NOT_FOUND)
                 );
     }
 
@@ -192,9 +192,7 @@ public class MockTestServiceImpl implements IMockTestService {
                                                  .fetchOne()
                                         ).orElse(0L);
         long totalPages = (long) Math.ceil((double) totalElements / filterResponse.getPageSize());
-        filterResponse.setTotalElements(totalElements);
         filterResponse.setTotalPages(totalPages);
-        filterResponse.withPreviousAndNextPage();
 
         OrderSpecifier<?> orderSpecifier;
 

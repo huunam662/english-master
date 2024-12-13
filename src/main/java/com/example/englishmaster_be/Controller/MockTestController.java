@@ -38,9 +38,9 @@ public class MockTestController {
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @MessageResponse("Create mock test successfully")
-    public MockTestResponse createMockTest(@RequestBody MockTestRequest saveMockTestDTO) {
+    public MockTestResponse createMockTest(@RequestBody MockTestRequest saveMockTestRequest) {
 
-        MockTestEntity mockTest = mockTestService.saveMockTest(saveMockTestDTO);
+        MockTestEntity mockTest = mockTestService.saveMockTest(saveMockTestRequest);
 
         return MockTestMapper.INSTANCE.toMockTestResponse(mockTest);
     }
@@ -69,7 +69,7 @@ public class MockTestController {
     @PreAuthorize("hasRole('ADMIN')")
     @MessageResponse("List mock test successfully")
     public FilterResponse<?> listMockTestOfAdmin(
-            @RequestParam(value = "page", defaultValue = "0") @Min(0) Integer page,
+            @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
             @RequestParam(value = "sortBy", defaultValue = "updateAt") String sortBy,
             @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction sortDirection

@@ -9,8 +9,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class RefreshTokenDTO {
+public class DeleteRequestRequest {
 
-    String requestRefresh;
+    String filepath;
 
 }

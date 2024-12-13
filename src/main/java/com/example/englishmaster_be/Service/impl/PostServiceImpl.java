@@ -4,7 +4,7 @@ import com.example.englishmaster_be.Common.dto.response.FilterResponse;
 import com.example.englishmaster_be.Mapper.PostMapper;
 import com.example.englishmaster_be.Model.Request.Post.PostFilterRequest;
 import com.example.englishmaster_be.Model.Request.Post.PostRequest;
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
+import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.entity.CommentEntity;
 import com.example.englishmaster_be.entity.PostEntity;
 import com.example.englishmaster_be.entity.QPostEntity;
@@ -60,9 +60,7 @@ public class PostServiceImpl implements IPostService {
 
         long totalElements = Optional.ofNullable(queryFactory.select(QPostEntity.postEntity.count()).from(QPostEntity.postEntity).fetchOne()).orElse(0L);
         long totalPages = (long)Math.ceil((double) totalElements / filterResponse.getPageSize());
-        filterResponse.setTotalElements(totalElements);
         filterResponse.setTotalPages(totalPages);
-        filterResponse.withPreviousAndNextPage();
 
         OrderSpecifier<?> orderSpecifier;
 

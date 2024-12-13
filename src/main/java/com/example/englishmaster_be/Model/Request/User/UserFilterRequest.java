@@ -7,6 +7,8 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 import org.springframework.data.domain.Sort;
 
+import java.time.LocalDate;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,4 +24,8 @@ public class UserFilterRequest extends FilterRequest {
     Sort.Direction sortDirection;
 
     Boolean enable;
+
+    int inactiveUser;
+
+    LocalDate lastLoginDate;
 }

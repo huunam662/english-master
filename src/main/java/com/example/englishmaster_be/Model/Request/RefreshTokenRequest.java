@@ -1,16 +1,16 @@
-package com.example.englishmaster_be.Model.Response;
+package com.example.englishmaster_be.Model.Request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UnsplashResult {
+public class RefreshTokenRequest {
 
-    String urls;
+    String requestRefresh;
 
 }

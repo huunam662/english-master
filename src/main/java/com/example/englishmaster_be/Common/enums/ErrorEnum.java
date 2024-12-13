@@ -1,14 +1,13 @@
-package com.example.englishmaster_be.Exception;
+package com.example.englishmaster_be.Common.enums;
 
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public enum Error {
+public enum ErrorEnum {
 
     SEND_EMAIL_FAILURE("Failed to send confirmation email", HttpStatus.INTERNAL_SERVER_ERROR),
     PART_NOT_FOUND("Part not found", HttpStatus.NOT_FOUND),
@@ -47,7 +46,7 @@ public enum Error {
     String message;
     HttpStatus statusCode;
 
-    Error(String message, HttpStatus statusCode) {
+    ErrorEnum(String message, HttpStatus statusCode) {
         this.message = message;
         this.statusCode = statusCode;
     }
