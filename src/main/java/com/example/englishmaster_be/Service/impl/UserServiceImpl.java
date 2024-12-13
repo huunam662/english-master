@@ -2,7 +2,7 @@ package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Common.dto.response.FilterResponse;
 import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
-import com.example.englishmaster_be.Configuration.jwt.JwtUtils;
+import com.example.englishmaster_be.Configuration.jwt.JwtUtil;
 import com.example.englishmaster_be.Common.enums.RoleEnum;
 import com.example.englishmaster_be.Exception.template.CustomException;
 import com.example.englishmaster_be.Mapper.MockTestMapper;
@@ -11,7 +11,7 @@ import com.example.englishmaster_be.Model.Request.*;
 import com.example.englishmaster_be.Model.Request.ConfirmationToken.ConfirmationTokenRequest;
 import com.example.englishmaster_be.Model.Request.User.ChangeProfileRequest;
 import com.example.englishmaster_be.Model.Request.User.UserFilterRequest;
-import com.example.englishmaster_be.Common.enums.ErrorEnum;
+import com.example.englishmaster_be.Common.enums.error.ErrorEnum;
 import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.Mapper.UserMapper;
 import com.example.englishmaster_be.Model.Response.*;
@@ -38,11 +38,11 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,7 +68,7 @@ public class UserServiceImpl implements IUserService {
 
     JPAQueryFactory queryFactory;
 
-    JwtUtils jwtUtils;
+    JwtUtil jwtUtil;
 
     JavaMailSender mailSender;
 
@@ -87,6 +87,8 @@ public class UserServiceImpl implements IUserService {
     ConfirmationTokenRepository confirmationTokenRepository;
 
     ContentRepository contentRepository;
+
+    UserDetailsService userDetailsService;
 
     IInvalidTokenService iInvalidTokenService;
 
@@ -120,7 +122,7 @@ public class UserServiceImpl implements IUserService {
 
         user = UserMapper.INSTANCE.toUserEntity(userRegisterRequest);
         user.setPassword(passwordEncoder.encode(userRegisterRequest.getPassword()));
-        user.setRole(roleRepository.findByRoleName(RoleEnum.USER.name()));
+        user.setRole(roleRepository.findByRoleName(RoleEnum.USER));
 
         user = userRepository.save(user);
 
@@ -169,7 +171,7 @@ public class UserServiceImpl implements IUserService {
         if(!userDetails.isEnabled())
             throw new CustomException(ErrorEnum.ACCOUNT_DISABLED);
 
-        String jwt = jwtUtils.generateJwtToken(userDetails);
+        String jwt = jwtUtil.generateToken(userDetails);
 
         UserEntity user = findUser(userDetails);
 
@@ -343,7 +345,9 @@ public class UserServiceImpl implements IUserService {
 
         refreshTokenService.verifyExpiration(token);
 
-        String newToken = jwtUtils.generateTokenFromUsername(token.getUser().getEmail());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(token.getUser().getEmail());
+
+        String newToken = jwtUtil.generateToken(userDetails);
 
         return AuthResponse.builder()
                 .accessToken(newToken)

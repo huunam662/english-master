@@ -1,12 +1,18 @@
 package com.example.englishmaster_be.Service.impl;
 
+import com.example.englishmaster_be.Common.dto.response.FilterResponse;
 import com.example.englishmaster_be.Mapper.TypeMapper;
+import com.example.englishmaster_be.Model.Request.Type.TypeFilterRequest;
 import com.example.englishmaster_be.Model.Request.Type.TypeRequest;
 import com.example.englishmaster_be.Exception.template.BadRequestException;
+import com.example.englishmaster_be.Model.Response.TypeResponse;
+import com.example.englishmaster_be.Util.TypeUtil;
 import com.example.englishmaster_be.entity.QTypeEntity;
 import com.example.englishmaster_be.entity.TypeEntity;
 import com.example.englishmaster_be.Repository.TypeRepository;
 import com.example.englishmaster_be.Service.ITypeService;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
@@ -14,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
@@ -30,13 +37,47 @@ public class TypeServiceImpl implements ITypeService {
     JPAQueryFactory queryFactory;
 
     @Override
-    public List<TypeEntity> getAllTypes() {
+    public FilterResponse<?> getTypeList(TypeFilterRequest filterRequest) {
 
-        QTypeEntity type = QTypeEntity.typeEntity;
+        FilterResponse<TypeResponse> filterResponse = FilterResponse.<TypeResponse>builder()
+                .pageNumber(filterRequest.getPage())
+                .pageSize(filterRequest.getPageSize())
+                .offset((long) (filterRequest.getPage() - 1) * filterRequest.getPageSize())
+                .build();
 
-        JPAQuery<TypeEntity> query = queryFactory.selectFrom(type);
+        BooleanExpression wherePattern = QTypeEntity.typeEntity.isNotNull();
 
-        return query.fetch();
+        if(filterRequest.getSearch() != null) {
+
+            String likeExpression = "%" + filterRequest.getSearch().trim().replaceAll("\\s+", "%") + "%";
+
+            wherePattern = wherePattern.and(QTypeEntity.typeEntity.typeName.like(likeExpression).or(QTypeEntity.typeEntity.nameSlug.like(likeExpression)));
+
+        }
+
+        long totalElements = Optional.ofNullable(
+                queryFactory.select(QTypeEntity.typeEntity.count())
+                            .from(QTypeEntity.typeEntity)
+                            .where(wherePattern)
+                            .fetchOne()
+                ).orElse(0L);
+        long totalPages = (long) Math.ceil((double) totalElements / filterResponse.getPageSize());
+        filterResponse.setTotalPages(totalPages);
+
+        OrderSpecifier<?> orderSpecifier = TypeUtil.buildTypeOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
+
+        JPAQuery<TypeEntity> query = queryFactory
+                .selectFrom(QTypeEntity.typeEntity)
+                .where(wherePattern)
+                .orderBy(orderSpecifier)
+                .offset(filterResponse.getOffset())
+                .limit(filterResponse.getPageSize());
+
+        filterResponse.setContent(
+                TypeMapper.INSTANCE.toTypeResponseList(query.fetch())
+        );
+
+        return filterResponse;
     }
 
     public TypeEntity getTypeById(UUID id) {

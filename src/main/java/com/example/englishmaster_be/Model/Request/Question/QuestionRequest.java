@@ -44,4 +44,6 @@ public class QuestionRequest {
 
     List<QuestionRequest> listQuestionChild;
 
+    boolean hasHints;
+
 }

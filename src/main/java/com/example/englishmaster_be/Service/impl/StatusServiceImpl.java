@@ -4,7 +4,7 @@ import com.example.englishmaster_be.Common.enums.StatusEnum;
 import com.example.englishmaster_be.Mapper.StatusMapper;
 import com.example.englishmaster_be.Model.Request.Status.StatusRequest;
 import com.example.englishmaster_be.Exception.template.CustomException;
-import com.example.englishmaster_be.Common.enums.ErrorEnum;
+import com.example.englishmaster_be.Common.enums.error.ErrorEnum;
 import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.entity.QStatusEntity;
 import com.example.englishmaster_be.Service.ITypeService;

@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Configuration.filter;
 
-import com.example.englishmaster_be.Common.enums.ErrorEnum;
-import com.example.englishmaster_be.Configuration.jwt.JwtUtils;
+import com.example.englishmaster_be.Common.enums.error.ErrorEnum;
+import com.example.englishmaster_be.Configuration.jwt.JwtUtil;
 import com.example.englishmaster_be.Common.dto.response.ExceptionResponseModel;
 import com.example.englishmaster_be.Exception.template.CustomException;
 import com.example.englishmaster_be.Service.IInvalidTokenService;
@@ -29,7 +29,7 @@ import java.nio.charset.StandardCharsets;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthTokenFilter extends OncePerRequestFilter {
 
-    JwtUtils jwtUtils;
+    JwtUtil jwtUtil;
 
     UserDetailsService userDetailsService;
 
@@ -49,14 +49,14 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
             if (headerAuth != null && !headerAuth.isEmpty()){
 
-                String jwt = headerAuth.substring(7);
+                String jwtToken = headerAuth.substring(7);
 
-                if (!jwtUtils.validateJwtToken(jwt) || invalidTokenService.invalidToken(jwt))
-                    throw new CustomException(ErrorEnum.UNAUTHENTICATED);
-
-                String username = jwtUtils.getUserNameFromJwtToken(jwt);
+                String username = jwtUtil.extractUsername(jwtToken);
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+                if (!jwtUtil.validateToken(jwtToken, userDetails) || invalidTokenService.invalidToken(jwtToken))
+                    throw new CustomException(ErrorEnum.UNAUTHENTICATED);
 
                 if(!userDetails.isEnabled())
                     throw new CustomException(ErrorEnum.ACCOUNT_DISABLED);

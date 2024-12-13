@@ -86,7 +86,7 @@ public class TopicEntity {
     @OneToMany(mappedBy = "topic")
     List<CommentEntity> comments;
 
-    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL,orphanRemoval = true)
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
     List<MockTestEntity> mockTests;
 
     @ManyToMany

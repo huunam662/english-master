@@ -18,9 +18,7 @@ public class TopicFilterRequest extends FilterRequest {
 
     UUID packId;
 
-    Integer page;
-
-    Integer size;
+    String search;
 
     String sortBy;
 

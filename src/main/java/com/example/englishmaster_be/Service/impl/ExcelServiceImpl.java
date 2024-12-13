@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.Common.enums.ErrorEnum;
+import com.example.englishmaster_be.Common.enums.error.ErrorEnum;
 import com.example.englishmaster_be.Common.enums.PartEnum;
 import com.example.englishmaster_be.Model.Request.Answer.AnswerBasicRequest;
 import com.example.englishmaster_be.Model.Response.excel.QuestionByExcelFileResponse;

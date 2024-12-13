@@ -89,6 +89,12 @@ public class QuestionEntity {
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     List<ContentEntity> contentCollection;
 
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
+    List<LabelEntity> labels;
+
+    @Column(name = "has_hints")
+    Boolean hasHints;
+
     @PreRemove
     void preRemove(){
         topics.forEach(topic -> topic.getQuestions().remove(this));

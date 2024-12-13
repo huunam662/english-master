@@ -1,12 +1,20 @@
 package com.example.englishmaster_be.Controller;
 
+import com.example.englishmaster_be.Common.dto.response.FilterResponse;
+import com.example.englishmaster_be.Common.enums.sort.SortByTypeFieldsEnum;
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
 import com.example.englishmaster_be.Mapper.TypeMapper;
+import com.example.englishmaster_be.Model.Request.Type.TypeFilterRequest;
 import com.example.englishmaster_be.Model.Request.Type.TypeRequest;
 import com.example.englishmaster_be.Model.Response.TypeResponse;
 import com.example.englishmaster_be.Service.ITypeService;
 import com.example.englishmaster_be.entity.TypeEntity;
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import org.springframework.core.annotation.Order;
+import org.springframework.data.domain.Sort;
+import org.springframework.web.bind.annotation.RequestBody;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +22,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "Type")
@@ -30,11 +37,28 @@ public class TypeController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getAllTypes")
     @MessageResponse("List Type List successfully")
-    public List<TypeResponse> getAllTypes() {
+    public FilterResponse<?> getAllTypes(
+            @Schema(description = "Trang")
+            @RequestParam(value = "page", defaultValue = "1") @Min(1) int page,
+            @Schema(description = "Kích thước của trang")
+            @RequestParam(value = "pageSize", defaultValue = "8") @Min(1) @Max(100) int pageSize,
+            @Schema(description = "Tìm kiếm")
+            @RequestParam(value = "search", defaultValue = "") String search,
+            @Schema(description = "Sắp xếp theo trường", allowableValues = {"None", "TypeName", "NameSlug"})
+            @RequestParam(value = "sortBy", defaultValue = "None") SortByTypeFieldsEnum sortBy,
+            @Schema(description = "Tùy chọn tăng giảm", allowableValues = {"ASC", "DESC"})
+            @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction direction
+    ) {
 
-        List<TypeEntity> typeEntityList = typeService.getAllTypes();
+        TypeFilterRequest filterRequest = TypeFilterRequest.builder()
+                .page(page)
+                .pageSize(pageSize)
+                .search(search)
+                .sortBy(sortBy)
+                .direction(direction)
+                .build();
 
-        return TypeMapper.INSTANCE.toTypeResponseList(typeEntityList);
+        return typeService.getTypeList(filterRequest);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

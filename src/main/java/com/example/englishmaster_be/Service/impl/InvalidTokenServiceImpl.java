@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.Configuration.jwt.JwtUtils;
+import com.example.englishmaster_be.Configuration.jwt.JwtUtil;
 import com.example.englishmaster_be.entity.InvalidTokenEntity;
 import com.example.englishmaster_be.Model.Response.InvalidTokenResponse;
 import com.example.englishmaster_be.Repository.InvalidTokenRepository;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class InvalidTokenServiceImpl implements IInvalidTokenService {
 
-    JwtUtils jwtUtils;
+    JwtUtil jwtUtils;
 
     InvalidTokenRepository invalidTokenRepository;
 
@@ -33,7 +33,7 @@ public class InvalidTokenServiceImpl implements IInvalidTokenService {
     public InvalidTokenResponse insertInvalidToken(String token) {
 
         // Kiểm tra và trích xuất thời gian hết hạn của token
-        LocalDateTime dateExpire = jwtUtils.getTokenExpiryFromJWT(token);
+        LocalDateTime dateExpire = jwtUtils.getTokenExpireFromJWT(token);
         if (dateExpire == null) {
             throw new IllegalArgumentException("Token không hợp lệ hoặc đã hết hạn.");
         }

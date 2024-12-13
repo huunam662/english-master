@@ -5,8 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.io.Serializable;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.CascadeType;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,6 +39,7 @@ public class StatusEntity {
     TypeEntity type;
 
     @OneToMany(mappedBy = "status")
+    @Cascade({CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     List<TopicEntity> topicList;
 
 }

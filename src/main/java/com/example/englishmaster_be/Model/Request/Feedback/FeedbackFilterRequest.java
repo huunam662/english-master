@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Model.Request.Feedback;
 
 import com.example.englishmaster_be.Common.dto.request.FilterRequest;
-import com.example.englishmaster_be.Common.enums.SortByFeedbackFieldsEnum;
+import com.example.englishmaster_be.Common.enums.sort.SortByFeedbackFieldsEnum;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
@@ -15,7 +15,7 @@ import org.springframework.data.domain.Sort;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FeedbackFilterRequest extends FilterRequest {
 
-        int size;
+        String search;
 
         SortByFeedbackFieldsEnum sortBy;
 
