@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Service.impl;
 
 
-import com.example.englishmaster_be.Exception.Response.ResourceNotFoundException;
+import com.example.englishmaster_be.Exception.template.ResourceNotFoundException;
 import com.example.englishmaster_be.Service.IFileStorageService;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
@@ -56,7 +56,7 @@ public class FileStorageServiceImpl implements IFileStorageService {
 //                throw new RuntimeException("Could not read the file!");
 //            }
 //        } catch (MalformedURLException e) {
-//            throw new RuntimeException("Error: " + e.getMessage());
+//            throw new RuntimeException("ErrorEnum: " + e.getMessage());
 //        }
 //    }
 
@@ -136,7 +136,7 @@ public class FileStorageServiceImpl implements IFileStorageService {
 //            Path file = root.resolve(filename);
 //            return Files.deleteIfExists(file);
 //        } catch (IOException e) {
-//            throw new RuntimeException("Error: " + e.getMessage());
+//            throw new RuntimeException("ErrorEnum: " + e.getMessage());
 //        }
 //    }
 

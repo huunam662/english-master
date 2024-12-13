@@ -48,7 +48,7 @@ public class ScheduledTasks {
 
             log.info("Deleted {} expired users", usersToDelete.size());
         } catch (Exception e) {
-            log.error("Error in deleteExpiredUsers task", e);
+            log.error("ErrorEnum in deleteExpiredUsers task", e);
         }
     }
 
@@ -67,7 +67,7 @@ public class ScheduledTasks {
 
             log.info("Deleted {} expired tokens", tokensToDelete.size());
         } catch (Exception e) {
-            log.error("Error in deleteExpiredToken task", e);
+            log.error("ErrorEnum in deleteExpiredToken task", e);
         }
     }
 }

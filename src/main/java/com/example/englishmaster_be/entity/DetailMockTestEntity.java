@@ -53,10 +53,4 @@ public class DetailMockTestEntity {
     @JoinColumn(name = "update_by", referencedColumnName = "id")
     UserEntity userUpdate;
 
-	@Override
-	public String toString() {
-		return "DetailMockTestEntity{" +
-				"detailMockTestId=" + detailMockTestId +
-				'}';
-	}
 }

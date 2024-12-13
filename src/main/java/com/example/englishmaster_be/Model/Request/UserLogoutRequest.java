@@ -1,6 +1,5 @@
 package com.example.englishmaster_be.Model.Request;
 
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,12 +9,10 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ChangePasswordDTO {
+public class UserLogoutRequest {
 
-    String code;
+    String accessToken;
 
-    String newPass;
-
-    String confirmPass;
+    String refreshToken;
 
 }

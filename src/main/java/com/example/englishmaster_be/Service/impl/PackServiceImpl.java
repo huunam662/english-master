@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Service.impl;
 
 import com.example.englishmaster_be.Model.Request.Pack.PackRequest;
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
+import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.Repository.*;
 import com.example.englishmaster_be.Service.*;
 import com.example.englishmaster_be.entity.PackEntity;

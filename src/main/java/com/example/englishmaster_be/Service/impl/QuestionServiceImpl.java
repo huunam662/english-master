@@ -1,12 +1,12 @@
 package com.example.englishmaster_be.Service.impl;
 
-import com.example.englishmaster_be.Exception.CustomException;
-import com.example.englishmaster_be.Exception.Error;
+import com.example.englishmaster_be.Exception.template.CustomException;
+import com.example.englishmaster_be.Common.enums.ErrorEnum;
 import com.example.englishmaster_be.Model.Request.Answer.AnswerBasicRequest;
 import com.example.englishmaster_be.Model.Request.Question.GroupQuestionRequest;
 import com.example.englishmaster_be.Model.Request.Question.QuestionRequest;
 import com.example.englishmaster_be.Model.Request.UploadMultiFileRequest;
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
+import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.Mapper.QuestionMapper;
 import com.example.englishmaster_be.Repository.AnswerRepository;
@@ -273,7 +273,7 @@ public class QuestionServiceImpl implements IQuestionService {
     public QuestionEntity updateFileQuestion(UUID questionId, String oldFileName, MultipartFile newFile) {
 
         if(newFile == null || newFile.isEmpty())
-            throw new CustomException(Error.NULL_OR_EMPTY_FILE);
+            throw new CustomException(ErrorEnum.NULL_OR_EMPTY_FILE);
 
         UserEntity user = userService.currentUser();
 

@@ -4,13 +4,13 @@ import com.example.englishmaster_be.Common.dto.response.FilterResponse;
 import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
 import com.example.englishmaster_be.Mapper.UserMapper;
 import com.example.englishmaster_be.Model.Request.*;
-import com.example.englishmaster_be.Model.Request.User.ChangePasswordRequest;
 import com.example.englishmaster_be.Model.Request.User.ChangeProfileRequest;
 import com.example.englishmaster_be.Model.Request.User.UserFilterRequest;
 import com.example.englishmaster_be.Model.Response.AuthResponse;
 import com.example.englishmaster_be.Model.Response.InformationUserResponse;
 import com.example.englishmaster_be.Service.IUserService;
 import com.example.englishmaster_be.entity.UserEntity;
+import com.example.englishmaster_be.Model.Response.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import java.util.List;
 
 
 @Tag(name = "User")
@@ -37,7 +38,7 @@ public class UserController {
     @PostMapping("/register")
     @MessageResponse("Sent a confirmation mail")
     public void register(
-            @Valid @RequestBody UserRegisterDTO registerDTO
+            @Valid @RequestBody UserRegisterRequest registerDTO
     ) {
 
         userService.registerUser(registerDTO);
@@ -52,7 +53,7 @@ public class UserController {
 
     @PostMapping("/login")
     @MessageResponse("login successfully")
-    public AuthResponse login(@RequestBody UserLoginDTO loginDTO) {
+    public AuthResponse login(@RequestBody UserLoginRequest loginDTO) {
 
         return userService.login(loginDTO);
     }
@@ -73,7 +74,7 @@ public class UserController {
 
     @PostMapping("/changePassword")
     @MessageResponse("Update your password successfully")
-    public void changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+    public void changePassword(@RequestBody ChangePasswordRequest changePasswordDTO) {
 
         userService.changePassword(changePasswordDTO);
     }
@@ -89,7 +90,7 @@ public class UserController {
 
     @PostMapping("/refreshToken")
     @MessageResponse("Created new access token")
-    public AuthResponse refreshToken(@RequestBody RefreshTokenDTO refreshTokenDTO) {
+    public AuthResponse refreshToken(@RequestBody RefreshTokenRequest refreshTokenDTO) {
 
         return userService.refreshToken(refreshTokenDTO);
     }
@@ -108,7 +109,9 @@ public class UserController {
     @PatchMapping(value = "/changeProfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @MessageResponse("Change profile UserEntity successfully")
-    public InformationUserResponse changeProfile(@ModelAttribute("profileUser") ChangeProfileRequest changeProfileRequest) {
+    public InformationUserResponse changeProfile(
+            @ModelAttribute("profileUser") ChangeProfileRequest changeProfileRequest
+    ) {
 
         UserEntity user = userService.changeProfile(changeProfileRequest);
 
@@ -119,9 +122,9 @@ public class UserController {
     @PatchMapping(value = "/changePass")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @MessageResponse("Change pass UserEntity successfully")
-    public void changePass(@RequestBody ChangePasswordRequest changePassDTO) {
+    public void changePass(@RequestBody ChangePasswordRequest changePasswordRequest) {
 
-        userService.changePass(changePassDTO);
+        userService.changePass(changePasswordRequest);
     }
 
 
@@ -147,9 +150,36 @@ public class UserController {
 
     @PostMapping("/logout")
     @MessageResponse("Logout successfully")
-    public void logoutUser(@RequestBody UserLogoutDTO userLogoutDTO) {
+    public void logoutUser(@RequestBody UserLogoutRequest userLogoutDTO) {
 
         userService.logoutUserOf(userLogoutDTO);
+    }
+
+    @PostMapping("/notifyInactiveUsers")
+    @MessageResponse("Notify inactive users successfully")
+    public void notifyInactiveUsers() {
+
+        userService.notifyInactiveUsers();
+    }
+
+    // API để tìm kiếm người dùng lâu ngày chưa đăng nhập
+    @GetMapping("/users/inactive")
+    @PreAuthorize("hasRole('ADMIN')")
+    @MessageResponse("List inactive users successfully")
+    public List<UserResponse> getInactiveUsers() {
+
+        List<UserEntity> inactiveUsers = userService.getUsersNotLoggedInLast10Days();
+
+        return UserMapper.INSTANCE.toUserResponseList(inactiveUsers);
+    }
+
+    @GetMapping("/inactive-notify")
+    @MessageResponse("Notify inactive users successfully")
+    public List<UserResponse> notifyInactiveUsers(@RequestParam int days){
+
+        List<UserEntity> notifyInactiveUsers = userService.findUsersInactiveForDaysAndNotify(days);
+
+        return UserMapper.INSTANCE.toUserResponseList(notifyInactiveUsers);
     }
 
 }

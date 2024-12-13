@@ -5,7 +5,7 @@ import com.example.englishmaster_be.Model.Request.Answer.AnswerBlankRequest;
 import com.example.englishmaster_be.Model.Request.Answer.AnswerMatchingQuestionRequest;
 import com.example.englishmaster_be.Model.Request.Answer.UserAnswerRequest;
 import com.example.englishmaster_be.Common.enums.QuestionTypeEnum;
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
+import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.Model.Response.AnswerMatchingBasicResponse;
 import com.example.englishmaster_be.Model.Response.ScoreAnswerResponse;
 import com.example.englishmaster_be.Repository.*;

@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.Mapper;
 
 import com.example.englishmaster_be.Model.Request.User.ChangeProfileRequest;
-import com.example.englishmaster_be.Model.Request.UserRegisterDTO;
+import com.example.englishmaster_be.Model.Request.UserRegisterRequest;
 import com.example.englishmaster_be.Model.Response.InformationUserResponse;
 import com.example.englishmaster_be.Model.Response.UserResponse;
 import com.example.englishmaster_be.entity.UserEntity;
@@ -18,7 +18,7 @@ public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-    UserEntity toUserEntity(UserRegisterDTO userRegisterDTO);
+    UserEntity toUserEntity(UserRegisterRequest userRegisterDTO);
 
     UserResponse toUserResponse(UserEntity user);
 

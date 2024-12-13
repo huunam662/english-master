@@ -4,5 +4,7 @@ import com.example.englishmaster_be.Model.Request.ConfirmationToken.Confirmation
 import com.example.englishmaster_be.Model.Response.ConfirmationTokenResponse;
 
 public interface IConfirmationTokenService {
+
     ConfirmationTokenResponse createConfirmationToken(ConfirmationTokenRequest confirmationTokenRequest);
+
 }

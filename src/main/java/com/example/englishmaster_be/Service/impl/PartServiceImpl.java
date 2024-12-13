@@ -1,11 +1,11 @@
 package com.example.englishmaster_be.Service.impl;
 
+import com.example.englishmaster_be.Common.enums.ErrorEnum;
 import com.example.englishmaster_be.Model.Request.Part.PartRequest;
 import com.example.englishmaster_be.Model.Request.UploadMultiFileRequest;
 import com.example.englishmaster_be.Model.Request.UploadTextRequest;
-import com.example.englishmaster_be.Exception.CustomException;
-import com.example.englishmaster_be.Exception.Error;
-import com.example.englishmaster_be.Exception.Response.BadRequestException;
+import com.example.englishmaster_be.Exception.template.CustomException;
+import com.example.englishmaster_be.Exception.template.BadRequestException;
 import com.example.englishmaster_be.Helper.GetExtension;
 import com.example.englishmaster_be.Mapper.PartMapper;
 import com.example.englishmaster_be.entity.PartEntity;
@@ -97,7 +97,7 @@ public class PartServiceImpl implements IPartService {
     public PartEntity getPartToId(UUID partId) {
         return partRepository.findByPartId(partId)
                 .orElseThrow(
-                        () -> new CustomException(Error.PART_NOT_FOUND)
+                        () -> new CustomException(ErrorEnum.PART_NOT_FOUND)
                 );
     }
 
@@ -109,7 +109,7 @@ public class PartServiceImpl implements IPartService {
         return listPart.stream().filter(
                 part -> part.getPartName().substring(0, 6).equalsIgnoreCase(partName)
         ).findFirst().orElseThrow(
-                () -> new CustomException(Error.PART_NOT_FOUND)
+                () -> new CustomException(ErrorEnum.PART_NOT_FOUND)
         );
     }
 
@@ -146,7 +146,7 @@ public class PartServiceImpl implements IPartService {
                 uploadMultiFileRequest == null
                         || uploadMultiFileRequest.getContentData() == null
                         || uploadMultiFileRequest.getContentData().isEmpty()
-        ) throw new CustomException(Error.NULL_OR_EMPTY_FILE);
+        ) throw new CustomException(ErrorEnum.NULL_OR_EMPTY_FILE);
 
 
         for(MultipartFile file : uploadMultiFileRequest.getContentData()){

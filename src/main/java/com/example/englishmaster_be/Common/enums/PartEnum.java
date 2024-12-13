@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 public enum PartEnum {
 
     PART_1("PART 1: Picture Description"),
-    PART_2("PART 2: QuestionEntity - Response"),
+    PART_2("PART 2: QuestionEntity - template"),
     PART_3("PART 3: Short Conversations"),
     PART_4("PART 4: Short Talks"),
     PART_5("PART 5: Incomplete Sentences"),
