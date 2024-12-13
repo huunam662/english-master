@@ -1005,17 +1005,11 @@ public class TopicServiceImpl implements ITopicService {
 
         BooleanExpression wherePattern = QTopicEntity.topicEntity.isNotNull();
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        UserEntity currentUser = userService.currentUser();
 
-        if (authentication != null) {
+        boolean isUser = currentUser.getRole().getRoleName().equals(RoleEnum.USER);
 
-            boolean isUser = authentication.getAuthorities().stream().anyMatch(
-                    auth -> auth.getAuthority().equals("ROLE_" + RoleEnum.USER.name())
-                                );
-
-            if(isUser) wherePattern = wherePattern.and(QTopicEntity.topicEntity.enable.eq(Boolean.TRUE));
-
-        }
+        if(isUser) wherePattern = wherePattern.and(QTopicEntity.topicEntity.enable.eq(Boolean.TRUE));
 
         if (filterRequest.getPackId() != null)
             wherePattern = wherePattern.and(QTopicEntity.topicEntity.pack.packId.eq(filterRequest.getPackId()));

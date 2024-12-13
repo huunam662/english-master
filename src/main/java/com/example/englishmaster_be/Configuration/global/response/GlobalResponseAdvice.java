@@ -99,8 +99,13 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
         else if(body instanceof ResponseEntity<?> responseEntity)
             body = responseEntity.getBody();
 
-        else if(body instanceof FilterResponse<?> filterResponse)
+        else if(body instanceof FilterResponse<?> filterResponse){
+
+            if(filterResponse.getContent() != null)
+                filterResponse.setContentLength(filterResponse.getContent().size());
+
             filterResponse.withPreviousAndNextPage();
+        }
 
         return ResponseModel.builder()
                 .success(Boolean.TRUE)

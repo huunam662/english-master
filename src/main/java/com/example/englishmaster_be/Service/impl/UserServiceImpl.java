@@ -167,7 +167,7 @@ public class UserServiceImpl implements IUserService {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         if(!userDetails.isEnabled())
-            throw new DisabledException(ErrorEnum.ACCOUNT_DISABLED.getMessage());
+            throw new CustomException(ErrorEnum.ACCOUNT_DISABLED);
 
         String jwt = jwtUtils.generateJwtToken(userDetails);
 
@@ -520,7 +520,9 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public UserEntity currentUser() {
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails)
             return findUser(userDetails);
 
@@ -613,7 +615,7 @@ public class UserServiceImpl implements IUserService {
                 .offset((long) (filterRequest.getPage() - 1) * filterRequest.getSize())
                 .build();
 
-        BooleanExpression wherePattern = QUserEntity.userEntity.role.roleName.notEqualsIgnoreCase(RoleEnum.ADMIN.name());
+        BooleanExpression wherePattern = QUserEntity.userEntity.role.roleName.eq(RoleEnum.ADMIN);
 
         if (filterRequest.getEnable() != null)
             wherePattern.and(QUserEntity.userEntity.enabled.eq(filterRequest.getEnable()));

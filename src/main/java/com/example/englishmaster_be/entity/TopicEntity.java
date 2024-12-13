@@ -101,22 +101,4 @@ public class TopicEntity {
             inverseJoinColumns = @JoinColumn(name = "part_id"))
     List<PartEntity> parts;
 
-
-    public TopicEntity(String topicName,
-                       String topicImage,
-                       String topicDescription,
-                       String topicType,
-                       String workTime,
-                       LocalDateTime startTime,
-                       LocalDateTime endTime
-    ) {
-        this.topicName = topicName;
-        this.topicImage = topicImage;
-        this.topicDescription = topicDescription;
-        this.topicType = topicType;
-        this.workTime = workTime;
-        this.startTime = startTime;
-        this.endTime = endTime;
-    }
-
 }

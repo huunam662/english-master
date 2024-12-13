@@ -17,6 +17,8 @@ public class FilterResponse<T> {
 
     Integer pageSize = 0;
 
+    Integer contentLength = 0;
+
     Long offset = 0L;
 
     Long totalPages = 0L;

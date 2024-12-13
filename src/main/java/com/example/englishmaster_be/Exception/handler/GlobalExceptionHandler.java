@@ -122,6 +122,16 @@ public class GlobalExceptionHandler {
                 .build();
     }
 
+    @ExceptionHandler(AuthenticationException.class)
+    public ExceptionResponseModel handleAuthenticationException(AuthenticationException e) {
+
+        return ExceptionResponseModel.builder()
+                .status(HttpStatus.UNAUTHORIZED)
+                .code(HttpStatus.UNAUTHORIZED.value())
+                .message(e.getMessage())
+                .build();
+    }
+
 
     @ExceptionHandler({
         MessagingException.class,

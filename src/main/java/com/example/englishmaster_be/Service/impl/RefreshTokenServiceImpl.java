@@ -45,7 +45,7 @@ public class RefreshTokenServiceImpl implements IRefreshTokenService {
     @Override
     public ConfirmationTokenEntity createRefreshToken(String email) {
 
-        UserEntity user = userService.currentUser();
+        UserEntity user = userService.findUserByEmail(email);
 
         ConfirmationTokenEntity confirmationToken = ConfirmationTokenEntity.builder()
                 .createAt(LocalDateTime.now())

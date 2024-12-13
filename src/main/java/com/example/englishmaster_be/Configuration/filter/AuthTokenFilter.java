@@ -36,7 +36,6 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     IInvalidTokenService invalidTokenService;
 
 
-
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
