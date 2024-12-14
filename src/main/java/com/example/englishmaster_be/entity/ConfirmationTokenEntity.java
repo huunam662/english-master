@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -23,7 +22,7 @@ public class ConfirmationTokenEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-	@Column(name = "id")
+    @Column(name = "id")
     UUID userConfirmTokenId;
 
     @Column(name = "Type")
