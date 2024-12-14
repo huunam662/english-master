@@ -147,7 +147,7 @@ public class UserServiceImpl implements IUserService {
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        String confirmationLink = linkValue.getLinkBE() + "api/user/register/confirm?token=" + confirmationToken;
+        String confirmationLink = linkValue.getLinkFE() + "register/confirm?token=" + confirmationToken;
 
         String templateContent = readTemplateContent("email_templates.html");
         templateContent = templateContent.replace("{{linkConfirm}}", confirmationLink)
