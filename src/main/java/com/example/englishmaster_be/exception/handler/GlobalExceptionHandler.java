@@ -6,7 +6,6 @@ import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.exception.template.RefreshTokenException;
 import com.example.englishmaster_be.exception.template.ResourceNotFoundException;
 import com.example.englishmaster_be.common.dto.response.ExceptionResponseModel;
-import com.example.englishmaster_be.mapper.FieldErrorMapper;
 import jakarta.mail.MessagingException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -25,7 +24,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import java.nio.file.FileAlreadyExistsException;
 import java.rmi.ServerException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
