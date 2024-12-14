@@ -1,9 +1,9 @@
-package com.example.englishmaster_be.Mapper;
+package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.Model.Request.FlashCard.FlashCardRequest;
+import com.example.englishmaster_be.model.request.FlashCard.FlashCardRequest;
 import com.example.englishmaster_be.entity.FlashCardEntity;
-import com.example.englishmaster_be.Model.Response.FlashCardListWordResponse;
-import com.example.englishmaster_be.Model.Response.FlashCardResponse;
+import com.example.englishmaster_be.model.response.FlashCardListWordResponse;
+import com.example.englishmaster_be.model.response.FlashCardResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

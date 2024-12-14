@@ -1,17 +1,17 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
-import com.example.englishmaster_be.Model.Request.Comment.CommentRequest;
-import com.example.englishmaster_be.Exception.template.BadRequestException;
-import com.example.englishmaster_be.Mapper.CommentMapper;
+import com.example.englishmaster_be.model.request.Comment.CommentRequest;
+import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.mapper.CommentMapper;
 import com.example.englishmaster_be.entity.CommentEntity;
 import com.example.englishmaster_be.entity.PostEntity;
 import com.example.englishmaster_be.entity.TopicEntity;
 import com.example.englishmaster_be.entity.UserEntity;
-import com.example.englishmaster_be.Repository.*;
-import com.example.englishmaster_be.Service.ICommentService;
-import com.example.englishmaster_be.Service.IPostService;
-import com.example.englishmaster_be.Service.ITopicService;
-import com.example.englishmaster_be.Service.IUserService;
+import com.example.englishmaster_be.repository.*;
+import com.example.englishmaster_be.service.ICommentService;
+import com.example.englishmaster_be.service.IPostService;
+import com.example.englishmaster_be.service.ITopicService;
+import com.example.englishmaster_be.service.IUserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

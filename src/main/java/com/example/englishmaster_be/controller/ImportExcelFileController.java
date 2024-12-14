@@ -1,9 +1,10 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Model.Response.excel.ListQuestionByExcelFileResponse;
-import com.example.englishmaster_be.Model.Response.excel.TopicByExcelFileResponse;
-import com.example.englishmaster_be.Service.IExcelService;
+
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.model.response.excel.ListQuestionByExcelFileResponse;
+import com.example.englishmaster_be.model.response.excel.TopicByExcelFileResponse;
+import com.example.englishmaster_be.service.IExcelService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,7 @@ public class ImportExcelFileController {
     IExcelService excelService;
 
     @PostMapping(value = "/importExcel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @MessageResponse("File processed successfully")
+    @DefaultMessage("File processed successfully")
     @SneakyThrows
     public TopicByExcelFileResponse getCreateTopicByExcelFileDTO(@RequestParam("file") MultipartFile file) {
 
@@ -33,7 +34,7 @@ public class ImportExcelFileController {
     }
 
     @PostMapping(value = "/importQuestionPart67", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @MessageResponse("File processed successfully")
+    @DefaultMessage("File processed successfully")
     @SneakyThrows
     public ListQuestionByExcelFileResponse getCreateQuestionPart67ByExcelFileDTO(
             @RequestParam("topicId") UUID topicId,
@@ -45,7 +46,7 @@ public class ImportExcelFileController {
     }
 
     @PostMapping(value = "/importQuestionPart5", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @MessageResponse("File processed successfully")
+    @DefaultMessage("File processed successfully")
     @SneakyThrows
     public ListQuestionByExcelFileResponse getCreateQuestionByExcelFileDTO(
             @RequestParam("topicId") UUID topicId,
@@ -56,7 +57,7 @@ public class ImportExcelFileController {
     }
 
     @PostMapping(value = "/importQuestionPart12", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @MessageResponse("File processed successfully")
+    @DefaultMessage("File processed successfully")
     @SneakyThrows
     public ListQuestionByExcelFileResponse getCreateQuestionPart12ByExcelFileDTO(
             @RequestParam("topicId") UUID topicId,
@@ -69,7 +70,7 @@ public class ImportExcelFileController {
 
 
     @PostMapping(value = "/importQuestionPart34", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @MessageResponse("File processed successfully")
+    @DefaultMessage("File processed successfully")
     @SneakyThrows
     public ListQuestionByExcelFileResponse getCreateQuestionPart34ByExcelFileDTO(
             @RequestParam("topicId") UUID topicId,
@@ -81,7 +82,7 @@ public class ImportExcelFileController {
     }
 
     @PostMapping(value = "/importAllParts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @MessageResponse("File processed successfully")
+    @DefaultMessage("File processed successfully")
     @SneakyThrows
     public ListQuestionByExcelFileResponse getCreateQuestionAllPartByExcelFileDTO(
             @RequestParam("topicId") UUID topicId,

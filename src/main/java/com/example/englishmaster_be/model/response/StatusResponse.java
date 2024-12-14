@@ -1,6 +1,6 @@
-package com.example.englishmaster_be.Model.Response;
+package com.example.englishmaster_be.model.response;
 
-import com.example.englishmaster_be.Common.enums.StatusEnum;
+import com.example.englishmaster_be.common.constaint.StatusEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.*;

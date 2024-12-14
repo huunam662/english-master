@@ -1,11 +1,12 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Mapper.StatusMapper;
-import com.example.englishmaster_be.Model.Request.Status.StatusRequest;
-import com.example.englishmaster_be.Model.Response.StatusResponse;
+
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.entity.StatusEntity;
-import com.example.englishmaster_be.Service.IStatusService;
+import com.example.englishmaster_be.mapper.StatusMapper;
+import com.example.englishmaster_be.model.request.Status.StatusRequest;
+import com.example.englishmaster_be.model.response.StatusResponse;
+import com.example.englishmaster_be.service.IStatusService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,7 +25,7 @@ public class StatusController {
     IStatusService statusService;
 
     @PostMapping("/createStatus")
-    @MessageResponse("Create StatusEntity successfully")
+    @DefaultMessage("Create StatusEntity successfully")
     public StatusResponse createStatus(@RequestBody StatusRequest statusRequest) {
 
         StatusEntity statusEntity = statusService.saveStatus(statusRequest);
@@ -33,7 +34,7 @@ public class StatusController {
     }
 
     @PutMapping("/updateStatus")
-    @MessageResponse("Update StatusEntity successfully")
+    @DefaultMessage("Update StatusEntity successfully")
     public StatusResponse updateStatus(@RequestBody StatusRequest statusRequest) {
 
         StatusEntity status = statusService.saveStatus(statusRequest);
@@ -42,7 +43,7 @@ public class StatusController {
     }
 
     @GetMapping("/getStatusByTypeId/{id}")
-    @MessageResponse("List StatusEntity successfully")
+    @DefaultMessage("List StatusEntity successfully")
     public List<StatusResponse> getStatusByTypeId(@PathVariable("id") UUID id) {
 
         List<StatusEntity> statusEntityList = statusService.getAllStatusByType(id);
@@ -51,7 +52,7 @@ public class StatusController {
     }
 
     @GetMapping("/getStatusById/{id}")
-    @MessageResponse("Get StatusEntity successfully")
+    @DefaultMessage("Get StatusEntity successfully")
     public StatusResponse getStatusById(@PathVariable("id") UUID id) {
 
         StatusEntity status = statusService.getStatusById(id);
@@ -61,7 +62,7 @@ public class StatusController {
 
     @DeleteMapping("/{statusId}")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Delete status successfully")
+    @DefaultMessage("Delete status successfully")
     public void deleteStatusById(@PathVariable("statusId") UUID statusId) {
 
         statusService.deleteStatus(statusId);

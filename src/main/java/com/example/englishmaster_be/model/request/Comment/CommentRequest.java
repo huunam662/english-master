@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Model.Request.Comment;
+package com.example.englishmaster_be.model.request.Comment;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

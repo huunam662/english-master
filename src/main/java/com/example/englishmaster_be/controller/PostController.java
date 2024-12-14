@@ -1,14 +1,15 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Mapper.CommentMapper;
-import com.example.englishmaster_be.Mapper.PostMapper;
-import com.example.englishmaster_be.Model.Request.Post.PostFilterRequest;
-import com.example.englishmaster_be.Model.Request.Post.PostRequest;
-import com.example.englishmaster_be.Model.Response.CommentResponse;
-import com.example.englishmaster_be.Model.Response.PostResponse;
-import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
+
+import com.example.englishmaster_be.mapper.CommentMapper;
+import com.example.englishmaster_be.mapper.PostMapper;
+import com.example.englishmaster_be.model.request.Post.PostFilterRequest;
+import com.example.englishmaster_be.model.request.Post.PostRequest;
+import com.example.englishmaster_be.model.response.CommentResponse;
+import com.example.englishmaster_be.model.response.PostResponse;
+import com.example.englishmaster_be.service.*;
 import com.example.englishmaster_be.entity.CommentEntity;
 import com.example.englishmaster_be.entity.PostEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,7 +38,7 @@ public class PostController {
 
 
     @GetMapping(value = "/listPost")
-    @MessageResponse("List PostEntity successfully")
+    @DefaultMessage("List PostEntity successfully")
     public FilterResponse<?> listPost(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) int page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) int size,
@@ -57,7 +58,7 @@ public class PostController {
 
     @PostMapping(value = "/createPost")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Create PostEntity successfully")
+    @DefaultMessage("Create PostEntity successfully")
     public PostResponse createPost(@RequestBody PostRequest postRequest){
 
         PostEntity post = postService.savePost(postRequest);
@@ -67,7 +68,7 @@ public class PostController {
 
     @PatchMapping(value = "/{postId:.+}/updatePost")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Update PostEntity successfully")
+    @DefaultMessage("Update PostEntity successfully")
     public PostResponse updatePost(@PathVariable UUID postId, @RequestBody PostRequest postRequest){
 
         postRequest.setPostId(postId);
@@ -78,7 +79,7 @@ public class PostController {
     }
 
     @GetMapping(value = "/{postId:.+}/getAllCommentToPost")
-    @MessageResponse("Show list CommentEntity successfully")
+    @DefaultMessage("Show list CommentEntity successfully")
     public List<CommentResponse> getListCommentToPostId(@PathVariable UUID postId){
 
         List<CommentEntity> commentEntityList = postService.getListCommentToPostId(postId);
@@ -88,7 +89,7 @@ public class PostController {
 
     @DeleteMapping(value = "/{postId:.+}/deletePost")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Delete PostEntity successfully")
+    @DefaultMessage("Delete PostEntity successfully")
     public void deletePost(@PathVariable UUID postId){
 
         postService.deletePost(postId);

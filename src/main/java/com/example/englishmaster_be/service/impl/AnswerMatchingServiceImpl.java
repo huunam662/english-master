@@ -1,12 +1,12 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
-import com.example.englishmaster_be.Model.Request.Answer.AnswerMatchingQuestionRequest;
+import com.example.englishmaster_be.model.request.Answer.AnswerMatchingQuestionRequest;
 import com.example.englishmaster_be.entity.AnswerMatchingEntity;
 import com.example.englishmaster_be.entity.QuestionEntity;
-import com.example.englishmaster_be.Model.Response.AnswerMatchingBasicResponse;
-import com.example.englishmaster_be.Repository.AnswerMatchingRepository;
-import com.example.englishmaster_be.Service.IAnswerMatching;
-import com.example.englishmaster_be.Service.IQuestionService;
+import com.example.englishmaster_be.model.response.AnswerMatchingBasicResponse;
+import com.example.englishmaster_be.repository.AnswerMatchingRepository;
+import com.example.englishmaster_be.service.IAnswerMatching;
+import com.example.englishmaster_be.service.IQuestionService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

@@ -1,10 +1,11 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Model.Request.FlashCard.FlashCardWordRequest;
-import com.example.englishmaster_be.Mapper.FlashCardWordMapper;
-import com.example.englishmaster_be.Model.Response.FlashCardWordResponse;
-import com.example.englishmaster_be.Service.*;
+
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.model.request.FlashCard.FlashCardWordRequest;
+import com.example.englishmaster_be.mapper.FlashCardWordMapper;
+import com.example.englishmaster_be.model.response.FlashCardWordResponse;
+import com.example.englishmaster_be.service.*;
 import com.example.englishmaster_be.entity.FlashCardWordEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -31,7 +32,7 @@ public class FlashCardWordController {
 
     @DeleteMapping(value = "/{flashCardWordId:.+}/removeWord")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Delete flashcard word successfully")
+    @DefaultMessage("Delete flashcard word successfully")
     public void removeWord(@PathVariable UUID flashCardWordId){
 
         flashCardWordService.delete(flashCardWordId);
@@ -39,7 +40,7 @@ public class FlashCardWordController {
 
     @PostMapping(value = "/{flashCardId:.+}/addWordToFlashCard", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Create word for flashcard successfully")
+    @DefaultMessage("Create word for flashcard successfully")
     public FlashCardWordResponse addWordToFlashCard(@PathVariable UUID flashCardId, @ModelAttribute FlashCardWordRequest flashCardWordRequest){
 
         flashCardWordRequest.setFlashCardId(flashCardId);
@@ -52,7 +53,7 @@ public class FlashCardWordController {
 
     @PutMapping(value = "/{flashCardWordId:.+}/updateWord", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Update flashcard word successfully")
+    @DefaultMessage("Update flashcard word successfully")
     public FlashCardWordResponse updateWord(@PathVariable UUID flashCardWordId, @ModelAttribute FlashCardWordRequest flashCardWordRequest){
 
         flashCardWordRequest.setFlashCardWordId(flashCardWordId);
@@ -63,7 +64,7 @@ public class FlashCardWordController {
     }
 
     @GetMapping("/searchByWord")
-    @MessageResponse("Show list flashcard word successfully")
+    @DefaultMessage("Show list flashcard word successfully")
     public List<String> searchFlashCardByWord(@RequestParam(value = "query") String query) {
 
         return flashCardWordService.searchByFlashCardWord(query);

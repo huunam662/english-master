@@ -1,8 +1,8 @@
-package com.example.englishmaster_be.Service;
+package com.example.englishmaster_be.service;
 
-import com.example.englishmaster_be.Model.Request.Pack.PackRequest;
+import com.example.englishmaster_be.model.request.Pack.PackRequest;
 import com.example.englishmaster_be.entity.PackEntity;
-import com.example.englishmaster_be.Model.Response.PackResponse;
+import com.example.englishmaster_be.model.response.PackResponse;
 
 import java.util.List;
 import java.util.UUID;

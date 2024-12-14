@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Model.Request.InvalidToken;
+package com.example.englishmaster_be.model.request.InvalidToken;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

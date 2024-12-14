@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Value;
+package com.example.englishmaster_be.value;
 
 
 import lombok.*;
@@ -16,5 +16,8 @@ public class DictionaryValue {
 
     @Value("${unsplash.api.key}")
     String unsplashApiKey;
+
+    @Value("${dictionary.file.path}")
+    String fileName;
 
 }

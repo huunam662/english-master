@@ -1,9 +1,10 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
 
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Model.Response.DictionarySuggestionResponse;
-import com.example.englishmaster_be.Service.IDictionaryService;
+
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.model.response.DictionarySuggestionResponse;
+import com.example.englishmaster_be.service.IDictionaryService;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -22,7 +23,7 @@ public class DictionaryController {
 
 
     @GetMapping("/search/{word}")
-    @MessageResponse("Search successfully")
+    @DefaultMessage("Search successfully")
     public JsonNode searchWords(@PathVariable String word) {
 
         return dictionaryService.searchWords(word);
@@ -30,7 +31,7 @@ public class DictionaryController {
 
 
     @GetMapping("/suggest/{word}")
-    @MessageResponse("Show word successfully")
+    @DefaultMessage("Show word successfully")
     public DictionarySuggestionResponse getSuggestions(@PathVariable String word) {
 
         return dictionaryService.getSuggestions(word);
@@ -38,7 +39,7 @@ public class DictionaryController {
 
 
     @GetMapping("/image/{word}")
-    @MessageResponse("show image to word successfully")
+    @DefaultMessage("show image to word successfully")
     public JsonNode getImage(@PathVariable String word) {
 
         return dictionaryService.getImage(word);

@@ -1,6 +1,6 @@
-package com.example.englishmaster_be.Service;
+package com.example.englishmaster_be.service;
 
-import com.example.englishmaster_be.Model.Request.FlashCard.FlashCardWordRequest;
+import com.example.englishmaster_be.model.request.FlashCard.FlashCardWordRequest;
 import com.example.englishmaster_be.entity.FlashCardWordEntity;
 
 import java.util.List;

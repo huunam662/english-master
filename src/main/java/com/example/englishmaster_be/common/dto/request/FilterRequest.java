@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Common.dto.request;
+package com.example.englishmaster_be.common.dto.request;
 
 
 import io.swagger.v3.oas.annotations.media.Schema;

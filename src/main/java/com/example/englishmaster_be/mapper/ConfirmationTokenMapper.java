@@ -1,8 +1,8 @@
-package com.example.englishmaster_be.Mapper;
+package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.Model.Request.ConfirmationToken.ConfirmationTokenRequest;
+import com.example.englishmaster_be.model.request.ConfirmationToken.ConfirmationTokenRequest;
 import com.example.englishmaster_be.entity.ConfirmationTokenEntity;
-import com.example.englishmaster_be.Model.Response.ConfirmationTokenResponse;
+import com.example.englishmaster_be.model.response.ConfirmationTokenResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

@@ -1,7 +1,7 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Service.IContentService;
-import com.example.englishmaster_be.Service.ITopicService;
+import com.example.englishmaster_be.service.IContentService;
+import com.example.englishmaster_be.service.ITopicService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

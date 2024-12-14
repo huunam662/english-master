@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Model.Response.excel;
+package com.example.englishmaster_be.model.response.excel;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

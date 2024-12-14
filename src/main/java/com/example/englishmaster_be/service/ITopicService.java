@@ -1,15 +1,15 @@
-package com.example.englishmaster_be.Service;
+package com.example.englishmaster_be.service;
 
-import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.Model.Request.Question.QuestionRequest;
-import com.example.englishmaster_be.Model.Request.Topic.ListQuestionRequest;
-import com.example.englishmaster_be.Model.Request.Topic.TopicRequest;
-import com.example.englishmaster_be.Model.Request.Topic.TopicFilterRequest;
-import com.example.englishmaster_be.Model.Request.UploadFileRequest;
-import com.example.englishmaster_be.Model.Response.CommentResponse;
-import com.example.englishmaster_be.Model.Response.PartResponse;
-import com.example.englishmaster_be.Model.Response.QuestionResponse;
-import com.example.englishmaster_be.Model.Response.TopicResponse;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.model.request.Question.QuestionRequest;
+import com.example.englishmaster_be.model.request.Topic.ListQuestionRequest;
+import com.example.englishmaster_be.model.request.Topic.TopicRequest;
+import com.example.englishmaster_be.model.request.Topic.TopicFilterRequest;
+import com.example.englishmaster_be.model.request.UploadFileRequest;
+import com.example.englishmaster_be.model.response.CommentResponse;
+import com.example.englishmaster_be.model.response.PartResponse;
+import com.example.englishmaster_be.model.response.QuestionResponse;
+import com.example.englishmaster_be.model.response.TopicResponse;
 import com.example.englishmaster_be.entity.*;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;

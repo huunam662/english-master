@@ -1,11 +1,12 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
 
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Mapper.PackMapper;
-import com.example.englishmaster_be.Model.Request.Pack.PackRequest;
-import com.example.englishmaster_be.Model.Response.PackResponse;
-import com.example.englishmaster_be.Service.*;
+
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.mapper.PackMapper;
+import com.example.englishmaster_be.model.request.Pack.PackRequest;
+import com.example.englishmaster_be.model.response.PackResponse;
+import com.example.englishmaster_be.service.*;
 import com.example.englishmaster_be.entity.PackEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -28,7 +29,7 @@ public class PackController {
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Create pack successfully")
+    @DefaultMessage("Create pack successfully")
     public PackResponse createPack(@RequestBody PackRequest packRequest) {
 
         PackEntity pack = packService.createPack(packRequest);
@@ -37,7 +38,7 @@ public class PackController {
     }
 
     @GetMapping(value = "/listPack")
-    @MessageResponse("Show list pack successfully")
+    @DefaultMessage("Show list pack successfully")
     public List<PackResponse> getListPack(){
 
         List<PackEntity> packEntityList = packService.getListPack();

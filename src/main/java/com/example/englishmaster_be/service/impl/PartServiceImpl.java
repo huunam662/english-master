@@ -1,19 +1,19 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
-import com.example.englishmaster_be.Common.enums.error.ErrorEnum;
-import com.example.englishmaster_be.Model.Request.Part.PartRequest;
-import com.example.englishmaster_be.Model.Request.UploadMultiFileRequest;
-import com.example.englishmaster_be.Model.Request.UploadTextRequest;
-import com.example.englishmaster_be.Exception.template.CustomException;
-import com.example.englishmaster_be.Exception.template.BadRequestException;
-import com.example.englishmaster_be.Helper.GetExtension;
-import com.example.englishmaster_be.Mapper.PartMapper;
+import com.example.englishmaster_be.common.constaint.error.ErrorEnum;
+import com.example.englishmaster_be.helper.GetExtensionHelper;
+import com.example.englishmaster_be.model.request.Part.PartRequest;
+import com.example.englishmaster_be.model.request.UploadMultiFileRequest;
+import com.example.englishmaster_be.model.request.UploadTextRequest;
+import com.example.englishmaster_be.exception.template.CustomException;
+import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.mapper.PartMapper;
 import com.example.englishmaster_be.entity.PartEntity;
 import com.example.englishmaster_be.entity.UserEntity;
-import com.example.englishmaster_be.Repository.*;
-import com.example.englishmaster_be.Service.IFileStorageService;
-import com.example.englishmaster_be.Service.IPartService;
-import com.example.englishmaster_be.Service.IUserService;
+import com.example.englishmaster_be.repository.*;
+import com.example.englishmaster_be.service.IFileStorageService;
+import com.example.englishmaster_be.service.IPartService;
+import com.example.englishmaster_be.service.IUserService;
 import com.google.cloud.storage.Blob;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +31,8 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PartServiceImpl implements IPartService {
+
+    GetExtensionHelper getExtensionHelper;
 
     PartRepository partRepository;
 
@@ -158,7 +160,7 @@ public class PartServiceImpl implements IPartService {
 
             Blob blobResponse = fileStorageService.save(file);
 
-            partEntity.setContentType(GetExtension.typeFile(blobResponse.getName()));
+            partEntity.setContentType(getExtensionHelper.typeFile(blobResponse.getName()));
             partEntity.setContentData(blobResponse.getName());
             partEntity.setUserUpdate(user);
             partEntity.setUpdateAt(LocalDateTime.now());

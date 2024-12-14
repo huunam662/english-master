@@ -1,11 +1,12 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Model.Request.Content.ContentRequest;
-import com.example.englishmaster_be.Mapper.ContentMapper;
+
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.model.request.Content.ContentRequest;
+import com.example.englishmaster_be.mapper.ContentMapper;
 import com.example.englishmaster_be.entity.ContentEntity;
-import com.example.englishmaster_be.Model.Response.ContentResponse;
-import com.example.englishmaster_be.Service.IContentService;
+import com.example.englishmaster_be.model.response.ContentResponse;
+import com.example.englishmaster_be.service.IContentService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class ContentController {
 
 
     @GetMapping
-    @MessageResponse("Get content successfully")
+    @DefaultMessage("Get content successfully")
     public ContentResponse getContentById(@RequestParam UUID id) {
 
         ContentEntity content = contentService.getContentByContentId(id);
@@ -36,7 +37,7 @@ public class ContentController {
     }
 
     @GetMapping("/contentData")
-    @MessageResponse("Get content successfully")
+    @DefaultMessage("Get content successfully")
     public ContentResponse getContentData(@RequestParam UUID topicId, @RequestParam String code) {
 
         ContentEntity content = contentService.getContentByTopicIdAndCode(topicId, code);
@@ -46,14 +47,14 @@ public class ContentController {
 
     @DeleteMapping("/{contentId}")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Delete content successfully")
+    @DefaultMessage("Delete content successfully")
     public void getContentData(@PathVariable UUID contentId) {
 
         contentService.deleteContent(contentId);
     }
 
     @GetMapping("/content")
-    @MessageResponse("Get content successfully")
+    @DefaultMessage("Get content successfully")
     public ContentResponse getContent(@RequestParam String contentData) {
 
         ContentEntity content = contentService.getContentByContentData(contentData);
@@ -62,7 +63,7 @@ public class ContentController {
     }
 
     @PostMapping(value = "/create-content", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @MessageResponse("Create content successfully")
+    @DefaultMessage("Create content successfully")
     public ContentResponse createContent(
             @ModelAttribute ContentRequest contentRequest
     ) {
@@ -73,7 +74,7 @@ public class ContentController {
     }
 
     @PutMapping(value = "/{contentId}/update-content", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @MessageResponse("Update content successfully")
+    @DefaultMessage("Update content successfully")
     public ContentResponse updateContent(
             @PathVariable UUID contentId,
             @ModelAttribute ContentRequest contentRequest

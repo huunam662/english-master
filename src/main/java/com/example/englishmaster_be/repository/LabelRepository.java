@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Repository;
+package com.example.englishmaster_be.repository;
 
 import com.example.englishmaster_be.entity.LabelEntity;
 import com.example.englishmaster_be.entity.QuestionEntity;

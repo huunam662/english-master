@@ -1,6 +1,6 @@
-package com.example.englishmaster_be.Model.Response.excel;
+package com.example.englishmaster_be.model.response.excel;
 
-import com.example.englishmaster_be.Model.Request.Answer.AnswerBasicRequest;
+import com.example.englishmaster_be.model.request.Answer.AnswerBasicRequest;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

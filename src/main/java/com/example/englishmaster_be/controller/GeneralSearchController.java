@@ -1,8 +1,9 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Model.Response.GeneralSearchAllResponse;
-import com.example.englishmaster_be.Service.GeneralSearchService;
+
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.model.response.GeneralSearchAllResponse;
+import com.example.englishmaster_be.service.GeneralSearchService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +24,7 @@ public class GeneralSearchController{
 
 
     @GetMapping("/searchAll")
-    @MessageResponse("Search successfully")
+    @DefaultMessage("Search successfully")
     public GeneralSearchAllResponse searchAll(@RequestParam(value = "keyword", defaultValue = "") String keyword){
 
        return generalSearchService.searchAll(keyword);

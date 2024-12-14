@@ -1,12 +1,13 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Model.Request.FlashCard.FlashCardRequest;
-import com.example.englishmaster_be.Mapper.FlashCardMapper;
-import com.example.englishmaster_be.Model.Response.FlashCardListWordResponse;
-import com.example.englishmaster_be.Model.Response.FlashCardResponse;
+
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.model.request.FlashCard.FlashCardRequest;
+import com.example.englishmaster_be.mapper.FlashCardMapper;
+import com.example.englishmaster_be.model.response.FlashCardListWordResponse;
+import com.example.englishmaster_be.model.response.FlashCardResponse;
 import com.example.englishmaster_be.entity.FlashCardEntity;
-import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.service.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class FlashCardController {
 
     @GetMapping(value = "/{flashCardId:.+}/listFlashCardWord")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Show list flashcard word successfully")
+    @DefaultMessage("Show list flashcard word successfully")
     public FlashCardListWordResponse getWordToFlashCard(@PathVariable UUID flashCardId){
 
         FlashCardEntity flashCard = flashCardService.getFlashCardById(flashCardId);
@@ -41,7 +42,7 @@ public class FlashCardController {
 
     @GetMapping(value = "/listFlashCardUser")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Show list flashcard successfully")
+    @DefaultMessage("Show list flashcard successfully")
     public List<FlashCardResponse> listFlashCardUser(){
 
         List<FlashCardEntity> flashCardList = flashCardService.getListFlashCardByCurrentUser();
@@ -52,7 +53,7 @@ public class FlashCardController {
 
     @PostMapping(value = "/addFlashCardUser", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Create flashcard successfully")
+    @DefaultMessage("Create flashcard successfully")
     public FlashCardResponse addFlashCardUser(@ModelAttribute FlashCardRequest flashCardRequest){
 
         FlashCardEntity flashCard = flashCardService.saveFlashCard(flashCardRequest);
@@ -62,7 +63,7 @@ public class FlashCardController {
 
     @PutMapping(value = "/{flashCardId:.+}/updateFlashCard", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Update flashcard successfully")
+    @DefaultMessage("Update flashcard successfully")
     public FlashCardResponse updateFlashCard(@PathVariable UUID flashCardId, @ModelAttribute FlashCardRequest flashCardRequest){
 
         flashCardRequest.setFlashCardId(flashCardId);
@@ -74,7 +75,7 @@ public class FlashCardController {
 
     @DeleteMapping(value = "/{flashCardId:.+}/removeFlashCard")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Delete flashcard successfully")
+    @DefaultMessage("Delete flashcard successfully")
     public void removeWord(@PathVariable UUID flashCardId){
 
         flashCardService.delete(flashCardId);

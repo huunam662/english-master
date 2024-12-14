@@ -1,10 +1,10 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Model.Request.Posts.PostRequest;
-import com.example.englishmaster_be.Model.Request.Posts.FilterPostRequest;
-import com.example.englishmaster_be.Model.Request.Posts.SelectPostRequest;
-import com.example.englishmaster_be.Model.Request.Posts.UpdatePostRequest;
-import com.example.englishmaster_be.Service.IPostsService;
+import com.example.englishmaster_be.model.request.Posts.PostRequest;
+import com.example.englishmaster_be.model.request.Posts.FilterPostRequest;
+import com.example.englishmaster_be.model.request.Posts.SelectPostRequest;
+import com.example.englishmaster_be.model.request.Posts.UpdatePostRequest;
+import com.example.englishmaster_be.service.IPostsService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.http.MediaType;

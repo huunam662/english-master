@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Model.Request.MockTest;
+package com.example.englishmaster_be.model.request.MockTest;
 
 
 import lombok.*;

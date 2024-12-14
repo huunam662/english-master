@@ -1,7 +1,7 @@
-package com.example.englishmaster_be.Service;
+package com.example.englishmaster_be.service;
 
-import com.example.englishmaster_be.Model.Response.excel.ListQuestionByExcelFileResponse;
-import com.example.englishmaster_be.Model.Response.excel.TopicByExcelFileResponse;
+import com.example.englishmaster_be.model.response.excel.ListQuestionByExcelFileResponse;
+import com.example.englishmaster_be.model.response.excel.TopicByExcelFileResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;

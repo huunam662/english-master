@@ -1,13 +1,13 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
-import com.example.englishmaster_be.Model.Request.FlashCard.FlashCardRequest;
-import com.example.englishmaster_be.Mapper.FlashCardMapper;
+import com.example.englishmaster_be.model.request.FlashCard.FlashCardRequest;
+import com.example.englishmaster_be.mapper.FlashCardMapper;
 import com.example.englishmaster_be.entity.FlashCardEntity;
 import com.example.englishmaster_be.entity.UserEntity;
-import com.example.englishmaster_be.Repository.*;
-import com.example.englishmaster_be.Service.IFileStorageService;
-import com.example.englishmaster_be.Service.IFlashCardService;
-import com.example.englishmaster_be.Service.IUserService;
+import com.example.englishmaster_be.repository.*;
+import com.example.englishmaster_be.service.IFileStorageService;
+import com.example.englishmaster_be.service.IFlashCardService;
+import com.example.englishmaster_be.service.IUserService;
 import com.google.cloud.storage.Blob;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

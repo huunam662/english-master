@@ -1,16 +1,16 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
-import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.Mapper.TypeMapper;
-import com.example.englishmaster_be.Model.Request.Type.TypeFilterRequest;
-import com.example.englishmaster_be.Model.Request.Type.TypeRequest;
-import com.example.englishmaster_be.Exception.template.BadRequestException;
-import com.example.englishmaster_be.Model.Response.TypeResponse;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.mapper.TypeMapper;
+import com.example.englishmaster_be.model.request.Type.TypeFilterRequest;
+import com.example.englishmaster_be.model.request.Type.TypeRequest;
+import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.model.response.TypeResponse;
 import com.example.englishmaster_be.Util.TypeUtil;
 import com.example.englishmaster_be.entity.QTypeEntity;
 import com.example.englishmaster_be.entity.TypeEntity;
-import com.example.englishmaster_be.Repository.TypeRepository;
-import com.example.englishmaster_be.Service.ITypeService;
+import com.example.englishmaster_be.repository.TypeRepository;
+import com.example.englishmaster_be.service.ITypeService;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;

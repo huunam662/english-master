@@ -1,7 +1,7 @@
-package com.example.englishmaster_be.Service;
+package com.example.englishmaster_be.service;
 
 
-import com.example.englishmaster_be.Model.Request.Answer.AnswerRequest;
+import com.example.englishmaster_be.model.request.Answer.AnswerRequest;
 import com.example.englishmaster_be.entity.AnswerEntity;
 import com.example.englishmaster_be.entity.MockTestEntity;
 import com.example.englishmaster_be.entity.QuestionEntity;

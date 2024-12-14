@@ -1,10 +1,10 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
-import com.example.englishmaster_be.Mapper.FlashCardWordMapper;
-import com.example.englishmaster_be.Mapper.NewsMapper;
-import com.example.englishmaster_be.Mapper.TopicMapper;
-import com.example.englishmaster_be.Model.Response.GeneralSearchAllResponse;
-import com.example.englishmaster_be.Service.GeneralSearchService;
+import com.example.englishmaster_be.mapper.FlashCardWordMapper;
+import com.example.englishmaster_be.mapper.NewsMapper;
+import com.example.englishmaster_be.mapper.TopicMapper;
+import com.example.englishmaster_be.model.response.GeneralSearchAllResponse;
+import com.example.englishmaster_be.service.GeneralSearchService;
 import com.example.englishmaster_be.entity.*;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;

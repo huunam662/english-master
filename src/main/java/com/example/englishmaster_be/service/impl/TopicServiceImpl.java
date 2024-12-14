@@ -1,30 +1,30 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
-import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.Common.enums.StatusEnum;
-import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
-import com.example.englishmaster_be.Common.enums.RoleEnum;
-import com.example.englishmaster_be.Mapper.AnswerMapper;
-import com.example.englishmaster_be.Mapper.QuestionMapper;
-import com.example.englishmaster_be.Model.Request.Answer.AnswerBasicRequest;
-import com.example.englishmaster_be.Model.Request.Question.QuestionRequest;
-import com.example.englishmaster_be.Model.Request.Topic.ListQuestionRequest;
-import com.example.englishmaster_be.Model.Request.Topic.TopicRequest;
-import com.example.englishmaster_be.Model.Request.Topic.TopicFilterRequest;
-import com.example.englishmaster_be.Model.Request.UploadFileRequest;
-import com.example.englishmaster_be.Exception.template.BadRequestException;
-import com.example.englishmaster_be.Helper.GetExtension;
-import com.example.englishmaster_be.Mapper.PartMapper;
-import com.example.englishmaster_be.Mapper.TopicMapper;
-import com.example.englishmaster_be.Model.Response.PartResponse;
-import com.example.englishmaster_be.Model.Response.QuestionBasicResponse;
-import com.example.englishmaster_be.Model.Response.QuestionResponse;
-import com.example.englishmaster_be.Model.Response.TopicResponse;
-import com.example.englishmaster_be.Model.Response.excel.ListQuestionByExcelFileResponse;
-import com.example.englishmaster_be.Model.Response.excel.QuestionByExcelFileResponse;
-import com.example.englishmaster_be.Model.Response.excel.TopicByExcelFileResponse;
-import com.example.englishmaster_be.Repository.*;
-import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.common.constaint.StatusEnum;
+import com.example.englishmaster_be.common.thread.MessageResponseHolder;
+import com.example.englishmaster_be.common.constaint.RoleEnum;
+import com.example.englishmaster_be.helper.GetExtensionHelper;
+import com.example.englishmaster_be.mapper.AnswerMapper;
+import com.example.englishmaster_be.mapper.QuestionMapper;
+import com.example.englishmaster_be.model.request.Answer.AnswerBasicRequest;
+import com.example.englishmaster_be.model.request.Question.QuestionRequest;
+import com.example.englishmaster_be.model.request.Topic.ListQuestionRequest;
+import com.example.englishmaster_be.model.request.Topic.TopicRequest;
+import com.example.englishmaster_be.model.request.Topic.TopicFilterRequest;
+import com.example.englishmaster_be.model.request.UploadFileRequest;
+import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.mapper.PartMapper;
+import com.example.englishmaster_be.mapper.TopicMapper;
+import com.example.englishmaster_be.model.response.PartResponse;
+import com.example.englishmaster_be.model.response.QuestionBasicResponse;
+import com.example.englishmaster_be.model.response.QuestionResponse;
+import com.example.englishmaster_be.model.response.TopicResponse;
+import com.example.englishmaster_be.model.response.excel.ListQuestionByExcelFileResponse;
+import com.example.englishmaster_be.model.response.excel.QuestionByExcelFileResponse;
+import com.example.englishmaster_be.model.response.excel.TopicByExcelFileResponse;
+import com.example.englishmaster_be.repository.*;
+import com.example.englishmaster_be.service.*;
 import com.example.englishmaster_be.Util.LinkUtil;
 import com.example.englishmaster_be.entity.*;
 import com.google.cloud.storage.Blob;
@@ -55,6 +55,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TopicServiceImpl implements ITopicService {
+
+    GetExtensionHelper getExtensionHelper;
 
     JPAQueryFactory queryFactory;
 
@@ -782,7 +784,7 @@ public class TopicServiceImpl implements ITopicService {
 
                 ContentEntity content = ContentEntity.builder()
                         .contentData(fileName)
-                        .contentType(GetExtension.typeFile(fileName))
+                        .contentType(getExtensionHelper.typeFile(fileName))
                         .question(question)
                         .userCreate(user)
                         .userUpdate(user)
@@ -803,7 +805,7 @@ public class TopicServiceImpl implements ITopicService {
 
                 ContentEntity content = ContentEntity.builder()
                         .contentData(fileName)
-                        .contentType(GetExtension.typeFile(fileName))
+                        .contentType(getExtensionHelper.typeFile(fileName))
                         .question(question)
                         .userCreate(user)
                         .userUpdate(user)
@@ -920,7 +922,7 @@ public class TopicServiceImpl implements ITopicService {
 
             ContentEntity content = ContentEntity.builder()
                     .contentData(fileName)
-                    .contentType(GetExtension.typeFile(fileName))
+                    .contentType(getExtensionHelper.typeFile(fileName))
                     .question(question)
                     .userCreate(user)
                     .userUpdate(user)
@@ -940,7 +942,7 @@ public class TopicServiceImpl implements ITopicService {
 
             ContentEntity content = ContentEntity.builder()
                     .contentData(fileName)
-                    .contentType(GetExtension.typeFile(fileName))
+                    .contentType(getExtensionHelper.typeFile(fileName))
                     .question(question)
                     .userCreate(user)
                     .userUpdate(user)

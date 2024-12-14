@@ -1,16 +1,17 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Mapper.AnswerMapper;
-import com.example.englishmaster_be.Mapper.QuestionMapper;
-import com.example.englishmaster_be.Model.Request.Question.GroupQuestionRequest;
-import com.example.englishmaster_be.Model.Request.Question.QuestionRequest;
-import com.example.englishmaster_be.Model.Request.UploadMultiFileRequest;
-import com.example.englishmaster_be.Model.Response.AnswerResponse;
-import com.example.englishmaster_be.Model.Response.QuestionBasicResponse;
-import com.example.englishmaster_be.Model.Response.QuestionGroupResponse;
-import com.example.englishmaster_be.Model.Response.QuestionResponse;
-import com.example.englishmaster_be.Service.*;
+
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.mapper.AnswerMapper;
+import com.example.englishmaster_be.mapper.QuestionMapper;
+import com.example.englishmaster_be.model.request.Question.GroupQuestionRequest;
+import com.example.englishmaster_be.model.request.Question.QuestionRequest;
+import com.example.englishmaster_be.model.request.UploadMultiFileRequest;
+import com.example.englishmaster_be.model.response.AnswerResponse;
+import com.example.englishmaster_be.model.response.QuestionBasicResponse;
+import com.example.englishmaster_be.model.response.QuestionGroupResponse;
+import com.example.englishmaster_be.model.response.QuestionResponse;
+import com.example.englishmaster_be.service.*;
 import com.example.englishmaster_be.entity.AnswerEntity;
 import com.example.englishmaster_be.entity.QuestionEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -38,7 +39,7 @@ public class QuestionController {
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Create QuestionEntity successfully")
+    @DefaultMessage("Create QuestionEntity successfully")
     public QuestionResponse createQuestion(
             @ModelAttribute QuestionRequest questionRequest
     ) {
@@ -50,7 +51,7 @@ public class QuestionController {
 
     @PutMapping(value = "/{questionId:.+}/editQuestion")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Update QuestionEntity to TopicEntity successfully")
+    @DefaultMessage("Update QuestionEntity to TopicEntity successfully")
     public QuestionResponse editQuestion(
             @PathVariable UUID questionId,
             @ModelAttribute QuestionRequest questionRequest
@@ -66,7 +67,7 @@ public class QuestionController {
 
     @PutMapping(value = "/{questionId:.+}/uploadfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Upload QuestionEntity successfully")
+    @DefaultMessage("Upload QuestionEntity successfully")
     public QuestionBasicResponse uploadFileQuestion(
             @PathVariable UUID questionId,
             @ModelAttribute UploadMultiFileRequest uploadMultiFileRequest
@@ -79,7 +80,7 @@ public class QuestionController {
 
     @PutMapping(value = "/{questionId:.+}/updatefile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Update file QuestionEntity successfully")
+    @DefaultMessage("Update file QuestionEntity successfully")
     public QuestionBasicResponse updateFileQuestion(
             @PathVariable UUID questionId,
             @RequestParam("oldFileName") String oldFileName,
@@ -93,7 +94,7 @@ public class QuestionController {
 
     @PostMapping(value = "/create/groupQuestion")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Create QuestionEntity successfully")
+    @DefaultMessage("Create QuestionEntity successfully")
     public QuestionResponse createGroupQuestion(
             @RequestBody GroupQuestionRequest groupQuestionRequest
     ) {
@@ -106,7 +107,7 @@ public class QuestionController {
 
     @GetMapping(value = "/{partId:.+}/listTop10Question")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("List top 10 QuestionEntity successfully")
+    @DefaultMessage("List top 10 QuestionEntity successfully")
     public List<QuestionBasicResponse> getTop10Question(
             @PathVariable UUID partId,
             @RequestParam int indexp
@@ -119,7 +120,7 @@ public class QuestionController {
 
     @GetMapping(value = "/{questionId:.+}/checkQuestionGroup")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("QuestionEntity has QuestionEntity group")
+    @DefaultMessage("QuestionEntity has QuestionEntity group")
     public void checkQuestionGroup(@PathVariable UUID questionId) {
 
         questionService.checkQuestionGroup(questionId);
@@ -127,7 +128,7 @@ public class QuestionController {
 
     @GetMapping(value = "/{questionId:.+}/listQuestionGroup")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("List QuestionEntity group successfully")
+    @DefaultMessage("List QuestionEntity group successfully")
     public List<QuestionResponse> getQuestionGroupToQuestion(@PathVariable UUID questionId) {
 
         List<QuestionEntity> questionEntityList = questionService.getQuestionGroupListByQuestionId(questionId);
@@ -137,7 +138,7 @@ public class QuestionController {
 
     @GetMapping(value = "/{questionId:.+}/listAnswer")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("List AnswerEntity to QuestionEntity successfully")
+    @DefaultMessage("List AnswerEntity to QuestionEntity successfully")
     public List<AnswerResponse> getAnswerToQuestion(@PathVariable UUID questionId) {
 
         List<AnswerEntity> answerList = answerService.getListAnswerByQuestionId(questionId);
@@ -147,7 +148,7 @@ public class QuestionController {
 
     @DeleteMapping(value = "/{questionId:.+}/deleteQuestion")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Delete QuestionEntity successfully")
+    @DefaultMessage("Delete QuestionEntity successfully")
     public void deleteQuestion(@PathVariable UUID questionId) {
 
         questionService.deleteQuestion(questionId);
@@ -156,7 +157,7 @@ public class QuestionController {
 
     @GetMapping(value = "/{questionId:.+}/content")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Show ContentEntity QuestionEntity successfully")
+    @DefaultMessage("Show ContentEntity QuestionEntity successfully")
     public QuestionResponse getContentToQuestion(@PathVariable UUID questionId) {
 
         QuestionEntity question = questionService.getQuestionById(questionId);

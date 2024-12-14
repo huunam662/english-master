@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Model.Request;
+package com.example.englishmaster_be.model.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;

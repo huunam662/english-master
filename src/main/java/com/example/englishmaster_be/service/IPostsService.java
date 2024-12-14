@@ -1,9 +1,9 @@
-package com.example.englishmaster_be.Service;
+package com.example.englishmaster_be.service;
 
-import com.example.englishmaster_be.Model.Request.Posts.PostRequest;
-import com.example.englishmaster_be.Model.Request.Posts.FilterPostRequest;
-import com.example.englishmaster_be.Model.Request.Posts.SelectPostRequest;
-import com.example.englishmaster_be.Model.Request.Posts.UpdatePostRequest;
+import com.example.englishmaster_be.model.request.Posts.PostRequest;
+import com.example.englishmaster_be.model.request.Posts.FilterPostRequest;
+import com.example.englishmaster_be.model.request.Posts.SelectPostRequest;
+import com.example.englishmaster_be.model.request.Posts.UpdatePostRequest;
 
 import java.util.UUID;
 

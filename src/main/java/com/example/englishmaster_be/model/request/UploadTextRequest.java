@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Model.Request;
+package com.example.englishmaster_be.model.request;
 
 
 import lombok.*;

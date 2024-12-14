@@ -1,16 +1,17 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Mapper.DetailMockTestMapper;
-import com.example.englishmaster_be.Mapper.MockTestMapper;
-import com.example.englishmaster_be.Model.Request.MockTest.MockTestFilterRequest;
-import com.example.englishmaster_be.Model.Request.MockTest.MockTestRequest;
-import com.example.englishmaster_be.Model.Response.DetailMockTestResponse;
-import com.example.englishmaster_be.Model.Response.MockTestResponse;
-import com.example.englishmaster_be.Model.Response.PartMockTestResponse;
-import com.example.englishmaster_be.Model.Response.QuestionMockTestResponse;
-import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
+
+import com.example.englishmaster_be.mapper.DetailMockTestMapper;
+import com.example.englishmaster_be.mapper.MockTestMapper;
+import com.example.englishmaster_be.model.request.MockTest.MockTestFilterRequest;
+import com.example.englishmaster_be.model.request.MockTest.MockTestRequest;
+import com.example.englishmaster_be.model.response.DetailMockTestResponse;
+import com.example.englishmaster_be.model.response.MockTestResponse;
+import com.example.englishmaster_be.model.response.PartMockTestResponse;
+import com.example.englishmaster_be.model.response.QuestionMockTestResponse;
+import com.example.englishmaster_be.service.*;
 import com.example.englishmaster_be.entity.DetailMockTestEntity;
 import com.example.englishmaster_be.entity.MockTestEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -37,7 +38,7 @@ public class MockTestController {
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Create mock test successfully")
+    @DefaultMessage("Create mock test successfully")
     public MockTestResponse createMockTest(@RequestBody MockTestRequest saveMockTestRequest) {
 
         MockTestEntity mockTest = mockTestService.saveMockTest(saveMockTestRequest);
@@ -47,7 +48,7 @@ public class MockTestController {
 
     @GetMapping(value = "/getMockTestById")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Find MockTestEntity successfully")
+    @DefaultMessage("Find MockTestEntity successfully")
     public MockTestResponse getMockTest(@RequestParam UUID id) {
 
         MockTestEntity mockTest = mockTestService.findMockTestById(id);
@@ -57,7 +58,7 @@ public class MockTestController {
 
     @GetMapping(value = "/listMockTest")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Get top 10 mock test successfully")
+    @DefaultMessage("Get top 10 mock test successfully")
     public List<MockTestResponse> listTop10MockTest(@RequestParam int index) {
 
         List<MockTestEntity> listMockTest = mockTestService.getTop10MockTest(index);
@@ -67,7 +68,7 @@ public class MockTestController {
 
     @GetMapping(value = "/listMockTestAdmin")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("List mock test successfully")
+    @DefaultMessage("List mock test successfully")
     public FilterResponse<?> listMockTestOfAdmin(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
@@ -87,7 +88,7 @@ public class MockTestController {
 
     @GetMapping(value = "/{userId:.+}/listTestToUser")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Get top 10 mock test of UserEntity successfully")
+    @DefaultMessage("Get top 10 mock test of UserEntity successfully")
     public List<MockTestResponse> listMockTestToUser(
             @RequestParam int index,
             @PathVariable UUID userId
@@ -100,7 +101,7 @@ public class MockTestController {
 
     @PostMapping(value = "/{mockTestId:.+}/submitResult")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Create detail mock test successfully")
+    @DefaultMessage("Create detail mock test successfully")
     public List<DetailMockTestResponse> addAnswerToMockTest(@PathVariable UUID mockTestId, @RequestBody List<UUID> listAnswerId) {
 
         List<DetailMockTestEntity> detailMockTestEntityList = mockTestService.addAnswerToMockTest(mockTestId, listAnswerId);
@@ -120,7 +121,7 @@ public class MockTestController {
 
     @GetMapping(value = "/{mockTestId:.+}/sendEmail")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Send email successfully")
+    @DefaultMessage("Send email successfully")
     public void sendEmailToMock(@PathVariable UUID mockTestId) {
 
         mockTestService.sendEmailToMock(mockTestId);
@@ -128,7 +129,7 @@ public class MockTestController {
 
     @GetMapping(value = "/{mockTestId:.+}/listPart")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Show PartEntity to mock test successfully")
+    @DefaultMessage("Show PartEntity to mock test successfully")
     public PartMockTestResponse getPartToMockTest(@PathVariable UUID mockTestId) {
 
         return mockTestService.getPartToMockTest(mockTestId);
@@ -136,7 +137,7 @@ public class MockTestController {
 
     @GetMapping(value = "/{mockTestId:.+}/listQuestionToPart")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Show QuestionEntity of PartEntity to mock test successfully")
+    @DefaultMessage("Show QuestionEntity of PartEntity to mock test successfully")
     public List<QuestionMockTestResponse> getQuestionOfToMockTest(@PathVariable UUID mockTestId, @RequestParam UUID partId) {
 
         return mockTestService.getQuestionOfToMockTest(mockTestId, partId);

@@ -1,9 +1,9 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
-import com.example.englishmaster_be.Model.Request.Pack.PackRequest;
-import com.example.englishmaster_be.Exception.template.BadRequestException;
-import com.example.englishmaster_be.Repository.*;
-import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.model.request.Pack.PackRequest;
+import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.repository.*;
+import com.example.englishmaster_be.service.*;
 import com.example.englishmaster_be.entity.PackEntity;
 import com.example.englishmaster_be.entity.UserEntity;
 import lombok.AccessLevel;

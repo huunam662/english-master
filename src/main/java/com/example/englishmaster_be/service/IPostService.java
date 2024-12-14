@@ -1,10 +1,10 @@
-package com.example.englishmaster_be.Service;
+package com.example.englishmaster_be.service;
 
-import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.Model.Request.Post.PostFilterRequest;
-import com.example.englishmaster_be.Model.Request.Post.PostRequest;
-import com.example.englishmaster_be.Model.Response.CommentResponse;
-import com.example.englishmaster_be.Model.Response.PostResponse;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.model.request.Post.PostFilterRequest;
+import com.example.englishmaster_be.model.request.Post.PostRequest;
+import com.example.englishmaster_be.model.response.CommentResponse;
+import com.example.englishmaster_be.model.response.PostResponse;
 import com.example.englishmaster_be.entity.CommentEntity;
 import com.example.englishmaster_be.entity.PostEntity;
 

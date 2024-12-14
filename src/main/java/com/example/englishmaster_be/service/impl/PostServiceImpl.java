@@ -1,17 +1,17 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
-import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.Mapper.PostMapper;
-import com.example.englishmaster_be.Model.Request.Post.PostFilterRequest;
-import com.example.englishmaster_be.Model.Request.Post.PostRequest;
-import com.example.englishmaster_be.Exception.template.BadRequestException;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.mapper.PostMapper;
+import com.example.englishmaster_be.model.request.Post.PostFilterRequest;
+import com.example.englishmaster_be.model.request.Post.PostRequest;
+import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.entity.CommentEntity;
 import com.example.englishmaster_be.entity.PostEntity;
 import com.example.englishmaster_be.entity.QPostEntity;
-import com.example.englishmaster_be.Model.Response.PostResponse;
+import com.example.englishmaster_be.model.response.PostResponse;
 import com.example.englishmaster_be.entity.UserEntity;
-import com.example.englishmaster_be.Repository.*;
-import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.repository.*;
+import com.example.englishmaster_be.service.*;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;

@@ -1,10 +1,10 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Model.Request.User.UserFilterRequest;
-import com.example.englishmaster_be.Model.Response.CountMockTestTopicResponse;
-import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.model.request.User.UserFilterRequest;
+import com.example.englishmaster_be.model.response.CountMockTestTopicResponse;
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.service.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -30,7 +30,7 @@ public class AdminController {
 
     @GetMapping(value = "/getAllUser")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("List UserEntity successfully")
+    @DefaultMessage("List UserEntity successfully")
     public FilterResponse<?> getAllUser(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) int page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) int size,
@@ -60,7 +60,7 @@ public class AdminController {
 
     @DeleteMapping(value = "/{userId:.+}/deleteUser")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Delete account of UserEntity successfully")
+    @DefaultMessage("Delete account of UserEntity successfully")
     public void deleteUser(@PathVariable UUID userId) {
 
         userService.deleteUser(userId);
@@ -68,7 +68,7 @@ public class AdminController {
 
     @GetMapping(value = "/countMockTestOfTopic")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("List TopicEntity and count mock test successfully")
+    @DefaultMessage("List TopicEntity and count mock test successfully")
     public List<CountMockTestTopicResponse> countMockTestOfTopic(
             @RequestParam(value = "date", required = false) String date,
             @RequestParam(value = "pack") UUID packId

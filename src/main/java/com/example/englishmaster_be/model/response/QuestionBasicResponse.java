@@ -1,6 +1,6 @@
-package com.example.englishmaster_be.Model.Response;
+package com.example.englishmaster_be.model.response;
 
-import com.example.englishmaster_be.Common.enums.QuestionTypeEnum;
+import com.example.englishmaster_be.common.constaint.QuestionTypeEnum;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

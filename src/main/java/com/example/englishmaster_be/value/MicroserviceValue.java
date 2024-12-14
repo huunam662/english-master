@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Value;
+package com.example.englishmaster_be.value;
 
 import lombok.AccessLevel;
 import lombok.Getter;

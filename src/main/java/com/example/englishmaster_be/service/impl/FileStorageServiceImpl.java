@@ -1,16 +1,21 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
 
-import com.example.englishmaster_be.Exception.template.ResourceNotFoundException;
-import com.example.englishmaster_be.Service.IFileStorageService;
+import com.example.englishmaster_be.exception.template.ResourceNotFoundException;
+import com.example.englishmaster_be.service.IFileStorageService;
+import com.example.englishmaster_be.value.BucketValue;
+import com.example.englishmaster_be.value.FileValue;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.cloud.storage.Storage;
 import com.google.firebase.cloud.StorageClient;
 import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,20 +27,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
+@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 public class FileStorageServiceImpl implements IFileStorageService {
 
-    final String bucketName = "connect-student-nodejs.appspot.com";
+    FileValue fileValue;
 
-    @Value("${masterE.fileSave}")
-    String fileSave;
-//    private final Path root = Paths.get("D:\\Workplace\\FileEnglishMaster");
-//    private final Path root = Paths.get(fileSave);
-
+    BucketValue bucketValue;
 
     @Override
     public void init() {
-        Path root = Paths.get(fileSave);
+        Path root = Paths.get(fileValue.getFileSave());
         try {
             Files.createDirectories(root);
         } catch (IOException e) {
@@ -64,11 +66,11 @@ public class FileStorageServiceImpl implements IFileStorageService {
     @Override
     public Resource load(String filename) {
 
-        Bucket bucket = StorageClient.getInstance().bucket(bucketName);
+        Bucket bucket = StorageClient.getInstance().bucket(bucketValue.getBucketNameStudentNodejs());
 
         Storage storage = bucket.getStorage();
 
-        Blob blob = storage.get(bucketName, filename);
+        Blob blob = storage.get(bucketValue.getBucketNameStudentNodejs(), filename);
 
         if(blob == null) throw new ResourceNotFoundException("Image not found");
 
@@ -82,7 +84,7 @@ public class FileStorageServiceImpl implements IFileStorageService {
 //        Path root = Paths.get(fileSave);
 //        try {
 //            Files.copy(file.getInputStream(), root.resolve(fileName));
-//        } catch (Exception e) {
+//        } catch (exception e) {
 //            if (e instanceof FileAlreadyExistsException) {
 //                throw new RuntimeException("A file of that name already exists.");
 //            }
@@ -98,7 +100,7 @@ public class FileStorageServiceImpl implements IFileStorageService {
 
             String fileName = nameFile(file);
 
-            Bucket bucket = StorageClient.getInstance().bucket(bucketName);
+            Bucket bucket = StorageClient.getInstance().bucket(bucketValue.getBucketNameStudentNodejs());
 
             return bucket.create(fileName, file.getBytes(), file.getContentType());
 
@@ -115,7 +117,7 @@ public class FileStorageServiceImpl implements IFileStorageService {
         List<String> fileNames = new ArrayList<>();
         try {
 
-            Bucket bucket = StorageClient.getInstance().bucket(bucketName);
+            Bucket bucket = StorageClient.getInstance().bucket(bucketValue.getBucketNameStudentNodejs());
 
             bucket.list().iterateAll().forEach(blob -> {
                 if (blob != null) fileNames.add(blob.getName());
@@ -144,7 +146,7 @@ public class FileStorageServiceImpl implements IFileStorageService {
     @Override
     public boolean delete(String filename) {
 
-        Bucket bucket = StorageClient.getInstance().bucket(bucketName);
+        Bucket bucket = StorageClient.getInstance().bucket(bucketValue.getBucketNameStudentNodejs());
 
         Blob blob = bucket.get(filename);
 
@@ -156,7 +158,7 @@ public class FileStorageServiceImpl implements IFileStorageService {
     @Override
     public boolean isExistingFile(String filename) {
 
-        Bucket bucket = StorageClient.getInstance().bucket(bucketName);
+        Bucket bucket = StorageClient.getInstance().bucket(bucketValue.getBucketNameStudentNodejs());
 
         Blob blob = bucket.get(filename);
 

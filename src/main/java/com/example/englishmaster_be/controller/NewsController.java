@@ -1,12 +1,13 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Mapper.NewsMapper;
-import com.example.englishmaster_be.Model.Request.News.NewsFilterRequest;
-import com.example.englishmaster_be.Model.Request.News.NewsRequest;
-import com.example.englishmaster_be.Model.Response.NewsResponse;
-import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
+
+import com.example.englishmaster_be.mapper.NewsMapper;
+import com.example.englishmaster_be.model.request.News.NewsFilterRequest;
+import com.example.englishmaster_be.model.request.News.NewsRequest;
+import com.example.englishmaster_be.model.response.NewsResponse;
+import com.example.englishmaster_be.service.*;
 import com.example.englishmaster_be.entity.NewsEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
@@ -34,7 +35,7 @@ public class NewsController {
 
     @GetMapping(value = "/listNewsAdmin")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("List News successfully")
+    @DefaultMessage("List News successfully")
     public FilterResponse<?> listNewsOfAdmin(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
@@ -58,7 +59,7 @@ public class NewsController {
 
 
     @GetMapping(value = "/listNewsUser")
-    @MessageResponse("List NewsEntity successfully")
+    @DefaultMessage("List NewsEntity successfully")
     public List<NewsResponse> listNewsOfUser(
             @RequestParam(value = "size", defaultValue = "5") @Min(1) @Max(100) Integer size
     ){
@@ -75,7 +76,7 @@ public class NewsController {
 
     @PostMapping(value = "/createNews" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Create NewsEntity successfully")
+    @DefaultMessage("Create NewsEntity successfully")
     public NewsResponse createNews(
             @ModelAttribute("contentNews") NewsRequest newsRequest
     ){
@@ -88,7 +89,7 @@ public class NewsController {
 
     @PatchMapping(value = "/{newsId:.+}/updateNews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Update NewsEntity successfully")
+    @DefaultMessage("Update NewsEntity successfully")
     public NewsResponse updateNews(
             @PathVariable UUID newsId,
             @ModelAttribute("contentNews") NewsRequest newsRequest
@@ -112,7 +113,7 @@ public class NewsController {
 
     @DeleteMapping(value = "/{newsId:.+}/deleteNews")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Delete NewsEntity successfully")
+    @DefaultMessage("Delete NewsEntity successfully")
     public void deleteNews(@PathVariable UUID newsId){
 
         newsService.deleteNews(newsId);
@@ -121,7 +122,7 @@ public class NewsController {
 
     @GetMapping(value="/searchByTitle")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Search by title successfully")
+    @DefaultMessage("Search by title successfully")
     public List<NewsResponse> searchByTitle(@RequestParam("title") String title) {
 
         List<NewsEntity> newsEntityList = newsService.searchByTitle(title);

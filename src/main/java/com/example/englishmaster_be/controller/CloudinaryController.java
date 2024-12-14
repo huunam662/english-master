@@ -1,8 +1,9 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Model.Response.CloudiaryUploadFileResponse;
-import com.example.englishmaster_be.Service.ICloudinaryService;
+
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.model.response.CloudiaryUploadFileResponse;
+import com.example.englishmaster_be.service.ICloudinaryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +23,7 @@ public class CloudinaryController {
 
 
 	@PostMapping(value = "/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	@MessageResponse("File uploaded successfully")
+	@DefaultMessage("File uploaded successfully")
 	public CloudiaryUploadFileResponse uploadImage(@RequestParam("image") MultipartFile file) {
 
 		return cloudinaryService.uploadFile(file);

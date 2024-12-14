@@ -1,11 +1,12 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Model.Request.Answer.AnswerRequest;
-import com.example.englishmaster_be.Mapper.AnswerMapper;
-import com.example.englishmaster_be.Model.Response.AnswerResponse;
-import com.example.englishmaster_be.Model.Response.CheckCorrectAnswerResponse;
-import com.example.englishmaster_be.Service.*;
+
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.model.request.Answer.AnswerRequest;
+import com.example.englishmaster_be.mapper.AnswerMapper;
+import com.example.englishmaster_be.model.response.AnswerResponse;
+import com.example.englishmaster_be.model.response.CheckCorrectAnswerResponse;
+import com.example.englishmaster_be.service.*;
 import com.example.englishmaster_be.entity.AnswerEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -28,7 +29,7 @@ public class AnswerController {
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Save answer successfully")
+    @DefaultMessage("Save answer successfully")
     public AnswerResponse createAnswer(@RequestBody AnswerRequest answerRequest) {
 
         AnswerEntity answer = answerService.saveAnswer(answerRequest);
@@ -38,7 +39,7 @@ public class AnswerController {
 
     @PutMapping(value = "/{answerId:.+}/update")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Save answer successfully")
+    @DefaultMessage("Save answer successfully")
     public AnswerResponse updateAnswer(@PathVariable UUID answerId, @RequestBody AnswerRequest answerRequest) {
 
         answerRequest.setAnswerId(answerId);
@@ -50,7 +51,7 @@ public class AnswerController {
 
     @DeleteMapping(value = "/{answerId:.+}/delete")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Delete AnswerEntity successfully")
+    @DefaultMessage("Delete AnswerEntity successfully")
     public void deleteAnswer(@PathVariable UUID answerId) {
 
         answerService.deleteAnswer(answerId);
@@ -58,7 +59,7 @@ public class AnswerController {
 
     @GetMapping(value = "/{answerId:.+}/getDetailAnswer")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Detail AnswerEntity successfully")
+    @DefaultMessage("Detail AnswerEntity successfully")
     public AnswerResponse getDetailAnswer(@PathVariable UUID answerId) {
 
         AnswerEntity answer = answerService.getAnswerById(answerId);
@@ -68,7 +69,7 @@ public class AnswerController {
 
     @GetMapping(value = "/{answerId:.+}/checkCorrect")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Check AnswerEntity successfully")
+    @DefaultMessage("Check AnswerEntity successfully")
     public CheckCorrectAnswerResponse checkCorrectAnswer(@PathVariable UUID answerId) {
 
         AnswerEntity answer = answerService.getAnswerById(answerId);

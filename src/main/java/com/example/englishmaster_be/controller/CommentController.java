@@ -1,11 +1,12 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Model.Request.Comment.CommentRequest;
-import com.example.englishmaster_be.Mapper.CommentMapper;
-import com.example.englishmaster_be.Model.Response.CommentResponse;
+
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.model.request.Comment.CommentRequest;
+import com.example.englishmaster_be.mapper.CommentMapper;
+import com.example.englishmaster_be.model.response.CommentResponse;
 import com.example.englishmaster_be.entity.CommentEntity;
-import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.service.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class CommentController {
 
 
     @GetMapping(value = "/{commentId:.+}/getAllComment")
-    @MessageResponse("Show list CommentEntity child successfully")
+    @DefaultMessage("Show list CommentEntity child successfully")
     public List<CommentResponse> getListCommentToCommentId(@PathVariable UUID commentId){
 
         List<CommentEntity> commentList = commentService.getListCommentByCommentId(commentId);
@@ -37,7 +38,7 @@ public class CommentController {
 
     @PostMapping(value = "/{topicId:.+}/addCommentToTopic")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Create CommentEntity successfully")
+    @DefaultMessage("Create CommentEntity successfully")
     public CommentResponse createCommentToTopic(
             @PathVariable UUID topicId,
             @RequestBody CommentRequest commentRequest
@@ -50,7 +51,7 @@ public class CommentController {
 
     @PostMapping(value = "/{postId:.+}/addCommentToPost")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Create CommentEntity successfully")
+    @DefaultMessage("Create CommentEntity successfully")
     public CommentResponse createCommentToPost(
             @PathVariable UUID postId,
             @RequestBody CommentRequest commentRequest
@@ -64,7 +65,7 @@ public class CommentController {
 
     @PostMapping(value = "/{commentId:.+}/addCommentToComment")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Create CommentEntity successfully")
+    @DefaultMessage("Create CommentEntity successfully")
     public CommentResponse createCommentToComment(
             @PathVariable UUID commentId,
             @RequestBody CommentRequest commentRequest
@@ -77,7 +78,7 @@ public class CommentController {
 
     @PatchMapping(value = "/{commentId:.+}/updateComment")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Update CommentEntity successfully")
+    @DefaultMessage("Update CommentEntity successfully")
     public CommentResponse updateComment(
             @PathVariable UUID commentId,
             @RequestBody CommentRequest commentRequest
@@ -90,7 +91,7 @@ public class CommentController {
 
     @DeleteMapping(value = "/{commentId:.+}/deleteComment")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Delete CommentEntity successfully")
+    @DefaultMessage("Delete CommentEntity successfully")
     public void deleteComment(@PathVariable UUID commentId){
 
         commentService.deleteComment(commentId);

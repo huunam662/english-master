@@ -1,13 +1,14 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.Common.enums.sort.SortByTypeFieldsEnum;
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Mapper.TypeMapper;
-import com.example.englishmaster_be.Model.Request.Type.TypeFilterRequest;
-import com.example.englishmaster_be.Model.Request.Type.TypeRequest;
-import com.example.englishmaster_be.Model.Response.TypeResponse;
-import com.example.englishmaster_be.Service.ITypeService;
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.common.constaint.sort.SortByTypeFieldsEnum;
+
+import com.example.englishmaster_be.mapper.TypeMapper;
+import com.example.englishmaster_be.model.request.Type.TypeFilterRequest;
+import com.example.englishmaster_be.model.request.Type.TypeRequest;
+import com.example.englishmaster_be.model.response.TypeResponse;
+import com.example.englishmaster_be.service.ITypeService;
 import com.example.englishmaster_be.entity.TypeEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Max;
@@ -36,7 +37,7 @@ public class TypeController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getAllTypes")
-    @MessageResponse("List Type List successfully")
+    @DefaultMessage("List Type List successfully")
     public FilterResponse<?> getAllTypes(
             @Schema(description = "Trang")
             @RequestParam(value = "page", defaultValue = "1") @Min(1) int page,
@@ -63,7 +64,7 @@ public class TypeController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/getType/{id}")
-    @MessageResponse("Get Type successfully")
+    @DefaultMessage("Get Type successfully")
     public TypeResponse getType(@PathVariable("id") UUID id) {
 
         TypeEntity typeEntity = typeService.getTypeById(id);
@@ -73,7 +74,7 @@ public class TypeController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{typeId}/updateType")
-    @MessageResponse("Create Type successfully")
+    @DefaultMessage("Create Type successfully")
     public TypeResponse updateType(@PathVariable("typeId") UUID typeId, @RequestBody TypeRequest typeRequest) {
 
         typeRequest.setTypeId(typeId);
@@ -85,7 +86,7 @@ public class TypeController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/createType")
-    @MessageResponse("Create Type successfully")
+    @DefaultMessage("Create Type successfully")
     public TypeResponse createType(@RequestBody TypeRequest typeRequest) {
 
         TypeEntity typeEntity = typeService.saveType(typeRequest);
@@ -95,7 +96,7 @@ public class TypeController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
-    @MessageResponse("Delete Type successfully")
+    @DefaultMessage("Delete Type successfully")
     public void deleteType(@PathVariable("id") UUID id) {
 
         typeService.deleteTypeById(id);

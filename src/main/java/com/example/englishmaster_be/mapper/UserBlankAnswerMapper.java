@@ -1,6 +1,6 @@
-package com.example.englishmaster_be.Mapper;
+package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.Model.Response.UserBlankAnswerResponse;
+import com.example.englishmaster_be.model.response.UserBlankAnswerResponse;
 import com.example.englishmaster_be.entity.UserBlankAnswerEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

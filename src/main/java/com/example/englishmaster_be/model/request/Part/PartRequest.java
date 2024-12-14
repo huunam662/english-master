@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Model.Request.Part;
+package com.example.englishmaster_be.model.request.Part;
 
 
 import io.swagger.v3.oas.annotations.Hidden;

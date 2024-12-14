@@ -1,17 +1,17 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
-import com.example.englishmaster_be.Common.enums.StatusEnum;
-import com.example.englishmaster_be.Mapper.StatusMapper;
-import com.example.englishmaster_be.Model.Request.Status.StatusRequest;
-import com.example.englishmaster_be.Exception.template.CustomException;
-import com.example.englishmaster_be.Common.enums.error.ErrorEnum;
-import com.example.englishmaster_be.Exception.template.BadRequestException;
+import com.example.englishmaster_be.common.constaint.StatusEnum;
+import com.example.englishmaster_be.mapper.StatusMapper;
+import com.example.englishmaster_be.model.request.Status.StatusRequest;
+import com.example.englishmaster_be.exception.template.CustomException;
+import com.example.englishmaster_be.common.constaint.error.ErrorEnum;
+import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.entity.QStatusEntity;
-import com.example.englishmaster_be.Service.ITypeService;
+import com.example.englishmaster_be.service.ITypeService;
 import com.example.englishmaster_be.entity.StatusEntity;
 import com.example.englishmaster_be.entity.TypeEntity;
-import com.example.englishmaster_be.Repository.StatusRepository;
-import com.example.englishmaster_be.Service.IStatusService;
+import com.example.englishmaster_be.repository.StatusRepository;
+import com.example.englishmaster_be.service.IStatusService;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;

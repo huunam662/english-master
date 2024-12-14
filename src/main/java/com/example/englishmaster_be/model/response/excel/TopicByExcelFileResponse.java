@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Model.Response.excel;
+package com.example.englishmaster_be.model.response.excel;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;

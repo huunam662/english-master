@@ -1,7 +1,8 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Model.Response.UserAccessResponse;
+
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.model.response.UserAccessResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
@@ -15,7 +16,7 @@ public class ExamController {
 
     @GetMapping("/user")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("UserEntity access")
+    @DefaultMessage("UserEntity access")
     public UserAccessResponse userAccess() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

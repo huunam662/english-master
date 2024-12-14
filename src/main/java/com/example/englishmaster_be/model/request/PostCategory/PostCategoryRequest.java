@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Model.Request.PostCategory;
+package com.example.englishmaster_be.model.request.PostCategory;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;

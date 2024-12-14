@@ -1,7 +1,7 @@
-package com.example.englishmaster_be.Mapper;
+package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.Model.Request.News.NewsRequest;
-import com.example.englishmaster_be.Model.Response.NewsResponse;
+import com.example.englishmaster_be.model.request.News.NewsRequest;
+import com.example.englishmaster_be.model.response.NewsResponse;
 import com.example.englishmaster_be.entity.NewsEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -1,14 +1,14 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
-import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
-import com.example.englishmaster_be.Mapper.NewsMapper;
-import com.example.englishmaster_be.Model.Request.News.NewsRequest;
-import com.example.englishmaster_be.Model.Request.News.NewsFilterRequest;
-import com.example.englishmaster_be.Model.Response.NewsResponse;
-import com.example.englishmaster_be.Repository.*;
-import com.example.englishmaster_be.Service.IFileStorageService;
-import com.example.englishmaster_be.Service.INewsService;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.common.thread.MessageResponseHolder;
+import com.example.englishmaster_be.mapper.NewsMapper;
+import com.example.englishmaster_be.model.request.News.NewsRequest;
+import com.example.englishmaster_be.model.request.News.NewsFilterRequest;
+import com.example.englishmaster_be.model.response.NewsResponse;
+import com.example.englishmaster_be.repository.*;
+import com.example.englishmaster_be.service.IFileStorageService;
+import com.example.englishmaster_be.service.INewsService;
 import com.example.englishmaster_be.entity.NewsEntity;
 import com.example.englishmaster_be.entity.QNewsEntity;
 import com.google.cloud.storage.Blob;

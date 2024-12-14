@@ -1,14 +1,13 @@
-package com.example.englishmaster_be.Exception.handler;
+package com.example.englishmaster_be.exception.handler;
 
-import com.example.englishmaster_be.Common.enums.error.ErrorEnum;
-import com.example.englishmaster_be.Exception.template.BadRequestException;
-import com.example.englishmaster_be.Exception.template.CustomException;
-import com.example.englishmaster_be.Exception.template.RefreshTokenException;
-import com.example.englishmaster_be.Exception.template.ResourceNotFoundException;
-import com.example.englishmaster_be.Common.dto.response.ExceptionResponseModel;
+import com.example.englishmaster_be.common.constaint.error.ErrorEnum;
+import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.exception.template.CustomException;
+import com.example.englishmaster_be.exception.template.RefreshTokenException;
+import com.example.englishmaster_be.exception.template.ResourceNotFoundException;
+import com.example.englishmaster_be.common.dto.response.ExceptionResponseModel;
+import com.example.englishmaster_be.mapper.FieldErrorMapper;
 import jakarta.mail.MessagingException;
-import lombok.AccessLevel;
-import lombok.experimental.FieldDefaults;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -16,6 +15,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -24,11 +24,10 @@ import org.springframework.web.client.HttpClientErrorException;
 
 import java.nio.file.FileAlreadyExistsException;
 import java.rmi.ServerException;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class GlobalExceptionHandler {
 
 
@@ -68,12 +67,18 @@ public class GlobalExceptionHandler {
 
         String message = "Validation failed";
 
-        List<String> errors = exception.getBindingResult()
-                .getFieldErrors()
-                .stream()
-                .map(FieldError::getDefaultMessage)
-                .toList();
+        BindingResult bindingResult = exception.getBindingResult();
 
+        List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+
+        Map<String, String> errors = new HashMap<>();
+
+        if(!fieldErrors.isEmpty()) {
+
+            int lastIndex = fieldErrors.size() - 1;
+
+            errors.put(fieldErrors.get(lastIndex).getField(), fieldErrors.get(lastIndex).getDefaultMessage());
+        }
         return ExceptionResponseModel.builder()
                 .status(HttpStatus.BAD_REQUEST)
                 .code(HttpStatus.BAD_REQUEST.value())
@@ -134,10 +139,10 @@ public class GlobalExceptionHandler {
 
 
     @ExceptionHandler({
-        MessagingException.class,
-        BadRequestException.class,
-        IllegalArgumentException.class,
-        FileAlreadyExistsException.class
+            MessagingException.class,
+            BadRequestException.class,
+            IllegalArgumentException.class,
+            FileAlreadyExistsException.class
     })
     public ExceptionResponseModel handleIllegalArgumentException(Exception exception) {
 

@@ -1,10 +1,10 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
-import com.example.englishmaster_be.Configuration.jwt.JwtUtil;
+import com.example.englishmaster_be.config.jwt.JwtUtil;
 import com.example.englishmaster_be.entity.InvalidTokenEntity;
-import com.example.englishmaster_be.Model.Response.InvalidTokenResponse;
-import com.example.englishmaster_be.Repository.InvalidTokenRepository;
-import com.example.englishmaster_be.Service.IInvalidTokenService;
+import com.example.englishmaster_be.model.response.InvalidTokenResponse;
+import com.example.englishmaster_be.repository.InvalidTokenRepository;
+import com.example.englishmaster_be.service.IInvalidTokenService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

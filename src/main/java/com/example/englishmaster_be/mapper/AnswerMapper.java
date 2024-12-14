@@ -1,10 +1,10 @@
-package com.example.englishmaster_be.Mapper;
+package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.Model.Request.Answer.AnswerBasicRequest;
-import com.example.englishmaster_be.Model.Request.Answer.AnswerRequest;
+import com.example.englishmaster_be.model.request.Answer.AnswerBasicRequest;
+import com.example.englishmaster_be.model.request.Answer.AnswerRequest;
 import com.example.englishmaster_be.entity.AnswerEntity;
-import com.example.englishmaster_be.Model.Response.AnswerResponse;
-import com.example.englishmaster_be.Model.Response.CheckCorrectAnswerResponse;
+import com.example.englishmaster_be.model.response.AnswerResponse;
+import com.example.englishmaster_be.model.response.CheckCorrectAnswerResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

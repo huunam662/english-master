@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Common.dto.response;
+package com.example.englishmaster_be.common.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
@@ -15,4 +15,5 @@ public class ExceptionResponseModel extends ResponseModel {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     Object errors = null;
+
 }

@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Model.Request.FlashCard;
+package com.example.englishmaster_be.model.request.FlashCard;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.*;

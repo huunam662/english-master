@@ -1,8 +1,8 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
 import com.example.englishmaster_be.entity.OtpEntity;
-import com.example.englishmaster_be.Repository.OtpRepository;
-import com.example.englishmaster_be.Service.IOtpService;
+import com.example.englishmaster_be.repository.OtpRepository;
+import com.example.englishmaster_be.service.IOtpService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

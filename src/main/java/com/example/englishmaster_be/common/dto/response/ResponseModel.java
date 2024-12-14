@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Common.dto.response;
+package com.example.englishmaster_be.common.dto.response;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;

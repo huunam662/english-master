@@ -1,14 +1,15 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.Common.enums.sort.SortByFeedbackFieldsEnum;
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Model.Request.Feedback.FeedbackFilterRequest;
-import com.example.englishmaster_be.Model.Request.Feedback.FeedbackRequest;
-import com.example.englishmaster_be.Mapper.FeedbackMapper;
-import com.example.englishmaster_be.Model.Response.FeedbackResponse;
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.common.constaint.sort.SortByFeedbackFieldsEnum;
+
+import com.example.englishmaster_be.model.request.Feedback.FeedbackFilterRequest;
+import com.example.englishmaster_be.model.request.Feedback.FeedbackRequest;
+import com.example.englishmaster_be.mapper.FeedbackMapper;
+import com.example.englishmaster_be.model.response.FeedbackResponse;
 import com.example.englishmaster_be.entity.FeedbackEntity;
-import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.service.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -34,7 +35,7 @@ public class FeedbackController {
 
     @GetMapping(value = "/listFeedbackAdmin")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("List FeedbackEntity successfully")
+    @DefaultMessage("List FeedbackEntity successfully")
     public FilterResponse<?> listFeedbackOfAdmin(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
@@ -58,7 +59,7 @@ public class FeedbackController {
     }
 
     @GetMapping(value = "/listFeedbackUser")
-    @MessageResponse("List FeedbackEntity successfully")
+    @DefaultMessage("List FeedbackEntity successfully")
     public FilterResponse<?> listFeedbackOfUser(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
@@ -77,7 +78,7 @@ public class FeedbackController {
 
     @PostMapping(value = "/createFeedback" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Create FeedbackEntity successfully")
+    @DefaultMessage("Create FeedbackEntity successfully")
     public FeedbackResponse createFeedback(
             @ModelAttribute("contentFeedback") FeedbackRequest feedbackRequest
     ){
@@ -99,7 +100,7 @@ public class FeedbackController {
 
     @PatchMapping(value = "/{feedbackId:.+}/updateFeedback", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Update FeedbackEntity successfully")
+    @DefaultMessage("Update FeedbackEntity successfully")
     public FeedbackResponse updateFeedback(
             @PathVariable UUID feedbackId,
             @ModelAttribute(name = "contentFeedback") FeedbackRequest feedbackRequest
@@ -114,7 +115,7 @@ public class FeedbackController {
 
     @DeleteMapping(value = "/{FeedbackId:.+}/deleteFeedback")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("Delete FeedbackEntity successfully")
+    @DefaultMessage("Delete FeedbackEntity successfully")
     public void deleteFeedback(@PathVariable UUID FeedbackId){
 
         feedbackService.deleteFeedback(FeedbackId);

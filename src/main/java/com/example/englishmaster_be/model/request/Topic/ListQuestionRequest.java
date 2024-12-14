@@ -1,6 +1,6 @@
-package com.example.englishmaster_be.Model.Request.Topic;
+package com.example.englishmaster_be.model.request.Topic;
 
-import com.example.englishmaster_be.Model.Request.Question.QuestionRequest;
+import com.example.englishmaster_be.model.request.Question.QuestionRequest;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

@@ -1,9 +1,9 @@
-package com.example.englishmaster_be.Service;
+package com.example.englishmaster_be.service;
 
-import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.Model.Request.News.NewsRequest;
-import com.example.englishmaster_be.Model.Request.News.NewsFilterRequest;
-import com.example.englishmaster_be.Model.Response.NewsResponse;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.model.request.News.NewsRequest;
+import com.example.englishmaster_be.model.request.News.NewsFilterRequest;
+import com.example.englishmaster_be.model.response.NewsResponse;
 import com.example.englishmaster_be.entity.NewsEntity;
 
 import java.util.List;

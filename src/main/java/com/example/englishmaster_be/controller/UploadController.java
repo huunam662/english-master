@@ -1,8 +1,9 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Model.Request.DeleteRequestRequest;
-import com.example.englishmaster_be.Service.IUploadService;
+
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.model.request.DeleteRequestRequest;
+import com.example.englishmaster_be.service.IUploadService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class UploadController {
     IUploadService uploadService;
 
     @PostMapping(value = "/file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @MessageResponse("Successfully uploaded file")
+    @DefaultMessage("Successfully uploaded file")
     public String uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "dir", defaultValue = "/") String dir,
@@ -37,7 +38,7 @@ public class UploadController {
     }
 
     @DeleteMapping
-    @MessageResponse("Successfully delete file")
+    @DefaultMessage("Successfully delete file")
     @SneakyThrows
     public void deleteFile(@RequestBody DeleteRequestRequest dto) {
 

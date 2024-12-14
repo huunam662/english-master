@@ -1,13 +1,13 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
-import com.example.englishmaster_be.Model.Request.FlashCard.FlashCardWordRequest;
-import com.example.englishmaster_be.Mapper.FlashCardWordMapper;
+import com.example.englishmaster_be.model.request.FlashCard.FlashCardWordRequest;
+import com.example.englishmaster_be.mapper.FlashCardWordMapper;
 import com.example.englishmaster_be.entity.FlashCardEntity;
 import com.example.englishmaster_be.entity.FlashCardWordEntity;
 import com.example.englishmaster_be.entity.QFlashCardWordEntity;
 import com.example.englishmaster_be.entity.UserEntity;
-import com.example.englishmaster_be.Repository.*;
-import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.repository.*;
+import com.example.englishmaster_be.service.*;
 import com.google.cloud.storage.Blob;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;

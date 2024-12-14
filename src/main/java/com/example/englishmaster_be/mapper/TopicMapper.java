@@ -1,9 +1,9 @@
-package com.example.englishmaster_be.Mapper;
+package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.Model.Request.Topic.TopicRequest;
+import com.example.englishmaster_be.model.request.Topic.TopicRequest;
 import com.example.englishmaster_be.entity.PartEntity;
-import com.example.englishmaster_be.Model.Response.TopicResponse;
-import com.example.englishmaster_be.Model.Response.excel.TopicByExcelFileResponse;
+import com.example.englishmaster_be.model.response.TopicResponse;
+import com.example.englishmaster_be.model.response.excel.TopicByExcelFileResponse;
 import com.example.englishmaster_be.entity.TopicEntity;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;

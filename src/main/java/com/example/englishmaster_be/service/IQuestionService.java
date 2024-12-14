@@ -1,10 +1,10 @@
-package com.example.englishmaster_be.Service;
+package com.example.englishmaster_be.service;
 
-import com.example.englishmaster_be.Model.Request.Question.GroupQuestionRequest;
-import com.example.englishmaster_be.Model.Request.Question.QuestionRequest;
-import com.example.englishmaster_be.Model.Request.UploadMultiFileRequest;
-import com.example.englishmaster_be.Model.Response.QuestionGroupResponse;
-import com.example.englishmaster_be.Model.Response.QuestionResponse;
+import com.example.englishmaster_be.model.request.Question.GroupQuestionRequest;
+import com.example.englishmaster_be.model.request.Question.QuestionRequest;
+import com.example.englishmaster_be.model.request.UploadMultiFileRequest;
+import com.example.englishmaster_be.model.response.QuestionGroupResponse;
+import com.example.englishmaster_be.model.response.QuestionResponse;
 import com.example.englishmaster_be.entity.QuestionEntity;
 import org.springframework.web.multipart.MultipartFile;
 

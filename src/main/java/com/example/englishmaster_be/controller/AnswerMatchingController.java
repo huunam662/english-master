@@ -1,11 +1,11 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Model.Request.Answer.AnswerMatchingQuestionRequest;
-import com.example.englishmaster_be.Mapper.AnswerMatchingMapper;
+import com.example.englishmaster_be.model.request.Answer.AnswerMatchingQuestionRequest;
+import com.example.englishmaster_be.mapper.AnswerMatchingMapper;
 import com.example.englishmaster_be.entity.AnswerMatchingEntity;
-import com.example.englishmaster_be.Model.Response.AnswerMatchingResponse;
-import com.example.englishmaster_be.Model.Response.AnswerMatchingBasicResponse;
-import com.example.englishmaster_be.Service.IAnswerMatching;
+import com.example.englishmaster_be.model.response.AnswerMatchingResponse;
+import com.example.englishmaster_be.model.response.AnswerMatchingBasicResponse;
+import com.example.englishmaster_be.service.IAnswerMatching;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

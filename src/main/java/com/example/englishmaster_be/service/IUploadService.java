@@ -1,7 +1,7 @@
-package com.example.englishmaster_be.Service;
+package com.example.englishmaster_be.service;
 
-import com.example.englishmaster_be.Model.Request.DeleteRequestRequest;
-import com.example.englishmaster_be.Model.Response.DeleteResponse;
+import com.example.englishmaster_be.model.request.DeleteRequestRequest;
+import com.example.englishmaster_be.model.response.DeleteResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;

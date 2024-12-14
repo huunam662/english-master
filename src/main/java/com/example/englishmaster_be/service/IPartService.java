@@ -1,8 +1,8 @@
-package com.example.englishmaster_be.Service;
+package com.example.englishmaster_be.service;
 
-import com.example.englishmaster_be.Model.Request.Part.PartRequest;
-import com.example.englishmaster_be.Model.Request.UploadMultiFileRequest;
-import com.example.englishmaster_be.Model.Request.UploadTextRequest;
+import com.example.englishmaster_be.model.request.Part.PartRequest;
+import com.example.englishmaster_be.model.request.UploadMultiFileRequest;
+import com.example.englishmaster_be.model.request.UploadTextRequest;
 import com.example.englishmaster_be.entity.PartEntity;
 
 import java.util.List;

@@ -1,7 +1,7 @@
-package com.example.englishmaster_be.Mapper;
+package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.Model.Request.Status.StatusRequest;
-import com.example.englishmaster_be.Model.Response.StatusResponse;
+import com.example.englishmaster_be.model.request.Status.StatusRequest;
+import com.example.englishmaster_be.model.response.StatusResponse;
 import com.example.englishmaster_be.entity.StatusEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

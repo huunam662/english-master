@@ -1,6 +1,6 @@
-package com.example.englishmaster_be.Repository;
+package com.example.englishmaster_be.repository;
 
-import com.example.englishmaster_be.Common.enums.StatusEnum;
+import com.example.englishmaster_be.common.constaint.StatusEnum;
 import com.example.englishmaster_be.entity.StatusEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

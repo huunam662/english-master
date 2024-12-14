@@ -1,6 +1,6 @@
-package com.example.englishmaster_be.Repository;
+package com.example.englishmaster_be.repository;
 
-import com.example.englishmaster_be.Common.enums.RoleEnum;
+import com.example.englishmaster_be.common.constaint.RoleEnum;
 import com.example.englishmaster_be.entity.RoleEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

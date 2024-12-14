@@ -1,8 +1,8 @@
-package com.example.englishmaster_be.Mapper;
+package com.example.englishmaster_be.mapper;
 
 
-import com.example.englishmaster_be.Model.Request.MockTest.ResultMockTestRequest;
-import com.example.englishmaster_be.Model.Response.ResultMockTestResponse;
+import com.example.englishmaster_be.model.request.MockTest.ResultMockTestRequest;
+import com.example.englishmaster_be.model.response.ResultMockTestResponse;
 import com.example.englishmaster_be.entity.ResultMockTestEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

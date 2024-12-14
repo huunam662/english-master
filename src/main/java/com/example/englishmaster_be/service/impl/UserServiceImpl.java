@@ -1,23 +1,26 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
-import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.Configuration.global.thread.MessageResponseHolder;
-import com.example.englishmaster_be.Configuration.jwt.JwtUtil;
-import com.example.englishmaster_be.Common.enums.RoleEnum;
-import com.example.englishmaster_be.Exception.template.CustomException;
-import com.example.englishmaster_be.Mapper.MockTestMapper;
-import com.example.englishmaster_be.Mapper.TopicMapper;
-import com.example.englishmaster_be.Model.Request.*;
-import com.example.englishmaster_be.Model.Request.ConfirmationToken.ConfirmationTokenRequest;
-import com.example.englishmaster_be.Model.Request.User.ChangeProfileRequest;
-import com.example.englishmaster_be.Model.Request.User.UserFilterRequest;
-import com.example.englishmaster_be.Common.enums.error.ErrorEnum;
-import com.example.englishmaster_be.Exception.template.BadRequestException;
-import com.example.englishmaster_be.Mapper.UserMapper;
-import com.example.englishmaster_be.Model.Response.*;
-import com.example.englishmaster_be.Repository.*;
-import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.common.constaint.ConfirmRegisterTypeEnum;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.common.thread.MessageResponseHolder;
+import com.example.englishmaster_be.config.jwt.JwtUtil;
+import com.example.englishmaster_be.common.constaint.RoleEnum;
+import com.example.englishmaster_be.exception.template.CustomException;
+import com.example.englishmaster_be.mapper.ConfirmationTokenMapper;
+import com.example.englishmaster_be.mapper.MockTestMapper;
+import com.example.englishmaster_be.mapper.TopicMapper;
+import com.example.englishmaster_be.model.request.*;
+import com.example.englishmaster_be.model.request.ConfirmationToken.ConfirmationTokenRequest;
+import com.example.englishmaster_be.model.request.User.ChangeProfileRequest;
+import com.example.englishmaster_be.model.request.User.UserFilterRequest;
+import com.example.englishmaster_be.common.constaint.error.ErrorEnum;
+import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.mapper.UserMapper;
+import com.example.englishmaster_be.model.response.*;
+import com.example.englishmaster_be.repository.*;
+import com.example.englishmaster_be.service.*;
 import com.example.englishmaster_be.entity.*;
+import com.example.englishmaster_be.value.LinkValue;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -50,6 +53,7 @@ import org.springframework.util.FileCopyUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -63,8 +67,7 @@ import java.util.regex.Pattern;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UserServiceImpl implements IUserService {
 
-    @Value("${masterE.linkFE}")
-    static String linkFE;
+    LinkValue linkValue;
 
     JPAQueryFactory queryFactory;
 
@@ -94,8 +97,6 @@ public class UserServiceImpl implements IUserService {
 
     IRefreshTokenService iRefreshTokenService;
 
-    IConfirmationTokenService confirmationTokenService;
-
     IOtpService otpService;
 
     ITopicService topicService;
@@ -117,40 +118,78 @@ public class UserServiceImpl implements IUserService {
 
         UserEntity user = userRepository.findByEmail(userRegisterRequest.getEmail()).orElse(null);
 
-        if (user != null && !user.getEnabled())
-            userRepository.delete(user);
+        if(user != null && user.getEnabled())
+            throw new BadRequestException("Email đã được sử dụng");
 
-        user = UserMapper.INSTANCE.toUserEntity(userRegisterRequest);
-        user.setPassword(passwordEncoder.encode(userRegisterRequest.getPassword()));
-        user.setRole(roleRepository.findByRoleName(RoleEnum.USER));
+        UserEntity userRegister = UserMapper.INSTANCE.toUserEntity(userRegisterRequest);
+        userRegister.setUserId(user != null ? user.getUserId() : UUID.randomUUID());
+        userRegister.setPassword(passwordEncoder.encode(userRegisterRequest.getPassword()));
+        userRegister.setRole(roleRepository.findByRoleName(RoleEnum.USER));
+        userRegister.setEnabled(Boolean.FALSE);
 
-        user = userRepository.save(user);
+        if(user != null && user.getConfirmToken() != null)
+            userRegister.setConfirmToken(new ArrayList<>());
 
-        ConfirmationTokenResponse confirmationTokenResponse = confirmationTokenService.createConfirmationToken(
-                ConfirmationTokenRequest.builder().user(user).build()
+        userRegister = userRepository.save(userRegister);
+
+        ConfirmationTokenResponse confirmationTokenResponse = this.createConfirmationToken(
+                ConfirmationTokenRequest.builder().user(userRegister).build()
         );
 
         try {
-            sendConfirmationEmail(user.getEmail(), confirmationTokenResponse.getCode());
+            sendConfirmationEmail(userRegister.getEmail(), confirmationTokenResponse.getCode());
         } catch (IOException | MessagingException e) {
             throw new CustomException(ErrorEnum.SEND_EMAIL_FAILURE);
         }
+    }
+
+    protected void sendConfirmationEmail(String email, String confirmationToken) throws IOException, MessagingException {
+
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        String confirmationLink = linkValue.getLinkBE() + "api/user/register/confirm?token=" + confirmationToken;
+
+        String templateContent = readTemplateContent("email_templates.html");
+        templateContent = templateContent.replace("{{linkConfirm}}", confirmationLink)
+                .replace("{{btnConfirm}}", "Xác nhận")
+                .replace("{{nameLink}}", "Vui lòng chọn xác nhận để tiến hành đăng ký tài khoản.")
+                .replace("*|current_year|*", String.valueOf(LocalDateTime.now().getYear()));
+
+        helper.setTo(email);
+        helper.setSubject("Xác nhận tài khoản");
+        helper.setText(templateContent, true);
+        mailSender.send(message);
+    }
+
+    @Transactional
+    @Override
+    public ConfirmationTokenResponse createConfirmationToken(ConfirmationTokenRequest confirmationTokenRequest) {
+
+        ConfirmationTokenEntity confirmationToken = ConfirmationTokenMapper.INSTANCE.toConfirmationTokenEntity(confirmationTokenRequest);
+
+        confirmationToken.setType(ConfirmRegisterTypeEnum.ACTIVE);
+        confirmationToken.setUser(confirmationTokenRequest.getUser());
+        confirmationToken.setCode(UUID.randomUUID().toString());
+        confirmationToken.setCreateAt(LocalDateTime.now());
+        confirmationToken = confirmationTokenRepository.save(confirmationToken);
+
+        return ConfirmationTokenMapper.INSTANCE.toConfirmationTokenResponse(confirmationToken);
     }
 
     @Transactional
     @Override
     public void confirmRegister(String confirmationToken) {
 
-        ConfirmationTokenEntity confirmToken = confirmationTokenRepository.findByCodeAndType(confirmationToken, "ACTIVE");
+        ConfirmationTokenEntity confirmToken = confirmationTokenRepository.findByCodeAndType(confirmationToken, ConfirmRegisterTypeEnum.ACTIVE);
 
         if (confirmToken == null)
-            throw new BadRequestException("Invalid verification code");
+            throw new BadRequestException("Không tồn tại");
 
         if (confirmToken.getUser().getEnabled())
-            throw new BadRequestException("Account has been verified");
+            throw new BadRequestException("Tài khoản đã được xác thực");
 
         if ((confirmToken.getCreateAt().plusMinutes(5)).isBefore(LocalDateTime.now()))
-            throw new BadRequestException("Verification code has expired, Please register again");
+            throw new BadRequestException("Phiên xác thực đã hết hạn, vui lòng đăng ký lại");
 
         UserEntity user = confirmToken.getUser();
 
@@ -159,6 +198,7 @@ public class UserServiceImpl implements IUserService {
         userRepository.save(user);
     }
 
+    @Transactional
     @Override
     public AuthResponse login(UserLoginRequest userLoginRequest) {
 
@@ -176,6 +216,7 @@ public class UserServiceImpl implements IUserService {
         UserEntity user = findUser(userDetails);
 
         refreshTokenService.deleteAllTokenExpired(user);
+        confirmationTokenRepository.deleteByUserAndType(user, ConfirmRegisterTypeEnum.ACTIVE);
 
         ConfirmationTokenEntity refreshToken = refreshTokenService.createRefreshToken(userDetails.getUsername());
 
@@ -256,7 +297,7 @@ public class UserServiceImpl implements IUserService {
     protected void sendForgetPassEmail(String email, String confirmationToken) throws MessagingException, IOException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        String confirmationLink = linkFE + "/forgetPass/confirm?token=" + confirmationToken;
+        String confirmationLink = linkValue.getLinkFE() + "/forgetPass/confirm?token=" + confirmationToken;
 
         String templateContent = readTemplateContent("email_templates.html");
         templateContent = templateContent.replace("{{linkConfirm}}", confirmationLink);
@@ -290,8 +331,8 @@ public class UserServiceImpl implements IUserService {
     public void changePassword(ChangePasswordRequest changePasswordRequest) {
 
         String otp = changePasswordRequest.getCode();
-        String newPassword = changePasswordRequest.getNewPass();
-        String confirmPassword = changePasswordRequest.getConfirmPass();
+        String newPassword = changePasswordRequest.getNewPassword();
+        String confirmPassword = changePasswordRequest.getConfirmNewPassword();
 
         // Regex để kiểm tra mật khẩu
         String regexPassword = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";
@@ -322,7 +363,7 @@ public class UserServiceImpl implements IUserService {
     @Override
     public String confirmForgetPassword(String token) {
 
-        ConfirmationTokenEntity confirmToken = confirmationTokenRepository.findByCodeAndType(token, "RESET_PASSWORD");
+        ConfirmationTokenEntity confirmToken = confirmationTokenRepository.findByCodeAndType(token, ConfirmRegisterTypeEnum.RESET_PASSWORD);
 
         if (confirmToken == null)
             throw new BadRequestException("Invalid reset code");
@@ -388,8 +429,8 @@ public class UserServiceImpl implements IUserService {
         Pattern pattern = Pattern.compile(regex);
 
         Matcher matcherOldPassword = pattern.matcher(changePasswordRequest.getOldPassword());
-        Matcher matcherNewPassword = pattern.matcher(changePasswordRequest.getNewPass());
-        Matcher matcherConfirmPassword = pattern.matcher(changePasswordRequest.getConfirmPass());
+        Matcher matcherNewPassword = pattern.matcher(changePasswordRequest.getNewPassword());
+        Matcher matcherConfirmPassword = pattern.matcher(changePasswordRequest.getConfirmNewPassword());
 
         if(!matcherOldPassword.matches())
             throw new BadRequestException("Old password must be contain at least 1 uppercase, 1 lowercase, 1 numeric, 1 special character and no spaces");
@@ -400,16 +441,16 @@ public class UserServiceImpl implements IUserService {
         if (!matcherConfirmPassword.matches())
             throw new BadRequestException("The confirm password must be contain at least 1 uppercase, 1 lowercase, 1 numeric, 1 special character and no spaces");
 
-        if (!changePasswordRequest.getConfirmPass().equals(changePasswordRequest.getNewPass()))
+        if (!changePasswordRequest.getConfirmNewPassword().equals(changePasswordRequest.getNewPassword()))
             throw new BadRequestException("Your new password doesn't match with your confirm password");
 
         if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword()))
             throw new BadRequestException("Your old password doesn't correct");
 
-        if (passwordEncoder.matches(changePasswordRequest.getNewPass(), user.getPassword()))
+        if (passwordEncoder.matches(changePasswordRequest.getNewPassword(), user.getPassword()))
             throw new BadRequestException("New password can't be the same as old password");
 
-        user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPass()));
+        user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
 
         userRepository.save(user);
 
@@ -582,24 +623,6 @@ public class UserServiceImpl implements IUserService {
         otpRepository.save(otpRecord);
 
         return true;
-    }
-
-    protected void sendConfirmationEmail(String email, String confirmationToken) throws IOException, MessagingException {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        String confirmationLink = linkFE + "register/confirm?token=" + confirmationToken;
-
-
-        String templateContent = readTemplateContent("email_templates.html");
-        templateContent = templateContent.replace("{{linkConfirm}}", confirmationLink);
-        templateContent = templateContent.replace("{{btnConfirm}}", "Confirm");
-        templateContent = templateContent.replace("{{nameLink}}", "Confirm Register");
-
-
-        helper.setTo(email);
-        helper.setSubject("Xác nhận tài khoản");
-        helper.setText(templateContent, true);
-        mailSender.send(message);
     }
 
     protected String readTemplateContent(String templateFileName) throws IOException {

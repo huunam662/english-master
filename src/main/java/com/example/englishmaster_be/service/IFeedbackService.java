@@ -1,8 +1,8 @@
-package com.example.englishmaster_be.Service;
+package com.example.englishmaster_be.service;
 
-import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.Model.Request.Feedback.FeedbackRequest;
-import com.example.englishmaster_be.Model.Request.Feedback.FeedbackFilterRequest;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.model.request.Feedback.FeedbackRequest;
+import com.example.englishmaster_be.model.request.Feedback.FeedbackFilterRequest;
 import com.example.englishmaster_be.entity.FeedbackEntity;
 
 import java.util.UUID;

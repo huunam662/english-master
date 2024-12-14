@@ -1,9 +1,9 @@
-package com.example.englishmaster_be.Mapper;
+package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.Model.Request.User.ChangeProfileRequest;
-import com.example.englishmaster_be.Model.Request.UserRegisterRequest;
-import com.example.englishmaster_be.Model.Response.InformationUserResponse;
-import com.example.englishmaster_be.Model.Response.UserResponse;
+import com.example.englishmaster_be.model.request.User.ChangeProfileRequest;
+import com.example.englishmaster_be.model.request.UserRegisterRequest;
+import com.example.englishmaster_be.model.response.InformationUserResponse;
+import com.example.englishmaster_be.model.response.UserResponse;
 import com.example.englishmaster_be.entity.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

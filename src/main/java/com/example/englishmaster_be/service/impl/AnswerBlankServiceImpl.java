@@ -1,11 +1,11 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
-import com.example.englishmaster_be.Model.Request.Answer.AnswerBlankRequest;
+import com.example.englishmaster_be.model.request.Answer.AnswerBlankRequest;
 import com.example.englishmaster_be.entity.AnswerBlankEntity;
 import com.example.englishmaster_be.entity.QuestionEntity;
-import com.example.englishmaster_be.Repository.AnswerBlankRepository;
-import com.example.englishmaster_be.Service.IAnswerBlankService;
-import com.example.englishmaster_be.Service.IQuestionService;
+import com.example.englishmaster_be.repository.AnswerBlankRepository;
+import com.example.englishmaster_be.service.IAnswerBlankService;
+import com.example.englishmaster_be.service.IQuestionService;
 import jakarta.transaction.Transactional;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

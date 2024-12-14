@@ -1,8 +1,8 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
 import com.cloudinary.Cloudinary;
-import com.example.englishmaster_be.Model.Response.CloudiaryUploadFileResponse;
-import com.example.englishmaster_be.Service.ICloudinaryService;
+import com.example.englishmaster_be.model.response.CloudiaryUploadFileResponse;
+import com.example.englishmaster_be.service.ICloudinaryService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;

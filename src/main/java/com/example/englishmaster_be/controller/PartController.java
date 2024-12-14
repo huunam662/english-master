@@ -1,12 +1,13 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Mapper.PartMapper;
-import com.example.englishmaster_be.Model.Request.Part.PartRequest;
-import com.example.englishmaster_be.Model.Request.UploadMultiFileRequest;
-import com.example.englishmaster_be.Model.Request.UploadTextRequest;
-import com.example.englishmaster_be.Model.Response.PartResponse;
-import com.example.englishmaster_be.Service.*;
+
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.mapper.PartMapper;
+import com.example.englishmaster_be.model.request.Part.PartRequest;
+import com.example.englishmaster_be.model.request.UploadMultiFileRequest;
+import com.example.englishmaster_be.model.request.UploadTextRequest;
+import com.example.englishmaster_be.model.response.PartResponse;
+import com.example.englishmaster_be.service.*;
 import com.example.englishmaster_be.entity.PackEntity;
 import com.example.englishmaster_be.entity.PartEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -32,7 +33,7 @@ public class PartController {
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Create PartEntity successfully")
+    @DefaultMessage("Create PartEntity successfully")
     public PartResponse createPart(
             @ModelAttribute PartRequest partRequest
     ) {
@@ -44,7 +45,7 @@ public class PartController {
 
     @PutMapping(value = "/{partId:.+}/update")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Update PartEntity successfully")
+    @DefaultMessage("Update PartEntity successfully")
     public PartResponse updatePart(
             @PathVariable UUID partId,
             @ModelAttribute PartRequest partRequest
@@ -59,7 +60,7 @@ public class PartController {
 
     @PutMapping(value = "/{partId:.+}/uploadfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Upload file PartEntity successfully")
+    @DefaultMessage("Upload file PartEntity successfully")
     public PartResponse uploadFilePart(
             @PathVariable UUID partId,
             @ModelAttribute UploadMultiFileRequest uploadMultiFileRequest
@@ -72,7 +73,7 @@ public class PartController {
 
     @PutMapping(value = "/{partId:.+}/uploadText")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Upload file PartEntity successfully")
+    @DefaultMessage("Upload file PartEntity successfully")
     public PartResponse uploadTextPart(@PathVariable UUID partId, @RequestBody UploadTextRequest uploadTextRequest) {
 
         PartEntity part = partService.uploadTextPart(partId, uploadTextRequest);
@@ -81,7 +82,7 @@ public class PartController {
     }
 
     @GetMapping(value = "/listPart")
-    @MessageResponse("Show PartEntity successfully")
+    @DefaultMessage("Show PartEntity successfully")
     public List<PartResponse> getAllPart() {
 
         List<PartEntity> partEntityList = partService.getListPart();
@@ -91,7 +92,7 @@ public class PartController {
 
     @DeleteMapping(value = "/{partId:.+}/delete")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Delete PartEntity successfully")
+    @DefaultMessage("Delete PartEntity successfully")
     public void deletePart(@PathVariable UUID partId) {
 
         partService.deletePart(partId);
@@ -99,7 +100,7 @@ public class PartController {
 
 
     @GetMapping(value = "/{partId:.+}/content")
-    @MessageResponse("Show information PartEntity successfully")
+    @DefaultMessage("Show information PartEntity successfully")
     public PartResponse getPartToId(
             @PathVariable UUID partId
     ) {

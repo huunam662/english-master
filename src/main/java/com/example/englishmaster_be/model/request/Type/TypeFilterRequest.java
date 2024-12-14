@@ -1,7 +1,7 @@
-package com.example.englishmaster_be.Model.Request.Type;
+package com.example.englishmaster_be.model.request.Type;
 
-import com.example.englishmaster_be.Common.dto.request.FilterRequest;
-import com.example.englishmaster_be.Common.enums.sort.SortByTypeFieldsEnum;
+import com.example.englishmaster_be.common.dto.request.FilterRequest;
+import com.example.englishmaster_be.common.constaint.sort.SortByTypeFieldsEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

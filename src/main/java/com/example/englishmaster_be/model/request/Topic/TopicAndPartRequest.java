@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Model.Request.Topic;
+package com.example.englishmaster_be.model.request.Topic;
 
 
 import lombok.*;

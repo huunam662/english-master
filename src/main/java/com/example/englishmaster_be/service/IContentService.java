@@ -1,6 +1,6 @@
-package com.example.englishmaster_be.Service;
+package com.example.englishmaster_be.service;
 
-import com.example.englishmaster_be.Model.Request.Content.ContentRequest;
+import com.example.englishmaster_be.model.request.Content.ContentRequest;
 import com.example.englishmaster_be.entity.ContentEntity;
 
 import java.util.List;

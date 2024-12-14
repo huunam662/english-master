@@ -1,6 +1,6 @@
-package com.example.englishmaster_be.Model.Request.Status;
+package com.example.englishmaster_be.model.request.Status;
 
-import com.example.englishmaster_be.Common.enums.StatusEnum;
+import com.example.englishmaster_be.common.constaint.StatusEnum;
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

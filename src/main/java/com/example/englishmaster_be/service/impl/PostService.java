@@ -1,12 +1,12 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
-import com.example.englishmaster_be.Model.Request.PostCategory.PostCategoryRequest;
-import com.example.englishmaster_be.Model.Request.Posts.PostRequest;
-import com.example.englishmaster_be.Model.Request.Posts.FilterPostRequest;
-import com.example.englishmaster_be.Model.Request.Posts.SelectPostRequest;
-import com.example.englishmaster_be.Model.Request.Posts.UpdatePostRequest;
-import com.example.englishmaster_be.Service.IPostsService;
-import com.example.englishmaster_be.Value.MicroserviceValue;
+import com.example.englishmaster_be.model.request.PostCategory.PostCategoryRequest;
+import com.example.englishmaster_be.model.request.Posts.PostRequest;
+import com.example.englishmaster_be.model.request.Posts.FilterPostRequest;
+import com.example.englishmaster_be.model.request.Posts.SelectPostRequest;
+import com.example.englishmaster_be.model.request.Posts.UpdatePostRequest;
+import com.example.englishmaster_be.service.IPostsService;
+import com.example.englishmaster_be.value.MicroserviceValue;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

@@ -1,8 +1,9 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Model.Response.FileResponse;
-import com.example.englishmaster_be.Service.IFileStorageService;
+
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.model.response.FileResponse;
+import com.example.englishmaster_be.service.IFileStorageService;
 import com.google.cloud.storage.Blob;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,7 +29,7 @@ public class FileController {
     IFileStorageService fileStorageService;
 
     @GetMapping("/{filename:.+}")
-    @MessageResponse("Load file successfully")
+    @DefaultMessage("Load file successfully")
     public Resource getFile(
             @Parameter(hidden = true) HttpServletResponse response,
             @PathVariable String filename
@@ -45,7 +46,7 @@ public class FileController {
     }
 
     @GetMapping("/showImage/{filename:.+}")
-    @MessageResponse("Load file successfully")
+    @DefaultMessage("Load file successfully")
     public Resource showImage(
             @Parameter(hidden = true) HttpServletResponse response,
             @PathVariable String filename
@@ -60,7 +61,7 @@ public class FileController {
 
 
     @GetMapping("/showAudio/{filename:.+}")
-    @MessageResponse("Load file successfully")
+    @DefaultMessage("Load file successfully")
     public Resource showAudio(
             @Parameter(hidden = true) HttpServletResponse response,
             @PathVariable String filename
@@ -74,14 +75,14 @@ public class FileController {
     }
 
     @GetMapping("/getImageName")
-    @MessageResponse("Load file names successfully")
+    @DefaultMessage("Load file names successfully")
     public List<String> showImages() {
 
         return fileStorageService.loadAll();
     }
 
     @PostMapping(value = "/saveImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @MessageResponse("Save file successfully")
+    @DefaultMessage("Save file successfully")
     public FileResponse saveImage(@RequestParam("file") MultipartFile file) {
 
         Blob blob = fileStorageService.save(file);
@@ -92,7 +93,7 @@ public class FileController {
     }
 
     @DeleteMapping("/deleteImage/{fileName}")
-    @MessageResponse("Delete file successfully")
+    @DefaultMessage("Delete file successfully")
     public void deleteImage(@PathVariable("fileName") String fileName) {
 
         fileStorageService.delete(fileName);

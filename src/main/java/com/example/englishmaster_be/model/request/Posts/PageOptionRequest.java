@@ -1,6 +1,6 @@
-package com.example.englishmaster_be.Model.Request.Posts;
+package com.example.englishmaster_be.model.request.Posts;
 
-import com.example.englishmaster_be.Common.enums.OrderEnum;
+import com.example.englishmaster_be.common.constaint.OrderEnum;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import jakarta.validation.constraints.Max;

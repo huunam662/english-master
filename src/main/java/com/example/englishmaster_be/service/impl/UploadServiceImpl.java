@@ -1,16 +1,16 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
-import com.example.englishmaster_be.Model.Request.DeleteRequestRequest;
-import com.example.englishmaster_be.Exception.template.CustomException;
-import com.example.englishmaster_be.Common.enums.error.ErrorEnum;
-import com.example.englishmaster_be.Exception.template.BadRequestException;
-import com.example.englishmaster_be.Helper.GetExtension;
-import com.example.englishmaster_be.Value.UploadValue;
+import com.example.englishmaster_be.helper.GetExtensionHelper;
+import com.example.englishmaster_be.model.request.DeleteRequestRequest;
+import com.example.englishmaster_be.exception.template.CustomException;
+import com.example.englishmaster_be.common.constaint.error.ErrorEnum;
+import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.value.UploadValue;
 import com.example.englishmaster_be.entity.ContentEntity;
 import com.example.englishmaster_be.entity.UserEntity;
-import com.example.englishmaster_be.Repository.ContentRepository;
-import com.example.englishmaster_be.Service.IUploadService;
-import com.example.englishmaster_be.Service.IUserService;
+import com.example.englishmaster_be.repository.ContentRepository;
+import com.example.englishmaster_be.service.IUploadService;
+import com.example.englishmaster_be.service.IUserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
@@ -37,6 +37,8 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UploadServiceImpl implements IUploadService {
+
+    GetExtensionHelper getExtensionHelper;
 
     RestTemplate restTemplate;
 
@@ -120,7 +122,7 @@ public class UploadServiceImpl implements IUploadService {
         ContentEntity content = ContentEntity.builder()
                 .topicId(topicId)
                 .code(code)
-                .contentType(GetExtension.typeFile(file.getOriginalFilename()))
+                .contentType(getExtensionHelper.typeFile(file.getOriginalFilename()))
                 .contentData(url)
                 .userCreate(currentUser)
                 .userUpdate(currentUser)

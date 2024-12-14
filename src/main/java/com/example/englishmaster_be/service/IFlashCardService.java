@@ -1,6 +1,6 @@
-package com.example.englishmaster_be.Service;
+package com.example.englishmaster_be.service;
 
-import com.example.englishmaster_be.Model.Request.FlashCard.FlashCardRequest;
+import com.example.englishmaster_be.model.request.FlashCard.FlashCardRequest;
 import com.example.englishmaster_be.entity.FlashCardEntity;
 import com.example.englishmaster_be.entity.UserEntity;
 

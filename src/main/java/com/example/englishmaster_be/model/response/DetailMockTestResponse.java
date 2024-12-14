@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Model.Response;
+package com.example.englishmaster_be.model.response;
 
 import com.example.englishmaster_be.entity.DetailMockTestEntity;
 import com.example.englishmaster_be.entity.QuestionEntity;

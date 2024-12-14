@@ -1,7 +1,7 @@
-package com.example.englishmaster_be.Service;
+package com.example.englishmaster_be.service;
 
-import com.example.englishmaster_be.Model.Request.MockTest.ResultMockTestRequest;
-import com.example.englishmaster_be.Model.Response.ResultMockTestResponse;
+import com.example.englishmaster_be.model.request.MockTest.ResultMockTestRequest;
+import com.example.englishmaster_be.model.response.ResultMockTestResponse;
 import com.example.englishmaster_be.entity.ResultMockTestEntity;
 
 import java.util.List;

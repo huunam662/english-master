@@ -1,9 +1,9 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
-import com.example.englishmaster_be.Helper.EnglishWordDictionary;
-import com.example.englishmaster_be.Model.Response.DictionarySuggestionResponse;
-import com.example.englishmaster_be.Service.IDictionaryService;
-import com.example.englishmaster_be.Value.DictionaryValue;
+import com.example.englishmaster_be.helper.EnglishWordDictionaryHelper;
+import com.example.englishmaster_be.model.response.DictionarySuggestionResponse;
+import com.example.englishmaster_be.service.IDictionaryService;
+import com.example.englishmaster_be.value.DictionaryValue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;
@@ -39,7 +39,7 @@ public class DictionaryServiceImpl implements IDictionaryService {
 
     DictionaryValue dictionaryValue;
 
-    EnglishWordDictionary englishWordDictionary;
+    EnglishWordDictionaryHelper englishWordDictionaryHelper;
 
 
 
@@ -64,7 +64,7 @@ public class DictionaryServiceImpl implements IDictionaryService {
     @Override
     public DictionarySuggestionResponse getSuggestions(String word) {
 
-        Set<String> wordSet = englishWordDictionary.getWordSet();
+        Set<String> wordSet = englishWordDictionaryHelper.getWordSet();
 
         Set<String> newSet = wordSet.stream()
                 .filter(wordSince -> wordSince.startsWith(word))

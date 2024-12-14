@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Repository;
+package com.example.englishmaster_be.repository;
 
 import com.example.englishmaster_be.entity.ResultMockTestEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,12 +1,12 @@
-package com.example.englishmaster_be.Service;
+package com.example.englishmaster_be.service;
 
-import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.Model.Request.MockTest.MockTestFilterRequest;
-import com.example.englishmaster_be.Model.Request.MockTest.MockTestRequest;
-import com.example.englishmaster_be.Model.Response.DetailMockTestResponse;
-import com.example.englishmaster_be.Model.Response.MockTestResponse;
-import com.example.englishmaster_be.Model.Response.PartMockTestResponse;
-import com.example.englishmaster_be.Model.Response.QuestionMockTestResponse;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.model.request.MockTest.MockTestFilterRequest;
+import com.example.englishmaster_be.model.request.MockTest.MockTestRequest;
+import com.example.englishmaster_be.model.response.DetailMockTestResponse;
+import com.example.englishmaster_be.model.response.MockTestResponse;
+import com.example.englishmaster_be.model.response.PartMockTestResponse;
+import com.example.englishmaster_be.model.response.QuestionMockTestResponse;
 import com.example.englishmaster_be.entity.DetailMockTestEntity;
 import com.example.englishmaster_be.entity.MockTestEntity;
 import com.example.englishmaster_be.entity.TopicEntity;

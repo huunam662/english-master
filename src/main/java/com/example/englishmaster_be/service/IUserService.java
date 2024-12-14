@@ -1,11 +1,13 @@
-package com.example.englishmaster_be.Service;
+package com.example.englishmaster_be.service;
 
-import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.Model.Request.*;
-import com.example.englishmaster_be.Model.Request.User.ChangeProfileRequest;
-import com.example.englishmaster_be.Model.Request.User.UserFilterRequest;
-import com.example.englishmaster_be.Model.Response.AuthResponse;
-import com.example.englishmaster_be.Model.Response.CountMockTestTopicResponse;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.model.request.*;
+import com.example.englishmaster_be.model.request.ConfirmationToken.ConfirmationTokenRequest;
+import com.example.englishmaster_be.model.request.User.ChangeProfileRequest;
+import com.example.englishmaster_be.model.request.User.UserFilterRequest;
+import com.example.englishmaster_be.model.response.AuthResponse;
+import com.example.englishmaster_be.model.response.ConfirmationTokenResponse;
+import com.example.englishmaster_be.model.response.CountMockTestTopicResponse;
 import com.example.englishmaster_be.entity.UserEntity;
 import jakarta.mail.MessagingException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +20,8 @@ public interface IUserService {
     void registerUser(UserRegisterRequest userRegisterRequest);
 
     void confirmRegister(String confirmationToken);
+
+    ConfirmationTokenResponse createConfirmationToken(ConfirmationTokenRequest confirmationTokenRequest);
 
     AuthResponse login(UserLoginRequest userLoginRequest);
 

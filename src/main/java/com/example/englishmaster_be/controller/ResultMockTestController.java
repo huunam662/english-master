@@ -1,11 +1,12 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Mapper.ResultMockTestMapper;
-import com.example.englishmaster_be.Model.Request.MockTest.ResultMockTestRequest;
-import com.example.englishmaster_be.Model.Response.ResultMockTestResponse;
-import com.example.englishmaster_be.Service.IResultMockTestService;
+
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.entity.ResultMockTestEntity;
+import com.example.englishmaster_be.mapper.ResultMockTestMapper;
+import com.example.englishmaster_be.model.request.MockTest.ResultMockTestRequest;
+import com.example.englishmaster_be.model.response.ResultMockTestResponse;
+import com.example.englishmaster_be.service.IResultMockTestService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class ResultMockTestController {
     IResultMockTestService resultMockTestService;
 
     @PostMapping(value = "/create")
-    @MessageResponse("Create result mock test successfully")
+    @DefaultMessage("Create result mock test successfully")
     public ResultMockTestResponse createResultMockTest(ResultMockTestRequest resultMockTestRequest) {
 
         ResultMockTestEntity resultMockTest = resultMockTestService.saveResultMockTest(resultMockTestRequest);
@@ -36,7 +37,7 @@ public class ResultMockTestController {
     }
 
     @GetMapping("/getAllResult")
-    @MessageResponse("Get all result mock test successfully")
+    @DefaultMessage("Get all result mock test successfully")
     public List<ResultMockTestResponse> getAllResult() {
 
         List<ResultMockTestEntity> resultMockTestEntityList = resultMockTestService.getAllResultMockTests();
@@ -45,7 +46,7 @@ public class ResultMockTestController {
     }
 
     @GetMapping("/getResultMockTestByPartAndMockTest")
-    @MessageResponse("Get result mock test successfully")
+    @DefaultMessage("Get result mock test successfully")
     public List<ResultMockTestResponse> getResultMockTest(
             @RequestParam(required = false) UUID partId,
             @RequestParam(required = false) UUID mockTestId
@@ -57,7 +58,7 @@ public class ResultMockTestController {
     }
 
     @DeleteMapping("/delete")
-    @MessageResponse("Delete result mock test successfully")
+    @DefaultMessage("Delete result mock test successfully")
     public void deleteResultMockTest(@RequestParam UUID uuid) {
 
         resultMockTestService.deleteResultMockTestById(uuid);

@@ -1,21 +1,20 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Mapper.AnswerMatchingMapper;
-import com.example.englishmaster_be.Mapper.UserAnswerMapper;
-import com.example.englishmaster_be.Mapper.UserBlankAnswerMapper;
-import com.example.englishmaster_be.Model.Request.Answer.AnswerBlankRequest;
-import com.example.englishmaster_be.Model.Request.Answer.AnswerMatchingQuestionRequest;
-import com.example.englishmaster_be.Model.Request.Answer.UserAnswerRequest;
-import com.example.englishmaster_be.Common.dto.response.ResponseModel;
-import com.example.englishmaster_be.Model.Response.AnswerMatchingBasicResponse;
-import com.example.englishmaster_be.Model.Response.ScoreAnswerResponse;
-import com.example.englishmaster_be.Model.Response.UserAnswerResponse;
-import com.example.englishmaster_be.Model.Response.UserBlankAnswerResponse;
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.mapper.AnswerMatchingMapper;
+import com.example.englishmaster_be.mapper.UserAnswerMapper;
+import com.example.englishmaster_be.mapper.UserBlankAnswerMapper;
+import com.example.englishmaster_be.model.request.Answer.AnswerBlankRequest;
+import com.example.englishmaster_be.model.request.Answer.AnswerMatchingQuestionRequest;
+import com.example.englishmaster_be.model.request.Answer.UserAnswerRequest;
+import com.example.englishmaster_be.model.response.AnswerMatchingBasicResponse;
+import com.example.englishmaster_be.model.response.ScoreAnswerResponse;
+import com.example.englishmaster_be.model.response.UserAnswerResponse;
+import com.example.englishmaster_be.model.response.UserBlankAnswerResponse;
 import com.example.englishmaster_be.entity.UserAnswerEntity;
 import com.example.englishmaster_be.entity.UserAnswerMatchingEntity;
 import com.example.englishmaster_be.entity.UserBlankAnswerEntity;
-import com.example.englishmaster_be.Service.impl.UserAnswerService;
+import com.example.englishmaster_be.service.impl.UserAnswerService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +38,7 @@ public class UserAnswerController {
 
 
     @GetMapping("/check-blank")
-    @MessageResponse("AnswerEntity Checking")
+    @DefaultMessage("AnswerEntity Checking")
     public void checkAnswer(
             @RequestParam(value = "user_id") UUID userId,
             @RequestParam(value = "question_id") UUID questionId
@@ -49,7 +48,7 @@ public class UserAnswerController {
     }
 
     @GetMapping("/check-multiple-choice")
-    @MessageResponse("AnswerEntity Checking")
+    @DefaultMessage("AnswerEntity Checking")
     public void checkAnswerMultipleChoice(
             @RequestParam(value = "user_id") UUID userId,
             @RequestParam(value = "question_id") UUID questionId
@@ -59,7 +58,7 @@ public class UserAnswerController {
     }
 
     @GetMapping("/check-correct")
-    @MessageResponse("Check answer successfully")
+    @DefaultMessage("Check answer successfully")
     public ScoreAnswerResponse checkCorrectAnswer(
             @RequestParam(value = "question_id") UUID questionId
     ) {
@@ -69,7 +68,7 @@ public class UserAnswerController {
 
 
     @PostMapping("/create-user-answer")
-    @MessageResponse("Create user answer successfully")
+    @DefaultMessage("Create user answer successfully")
     public UserAnswerResponse createUserAnswer(@RequestBody UserAnswerRequest userAnswerRequest) {
 
         UserAnswerEntity answer = userAnswerService.saveUserAnswer(userAnswerRequest);
@@ -78,7 +77,7 @@ public class UserAnswerController {
     }
 
     @PostMapping("/create-user-answer-blank")
-    @MessageResponse("Create user answer successfully")
+    @DefaultMessage("Create user answer successfully")
     public UserBlankAnswerResponse createUserAnswerBlank(@RequestBody AnswerBlankRequest request) {
 
         UserBlankAnswerEntity answer = userAnswerService.createUserBlankAnswer(request);
@@ -87,7 +86,7 @@ public class UserAnswerController {
     }
 
     @PostMapping("/create-user-answer-matching")
-    @MessageResponse("Create user answer successfully")
+    @DefaultMessage("Create user answer successfully")
     public AnswerMatchingBasicResponse createUserAnswerMatching(@RequestBody AnswerMatchingQuestionRequest request) {
 
         UserAnswerMatchingEntity userAnswerMatchingEntity = userAnswerService.createUserMatchingAnswer(request);

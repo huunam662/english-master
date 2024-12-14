@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Service;
+package com.example.englishmaster_be.service;
 
 import com.google.cloud.storage.Blob;
 import org.springframework.core.io.Resource;

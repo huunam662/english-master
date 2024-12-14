@@ -1,7 +1,7 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Model.Request.PostCategory.PostCategoryRequest;
-import com.example.englishmaster_be.Service.IPostCategoryService;
+import com.example.englishmaster_be.model.request.PostCategory.PostCategoryRequest;
+import com.example.englishmaster_be.service.IPostCategoryService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;

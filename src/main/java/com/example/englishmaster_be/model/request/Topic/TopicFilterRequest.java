@@ -1,6 +1,6 @@
-package com.example.englishmaster_be.Model.Request.Topic;
+package com.example.englishmaster_be.model.request.Topic;
 
-import com.example.englishmaster_be.Common.dto.request.FilterRequest;
+import com.example.englishmaster_be.common.dto.request.FilterRequest;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;

@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Model.Request.Feedback;
+package com.example.englishmaster_be.model.request.Feedback;
 
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.*;

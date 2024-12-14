@@ -1,16 +1,16 @@
-package com.example.englishmaster_be.Controller;
+package com.example.englishmaster_be.controller;
 
-import com.example.englishmaster_be.Common.dto.response.FilterResponse;
-import com.example.englishmaster_be.Configuration.global.annotation.MessageResponse;
-import com.example.englishmaster_be.Mapper.UserMapper;
-import com.example.englishmaster_be.Model.Request.*;
-import com.example.englishmaster_be.Model.Request.User.ChangeProfileRequest;
-import com.example.englishmaster_be.Model.Request.User.UserFilterRequest;
-import com.example.englishmaster_be.Model.Response.AuthResponse;
-import com.example.englishmaster_be.Model.Response.InformationUserResponse;
-import com.example.englishmaster_be.Service.IUserService;
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
 import com.example.englishmaster_be.entity.UserEntity;
-import com.example.englishmaster_be.Model.Response.*;
+import com.example.englishmaster_be.mapper.UserMapper;
+import com.example.englishmaster_be.model.request.*;
+import com.example.englishmaster_be.model.request.User.ChangeProfileRequest;
+import com.example.englishmaster_be.model.request.User.UserFilterRequest;
+import com.example.englishmaster_be.model.response.AuthResponse;
+import com.example.englishmaster_be.model.response.InformationUserResponse;
+import com.example.englishmaster_be.model.response.UserResponse;
+import com.example.englishmaster_be.service.IUserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
 
@@ -36,44 +37,44 @@ public class UserController {
 
 
     @PostMapping("/register")
-    @MessageResponse("Sent a confirmation mail")
+    @DefaultMessage("Kiểm tra Email của bạn để xác thực đăng ký")
     public void register(
-            @Valid @RequestBody UserRegisterRequest registerDTO
+            @Valid @RequestBody UserRegisterRequest userRegisterRequest
     ) {
 
-        userService.registerUser(registerDTO);
+        userService.registerUser(userRegisterRequest);
     }
 
     @GetMapping("/register/confirm")
-    @MessageResponse("Account has been successfully verified")
+    @DefaultMessage("Xác thực đăng ký thành công. Cảm ơn bạn, một thành viên của chúng tôi")
     public void confirmRegister(@RequestParam("token") String confirmationToken) {
 
         userService.confirmRegister(confirmationToken);
     }
 
     @PostMapping("/login")
-    @MessageResponse("login successfully")
+    @DefaultMessage("Đăng nhập thành công")
     public AuthResponse login(@RequestBody UserLoginRequest loginDTO) {
 
         return userService.login(loginDTO);
     }
 
     @PostMapping("/forgetPassword")
-    @MessageResponse("Please check your email to get OTP code for verify your account")
+    @DefaultMessage("Please check your email to get OTP code for verify your account")
     public void forgetPassword(@RequestParam("email") String email) {
 
         userService.forgotPassword(email);
     }
 
     @PostMapping("/verifyOtp")
-    @MessageResponse("Your verify is successfully")
+    @DefaultMessage("Your verify is successfully")
     public void verifyOtp(@RequestParam String otp) {
 
         userService.verifyOtp(otp);
     }
 
     @PostMapping("/changePassword")
-    @MessageResponse("Update your password successfully")
+    @DefaultMessage("Update your password successfully")
     public void changePassword(@RequestBody ChangePasswordRequest changePasswordDTO) {
 
         userService.changePassword(changePasswordDTO);
@@ -81,7 +82,7 @@ public class UserController {
 
 
     @GetMapping("/forgetPass/confirm")
-    @MessageResponse("Confirm successfully")
+    @DefaultMessage("Confirm successfully")
     public String confirmForgetPassword(@RequestParam String token) {
 
         return userService.confirmForgetPassword(token);
@@ -89,7 +90,7 @@ public class UserController {
 
 
     @PostMapping("/refreshToken")
-    @MessageResponse("Created new access token")
+    @DefaultMessage("Created new access token")
     public AuthResponse refreshToken(@RequestBody RefreshTokenRequest refreshTokenDTO) {
 
         return userService.refreshToken(refreshTokenDTO);
@@ -98,7 +99,7 @@ public class UserController {
 
     @GetMapping("/information")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Information UserEntity successfully")
+    @DefaultMessage("Information UserEntity successfully")
     public InformationUserResponse informationUser() {
 
         UserEntity currentUser = userService.currentUser();
@@ -108,7 +109,7 @@ public class UserController {
 
     @PatchMapping(value = "/changeProfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Change profile UserEntity successfully")
+    @DefaultMessage("Change profile UserEntity successfully")
     public InformationUserResponse changeProfile(
             @ModelAttribute("profileUser") ChangeProfileRequest changeProfileRequest
     ) {
@@ -121,7 +122,7 @@ public class UserController {
 
     @PatchMapping(value = "/changePass")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Change pass UserEntity successfully")
+    @DefaultMessage("Change pass UserEntity successfully")
     public void changePass(@RequestBody ChangePasswordRequest changePasswordRequest) {
 
         userService.changePass(changePasswordRequest);
@@ -130,7 +131,7 @@ public class UserController {
 
     @GetMapping(value = "/listExamResultsUser")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @MessageResponse("Show list exam result successfully")
+    @DefaultMessage("Show list exam result successfully")
     public FilterResponse<?> getExamResultsUser(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) int page,
             @RequestParam(value = "size", defaultValue = "5") @Min(1) @Max(100) int size,
@@ -149,14 +150,14 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    @MessageResponse("Logout successfully")
+    @DefaultMessage("Logout successfully")
     public void logoutUser(@RequestBody UserLogoutRequest userLogoutDTO) {
 
         userService.logoutUserOf(userLogoutDTO);
     }
 
     @PostMapping("/notifyInactiveUsers")
-    @MessageResponse("Notify inactive users successfully")
+    @DefaultMessage("Notify inactive users successfully")
     public void notifyInactiveUsers() {
 
         userService.notifyInactiveUsers();
@@ -165,7 +166,7 @@ public class UserController {
     // API để tìm kiếm người dùng lâu ngày chưa đăng nhập
     @GetMapping("/users/inactive")
     @PreAuthorize("hasRole('ADMIN')")
-    @MessageResponse("List inactive users successfully")
+    @DefaultMessage("List inactive users successfully")
     public List<UserResponse> getInactiveUsers() {
 
         List<UserEntity> inactiveUsers = userService.getUsersNotLoggedInLast10Days();
@@ -174,7 +175,7 @@ public class UserController {
     }
 
     @GetMapping("/inactive-notify")
-    @MessageResponse("Notify inactive users successfully")
+    @DefaultMessage("Notify inactive users successfully")
     public List<UserResponse> notifyInactiveUsers(@RequestParam int days){
 
         List<UserEntity> notifyInactiveUsers = userService.findUsersInactiveForDaysAndNotify(days);

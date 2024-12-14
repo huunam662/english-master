@@ -1,19 +1,19 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
-import com.example.englishmaster_be.Exception.template.CustomException;
-import com.example.englishmaster_be.Common.enums.error.ErrorEnum;
-import com.example.englishmaster_be.Model.Request.Answer.AnswerBasicRequest;
-import com.example.englishmaster_be.Model.Request.Question.GroupQuestionRequest;
-import com.example.englishmaster_be.Model.Request.Question.QuestionRequest;
-import com.example.englishmaster_be.Model.Request.UploadMultiFileRequest;
-import com.example.englishmaster_be.Exception.template.BadRequestException;
-import com.example.englishmaster_be.Helper.GetExtension;
-import com.example.englishmaster_be.Mapper.QuestionMapper;
-import com.example.englishmaster_be.Repository.AnswerRepository;
-import com.example.englishmaster_be.Repository.ContentRepository;
-import com.example.englishmaster_be.Repository.PartRepository;
-import com.example.englishmaster_be.Repository.QuestionRepository;
-import com.example.englishmaster_be.Service.*;
+import com.example.englishmaster_be.exception.template.CustomException;
+import com.example.englishmaster_be.common.constaint.error.ErrorEnum;
+import com.example.englishmaster_be.helper.GetExtensionHelper;
+import com.example.englishmaster_be.model.request.Answer.AnswerBasicRequest;
+import com.example.englishmaster_be.model.request.Question.GroupQuestionRequest;
+import com.example.englishmaster_be.model.request.Question.QuestionRequest;
+import com.example.englishmaster_be.model.request.UploadMultiFileRequest;
+import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.mapper.QuestionMapper;
+import com.example.englishmaster_be.repository.AnswerRepository;
+import com.example.englishmaster_be.repository.ContentRepository;
+import com.example.englishmaster_be.repository.PartRepository;
+import com.example.englishmaster_be.repository.QuestionRepository;
+import com.example.englishmaster_be.service.*;
 import com.example.englishmaster_be.entity.*;
 import com.google.cloud.storage.Blob;
 import lombok.AccessLevel;
@@ -38,6 +38,8 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class QuestionServiceImpl implements IQuestionService {
+
+    GetExtensionHelper getExtensionHelper;
 
     QuestionRepository questionRepository;
 
@@ -124,7 +126,7 @@ public class QuestionServiceImpl implements IQuestionService {
                 String filename = fileStorageService.nameFile(questionRequest.getContentImage());
                 ContentEntity content = ContentEntity.builder()
                         .question(question)
-                        .contentType(GetExtension.typeFile(filename))
+                        .contentType(getExtensionHelper.typeFile(filename))
                         .contentData(filename)
                         .userCreate(user)
                         .userUpdate(user)
@@ -150,7 +152,7 @@ public class QuestionServiceImpl implements IQuestionService {
                 String filename = fileStorageService.nameFile(questionRequest.getContentAudio());
                 ContentEntity content = ContentEntity.builder()
                         .question(question)
-                        .contentType(GetExtension.typeFile(filename))
+                        .contentType(getExtensionHelper.typeFile(filename))
                         .contentData(filename)
                         .userCreate(user)
                         .userUpdate(user)
@@ -258,7 +260,7 @@ public class QuestionServiceImpl implements IQuestionService {
 
             ContentEntity content = ContentEntity.builder()
                     .contentData(fileName)
-                    .contentType(GetExtension.getExtension(fileName))
+                    .contentType(getExtensionHelper.getExtension(fileName))
                     .userCreate(user)
                     .userUpdate(user)
                     .question(question)
@@ -294,7 +296,7 @@ public class QuestionServiceImpl implements IQuestionService {
         String fileNameNew = blobResponse.getName();
 
         content.setContentData(fileNameNew);
-        content.setContentType(GetExtension.typeFile(fileNameNew));
+        content.setContentType(getExtensionHelper.typeFile(fileNameNew));
         content.setUpdateAt(LocalDateTime.now());
         content.setUserUpdate(user);
 

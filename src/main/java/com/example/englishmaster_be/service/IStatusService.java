@@ -1,7 +1,7 @@
-package com.example.englishmaster_be.Service;
+package com.example.englishmaster_be.service;
 
-import com.example.englishmaster_be.Common.enums.StatusEnum;
-import com.example.englishmaster_be.Model.Request.Status.StatusRequest;
+import com.example.englishmaster_be.common.constaint.StatusEnum;
+import com.example.englishmaster_be.model.request.Status.StatusRequest;
 import com.example.englishmaster_be.entity.StatusEntity;
 
 import java.util.List;

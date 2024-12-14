@@ -1,6 +1,6 @@
-package com.example.englishmaster_be.Service;
+package com.example.englishmaster_be.service;
 
-import com.example.englishmaster_be.Model.Request.Comment.CommentRequest;
+import com.example.englishmaster_be.model.request.Comment.CommentRequest;
 import com.example.englishmaster_be.entity.CommentEntity;
 
 import java.util.List;

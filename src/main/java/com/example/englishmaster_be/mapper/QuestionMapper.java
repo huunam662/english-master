@@ -1,11 +1,11 @@
-package com.example.englishmaster_be.Mapper;
+package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.Model.Request.Question.GroupQuestionRequest;
-import com.example.englishmaster_be.Model.Request.Question.QuestionRequest;
-import com.example.englishmaster_be.Model.Response.QuestionBasicResponse;
-import com.example.englishmaster_be.Model.Response.excel.QuestionByExcelFileResponse;
+import com.example.englishmaster_be.model.request.Question.GroupQuestionRequest;
+import com.example.englishmaster_be.model.request.Question.QuestionRequest;
+import com.example.englishmaster_be.model.response.QuestionBasicResponse;
+import com.example.englishmaster_be.model.response.excel.QuestionByExcelFileResponse;
 import com.example.englishmaster_be.entity.QuestionEntity;
-import com.example.englishmaster_be.Model.Response.QuestionResponse;
+import com.example.englishmaster_be.model.response.QuestionResponse;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 

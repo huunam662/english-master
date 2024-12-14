@@ -1,12 +1,12 @@
-package com.example.englishmaster_be.Service.impl;
+package com.example.englishmaster_be.service.impl;
 
-import com.example.englishmaster_be.Mapper.ResultMockTestMapper;
-import com.example.englishmaster_be.Model.Request.MockTest.ResultMockTestRequest;
-import com.example.englishmaster_be.Repository.ResultMockTestRepository;
-import com.example.englishmaster_be.Service.IMockTestService;
-import com.example.englishmaster_be.Service.IPartService;
-import com.example.englishmaster_be.Service.IResultMockTestService;
-import com.example.englishmaster_be.Service.IUserService;
+import com.example.englishmaster_be.mapper.ResultMockTestMapper;
+import com.example.englishmaster_be.model.request.MockTest.ResultMockTestRequest;
+import com.example.englishmaster_be.repository.ResultMockTestRepository;
+import com.example.englishmaster_be.service.IMockTestService;
+import com.example.englishmaster_be.service.IPartService;
+import com.example.englishmaster_be.service.IResultMockTestService;
+import com.example.englishmaster_be.service.IUserService;
 import com.example.englishmaster_be.entity.MockTestEntity;
 import com.example.englishmaster_be.entity.PartEntity;
 import com.example.englishmaster_be.entity.ResultMockTestEntity;

@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Model.Request.ConfirmationToken;
+package com.example.englishmaster_be.model.request.ConfirmationToken;
 
 import com.example.englishmaster_be.entity.UserEntity;
 import lombok.*;

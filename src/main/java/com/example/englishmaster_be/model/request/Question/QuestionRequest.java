@@ -1,7 +1,7 @@
-package com.example.englishmaster_be.Model.Request.Question;
+package com.example.englishmaster_be.model.request.Question;
 
-import com.example.englishmaster_be.Model.Request.Answer.AnswerBasicRequest;
-import com.example.englishmaster_be.Common.enums.QuestionTypeEnum;
+import com.example.englishmaster_be.model.request.Answer.AnswerBasicRequest;
+import com.example.englishmaster_be.common.constaint.QuestionTypeEnum;
 import io.swagger.v3.oas.annotations.Hidden;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

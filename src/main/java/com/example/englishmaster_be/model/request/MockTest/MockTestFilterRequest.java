@@ -1,7 +1,7 @@
-package com.example.englishmaster_be.Model.Request.MockTest;
+package com.example.englishmaster_be.model.request.MockTest;
 
 
-import com.example.englishmaster_be.Common.dto.request.FilterRequest;
+import com.example.englishmaster_be.common.dto.request.FilterRequest;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
