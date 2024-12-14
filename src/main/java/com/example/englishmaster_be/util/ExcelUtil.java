@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Util;
+package com.example.englishmaster_be.util;
 
 import org.springframework.web.multipart.MultipartFile;
 

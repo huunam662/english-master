@@ -6,7 +6,7 @@ import com.example.englishmaster_be.model.request.Type.TypeFilterRequest;
 import com.example.englishmaster_be.model.request.Type.TypeRequest;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.model.response.TypeResponse;
-import com.example.englishmaster_be.Util.TypeUtil;
+import com.example.englishmaster_be.util.TypeUtil;
 import com.example.englishmaster_be.entity.QTypeEntity;
 import com.example.englishmaster_be.entity.TypeEntity;
 import com.example.englishmaster_be.repository.TypeRepository;

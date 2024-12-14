@@ -13,7 +13,7 @@ import com.example.englishmaster_be.service.ICloudinaryService;
 import com.example.englishmaster_be.service.IContentService;
 import com.example.englishmaster_be.service.IQuestionService;
 import com.example.englishmaster_be.service.IUserService;
-import com.example.englishmaster_be.Util.LinkUtil;
+import com.example.englishmaster_be.value.LinkValue;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -30,6 +30,8 @@ import java.util.UUID;
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ContentServiceImpl implements IContentService {
+
+    LinkValue linkValue;
 
     ContentRepository contentRepository;
 
@@ -119,7 +121,7 @@ public class ContentServiceImpl implements IContentService {
 
         return listLinkCdn.stream()
                 .filter(linkCdn -> linkCdn != null && !linkCdn.isEmpty())
-                .map(linkCdn -> LinkUtil.linkFileShowImageBE + linkCdn)
+                .map(linkCdn -> linkValue.getLinkFileShowImageBE() + linkCdn)
                 .toList();
     }
 

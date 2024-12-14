@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.Util;
+package com.example.englishmaster_be.util;
 
 import com.example.englishmaster_be.common.constaint.sort.SortByTypeFieldsEnum;
 import com.example.englishmaster_be.entity.QTypeEntity;
