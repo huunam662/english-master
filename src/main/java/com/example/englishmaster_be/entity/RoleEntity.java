@@ -1,11 +1,10 @@
 package com.example.englishmaster_be.entity;
 
-import com.example.englishmaster_be.Common.enums.RoleEnum;
+import com.example.englishmaster_be.common.constaint.RoleEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -29,9 +28,6 @@ public class RoleEntity {
     @Column(name = "role_name")
     @Enumerated(EnumType.STRING)
     RoleEnum roleName;
-
-    @Column(name = "role_description")
-    String roleDescription;
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
     List<UserEntity> users;

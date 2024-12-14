@@ -29,6 +29,7 @@ public class UserEntity {
     @Column(name = "id")
     UUID userId;
 
+    @Column(unique = true)
     String email;
 
     String password;
@@ -62,7 +63,7 @@ public class UserEntity {
     @JoinColumn(name = "role", referencedColumnName = "id")
     RoleEntity role;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     List<ConfirmationTokenEntity> confirmToken;
 
     @OneToMany(mappedBy = "userComment", cascade = CascadeType.ALL)

@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.entity;
 
-import com.example.englishmaster_be.Common.enums.StatusEnum;
+import com.example.englishmaster_be.common.constaint.StatusEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;

@@ -1,11 +1,11 @@
 package com.example.englishmaster_be.entity;
 
+import com.example.englishmaster_be.common.constaint.ConfirmRegisterTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
-
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -22,11 +22,12 @@ public class ConfirmationTokenEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-	@Column(name = "id")
+    @Column(name = "id")
     UUID userConfirmTokenId;
 
     @Column(name = "Type")
-    String type;
+    @Enumerated(EnumType.STRING)
+    ConfirmRegisterTypeEnum type;
 
     @Column(name = "code")
     String code;

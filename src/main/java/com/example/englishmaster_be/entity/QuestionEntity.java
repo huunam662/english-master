@@ -1,13 +1,12 @@
 package com.example.englishmaster_be.entity;
 
-import com.example.englishmaster_be.Common.enums.QuestionTypeEnum;
+import com.example.englishmaster_be.common.constaint.QuestionTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
