@@ -25,8 +25,8 @@ import com.example.englishmaster_be.model.response.excel.QuestionByExcelFileResp
 import com.example.englishmaster_be.model.response.excel.TopicByExcelFileResponse;
 import com.example.englishmaster_be.repository.*;
 import com.example.englishmaster_be.service.*;
-import com.example.englishmaster_be.Util.LinkUtil;
 import com.example.englishmaster_be.entity.*;
+import com.example.englishmaster_be.value.LinkValue;
 import com.google.cloud.storage.Blob;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -55,6 +55,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TopicServiceImpl implements ITopicService {
+
+    LinkValue linkValue;
 
     GetExtensionHelper getExtensionHelper;
 
@@ -410,7 +412,7 @@ public class TopicServiceImpl implements ITopicService {
 
         return listLinkCdn.stream()
                 .filter(linkCdn -> linkCdn != null && !linkCdn.isEmpty())
-                .map(linkCdn -> LinkUtil.linkFileShowImageBE + linkCdn)
+                .map(linkCdn -> linkValue.getLinkFileShowImageBE() + linkCdn)
                 .toList();
     }
 

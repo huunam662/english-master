@@ -7,7 +7,7 @@ import com.example.englishmaster_be.model.request.Feedback.FeedbackRequest;
 import com.example.englishmaster_be.model.request.Feedback.FeedbackFilterRequest;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.FeedbackMapper;
-import com.example.englishmaster_be.Util.FeedBackUtil;
+import com.example.englishmaster_be.util.FeedBackUtil;
 import com.example.englishmaster_be.entity.FeedbackEntity;
 import com.example.englishmaster_be.entity.QFeedbackEntity;
 import com.example.englishmaster_be.model.response.FeedbackResponse;
