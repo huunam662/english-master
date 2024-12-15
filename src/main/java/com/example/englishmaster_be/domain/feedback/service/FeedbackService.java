@@ -8,9 +8,9 @@ import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackFilterRe
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.FeedbackMapper;
 import com.example.englishmaster_be.model.feedback.FeedbackRepository;
+import com.example.englishmaster_be.model.feedback.QFeedbackEntity;
 import com.example.englishmaster_be.util.FeedBackUtil;
 import com.example.englishmaster_be.model.feedback.FeedbackEntity;
-import com.example.englishmaster_be.entity.QFeedbackEntity;
 import com.example.englishmaster_be.domain.feedback.dto.response.FeedbackResponse;
 import com.google.cloud.storage.Blob;
 import com.querydsl.core.types.OrderSpecifier;
@@ -24,7 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;

@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.scheduled;
 
 import com.example.englishmaster_be.model.invalid_token.InvalidTokenEntity;
-import com.example.englishmaster_be.entity.QInvalidTokenEntity;
-import com.example.englishmaster_be.entity.QUserEntity;
+import com.example.englishmaster_be.model.invalid_token.QInvalidTokenEntity;
+import com.example.englishmaster_be.model.user.QUserEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.model.confirmation_token.ConfirmationTokenRepository;
 import com.example.englishmaster_be.model.invalid_token.InvalidTokenRepository;

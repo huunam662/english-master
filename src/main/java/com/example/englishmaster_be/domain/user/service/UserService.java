@@ -23,13 +23,15 @@ import com.example.englishmaster_be.model.confirmation_token.ConfirmationTokenEn
 import com.example.englishmaster_be.model.confirmation_token.ConfirmationTokenRepository;
 import com.example.englishmaster_be.model.content.ContentRepository;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;
+import com.example.englishmaster_be.model.mock_test.QMockTestEntity;
 import com.example.englishmaster_be.model.otp.OtpEntity;
 import com.example.englishmaster_be.model.otp.OtpRepository;
 import com.example.englishmaster_be.model.role.RoleRepository;
+import com.example.englishmaster_be.model.topic.QTopicEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
+import com.example.englishmaster_be.model.user.QUserEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.model.user.UserRepository;
-import com.example.englishmaster_be.entity.*;
 import com.example.englishmaster_be.domain.user.dto.response.UserConfirmTokenResponse;
 import com.example.englishmaster_be.shared.service.invalid_token.IInvalidTokenService;
 import com.example.englishmaster_be.shared.service.otp.IOtpService;

@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
-
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.NoSuchElementException;

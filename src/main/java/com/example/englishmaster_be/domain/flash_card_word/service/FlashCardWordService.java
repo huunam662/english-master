@@ -7,8 +7,8 @@ import com.example.englishmaster_be.domain.flash_card_word.dto.request.FlashCard
 import com.example.englishmaster_be.mapper.FlashCardWordMapper;
 import com.example.englishmaster_be.model.flash_card.FlashCardEntity;
 import com.example.englishmaster_be.model.flash_card_word.FlashCardWordEntity;
-import com.example.englishmaster_be.entity.QFlashCardWordEntity;
 import com.example.englishmaster_be.model.flash_card_word.FlashCardWordRepository;
+import com.example.englishmaster_be.model.flash_card_word.QFlashCardWordEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.google.cloud.storage.Blob;
 import com.querydsl.core.types.OrderSpecifier;

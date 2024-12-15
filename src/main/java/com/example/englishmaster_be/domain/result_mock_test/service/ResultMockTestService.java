@@ -2,6 +2,7 @@ package com.example.englishmaster_be.domain.result_mock_test.service;
 
 import com.example.englishmaster_be.mapper.ResultMockTestMapper;
 import com.example.englishmaster_be.domain.result_mock_test.dto.request.ResultMockTestRequest;
+import com.example.englishmaster_be.model.result_mock_test.QResultMockTestEntity;
 import com.example.englishmaster_be.model.result_mock_test.ResultMockTestRepository;
 import com.example.englishmaster_be.domain.mock_test.service.IMockTestService;
 import com.example.englishmaster_be.domain.part.service.IPartService;
@@ -10,7 +11,6 @@ import com.example.englishmaster_be.model.mock_test.MockTestEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.result_mock_test.ResultMockTestEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.entity.QResultMockTestEntity;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import lombok.AccessLevel;

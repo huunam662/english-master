@@ -6,8 +6,8 @@ import com.example.englishmaster_be.domain.type.dto.request.TypeFilterRequest;
 import com.example.englishmaster_be.domain.type.dto.request.TypeRequest;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.domain.type.dto.response.TypeResponse;
+import com.example.englishmaster_be.model.type.QTypeEntity;
 import com.example.englishmaster_be.util.TypeUtil;
-import com.example.englishmaster_be.entity.QTypeEntity;
 import com.example.englishmaster_be.model.type.TypeEntity;
 import com.example.englishmaster_be.model.type.TypeRepository;
 import com.querydsl.core.types.OrderSpecifier;
@@ -20,7 +20,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-
 import java.util.Optional;
 import java.util.UUID;
 
