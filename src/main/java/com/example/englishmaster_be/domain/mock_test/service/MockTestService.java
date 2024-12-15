@@ -17,7 +17,7 @@ import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestRequest
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.PartMapper;
 import com.example.englishmaster_be.exception.template.CustomException;
-import com.example.englishmaster_be.model.answer_blank.AnswerEntity;
+import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.detail_mock_test.DetailMockTestEntity;
 import com.example.englishmaster_be.model.detail_mock_test.DetailMockTestRepository;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;

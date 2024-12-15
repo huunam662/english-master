@@ -7,7 +7,7 @@ import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerRequest;
 import com.example.englishmaster_be.mapper.AnswerMapper;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
-import com.example.englishmaster_be.model.answer_blank.AnswerEntity;
+import com.example.englishmaster_be.model.answer.AnswerEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

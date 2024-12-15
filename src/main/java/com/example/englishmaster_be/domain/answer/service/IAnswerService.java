@@ -2,7 +2,7 @@ package com.example.englishmaster_be.domain.answer.service;
 
 
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerRequest;
-import com.example.englishmaster_be.model.answer_blank.AnswerEntity;
+import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 

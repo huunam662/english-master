@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.model.user_answer;
 
-import com.example.englishmaster_be.model.answer_blank.AnswerEntity;
+import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
