@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.config;
+package com.example.englishmaster_be.config.integration.cloud;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
@@ -6,7 +6,6 @@ import com.example.englishmaster_be.value.CloudinaryValue;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

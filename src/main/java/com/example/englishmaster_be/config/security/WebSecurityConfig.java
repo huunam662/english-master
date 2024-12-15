@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.config;
+package com.example.englishmaster_be.config.security;
 
 import com.example.englishmaster_be.config.filter.AuthTokenFilter;
 import lombok.AccessLevel;

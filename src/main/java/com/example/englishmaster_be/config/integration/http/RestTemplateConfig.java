@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.config;
+package com.example.englishmaster_be.config.integration.http;
 
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
