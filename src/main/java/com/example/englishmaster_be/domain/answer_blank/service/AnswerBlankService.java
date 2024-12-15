@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.answer_blank.service;
 
 import com.example.englishmaster_be.domain.answer_blank.dto.request.AnswerBlankRequest;
-import com.example.englishmaster_be.model.answer.AnswerBlankEntity;
+import com.example.englishmaster_be.model.answer_blank.AnswerBlankEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.answer_blank.AnswerBlankRepository;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;

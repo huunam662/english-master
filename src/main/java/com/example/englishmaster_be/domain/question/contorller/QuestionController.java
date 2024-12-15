@@ -12,7 +12,7 @@ import com.example.englishmaster_be.shared.dto.request.upload_file.UploadMultipl
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionBasicResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
-import com.example.englishmaster_be.model.answer_blank.AnswerEntity;
+import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;

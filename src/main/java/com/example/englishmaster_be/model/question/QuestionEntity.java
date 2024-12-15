@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.model.question;
 
 import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
-import com.example.englishmaster_be.model.answer_blank.AnswerEntity;
+import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.content.ContentEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.question_label.QuestionLabelEntity;

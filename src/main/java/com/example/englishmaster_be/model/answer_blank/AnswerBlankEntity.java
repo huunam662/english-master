@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.model.answer;
+package com.example.englishmaster_be.model.answer_blank;
 
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import io.swagger.v3.oas.annotations.media.Schema;

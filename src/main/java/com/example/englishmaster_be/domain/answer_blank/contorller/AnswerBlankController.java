@@ -4,7 +4,7 @@ import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.answer_blank.dto.request.AnswerBlankRequest;
 
 import com.example.englishmaster_be.mapper.AnswerBlankMapper;
-import com.example.englishmaster_be.model.answer.AnswerBlankEntity;
+import com.example.englishmaster_be.model.answer_blank.AnswerBlankEntity;
 import com.example.englishmaster_be.domain.answer_blank.dto.response.AnswerBlankResponse;
 import com.example.englishmaster_be.domain.answer_blank.service.IAnswerBlankService;
 import io.swagger.v3.oas.annotations.tags.Tag;

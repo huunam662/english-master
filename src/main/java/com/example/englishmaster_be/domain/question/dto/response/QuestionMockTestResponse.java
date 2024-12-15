@@ -2,7 +2,7 @@ package com.example.englishmaster_be.domain.question.dto.response;
 
 import com.example.englishmaster_be.mapper.AnswerMapper;
 import com.example.englishmaster_be.mapper.ContentMapper;
-import com.example.englishmaster_be.model.answer_blank.AnswerEntity;
+import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
 import com.example.englishmaster_be.domain.content.dto.response.ContentBasicResponse;

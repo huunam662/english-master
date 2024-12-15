@@ -33,7 +33,7 @@ import com.example.englishmaster_be.domain.topic.dto.response.TopicResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionListResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
 import com.example.englishmaster_be.model.answer.AnswerRepository;
-import com.example.englishmaster_be.model.answer_blank.AnswerEntity;
+import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.comment.CommentEntity;
 import com.example.englishmaster_be.model.content.ContentEntity;
 import com.example.englishmaster_be.model.content.ContentRepository;

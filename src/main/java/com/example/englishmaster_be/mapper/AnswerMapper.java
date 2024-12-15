@@ -3,7 +3,7 @@ package com.example.englishmaster_be.mapper;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerRequest;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerCorrectResponse;
-import com.example.englishmaster_be.model.answer_blank.AnswerEntity;
+import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

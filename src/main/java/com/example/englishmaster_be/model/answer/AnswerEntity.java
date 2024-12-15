@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.model.answer_blank;
+package com.example.englishmaster_be.model.answer;
 
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.user.UserEntity;

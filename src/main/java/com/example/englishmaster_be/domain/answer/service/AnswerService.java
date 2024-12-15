@@ -5,7 +5,7 @@ import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.AnswerMapper;
 import com.example.englishmaster_be.model.answer.AnswerRepository;
-import com.example.englishmaster_be.model.answer_blank.AnswerEntity;
+import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.detail_mock_test.DetailMockTestEntity;
 import com.example.englishmaster_be.model.detail_mock_test.DetailMockTestRepository;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;

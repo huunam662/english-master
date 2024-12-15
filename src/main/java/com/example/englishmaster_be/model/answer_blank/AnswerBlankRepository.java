@@ -1,6 +1,5 @@
 package com.example.englishmaster_be.model.answer_blank;
 
-import com.example.englishmaster_be.model.answer.AnswerBlankEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 
