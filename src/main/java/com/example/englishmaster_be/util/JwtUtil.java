@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.config.jwt;
+package com.example.englishmaster_be.util;
 
 import com.example.englishmaster_be.value.JwtValue;
 import io.jsonwebtoken.*;
@@ -57,6 +57,7 @@ public class JwtUtil {
     }
 
     String buildScope(Collection<? extends GrantedAuthority> grantedAuthorities){
+
         return grantedAuthorities
                 .stream()
                 .iterator()

@@ -9,7 +9,7 @@ import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.FeedbackMapper;
 import com.example.englishmaster_be.model.feedback.FeedbackRepository;
 import com.example.englishmaster_be.model.feedback.QFeedbackEntity;
-import com.example.englishmaster_be.util.FeedBackUtil;
+import com.example.englishmaster_be.helper.FeedbackHelper;
 import com.example.englishmaster_be.model.feedback.FeedbackEntity;
 import com.example.englishmaster_be.domain.feedback.dto.response.FeedbackResponse;
 import com.google.cloud.storage.Blob;
@@ -86,7 +86,7 @@ public class FeedbackService implements IFeedbackService {
                                     .selectFrom(QFeedbackEntity.feedbackEntity)
                                     .where(wherePattern);
 
-        OrderSpecifier<?> orderSpecifier = FeedBackUtil.buildFeedbackOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
+        OrderSpecifier<?> orderSpecifier = FeedbackHelper.buildFeedbackOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
 
         if(orderSpecifier != null) query.orderBy(orderSpecifier);
 
@@ -122,7 +122,7 @@ public class FeedbackService implements IFeedbackService {
         long totalPages = (long) Math.ceil((float) totalElements / filterResponse.getPageSize());
         filterResponse.setTotalPages(totalPages);
 
-        OrderSpecifier<?> orderSpecifier = FeedBackUtil.buildFeedbackOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
+        OrderSpecifier<?> orderSpecifier = FeedbackHelper.buildFeedbackOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
 
         JPAQuery<FeedbackEntity> query = queryFactory
                 .selectFrom(QFeedbackEntity.feedbackEntity)

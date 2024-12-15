@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.shared.service.invalid_token;
 
-import com.example.englishmaster_be.config.jwt.JwtUtil;
+import com.example.englishmaster_be.util.JwtUtil;
 import com.example.englishmaster_be.model.invalid_token.InvalidTokenEntity;
 import com.example.englishmaster_be.shared.dto.response.invalid_token.InvalidTokenResponse;
 import com.example.englishmaster_be.model.invalid_token.InvalidTokenRepository;

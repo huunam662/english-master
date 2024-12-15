@@ -63,17 +63,19 @@ public class  GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ExceptionResponseModel handleValidationExceptions(MethodArgumentNotValidException exception){
 
-        String message = "Validation failed";
+        String message = "Ràng buộc thất bại";
 
         BindingResult bindingResult = exception.getBindingResult();
 
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
 
-        Map<String, String> errors = new HashMap<>();
+        Map<String, String> errors = null;
 
         if(!fieldErrors.isEmpty()) {
 
             int lastIndex = fieldErrors.size() - 1;
+
+            errors = new HashMap<>();
 
             errors.put(fieldErrors.get(lastIndex).getField(), fieldErrors.get(lastIndex).getDefaultMessage());
         }
@@ -91,7 +93,7 @@ public class  GlobalExceptionHandler {
     })
     public ExceptionResponseModel handleBadCredentialsException(AuthenticationException ignored) {
 
-        String message = "Wrong username or password";
+        String message = "Sai tên tài khoản hoặc mât khẩu";
 
         return ExceptionResponseModel.builder()
                 .status(HttpStatus.UNAUTHORIZED)

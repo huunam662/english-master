@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.user.dto.response;
+package com.example.englishmaster_be.domain.auth.dto.response;
 
 
 import com.fasterxml.jackson.annotation.JsonInclude;

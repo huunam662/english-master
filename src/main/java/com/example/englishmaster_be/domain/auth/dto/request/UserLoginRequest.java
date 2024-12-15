@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.user.dto.request;
+package com.example.englishmaster_be.domain.auth.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;

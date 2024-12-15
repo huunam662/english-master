@@ -6,10 +6,8 @@ import com.example.englishmaster_be.domain.user.dto.request.*;
 import com.example.englishmaster_be.domain.user.dto.response.UserProfileResponse;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.mapper.UserMapper;
-import com.example.englishmaster_be.domain.user.dto.response.UserAuthResponse;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
@@ -29,67 +27,6 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     IUserService userService;
-
-
-    @PostMapping("/register")
-    @DefaultMessage("Kiểm tra Email của bạn để xác thực đăng ký")
-    public void register(
-            @Valid @RequestBody UserRegisterRequest userRegisterRequest
-    ) {
-
-        userService.registerUser(userRegisterRequest);
-    }
-
-    @GetMapping("/register/confirm")
-    @DefaultMessage("Xác thực đăng ký thành công. Cảm ơn bạn, một thành viên của chúng tôi")
-    public void confirmRegister(@RequestParam("token") String confirmationToken) {
-
-        userService.confirmRegister(confirmationToken);
-    }
-
-    @PostMapping("/login")
-    @DefaultMessage("Đăng nhập thành công")
-    public UserAuthResponse login(@RequestBody UserLoginRequest loginDTO) {
-
-        return userService.login(loginDTO);
-    }
-
-    @PostMapping("/forgetPassword")
-    @DefaultMessage("Please check your email to get OTP code for verify your account")
-    public void forgetPassword(@RequestParam("email") String email) {
-
-        userService.forgotPassword(email);
-    }
-
-    @PostMapping("/verifyOtp")
-    @DefaultMessage("Your verify is successfully")
-    public void verifyOtp(@RequestParam String otp) {
-
-        userService.verifyOtp(otp);
-    }
-
-    @PostMapping("/changePassword")
-    @DefaultMessage("Update your password successfully")
-    public void changePassword(@RequestBody UserChangePasswordRequest changePasswordDTO) {
-
-        userService.changePassword(changePasswordDTO);
-    }
-
-
-    @GetMapping("/forgetPass/confirm")
-    @DefaultMessage("Confirm successfully")
-    public String confirmForgetPassword(@RequestParam String token) {
-
-        return userService.confirmForgetPassword(token);
-    }
-
-
-    @PostMapping("/refreshToken")
-    @DefaultMessage("Created new access token")
-    public UserAuthResponse refreshToken(@RequestBody UserRefreshTokenRequest refreshTokenDTO) {
-
-        return userService.refreshToken(refreshTokenDTO);
-    }
 
 
     @GetMapping("/information")
@@ -115,15 +52,6 @@ public class UserController {
     }
 
 
-    @PatchMapping(value = "/changePass")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Change pass UserEntity successfully")
-    public void changePass(@RequestBody UserChangePasswordRequest changePasswordRequest) {
-
-        userService.changePass(changePasswordRequest);
-    }
-
-
     @GetMapping(value = "/listExamResultsUser")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Show list exam result successfully")
@@ -143,13 +71,5 @@ public class UserController {
 
         return userService.getExamResultsUser(userFilterRequest);
     }
-
-    @PostMapping("/logout")
-    @DefaultMessage("Logout successfully")
-    public void logoutUser(@RequestBody UserLogoutRequest userLogoutDTO) {
-
-        userService.logoutUserOf(userLogoutDTO);
-    }
-
 
 }

@@ -7,7 +7,7 @@ import com.example.englishmaster_be.domain.type.dto.request.TypeRequest;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.domain.type.dto.response.TypeResponse;
 import com.example.englishmaster_be.model.type.QTypeEntity;
-import com.example.englishmaster_be.util.TypeUtil;
+import com.example.englishmaster_be.helper.TypeHelper;
 import com.example.englishmaster_be.model.type.TypeEntity;
 import com.example.englishmaster_be.model.type.TypeRepository;
 import com.querydsl.core.types.OrderSpecifier;
@@ -61,7 +61,7 @@ public class TypeService implements ITypeService {
         long totalPages = (long) Math.ceil((double) totalElements / filterResponse.getPageSize());
         filterResponse.setTotalPages(totalPages);
 
-        OrderSpecifier<?> orderSpecifier = TypeUtil.buildTypeOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
+        OrderSpecifier<?> orderSpecifier = TypeHelper.buildTypeOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
 
         JPAQuery<TypeEntity> query = queryFactory
                 .selectFrom(QTypeEntity.typeEntity)

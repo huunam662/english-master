@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.user.dto.request;
+package com.example.englishmaster_be.domain.auth.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -9,8 +9,10 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserRefreshTokenRequest {
+public class UserLogoutRequest {
 
-    String requestRefresh;
+    String accessToken;
+
+    String refreshToken;
 
 }

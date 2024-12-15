@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.mapper;
 
 import com.example.englishmaster_be.domain.user.dto.request.UserChangeProfileRequest;
-import com.example.englishmaster_be.domain.user.dto.request.UserRegisterRequest;
+import com.example.englishmaster_be.domain.auth.dto.request.UserRegisterRequest;
 import com.example.englishmaster_be.domain.user.dto.response.UserProfileResponse;
 import com.example.englishmaster_be.domain.user.dto.response.UserResponse;
 import com.example.englishmaster_be.model.user.UserEntity;

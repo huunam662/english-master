@@ -23,6 +23,8 @@ public interface IAdminService {
 
     List<UserEntity> findUsersInactiveForDaysAndNotify(int inactiveDays);
 
+    List<UserEntity> findUsersInactiveForDays(int inactiveDays);
+
     void notifyInactiveUsers();
 
 }

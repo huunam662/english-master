@@ -12,7 +12,7 @@ import com.example.englishmaster_be.model.content.ContentRepository;
 import com.example.englishmaster_be.model.part.PartRepository;
 import com.example.englishmaster_be.domain.pack.service.IPackService;
 import com.example.englishmaster_be.domain.part.service.IPartService;
-import com.example.englishmaster_be.util.ExcelUtil;
+import com.example.englishmaster_be.helper.ExcelHelper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -54,7 +54,7 @@ public class ExcelFillService implements IExcelFillService {
         if(file == null || file.isEmpty())
             throw new BadRequestException("Please select a file_storage to upload");
 
-        if(ExcelUtil.isExcelFile(file))
+        if(ExcelHelper.isExcelFile(file))
             throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
@@ -95,7 +95,7 @@ public class ExcelFillService implements IExcelFillService {
         if (part != 1 && part != 2)
             throw new BadRequestException("Invalid PartEntity Value. It must be either 1 or 2");
 
-        if (ExcelUtil.isExcelFile(file))
+        if (ExcelHelper.isExcelFile(file))
             throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
@@ -171,7 +171,7 @@ public class ExcelFillService implements IExcelFillService {
         if(file == null || file.isEmpty())
             throw new BadRequestException("Please select a file_storage to upload");
 
-        if(ExcelUtil.isExcelFile(file))
+        if(ExcelHelper.isExcelFile(file))
             throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
@@ -221,7 +221,7 @@ public class ExcelFillService implements IExcelFillService {
         if (part != 3 && part != 4)
             throw new BadRequestException("Invalid PartEntity Value. It must be either 3 or 4");
 
-        if(ExcelUtil.isExcelFile(file))
+        if(ExcelHelper.isExcelFile(file))
             throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
@@ -294,7 +294,7 @@ public class ExcelFillService implements IExcelFillService {
         if(file == null || file.isEmpty())
             throw new BadRequestException("Please select a file_storage to upload");
 
-        if (ExcelUtil.isExcelFile(file))
+        if (ExcelHelper.isExcelFile(file))
             throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
 
         if (part != 6 && part != 7)
@@ -367,7 +367,7 @@ public class ExcelFillService implements IExcelFillService {
         if(file == null || file.isEmpty())
             throw new BadRequestException("Please select a file_storage to upload");
 
-        if (ExcelUtil.isExcelFile(file))
+        if (ExcelHelper.isExcelFile(file))
             throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
 
         ExcelQuestionListResponse result = new ExcelQuestionListResponse();

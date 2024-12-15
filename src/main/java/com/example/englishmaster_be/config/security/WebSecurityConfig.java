@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.config.security;
 
-import com.example.englishmaster_be.config.filter.AuthTokenFilter;
+import com.example.englishmaster_be.config.filter.AuthRequestFilterConfig;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -27,7 +27,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class WebSecurityConfig {
 
-    AuthTokenFilter authTokenFilter;
+    AuthRequestFilterConfig authTokenFilter;
 
     CorsConfigurationSource corsConfigurationSource;
 

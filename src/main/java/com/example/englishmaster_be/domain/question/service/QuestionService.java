@@ -7,7 +7,7 @@ import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
-import com.example.englishmaster_be.helper.GetExtensionHelper;
+import com.example.englishmaster_be.util.GetExtensionUtil;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
@@ -47,7 +47,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class QuestionService implements IQuestionService {
 
-    GetExtensionHelper getExtensionHelper;
+    GetExtensionUtil getExtensionHelper;
 
     QuestionRepository questionRepository;
 
