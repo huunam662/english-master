@@ -1,17 +1,13 @@
 package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.model.request.MockTest.MockTestRequest;
-import com.example.englishmaster_be.model.response.MockTestResponse;
-import com.example.englishmaster_be.model.response.PartMockTestResponse;
-import com.example.englishmaster_be.model.response.PartResponse;
-import com.example.englishmaster_be.entity.MockTestEntity;
-import com.example.englishmaster_be.entity.PartEntity;
+import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestRequest;
+import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestPartResponse;
+import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestResponse;
+import com.example.englishmaster_be.model.mock_test.MockTestEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 import org.mapstruct.factory.Mappers;
 
-import java.util.Comparator;
 import java.util.List;
 
 @Mapper
@@ -30,6 +26,6 @@ public interface MockTestMapper {
     @Mapping(target = "topicName", source = "topic.topicName")
     @Mapping(target = "topicTime", source = "topic.workTime")
     @Mapping(target = "parts", ignore = true)
-    PartMockTestResponse toPartMockTestResponse(MockTestEntity mockTestEntity);
+    MockTestPartResponse toPartMockTestResponse(MockTestEntity mockTestEntity);
 
 }

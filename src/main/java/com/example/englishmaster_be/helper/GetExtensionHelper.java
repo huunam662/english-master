@@ -26,8 +26,8 @@ public class GetExtensionHelper {
         String extension = this.getExtension(name);
 
         return switch (extension) {
-            case ".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG", ".gif", ".GIF" -> linkValue.getLinkBE() + "file/showImage/";
-            case ".mp3" -> linkValue.getLinkBE() + "file/showAudio/";
+            case ".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG", ".gif", ".GIF" -> linkValue.getLinkBE() + "file_storage/showImage/";
+            case ".mp3" -> linkValue.getLinkBE() + "file_storage/showAudio/";
             default -> "";
         };
     }

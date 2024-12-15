@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.model.request.Feedback.FeedbackRequest;
-import com.example.englishmaster_be.entity.FeedbackEntity;
-import com.example.englishmaster_be.model.response.FeedbackResponse;
+import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackRequest;
+import com.example.englishmaster_be.model.feedback.FeedbackEntity;
+import com.example.englishmaster_be.domain.feedback.dto.response.FeedbackResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

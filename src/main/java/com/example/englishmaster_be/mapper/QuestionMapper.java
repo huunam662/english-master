@@ -1,11 +1,11 @@
 package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.model.request.Question.GroupQuestionRequest;
-import com.example.englishmaster_be.model.request.Question.QuestionRequest;
-import com.example.englishmaster_be.model.response.QuestionBasicResponse;
-import com.example.englishmaster_be.model.response.excel.QuestionByExcelFileResponse;
-import com.example.englishmaster_be.entity.QuestionEntity;
-import com.example.englishmaster_be.model.response.QuestionResponse;
+import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
+import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
+import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionBasicResponse;
+import com.example.englishmaster_be.model.question.QuestionEntity;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -18,7 +18,7 @@ public interface QuestionMapper {
 
     QuestionEntity toQuestionEntity(QuestionRequest questionDto);
 
-    QuestionEntity toQuestionEntity(GroupQuestionRequest saveGroupQuestionDTO);
+    QuestionEntity toQuestionEntity(QuestionGroupRequest saveGroupQuestionDTO);
 
     @Mapping(target = "partId", source = "part.partId")
     @Mapping(target = "contentList", source = "contentCollection")
@@ -35,7 +35,7 @@ public interface QuestionMapper {
     List<QuestionBasicResponse> toQuestionBasicResponseList(List<QuestionEntity> questionList);
 
     @Mapping(target = "questionId", ignore = true)
-    void flowToQuestionEntity(QuestionByExcelFileResponse questionByExcelFileResponse, @MappingTarget QuestionEntity questionEntity);
+    void flowToQuestionEntity(ExcelQuestionResponse questionByExcelFileResponse, @MappingTarget QuestionEntity questionEntity);
 
     @Mapping(target = "questionId", ignore = true)
     void flowToQuestionEntity(QuestionRequest questionRequest, @MappingTarget QuestionEntity questionEntity);

@@ -1,10 +1,10 @@
 package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.model.request.Answer.AnswerBasicRequest;
-import com.example.englishmaster_be.model.request.Answer.AnswerRequest;
-import com.example.englishmaster_be.entity.AnswerEntity;
-import com.example.englishmaster_be.model.response.AnswerResponse;
-import com.example.englishmaster_be.model.response.CheckCorrectAnswerResponse;
+import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
+import com.example.englishmaster_be.domain.answer.dto.request.AnswerRequest;
+import com.example.englishmaster_be.domain.answer.dto.response.AnswerCorrectResponse;
+import com.example.englishmaster_be.model.answer_blank.AnswerEntity;
+import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -28,6 +28,6 @@ public interface AnswerMapper {
     void flowToAnswerEntity(AnswerBasicRequest answerBasicRequest, @MappingTarget AnswerEntity answer);
 
     @Mapping(target = "scoreAnswer", source = "question.questionScore")
-    CheckCorrectAnswerResponse toCheckCorrectAnswerResponse(AnswerEntity answer);
+    AnswerCorrectResponse toCheckCorrectAnswerResponse(AnswerEntity answer);
 
 }

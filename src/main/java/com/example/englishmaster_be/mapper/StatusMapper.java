@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.model.request.Status.StatusRequest;
-import com.example.englishmaster_be.model.response.StatusResponse;
-import com.example.englishmaster_be.entity.StatusEntity;
+import com.example.englishmaster_be.domain.status.dto.request.StatusRequest;
+import com.example.englishmaster_be.domain.status.dto.response.StatusResponse;
+import com.example.englishmaster_be.model.status.StatusEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

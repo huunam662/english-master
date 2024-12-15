@@ -1,9 +1,9 @@
 package com.example.englishmaster_be.mapper;
 
 
-import com.example.englishmaster_be.model.request.Part.PartRequest;
-import com.example.englishmaster_be.entity.PartEntity;
-import com.example.englishmaster_be.model.response.PartResponse;
+import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
+import com.example.englishmaster_be.model.part.PartEntity;
+import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

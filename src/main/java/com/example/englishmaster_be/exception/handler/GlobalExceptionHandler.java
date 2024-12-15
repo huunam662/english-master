@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.exception.handler;
 
-import com.example.englishmaster_be.common.constaint.error.ErrorEnum;
+import com.example.englishmaster_be.common.constant.error.ErrorEnum;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.exception.template.RefreshTokenException;
@@ -26,7 +26,7 @@ import java.rmi.ServerException;
 import java.util.*;
 
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class  GlobalExceptionHandler {
 
 
     @ExceptionHandler(CustomException.class)

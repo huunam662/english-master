@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.model.response.PackResponse;
-import com.example.englishmaster_be.entity.PackEntity;
+import com.example.englishmaster_be.domain.pack.dto.response.PackResponse;
+import com.example.englishmaster_be.model.pack.PackEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 

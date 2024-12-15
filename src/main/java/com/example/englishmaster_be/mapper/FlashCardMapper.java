@@ -1,9 +1,9 @@
 package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.model.request.FlashCard.FlashCardRequest;
-import com.example.englishmaster_be.entity.FlashCardEntity;
-import com.example.englishmaster_be.model.response.FlashCardListWordResponse;
-import com.example.englishmaster_be.model.response.FlashCardResponse;
+import com.example.englishmaster_be.domain.flash_card.dto.request.FlashCardRequest;
+import com.example.englishmaster_be.model.flash_card.FlashCardEntity;
+import com.example.englishmaster_be.domain.flash_card_word.dto.response.FlashCardWordListResponse;
+import com.example.englishmaster_be.domain.flash_card.dto.response.FlashCardResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -21,7 +21,7 @@ public interface FlashCardMapper {
     List<FlashCardResponse> toFlashCardResponseList(List<FlashCardEntity> flashCardList);
 
     @Mapping(target = "flashCardWords", expression = "java(FlashCardWordMapper.INSTANCE.toFlashCardWordResponseList(flashCard.getFlashCardWords()))")
-    FlashCardListWordResponse toFlashCardListWordResponse(FlashCardEntity flashCard);
+    FlashCardWordListResponse toFlashCardListWordResponse(FlashCardEntity flashCard);
 
     @Mapping(target = "flashCardImage", ignore = true)
     @Mapping(target = "flashCardId", ignore = true)

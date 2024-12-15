@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.model.response.DetailMockTestResponse;
-import com.example.englishmaster_be.entity.DetailMockTestEntity;
+import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestDetailResponse;
+import com.example.englishmaster_be.model.detail_mock_test.DetailMockTestEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -17,8 +17,8 @@ public interface DetailMockTestMapper {
     @Mapping(target = "answerContent", source = "answer.answerContent")
     @Mapping(target = "correctAnswer", source = "answer.correctAnswer", defaultValue = "false")
     @Mapping(target = "scoreAnswer", source = "answer.question.questionScore", defaultValue = "0")
-    DetailMockTestResponse toDetailMockTestResponse(DetailMockTestEntity detailMockTestEntity);
+    MockTestDetailResponse toDetailMockTestResponse(DetailMockTestEntity detailMockTestEntity);
 
-    List<DetailMockTestResponse> toDetailMockTestResponseList(List<DetailMockTestEntity> detailMockTestList);
+    List<MockTestDetailResponse> toDetailMockTestResponseList(List<DetailMockTestEntity> detailMockTestList);
 
 }
