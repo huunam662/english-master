@@ -1,10 +1,10 @@
 package com.example.englishmaster_be.config.filter;
 
-import com.example.englishmaster_be.common.constaint.error.ErrorEnum;
+import com.example.englishmaster_be.common.constant.error.ErrorEnum;
 import com.example.englishmaster_be.config.jwt.JwtUtil;
 import com.example.englishmaster_be.common.dto.response.ExceptionResponseModel;
 import com.example.englishmaster_be.exception.template.CustomException;
-import com.example.englishmaster_be.service.IInvalidTokenService;
+import com.example.englishmaster_be.shared.service.invalid_token.IInvalidTokenService;
 import io.swagger.v3.core.util.Json;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;

@@ -1,10 +1,10 @@
 package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.model.request.Topic.TopicRequest;
-import com.example.englishmaster_be.entity.PartEntity;
-import com.example.englishmaster_be.model.response.TopicResponse;
-import com.example.englishmaster_be.model.response.excel.TopicByExcelFileResponse;
-import com.example.englishmaster_be.entity.TopicEntity;
+import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
+import com.example.englishmaster_be.domain.topic.dto.request.TopicRequest;
+import com.example.englishmaster_be.model.part.PartEntity;
+import com.example.englishmaster_be.domain.topic.dto.response.TopicResponse;
+import com.example.englishmaster_be.model.topic.TopicEntity;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -17,7 +17,7 @@ public interface TopicMapper {
 
     TopicMapper INSTANCE = Mappers.getMapper(TopicMapper.class);
 
-    TopicRequest toTopicRequest(TopicByExcelFileResponse topicByExcelFileResponse);
+    TopicRequest toTopicRequest(ExcelTopicResponse topicByExcelFileResponse);
 
     @Mapping(target = "parts", expression = "java(toListPartId(topicEntity.getParts()))")
     @Mapping(target = "packId", source = "pack.packId")
@@ -39,6 +39,6 @@ public interface TopicMapper {
     @Mapping(target = "numberQuestion", defaultValue = "0")
     void flowToTopicEntity(TopicRequest topicRequest, @MappingTarget TopicEntity topicEntity);
 
-    void flowToTopicEntity(TopicByExcelFileResponse topicByExcelFileResponse, @MappingTarget TopicEntity topicEntity);
+    void flowToTopicEntity(ExcelTopicResponse topicByExcelFileResponse, @MappingTarget TopicEntity topicEntity);
 
 }

@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.entity.AnswerBlankEntity;
-import com.example.englishmaster_be.model.response.AnswerBlankResponse;
+import com.example.englishmaster_be.model.answer.AnswerBlankEntity;
+import com.example.englishmaster_be.domain.answer_blank.dto.response.AnswerBlankResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

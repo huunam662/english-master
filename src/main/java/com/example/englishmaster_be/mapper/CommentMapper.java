@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.entity.CommentEntity;
-import com.example.englishmaster_be.model.response.CommentResponse;
+import com.example.englishmaster_be.model.comment.CommentEntity;
+import com.example.englishmaster_be.domain.comment.dto.response.CommentResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

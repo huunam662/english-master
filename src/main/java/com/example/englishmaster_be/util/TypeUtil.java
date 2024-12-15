@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.util;
 
-import com.example.englishmaster_be.common.constaint.sort.SortByTypeFieldsEnum;
+import com.example.englishmaster_be.common.constant.sort.SortByTypeFieldsEnum;
 import com.example.englishmaster_be.entity.QTypeEntity;
 import com.querydsl.core.types.OrderSpecifier;
 import org.springframework.data.domain.Sort;

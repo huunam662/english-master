@@ -1,10 +1,10 @@
 package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.model.request.User.ChangeProfileRequest;
-import com.example.englishmaster_be.model.request.UserRegisterRequest;
-import com.example.englishmaster_be.model.response.InformationUserResponse;
-import com.example.englishmaster_be.model.response.UserResponse;
-import com.example.englishmaster_be.entity.UserEntity;
+import com.example.englishmaster_be.domain.user.dto.request.UserChangeProfileRequest;
+import com.example.englishmaster_be.domain.user.dto.request.UserRegisterRequest;
+import com.example.englishmaster_be.domain.user.dto.response.UserProfileResponse;
+import com.example.englishmaster_be.domain.user.dto.response.UserResponse;
+import com.example.englishmaster_be.model.user.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -25,11 +25,11 @@ public interface UserMapper {
     List<UserResponse> toUserResponseList(List<UserEntity> userEntityList);
 
     @Mapping(target = "avatar", ignore = true)
-    void flowToUserEntity(ChangeProfileRequest changeProfileRequest, @MappingTarget UserEntity userEntity);
+    void flowToUserEntity(UserChangeProfileRequest changeProfileRequest, @MappingTarget UserEntity userEntity);
 
     @Mapping(target = "role", source = "role.roleName")
     @Mapping(target = "user", expression = "java(toUserResponse(userEntity))")
-    InformationUserResponse toInformationUserResponse(UserEntity userEntity);
+    UserProfileResponse toInformationUserResponse(UserEntity userEntity);
 
 }
 

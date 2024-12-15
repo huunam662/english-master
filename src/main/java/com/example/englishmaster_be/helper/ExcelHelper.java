@@ -6,9 +6,9 @@ public class ExcelHelper {
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     static String PART5 = "Part5";
 
-//    public static boolean hasExcelFormat(MultipartFile file) {
+//    public static boolean hasExcelFormat(MultipartFile file_storage) {
 //
-//        if (!TYPE.equals(file.getContentType())) {
+//        if (!TYPE.equals(file_storage.getContentType())) {
 //            return false;
 //        }
 //
@@ -87,7 +87,7 @@ public class ExcelHelper {
 //            workbook.close();
 //
 //        } catch (IOException e) {
-//            throw new RuntimeException("fail to parse Excel file: " + e.getMessage());
+//            throw new RuntimeException("fail to parse Excel file_storage: " + e.getMessage());
 //        }
 //    }
 }

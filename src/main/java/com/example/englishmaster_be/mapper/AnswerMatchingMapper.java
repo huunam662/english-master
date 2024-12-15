@@ -1,10 +1,10 @@
 package com.example.englishmaster_be.mapper;
 
 
-import com.example.englishmaster_be.model.response.AnswerMatchingBasicResponse;
-import com.example.englishmaster_be.entity.AnswerMatchingEntity;
-import com.example.englishmaster_be.model.response.AnswerMatchingResponse;
-import com.example.englishmaster_be.entity.UserAnswerMatchingEntity;
+import com.example.englishmaster_be.domain.answer_matching.dto.response.AnswerMatchingBasicResponse;
+import com.example.englishmaster_be.model.answer_matching.AnswerMatchingEntity;
+import com.example.englishmaster_be.domain.answer_matching.dto.response.AnswerMatchingResponse;
+import com.example.englishmaster_be.model.user_answer_matching.UserAnswerMatchingEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;

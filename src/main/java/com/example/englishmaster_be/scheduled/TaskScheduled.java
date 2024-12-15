@@ -1,12 +1,12 @@
 package com.example.englishmaster_be.scheduled;
 
-import com.example.englishmaster_be.entity.InvalidTokenEntity;
+import com.example.englishmaster_be.model.invalid_token.InvalidTokenEntity;
 import com.example.englishmaster_be.entity.QInvalidTokenEntity;
 import com.example.englishmaster_be.entity.QUserEntity;
-import com.example.englishmaster_be.entity.UserEntity;
-import com.example.englishmaster_be.repository.ConfirmationTokenRepository;
-import com.example.englishmaster_be.repository.InvalidTokenRepository;
-import com.example.englishmaster_be.repository.UserRepository;
+import com.example.englishmaster_be.model.user.UserEntity;
+import com.example.englishmaster_be.model.confirmation_token.ConfirmationTokenRepository;
+import com.example.englishmaster_be.model.invalid_token.InvalidTokenRepository;
+import com.example.englishmaster_be.model.user.UserRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;

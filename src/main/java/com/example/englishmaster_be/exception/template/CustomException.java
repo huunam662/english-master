@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.exception.template;
 
-import com.example.englishmaster_be.common.constaint.error.ErrorEnum;
+import com.example.englishmaster_be.common.constant.error.ErrorEnum;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;

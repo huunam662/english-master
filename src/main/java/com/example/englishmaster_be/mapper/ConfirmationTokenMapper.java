@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.model.request.ConfirmationToken.ConfirmationTokenRequest;
-import com.example.englishmaster_be.entity.ConfirmationTokenEntity;
-import com.example.englishmaster_be.model.response.ConfirmationTokenResponse;
+import com.example.englishmaster_be.domain.user.dto.request.UserConfirmTokenRequest;
+import com.example.englishmaster_be.domain.user.dto.response.UserConfirmTokenResponse;
+import com.example.englishmaster_be.model.confirmation_token.ConfirmationTokenEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
@@ -12,8 +12,8 @@ public interface ConfirmationTokenMapper {
 
     ConfirmationTokenMapper INSTANCE = Mappers.getMapper(ConfirmationTokenMapper.class);
 
-    ConfirmationTokenEntity toConfirmationTokenEntity(ConfirmationTokenRequest confirmationTokenRequest);
+    ConfirmationTokenEntity toConfirmationTokenEntity(UserConfirmTokenRequest confirmationTokenRequest);
 
-    ConfirmationTokenResponse toConfirmationTokenResponse(ConfirmationTokenEntity confirmationToken);
+    UserConfirmTokenResponse toConfirmationTokenResponse(ConfirmationTokenEntity confirmationToken);
 }
 

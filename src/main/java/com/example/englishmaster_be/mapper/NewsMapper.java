@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.model.request.News.NewsRequest;
-import com.example.englishmaster_be.model.response.NewsResponse;
-import com.example.englishmaster_be.entity.NewsEntity;
+import com.example.englishmaster_be.domain.news.dto.request.NewsRequest;
+import com.example.englishmaster_be.domain.news.dto.response.NewsResponse;
+import com.example.englishmaster_be.model.news.NewsEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

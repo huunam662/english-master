@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.model.request.Type.TypeRequest;
-import com.example.englishmaster_be.model.response.TypeResponse;
-import com.example.englishmaster_be.entity.TypeEntity;
+import com.example.englishmaster_be.domain.type.dto.request.TypeRequest;
+import com.example.englishmaster_be.domain.type.dto.response.TypeResponse;
+import com.example.englishmaster_be.model.type.TypeEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

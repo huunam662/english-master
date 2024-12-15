@@ -1,9 +1,9 @@
 package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.model.request.Content.ContentRequest;
-import com.example.englishmaster_be.model.response.ContentBasicResponse;
-import com.example.englishmaster_be.entity.ContentEntity;
-import com.example.englishmaster_be.model.response.ContentResponse;
+import com.example.englishmaster_be.domain.content.dto.request.ContentRequest;
+import com.example.englishmaster_be.domain.content.dto.response.ContentBasicResponse;
+import com.example.englishmaster_be.model.content.ContentEntity;
+import com.example.englishmaster_be.domain.content.dto.response.ContentResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

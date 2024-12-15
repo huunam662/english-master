@@ -1,9 +1,9 @@
 package com.example.englishmaster_be.mapper;
 
 
-import com.example.englishmaster_be.model.request.MockTest.ResultMockTestRequest;
-import com.example.englishmaster_be.model.response.ResultMockTestResponse;
-import com.example.englishmaster_be.entity.ResultMockTestEntity;
+import com.example.englishmaster_be.domain.result_mock_test.dto.request.ResultMockTestRequest;
+import com.example.englishmaster_be.domain.result_mock_test.dto.response.ResultMockTestResponse;
+import com.example.englishmaster_be.model.result_mock_test.ResultMockTestEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

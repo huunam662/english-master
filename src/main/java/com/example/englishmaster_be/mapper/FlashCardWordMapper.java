@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.model.request.FlashCard.FlashCardWordRequest;
-import com.example.englishmaster_be.entity.FlashCardWordEntity;
-import com.example.englishmaster_be.model.response.FlashCardWordResponse;
+import com.example.englishmaster_be.domain.flash_card_word.dto.request.FlashCardWordRequest;
+import com.example.englishmaster_be.model.flash_card_word.FlashCardWordEntity;
+import com.example.englishmaster_be.domain.flash_card_word.dto.response.FlashCardWordResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
