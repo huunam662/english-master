@@ -6,9 +6,9 @@ import org.springframework.stereotype.Component;
 import javax.sql.DataSource;
 
 @Component
-public class JdbcUserDetailsManagerCustom extends JdbcUserDetailsManager {
+public class JdbcUserDetailsManagerConfig extends JdbcUserDetailsManager {
 
-    public JdbcUserDetailsManagerCustom(DataSource dataSource) {
+    public JdbcUserDetailsManagerConfig(DataSource dataSource) {
 
         super(dataSource);
 
