@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.upload.service;
 
-import com.example.englishmaster_be.helper.GetExtensionHelper;
+import com.example.englishmaster_be.util.GetExtensionUtil;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
@@ -36,7 +36,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UploadService implements IUploadService {
 
-    GetExtensionHelper getExtensionHelper;
+    GetExtensionUtil getExtensionHelper;
 
     RestTemplate restTemplate;
 

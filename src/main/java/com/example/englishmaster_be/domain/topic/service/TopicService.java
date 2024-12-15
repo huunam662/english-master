@@ -14,7 +14,7 @@ import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.status.service.IStatusService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.helper.GetExtensionHelper;
+import com.example.englishmaster_be.util.GetExtensionUtil;
 import com.example.englishmaster_be.mapper.AnswerMapper;
 import com.example.englishmaster_be.mapper.QuestionMapper;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
@@ -79,7 +79,7 @@ public class TopicService implements ITopicService {
 
     LinkValue linkValue;
 
-    GetExtensionHelper getExtensionHelper;
+    GetExtensionUtil getExtensionHelper;
 
     JPAQueryFactory queryFactory;
 

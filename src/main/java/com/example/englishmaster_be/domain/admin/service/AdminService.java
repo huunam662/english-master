@@ -18,6 +18,7 @@ import com.example.englishmaster_be.model.user.QUserEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.model.user.UserRepository;
 import com.example.englishmaster_be.domain.admin.dto.response.CountMockTestTopicResponse;
+import com.example.englishmaster_be.util.MailerUtil;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -44,6 +45,8 @@ public class AdminService implements IAdminService {
 
     JPAQueryFactory queryFactory;
 
+    MailerUtil mailerUtil;
+
     IUserService userService;
 
     IPackService packService;
@@ -53,6 +56,7 @@ public class AdminService implements IAdminService {
     IMockTestService mockTestService;
 
     UserRepository userRepository;
+
 
 
     @Transactional
@@ -199,7 +203,7 @@ public class AdminService implements IAdminService {
         List<UserEntity> inactiveUsers = query.fetch();
 
         for (UserEntity user : inactiveUsers)
-            userService.sendNotificationEmail(user);
+            mailerUtil.sendNotificationEmail(user);
 
         return inactiveUsers;
     }
@@ -212,10 +216,30 @@ public class AdminService implements IAdminService {
 
         for (UserEntity user : inactiveUsers) {
             try {
-                userService.sendMail(user.getEmail());
+                mailerUtil.sendMail(user.getEmail());
             }catch (MessagingException e){
                 System.out.println("Failed to send email to: " + user.getEmail());
             }
         }
+    }
+
+
+    @Transactional
+    @Override
+    public List<UserEntity> findUsersInactiveForDays(int inactiveDays) {
+
+        // Tính toán ngày đã qua kể từ ngày hiện tại
+        LocalDateTime thresholdDate = LocalDateTime.now().minusDays(inactiveDays);
+
+        // Xây dựng điều kiện lọc
+        BooleanExpression wherePattern = QUserEntity.userEntity.lastLogin.before(thresholdDate);
+
+        // Truy vấn người dùng lâu ngày chưa đăng nhập
+        JPAQuery<UserEntity> query = queryFactory
+                .selectFrom(QUserEntity.userEntity)
+                .where(wherePattern);
+
+        // Chuyển đổi kết quả thành UserResponse
+        return query.fetch();
     }
 }

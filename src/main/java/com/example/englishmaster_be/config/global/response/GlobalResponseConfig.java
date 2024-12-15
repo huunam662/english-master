@@ -25,7 +25,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 @RestControllerAdvice
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
+public class GlobalResponseConfig implements ResponseBodyAdvice<Object> {
 
     HttpServletRequest httpServletRequest;
 
@@ -44,7 +44,7 @@ public class GlobalResponseAdvice implements ResponseBodyAdvice<Object> {
         System.out.println("requestURI: " + requestURI);
         System.out.println("packageName: " + packageName);
         System.out.println("declaringClass: " + declaringClass);
-        System.out.println("annotation declaringClass" + declaringClass.getAnnotation(RestController.class));
+        System.out.println("annotation declaringClass: " + declaringClass.getAnnotation(RestController.class));
         System.out.println("------- supports ResponseBodyAdvice -----------");
         // -> end (1)
 

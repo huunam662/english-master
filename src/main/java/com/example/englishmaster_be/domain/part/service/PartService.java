@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.part.service;
 
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
-import com.example.englishmaster_be.helper.GetExtensionHelper;
+import com.example.englishmaster_be.util.GetExtensionUtil;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
 import com.example.englishmaster_be.model.part.PartRepository;
 import com.example.englishmaster_be.shared.dto.request.upload_file.UploadMultipleFileRequest;
@@ -31,7 +31,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PartService implements IPartService {
 
-    GetExtensionHelper getExtensionHelper;
+    GetExtensionUtil getExtensionHelper;
 
     PartRepository partRepository;
 

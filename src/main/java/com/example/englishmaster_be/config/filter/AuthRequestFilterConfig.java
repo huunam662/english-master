@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.config.filter;
 
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
-import com.example.englishmaster_be.config.jwt.JwtUtil;
+import com.example.englishmaster_be.util.JwtUtil;
 import com.example.englishmaster_be.common.dto.response.ExceptionResponseModel;
 import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.shared.service.invalid_token.IInvalidTokenService;
@@ -27,13 +27,14 @@ import java.nio.charset.StandardCharsets;
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class AuthTokenFilter extends OncePerRequestFilter {
+public class AuthRequestFilterConfig extends OncePerRequestFilter {
 
     JwtUtil jwtUtil;
 
     UserDetailsService userDetailsService;
 
     IInvalidTokenService invalidTokenService;
+
 
 
     @Override
@@ -43,13 +44,17 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) {
 
+        System.out.println("-> doFilterInternal");
+
         try{
 
             String headerAuth = request.getHeader("Authorization");
 
             if (headerAuth != null && !headerAuth.isEmpty()){
 
-                String jwtToken = headerAuth.substring(7);
+                String prefixHeaderAuth = "Bearer";
+
+                String jwtToken = headerAuth.substring(prefixHeaderAuth.length()).trim();
 
                 String username = jwtUtil.extractUsername(jwtToken);
 
@@ -69,8 +74,10 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
             }
 
+//            System.out.println("request.getRequestURI(): " + request.getRequestURI());
+
             filterChain.doFilter(request, response);
-    
+
         }
         catch (Exception e){
 

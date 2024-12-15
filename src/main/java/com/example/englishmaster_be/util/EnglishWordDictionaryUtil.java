@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.helper;
+package com.example.englishmaster_be.util;
 
 import com.example.englishmaster_be.value.DictionaryValue;
 import jakarta.annotation.PostConstruct;
@@ -12,14 +12,13 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
-public class EnglishWordDictionaryHelper {
+public class EnglishWordDictionaryUtil {
 
     DictionaryValue dictionaryValue;
 

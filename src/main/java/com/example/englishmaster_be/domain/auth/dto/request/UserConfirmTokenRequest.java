@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.user.dto.request;
+package com.example.englishmaster_be.domain.auth.dto.request;
 
 import com.example.englishmaster_be.model.user.UserEntity;
 import lombok.*;
