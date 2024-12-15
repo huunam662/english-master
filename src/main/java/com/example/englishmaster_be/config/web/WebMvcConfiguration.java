@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.config;
+package com.example.englishmaster_be.config.web;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RestController;

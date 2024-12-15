@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.config;
+package com.example.englishmaster_be.config.web;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

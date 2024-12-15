@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.config;
+package com.example.englishmaster_be.config.integration.query;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
