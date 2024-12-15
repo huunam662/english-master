@@ -9,7 +9,7 @@ import com.example.englishmaster_be.domain.news.dto.response.NewsResponse;
 import com.example.englishmaster_be.model.news.NewsRepository;
 import com.example.englishmaster_be.domain.file_storage.service.IFileStorageService;
 import com.example.englishmaster_be.model.news.NewsEntity;
-import com.example.englishmaster_be.entity.QNewsEntity;
+import com.example.englishmaster_be.model.news.QNewsEntity;
 import com.google.cloud.storage.Blob;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
