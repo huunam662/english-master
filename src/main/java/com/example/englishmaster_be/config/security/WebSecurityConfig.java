@@ -18,6 +18,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -57,8 +58,17 @@ public class WebSecurityConfig {
 
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-        corsConfiguration.addAllowedOrigin("*");
-        corsConfiguration.addAllowedMethod("*");
+        corsConfiguration.setAllowedOriginPatterns(
+                List.of(
+                        "http://localhost:3000",
+                        "http://localhost:8080",
+                        "https://englishmaster.erp.meu-solutions.com",
+                        "https://gateway.dev.meu-solutions.com/englishmaster"
+                )
+        );
+        corsConfiguration.setAllowedMethods(
+                List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        );
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.setAllowCredentials(Boolean.TRUE);
 
