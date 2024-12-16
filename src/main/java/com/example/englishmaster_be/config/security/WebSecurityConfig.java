@@ -30,15 +30,13 @@ public class WebSecurityConfig {
 
     AuthRequestFilterConfig authTokenFilter;
 
-    CorsConfigurationSource corsConfigurationSource;
-
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .formLogin(FormLoginConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                .cors(cors -> cors.configurationSource(this.corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.authorizeHttpRequests(auth ->
@@ -53,7 +51,6 @@ public class WebSecurityConfig {
     }
 
 
-    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration corsConfiguration = new CorsConfiguration();
@@ -63,11 +60,12 @@ public class WebSecurityConfig {
                         "http://localhost:3000",
                         "http://localhost:8080",
                         "https://englishmaster.erp.meu-solutions.com",
-                        "https://gateway.dev.meu-solutions.com/englishmaster"
+                        "https://gateway.dev.meu-solutions.com"
                 )
         );
-        corsConfiguration.addAllowedMethod("*");
-        corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.setAllowedHeaders(List.of("*"));
+        corsConfiguration.setAllowedMethods(List.of("*"));
+        corsConfiguration.setAllowCredentials(Boolean.TRUE);
 
         UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
         corsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
