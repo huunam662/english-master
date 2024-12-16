@@ -66,11 +66,9 @@ public class WebSecurityConfig {
                         "https://gateway.dev.meu-solutions.com/englishmaster"
                 )
         );
-        corsConfiguration.setAllowedMethods(
-                List.of("GET", "POST", "PUT", "DELETE", "OPTIONS")
-        );
+        corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");
-        corsConfiguration.setAllowCredentials(Boolean.TRUE);
+        corsConfiguration.setAllowCredentials(Boolean.FALSE);
 
         UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
         corsConfigurationSource.registerCorsConfiguration("/**", corsConfiguration);
