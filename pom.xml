@@ -309,10 +309,6 @@
 
     <build>
 
-        <directory>${project.basedir}/bin</directory>
-        <sourceDirectory>${project.basedir}/src/main/java</sourceDirectory>
-        <outputDirectory>${project.basedir}/bin</outputDirectory>
-
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
