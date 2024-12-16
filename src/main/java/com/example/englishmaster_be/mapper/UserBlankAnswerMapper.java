@@ -1,0 +1,17 @@
+package com.example.englishmaster_be.mapper;
+
+import com.example.englishmaster_be.domain.user_answer.dto.response.UserAnswerBlankResponse;
+import com.example.englishmaster_be.model.user_blank_answer.UserBlankAnswerEntity;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
+
+@Mapper
+public interface UserBlankAnswerMapper {
+
+    UserBlankAnswerMapper INSTANCE = Mappers.getMapper(UserBlankAnswerMapper.class);
+
+    @Mapping(target = "question", expression = "java(QuestionMapper.INSTANCE.toQuestionBasicResponse(userBlankAnswerEntity.getQuestion()))")
+    UserAnswerBlankResponse toUserBlankAnswerResponse(UserBlankAnswerEntity userBlankAnswerEntity);
+
+}

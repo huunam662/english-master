@@ -10,10 +10,15 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 public class EnglishmasterBeApplication {
 
+    private static final String local = "local";
+
+    private static final String staging = "staging";
+
     public static void main(String[] args) {
+
         SpringApplication application = new SpringApplication(EnglishmasterBeApplication.class);
         ConfigurableEnvironment environment = new StandardEnvironment();
-        environment.setActiveProfiles("local");
+        environment.setActiveProfiles(staging);
         application.setEnvironment(environment);
         application.run(args);
     }
