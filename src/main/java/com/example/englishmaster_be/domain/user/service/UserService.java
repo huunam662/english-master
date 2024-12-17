@@ -52,7 +52,6 @@ public class UserService implements IUserService {
     IUploadService uploadService;
 
 
-
     @Transactional
     @Override
     public UserEntity changeProfile(UserChangeProfileRequest changeProfileRequest) {
@@ -142,8 +141,11 @@ public class UserService implements IUserService {
 
 
     @Override
-    public UserEntity findUser(UserDetails userDetails) {
-        return findUserByEmail(userDetails.getUsername());
+    public UserEntity getUserById(UUID userId) {
+
+        return userRepository.findById(userId).orElseThrow(
+                () -> new BadRequestException("Người dùng không tồn tại")
+        );
     }
 
     @Override
@@ -152,15 +154,16 @@ public class UserService implements IUserService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails)
-            return findUser(userDetails);
+            return getUserByEmail(userDetails.getUsername());
 
-        throw new AuthenticationServiceException("Please authenticate user");
+        throw new AuthenticationServiceException("Vui lòng xác thực người dùng");
     }
 
     @Override
-    public UserEntity findUserByEmail(String email) {
+    public UserEntity getUserByEmail(String email) {
+
         return userRepository.findByEmail(email).orElseThrow(
-                () -> new BadRequestException("UserEntity not found")
+                () -> new BadRequestException("Người dùng không tồn tại")
         );
     }
 
@@ -174,6 +177,7 @@ public class UserService implements IUserService {
 
     @Override
     public boolean existsEmail(String email) {
+
         return userRepository.existsByEmail(email);
     }
 

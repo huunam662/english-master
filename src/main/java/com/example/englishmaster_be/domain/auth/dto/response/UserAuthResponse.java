@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.UUID;
+
 
 @Getter
 @Setter
@@ -17,6 +19,6 @@ public class UserAuthResponse {
 
     String accessToken;
 
-    String refreshToken;
+    UUID refreshToken;
 
 }

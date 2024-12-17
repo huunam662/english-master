@@ -36,7 +36,6 @@ public class AuthRequestFilterConfig extends OncePerRequestFilter {
     IInvalidTokenService invalidTokenService;
 
 
-
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
@@ -56,12 +55,12 @@ public class AuthRequestFilterConfig extends OncePerRequestFilter {
 
                 String jwtToken = headerAuth.substring(prefixHeaderAuth.length()).trim();
 
+                if (!jwtUtil.validateToken(jwtToken) || invalidTokenService.invalidToken(jwtToken))
+                    throw new CustomException(ErrorEnum.UNAUTHENTICATED);
+
                 String username = jwtUtil.extractUsername(jwtToken);
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-
-                if (!jwtUtil.validateToken(jwtToken, userDetails) || invalidTokenService.invalidToken(jwtToken))
-                    throw new CustomException(ErrorEnum.UNAUTHENTICATED);
 
                 if(!userDetails.isEnabled())
                     throw new CustomException(ErrorEnum.ACCOUNT_DISABLED);

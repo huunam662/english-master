@@ -1,5 +1,8 @@
 package com.example.englishmaster_be.shared.service.otp;
 
+import com.example.englishmaster_be.common.constant.OtpStatusEnum;
+import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.helper.OtpHelper;
 import com.example.englishmaster_be.model.otp.OtpEntity;
 import com.example.englishmaster_be.model.otp.OtpRepository;
 import lombok.AccessLevel;
@@ -12,9 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
-import java.util.Optional;
-import java.util.Random;
-
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
@@ -23,51 +23,57 @@ public class OtpService implements IOtpService {
 
     OtpRepository otpRepository;
 
+
+    @Override
+    public OtpEntity getOtp(String otp) {
+
+        return otpRepository.findByOtp(otp).orElseThrow(
+                () -> new BadRequestException("Mã OTP không hợp lệ")
+        );
+    }
+
     @Transactional
     @Override
-    public String generateOtp(String email) {
+    public OtpEntity generateOtp(String email) {
 
-        String otpCode = String.format("%06d", new Random().nextInt(999999));
+        int codeLength = 6;
 
-        OtpEntity otpObj = new OtpEntity();
+        String otpCode = OtpHelper.generateOtpCode(codeLength);
 
-        otpObj.setOtp(otpCode);
-        otpObj.setEmail(email);
-        otpObj.setStatus("Unverified");
-        otpObj.setExpirationTime(LocalDateTime.now().plusMinutes(1));
-        otpObj.setCreatedAt(LocalDateTime.now());
-        otpRepository.save(otpObj);
+        OtpEntity otp = OtpEntity.builder()
+                .otp(otpCode)
+                .email(email)
+                .status(OtpStatusEnum.UnVerified)
+                .expirationTime(LocalDateTime.now().plusMinutes(2))
+                .createdAt(LocalDateTime.now())
+                .build();
 
-        return otpCode;
+        return otpRepository.save(otp);
     }
 
     @Override
-    public boolean validateOtp(String otp) {
+    public boolean isValidateOtp(String otp) {
 
-        Optional<OtpEntity> otpObj = otpRepository.findById(otp);
+        OtpEntity otpEntity = getOtp(otp);
 
-        if (otpObj.isEmpty()) return false;
-
-        OtpEntity foundOtp = otpObj.get();
-
-        return foundOtp.getExpirationTime().isBefore(LocalDateTime.now());
+        return otpEntity.getExpirationTime().isBefore(LocalDateTime.now());
     }
 
     @Transactional
     @Override
     public void updateOtpStatusToVerified(String otp) {
-        Optional<OtpEntity> otpObj = otpRepository.findById(otp);
-        if (otpObj.isPresent()) {
-            OtpEntity foundOtp = otpObj.get();
-            foundOtp.setStatus("Verified");
-            otpRepository.save(foundOtp);
-        }
+
+        OtpEntity otpEntity = getOtp(otp);
+
+        otpEntity.setStatus(OtpStatusEnum.Verified);
+
+        otpRepository.save(otpEntity);
     }
     @Override
     public void deleteOtp(String otp) {
 
-        OtpEntity otpEntity = otpRepository.findById(otp).orElseThrow(
-                () -> new RuntimeException("OtpEntity not found")
+        OtpEntity otpEntity = otpRepository.findByOtp(otp).orElseThrow(
+                () -> new RuntimeException("Không tìm thấy mã OTP")
         );
 
         otpRepository.delete(otpEntity);

@@ -3,6 +3,7 @@ package com.example.englishmaster_be.config.security;
 import com.example.englishmaster_be.config.filter.AuthRequestFilterConfig;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,7 +33,8 @@ public class WebSecurityConfig {
 
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    @SneakyThrows
+    public SecurityFilterChain filterChain(HttpSecurity http){
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .formLogin(FormLoginConfigurer::disable)

@@ -1,5 +1,8 @@
 package com.example.englishmaster_be.model.invalid_token;
 
+import com.example.englishmaster_be.common.constant.InvalidTokenTypeEnum;
+import com.example.englishmaster_be.common.constant.SessionActiveTypeEnum;
+import com.example.englishmaster_be.model.user.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
@@ -19,10 +22,18 @@ import java.time.LocalDateTime;
 public class InvalidTokenEntity {
 
     @Id
-    @JoinColumn(name = "token")
+    @Column(name = "token", columnDefinition = "TEXT")
     String token;
 
-    @JoinColumn(name = "expire_time")
+    @Column(name = "expire_time")
     LocalDateTime expireTime;
+
+    @Column(name = "type")
+    @Enumerated(EnumType.STRING)
+    InvalidTokenTypeEnum type;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    UserEntity user;
 
 }

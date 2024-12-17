@@ -12,6 +12,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
 
 
 @Tag(name = "Auth")
@@ -43,14 +44,14 @@ public class AuthController {
 
     @GetMapping("/register/confirm")
     @DefaultMessage("Xác thực đăng ký thành công. Cảm ơn bạn, một thành viên của chúng tôi")
-    public void confirmRegister(@RequestParam("token") String confirmationToken) {
+    public void confirmRegister(@RequestParam("token") UUID sessionActiveCode) {
 
-        authService.confirmRegister(confirmationToken);
+        authService.confirmRegister(sessionActiveCode);
     }
 
 
     @PostMapping("/forgetPassword")
-    @DefaultMessage("Please check your email to get OTP code for verify your account")
+    @DefaultMessage("Hãy kiểm tra email của bạn để nhận mã xác thực")
     public void forgetPassword(@RequestParam("email") String email) {
 
         authService.forgotPassword(email);
@@ -58,7 +59,7 @@ public class AuthController {
 
 
     @PostMapping("/verifyOtp")
-    @DefaultMessage("Your verify is successfully")
+    @DefaultMessage("Xác thực mã OTP thành công")
     public void verifyOtp(@RequestParam String otp) {
 
         authService.verifyOtp(otp);
@@ -66,40 +67,25 @@ public class AuthController {
 
 
     @PostMapping("/changePassword")
-    @DefaultMessage("Update your password successfully")
-    public void changePassword(@RequestBody UserChangePasswordRequest changePasswordDTO) {
+    @DefaultMessage("Cập nhật mật khẩu thành công")
+    public UserAuthResponse changePassword(@Valid @RequestBody UserChangePasswordRequest changePasswordDTO) {
 
-        authService.changePassword(changePasswordDTO);
+        return authService.changePassword(changePasswordDTO);
     }
 
-
-    @GetMapping("/forgetPass/confirm")
-    @DefaultMessage("Confirm successfully")
-    public String confirmForgetPassword(@RequestParam String token) {
-
-        return authService.confirmForgetPassword(token);
-    }
 
 
     @PostMapping("/refreshToken")
-    @DefaultMessage("Created new access token")
+    @DefaultMessage("Mã truy cập được tạo thành công")
     public UserAuthResponse refreshToken(@RequestBody UserRefreshTokenRequest refreshTokenDTO) {
 
         return authService.refreshToken(refreshTokenDTO);
     }
 
 
-    @PatchMapping(value = "/changePass")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Change pass UserEntity successfully")
-    public void changePass(@RequestBody UserChangePasswordRequest changePasswordRequest) {
-
-        authService.changePass(changePasswordRequest);
-    }
-
 
     @PostMapping("/logout")
-    @DefaultMessage("Logout successfully")
+    @DefaultMessage("Đăng xuất thành công")
     public void logoutUser(@RequestBody UserLogoutRequest userLogoutDTO) {
 
         authService.logoutOf(userLogoutDTO);
