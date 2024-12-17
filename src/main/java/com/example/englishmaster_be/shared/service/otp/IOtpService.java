@@ -1,11 +1,15 @@
 package com.example.englishmaster_be.shared.service.otp;
 
 
+import com.example.englishmaster_be.model.otp.OtpEntity;
+
 public interface IOtpService {
 
-    String generateOtp(String email);
+    OtpEntity getOtp(String otp);
 
-    boolean validateOtp(String otp);
+    OtpEntity generateOtp(String email);
+
+    boolean isValidateOtp(String otp);
 
     void updateOtpStatusToVerified(String otp);
 

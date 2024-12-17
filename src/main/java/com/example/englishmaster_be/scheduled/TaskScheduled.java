@@ -4,7 +4,7 @@ import com.example.englishmaster_be.model.invalid_token.InvalidTokenEntity;
 import com.example.englishmaster_be.model.invalid_token.QInvalidTokenEntity;
 import com.example.englishmaster_be.model.user.QUserEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.model.confirmation_token.ConfirmationTokenRepository;
+import com.example.englishmaster_be.model.session_active.SessionActiveRepository;
 import com.example.englishmaster_be.model.invalid_token.InvalidTokenRepository;
 import com.example.englishmaster_be.model.user.UserRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -22,7 +22,7 @@ public class TaskScheduled {
 
     UserRepository userRepository;
 
-    ConfirmationTokenRepository confirmationTokenRepository;
+    SessionActiveRepository confirmationTokenRepository;
 
     JPAQueryFactory queryFactory;
 

@@ -1,7 +1,8 @@
 package com.example.englishmaster_be.model.user;
 
 import com.example.englishmaster_be.model.comment.CommentEntity;
-import com.example.englishmaster_be.model.confirmation_token.ConfirmationTokenEntity;
+import com.example.englishmaster_be.model.invalid_token.InvalidTokenEntity;
+import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
 import com.example.englishmaster_be.model.flash_card.FlashCardEntity;
 import com.example.englishmaster_be.model.post.PostEntity;
 import com.example.englishmaster_be.model.role.RoleEntity;
@@ -68,8 +69,14 @@ public class UserEntity {
     @JoinColumn(name = "role", referencedColumnName = "id")
     RoleEntity role;
 
+    @OneToMany(mappedBy = "user")
+    List<SessionActiveEntity> sessionActives;
+
+    @OneToMany(mappedBy = "user")
+    List<InvalidTokenEntity> invalidTokens;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<ConfirmationTokenEntity> confirmToken;
+    List<SessionActiveEntity> confirmTokens;
 
     @OneToMany(mappedBy = "userComment", cascade = CascadeType.ALL)
     Collection<CommentEntity> comments;

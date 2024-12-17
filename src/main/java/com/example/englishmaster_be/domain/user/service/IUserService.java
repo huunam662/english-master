@@ -14,11 +14,11 @@ public interface IUserService {
 
     FilterResponse<?> getExamResultsUser(UserFilterRequest filterRequest);
 
-    UserEntity findUser(UserDetails userDetails);
-
     UserEntity currentUser();
 
-    UserEntity findUserByEmail(String email);
+    UserEntity getUserById(UUID userId);
+
+    UserEntity getUserByEmail(String email);
 
     UserEntity findUserById(UUID userId);
 

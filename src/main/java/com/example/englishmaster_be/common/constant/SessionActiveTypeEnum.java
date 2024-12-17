@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.common.constant;
 
-public enum ConfirmRegisterTypeEnum {
+public enum SessionActiveTypeEnum {
 
-    ACTIVE,
+    CONFIRM,
     REFRESH_TOKEN,
     RESET_PASSWORD
 
