@@ -18,6 +18,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -29,15 +30,13 @@ public class WebSecurityConfig {
 
     AuthRequestFilterConfig authTokenFilter;
 
-    CorsConfigurationSource corsConfigurationSource;
-
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .formLogin(FormLoginConfigurer::disable)
-                .cors(cors -> cors.configurationSource(corsConfigurationSource))
+                .cors(cors -> cors.configurationSource(this.corsConfigurationSource()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http.authorizeHttpRequests(auth ->
@@ -52,14 +51,20 @@ public class WebSecurityConfig {
     }
 
 
-    @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
         CorsConfiguration corsConfiguration = new CorsConfiguration();
 
-        corsConfiguration.addAllowedOrigin("*");
-        corsConfiguration.addAllowedMethod("*");
-        corsConfiguration.addAllowedHeader("*");
+        corsConfiguration.setAllowedOriginPatterns(
+                List.of(
+                        "http://localhost:3000",
+                        "http://localhost:8080",
+                        "https://englishmaster.erp.meu-solutions.com",
+                        "https://gateway.dev.meu-solutions.com"
+                )
+        );
+        corsConfiguration.setAllowedHeaders(List.of("*"));
+        corsConfiguration.setAllowedMethods(List.of("*"));
         corsConfiguration.setAllowCredentials(Boolean.TRUE);
 
         UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
