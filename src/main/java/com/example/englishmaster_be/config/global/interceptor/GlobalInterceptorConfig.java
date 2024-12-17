@@ -12,7 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Nonnull;
 
 @Component
-public class GlobalInterceptorHandler implements HandlerInterceptor {
+public class GlobalInterceptorConfig implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(

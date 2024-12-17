@@ -39,7 +39,7 @@ public class FeedbackController {
     public FilterResponse<?> listFeedbackOfAdmin(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
-            @RequestParam(value = "sortBy") SortByFeedbackFieldsEnum sortBy,
+            @RequestParam(value = "sortBy", defaultValue = "None") SortByFeedbackFieldsEnum sortBy,
             @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction sortDirection,
             @RequestParam(value = "search", defaultValue = "") String search,
             @RequestParam(value = "enable", defaultValue = "false") Boolean isEnable
@@ -63,13 +63,17 @@ public class FeedbackController {
     public FilterResponse<?> listFeedbackOfUser(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
-            @RequestParam(value = "search", defaultValue = "") String search
+            @RequestParam(value = "search", defaultValue = "") String search,
+            @RequestParam(value = "sortBy", defaultValue = "None") SortByFeedbackFieldsEnum sortBy,
+              @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction sortDirection
     ){
 
         FeedbackFilterRequest filterRequest = FeedbackFilterRequest
                 .builder()
                     .page(page)
                     .pageSize(size)
+                    .sortBy(sortBy)
+                    .direction(sortDirection)
                     .search(search)
                 .build();
 

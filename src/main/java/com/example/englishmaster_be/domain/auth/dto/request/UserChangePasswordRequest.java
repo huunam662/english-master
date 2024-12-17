@@ -8,6 +8,8 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -24,12 +26,12 @@ public class UserChangePasswordRequest {
 
     @NotBlank(message = "Mã xác thực không được bỏ trống")
     @Schema(description = "Mã xác thực nhận từ mail", example = "475434")
-    String code;
+    String otpCode;
 
     @NotBlank(message = "Mật khẩu không được bỏ trống")
     @Pattern(
             regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$",
-            message = "Mật khẩu phải chứa ít nhất 8 kí tự không bao gồm khoảng trắng và ít nhất 1 kí tự hoa, 1 kí tự thường, 1 kí tự đặc biệt"
+            message = "Mật khẩu phải chứa ít nhất 8 và tối đa 20 kí tự không bao gồm khoảng trắng và ít nhất 1 kí tự hoa, 1 kí tự thường, 1 chữ số, 1 kí tự đặc biệt"
     )
     @Schema(description = "Mật khẩu cũ", example = "Nguyenvana@123")
     String oldPassword;
@@ -37,7 +39,7 @@ public class UserChangePasswordRequest {
     @NotBlank(message = "Mật khẩu không được bỏ trống")
     @Pattern(
             regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$",
-            message = "Mật khẩu phải chứa ít nhất 8 kí tự không bao gồm khoảng trắng và ít nhất 1 kí tự hoa, 1 kí tự thường, 1 kí tự đặc biệt"
+            message = "Mật khẩu phải chứa ít nhất 8 và tối đa 20 kí tự không bao gồm khoảng trắng và ít nhất 1 kí tự hoa, 1 kí tự thường, 1 chữ số, 1 kí tự đặc biệt"
     )
     @Schema(description = "Mật khẩu mới", example = "Nguyenvana@123456")
     String newPassword;
@@ -45,7 +47,7 @@ public class UserChangePasswordRequest {
     @NotBlank(message = "Mật khẩu không được bỏ trống")
     @Pattern(
             regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$",
-            message = "Mật khẩu phải chứa ít nhất 8 kí tự không bao gồm khoảng trắng và ít nhất 1 kí tự hoa, 1 kí tự thường, 1 kí tự đặc biệt"
+            message = "Mật khẩu phải chứa ít nhất 8 và tối đa 20 kí tự không bao gồm khoảng trắng và ít nhất 1 kí tự hoa, 1 kí tự thường, 1 chữ số, 1 kí tự đặc biệt"
     )
     @Schema(description = "Xác nhận mật khẩu mới", example = "Nguyenvana@123456")
     String confirmNewPassword;

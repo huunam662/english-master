@@ -6,6 +6,7 @@ import org.springframework.core.env.ConfigurableEnvironment;
 import org.springframework.core.env.StandardEnvironment;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
+
 @EnableScheduling
 @SpringBootApplication
 public class EnglishmasterBeApplication {

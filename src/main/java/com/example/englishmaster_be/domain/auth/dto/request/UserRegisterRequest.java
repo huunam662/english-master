@@ -29,7 +29,7 @@ public class UserRegisterRequest {
 	@NotBlank(message = "Mật khẩu không được bỏ trống")
 	@Pattern(
 			regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$",
-			message = "Mật khẩu phải chứa ít nhất 8 kí tự không bao gồm khoảng trắng và ít nhất 1 kí tự hoa, 1 kí tự thường, 1 kí tự đặc biệt"
+			message = "Mật khẩu phải chứa ít nhất 8 và tối đa 20 kí tự không bao gồm khoảng trắng và ít nhất 1 kí tự hoa, 1 kí tự thường, 1 chữ số, 1 kí tự đặc biệt"
 	)
 	@Schema(description = "Mật khẩu nguời dùng", example = "Nguyenvana@123")
 	String password;
@@ -37,7 +37,7 @@ public class UserRegisterRequest {
 	@NotBlank(message = "Mật khẩu không được bỏ trống")
 	@Pattern(
 			regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$",
-			message = "Mật khẩu phải chứa ít nhất 8 kí tự không bao gồm khoảng trắng và ít nhất 1 kí tự hoa, 1 kí tự thường, 1 kí tự đặc biệt"
+			message = "Mật khẩu phải chứa ít nhất 8 và tối đa 20 kí tự không bao gồm khoảng trắng và ít nhất 1 kí tự hoa, 1 kí tự thường, 1 chữ số, 1 kí tự đặc biệt"
 	)
 	@Schema(description = "Xác nhận mật khẩu nguời dùng", example = "Nguyenvana@123")
 	String confirmPassword;

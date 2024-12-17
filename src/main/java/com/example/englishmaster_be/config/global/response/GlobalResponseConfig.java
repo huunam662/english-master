@@ -40,12 +40,12 @@ public class GlobalResponseConfig implements ResponseBodyAdvice<Object> {
         String packageName = returnType.getContainingClass().getPackageName();
         Class<?> declaringClass = returnType.getDeclaringClass();
 
-        System.out.println("------- supports ResponseBodyAdvice -----------");
+        System.out.println("----------- supports ResponseBodyAdvice -----------");
         System.out.println("requestURI: " + requestURI);
         System.out.println("packageName: " + packageName);
         System.out.println("declaringClass: " + declaringClass);
         System.out.println("annotation declaringClass: " + declaringClass.getAnnotation(RestController.class));
-        System.out.println("------- supports ResponseBodyAdvice -----------");
+        System.out.println("----------- supports ResponseBodyAdvice -----------");
         // -> end (1)
 
         // -> Cho phép beforeBodyWrite nhận xử lý nếu thỏa điều kiện dưới đây
@@ -71,13 +71,11 @@ public class GlobalResponseConfig implements ResponseBodyAdvice<Object> {
             @NonNull ServerHttpResponse response
     ) {
 
-        System.out.println("------- ResponseBodyAdvice -----------");
-        System.out.println("beforeBodyWrite");
+        System.out.println("----------- beforeBodyWrite -----------");
         System.out.println(returnType.getContainingClass().getPackageName());
         if(body != null) System.out.println(body.getClass().getSimpleName());
         System.out.println(returnType.getMethod());
-        System.out.println("------- ResponseBodyAdvice -----------");
-
+        System.out.println("----------- beforeBodyWrite -----------");
 
         if(body instanceof ExceptionResponseModel exceptionResponseModel) {
 

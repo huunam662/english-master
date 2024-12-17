@@ -3,6 +3,8 @@ package com.example.englishmaster_be.domain.auth.dto.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -11,8 +13,6 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserLogoutRequest {
 
-    String accessToken;
-
-    String refreshToken;
+    UUID refreshToken;
 
 }

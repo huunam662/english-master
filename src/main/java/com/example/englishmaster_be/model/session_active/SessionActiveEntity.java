@@ -1,6 +1,6 @@
-package com.example.englishmaster_be.model.confirmation_token;
+package com.example.englishmaster_be.model.session_active;
 
-import com.example.englishmaster_be.common.constant.ConfirmRegisterTypeEnum;
+import com.example.englishmaster_be.common.constant.SessionActiveTypeEnum;
 import com.example.englishmaster_be.model.user.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name="user_confirm_token")
+@Table(name="session_active")
 @Getter
 @Setter
 @Builder
@@ -19,19 +19,22 @@ import java.util.UUID;
 @Schema(hidden = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class ConfirmationTokenEntity {
+public class SessionActiveEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
-    UUID userConfirmTokenId;
+    UUID sessionId;
 
     @Column(name = "Type")
     @Enumerated(EnumType.STRING)
-    ConfirmRegisterTypeEnum type;
+    SessionActiveTypeEnum type;
 
-    @Column(name = "code")
-    String code;
+    @Column(name = "code", columnDefinition = "UUID")
+    UUID code;
+
+    @Column(name = "token", columnDefinition = "TEXT")
+    String token;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_at")

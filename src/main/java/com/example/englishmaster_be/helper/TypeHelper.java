@@ -9,10 +9,12 @@ public class TypeHelper {
 
     public static OrderSpecifier<?> buildTypeOrderSpecifier(SortByTypeFieldsEnum sortBy, Sort.Direction sortDirection) {
 
+        boolean isAscending = sortDirection != null && sortDirection.isAscending();
+
         return switch (sortBy) {
-            case TypeName -> sortDirection.isAscending() ? QTypeEntity.typeEntity.typeName.asc() : QTypeEntity.typeEntity.typeName.desc();
-            case NameSlug -> sortDirection.isAscending() ? QTypeEntity.typeEntity.nameSlug.asc() : QTypeEntity.typeEntity.nameSlug.desc();
-            default -> sortDirection.isAscending() ? QTypeEntity.typeEntity.typeId.asc() : QTypeEntity.typeEntity.typeId.desc();
+            case TypeName -> isAscending ? QTypeEntity.typeEntity.typeName.asc() : QTypeEntity.typeEntity.typeName.desc();
+            case NameSlug -> isAscending ? QTypeEntity.typeEntity.nameSlug.asc() : QTypeEntity.typeEntity.nameSlug.desc();
+            default -> isAscending ? QTypeEntity.typeEntity.typeId.asc() : QTypeEntity.typeEntity.typeId.desc();
         };
     }
 

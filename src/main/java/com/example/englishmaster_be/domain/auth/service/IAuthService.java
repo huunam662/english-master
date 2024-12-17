@@ -4,23 +4,21 @@ import com.example.englishmaster_be.domain.auth.dto.request.*;
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;
 import com.example.englishmaster_be.domain.auth.dto.response.UserConfirmTokenResponse;
 
+import java.util.UUID;
+
 public interface IAuthService {
 
     UserAuthResponse login(UserLoginRequest userLoginRequest);
 
     void registerUser(UserRegisterRequest userRegisterRequest);
 
-    void confirmRegister(String confirmationToken);
+    void confirmRegister(UUID sessionActiveCode);
 
     void forgotPassword(String email);
 
     void verifyOtp(String otp);
 
-    void changePass(UserChangePasswordRequest changePasswordRequest);
-
-    void changePassword(UserChangePasswordRequest changePasswordRequest);
-
-    String confirmForgetPassword(String token);
+    UserAuthResponse changePassword(UserChangePasswordRequest changePasswordRequest);
 
     UserAuthResponse refreshToken(UserRefreshTokenRequest refreshTokenRequest);
 
@@ -28,7 +26,7 @@ public interface IAuthService {
 
     boolean logoutUser();
 
-    boolean updatePassword(String otp,String newPassword);
+    void updatePassword(String otp,String newPassword);
 
     UserConfirmTokenResponse createConfirmationToken(UserConfirmTokenRequest confirmationTokenRequest);
 

@@ -1,17 +1,20 @@
 package com.example.englishmaster_be.domain.auth.service;
 
-import com.example.englishmaster_be.common.constant.ConfirmRegisterTypeEnum;
+import com.example.englishmaster_be.common.constant.InvalidTokenTypeEnum;
+import com.example.englishmaster_be.common.constant.SessionActiveTypeEnum;
+import com.example.englishmaster_be.common.constant.OtpStatusEnum;
 import com.example.englishmaster_be.common.constant.RoleEnum;
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
 import com.example.englishmaster_be.domain.auth.dto.request.*;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.model.confirmation_token.ConfirmationTokenRepository;
+import com.example.englishmaster_be.model.session_active.SessionActiveRepository;
 import com.example.englishmaster_be.model.otp.OtpRepository;
 import com.example.englishmaster_be.model.role.RoleRepository;
+import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
 import com.example.englishmaster_be.model.user.UserRepository;
 import com.example.englishmaster_be.shared.service.invalid_token.IInvalidTokenService;
 import com.example.englishmaster_be.shared.service.otp.IOtpService;
-import com.example.englishmaster_be.shared.service.refreshToken.IRefreshTokenService;
+import com.example.englishmaster_be.shared.service.session_active.ISessionActiveService;
 import com.example.englishmaster_be.util.JwtUtil;
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;
 import com.example.englishmaster_be.domain.auth.dto.response.UserConfirmTokenResponse;
@@ -19,7 +22,6 @@ import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.mapper.ConfirmationTokenMapper;
 import com.example.englishmaster_be.mapper.UserMapper;
-import com.example.englishmaster_be.model.confirmation_token.ConfirmationTokenEntity;
 import com.example.englishmaster_be.model.otp.OtpEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.util.MailerUtil;
@@ -43,10 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 
 
 @Service
@@ -67,7 +67,7 @@ public class AuthService implements IAuthService {
 
     IUserService userService;
 
-    IRefreshTokenService refreshTokenService;
+    ISessionActiveService sessionActiveService;
 
     IInvalidTokenService invalidTokenService;
 
@@ -77,7 +77,7 @@ public class AuthService implements IAuthService {
 
     UserRepository userRepository;
 
-    ConfirmationTokenRepository confirmationTokenRepository;
+    SessionActiveRepository sessionActiveRepository;
 
     RoleRepository roleRepository;
 
@@ -97,18 +97,16 @@ public class AuthService implements IAuthService {
         if(!userDetails.isEnabled())
             throw new CustomException(ErrorEnum.ACCOUNT_DISABLED);
 
-        String jwt = jwtUtil.generateToken(userDetails);
+        UserEntity user = userService.getUserByEmail(userDetails.getUsername());
 
-        UserEntity user = userService.findUser(userDetails);
+        sessionActiveService.deleteAllTokenExpired(user);
+        sessionActiveRepository.deleteByUserAndType(user, SessionActiveTypeEnum.CONFIRM);
 
-        refreshTokenService.deleteAllTokenExpired(user);
-        confirmationTokenRepository.deleteByUserAndType(user, ConfirmRegisterTypeEnum.ACTIVE);
-
-        ConfirmationTokenEntity refreshToken = refreshTokenService.createRefreshToken(userDetails.getUsername());
+        SessionActiveEntity sessionActive = sessionActiveService.saveSessionActive(userDetails);
 
         return UserAuthResponse.builder()
-                .accessToken(jwt)
-                .refreshToken(refreshToken.getCode())
+                .accessToken(sessionActive.getToken())
+                .refreshToken(sessionActive.getCode())
                 .build();
     }
 
@@ -129,8 +127,8 @@ public class AuthService implements IAuthService {
         userRegister.setRole(roleRepository.findByRoleName(RoleEnum.USER));
         userRegister.setEnabled(Boolean.FALSE);
 
-        if(user != null && user.getConfirmToken() != null)
-            userRegister.setConfirmToken(new ArrayList<>());
+        if(user != null && user.getConfirmTokens() != null)
+            userRegister.setConfirmTokens(new ArrayList<>());
 
         userRegister = userRepository.save(userRegister);
 
@@ -150,23 +148,23 @@ public class AuthService implements IAuthService {
     @Override
     public UserConfirmTokenResponse createConfirmationToken(UserConfirmTokenRequest confirmationTokenRequest) {
 
-        ConfirmationTokenEntity confirmationToken = ConfirmationTokenMapper.INSTANCE.toConfirmationTokenEntity(confirmationTokenRequest);
+        SessionActiveEntity sessionActive = ConfirmationTokenMapper.INSTANCE.toConfirmationTokenEntity(confirmationTokenRequest);
 
-        confirmationToken.setType(ConfirmRegisterTypeEnum.ACTIVE);
-        confirmationToken.setUser(confirmationTokenRequest.getUser());
-        confirmationToken.setCode(UUID.randomUUID().toString());
-        confirmationToken.setCreateAt(LocalDateTime.now());
-        confirmationToken = confirmationTokenRepository.save(confirmationToken);
+        sessionActive.setType(SessionActiveTypeEnum.CONFIRM);
+        sessionActive.setUser(confirmationTokenRequest.getUser());
+        sessionActive.setCode(UUID.randomUUID());
+        sessionActive.setCreateAt(LocalDateTime.now());
+        sessionActive = sessionActiveRepository.save(sessionActive);
 
-        return ConfirmationTokenMapper.INSTANCE.toConfirmationTokenResponse(confirmationToken);
+        return ConfirmationTokenMapper.INSTANCE.toConfirmationTokenResponse(sessionActive);
     }
 
 
     @Transactional
     @Override
-    public void confirmRegister(String confirmationToken) {
+    public void confirmRegister(UUID sessionActiveCode) {
 
-        ConfirmationTokenEntity confirmToken = confirmationTokenRepository.findByCodeAndType(confirmationToken, ConfirmRegisterTypeEnum.ACTIVE);
+        SessionActiveEntity confirmToken = sessionActiveRepository.findByCodeAndType(sessionActiveCode, SessionActiveTypeEnum.CONFIRM);
 
         if (confirmToken == null)
             throw new BadRequestException("Không tồn tại");
@@ -191,16 +189,18 @@ public class AuthService implements IAuthService {
     public void forgotPassword(String email) {
 
         if (email == null || email.isEmpty())
-            throw new BadRequestException("Please fill your email");
+            throw new BadRequestException("Email là bắt buộc");
 
         boolean emailExisting = userService.existsEmail(email);
 
         if(!emailExisting)
-            throw new BadRequestException("Your email isn't found");
+            throw new BadRequestException("Email bạn đã đăng ký không tồn tại");
 
-        String otp = otpService.generateOtp(email);
+        otpRepository.deleteByEmailAndStatus(email, OtpStatusEnum.UnVerified);
 
-        mailerUtil.sendOtpToEmail(email, otp);
+        OtpEntity otpEntity = otpService.generateOtp(email);
+
+        mailerUtil.sendOtpToEmail(email, otpEntity.getOtp());
 
     }
 
@@ -210,12 +210,10 @@ public class AuthService implements IAuthService {
     public void verifyOtp(String otp) {
 
         if (otp == null || otp.isEmpty())
-            throw new BadRequestException("Please fill your otp");
+            throw new BadRequestException("Mã OTP là bắt buộc");
 
-        boolean isOtpValid = otpService.validateOtp(otp);
-
-        if (!isOtpValid)
-            throw new BadRequestException("The OTP code is expired");
+        if (otpService.isValidateOtp(otp))
+            throw new BadRequestException("Mã OTP đã hết hiệu lực");
 
         otpService.updateOtpStatusToVerified(otp);
 
@@ -224,109 +222,49 @@ public class AuthService implements IAuthService {
 
     @Transactional
     @Override
-    public void changePass(UserChangePasswordRequest changePasswordRequest) {
+    public UserAuthResponse changePassword(UserChangePasswordRequest changePasswordRequest) {
 
         UserEntity user = userService.currentUser();
 
-        String regex = "^(?=.*[0-9])"
-                + "(?=.*[a-z])(?=.*[A-Z])"
-                + "(?=.*[@#$%^&+=])"
-                + "(?=\\S+$).{8,20}$";
-
-        Pattern pattern = Pattern.compile(regex);
-
-        Matcher matcherOldPassword = pattern.matcher(changePasswordRequest.getOldPassword());
-        Matcher matcherNewPassword = pattern.matcher(changePasswordRequest.getNewPassword());
-        Matcher matcherConfirmPassword = pattern.matcher(changePasswordRequest.getConfirmNewPassword());
-
-        if(!matcherOldPassword.matches())
-            throw new BadRequestException("Old password must be contain at least 1 uppercase, 1 lowercase, 1 numeric, 1 special character and no spaces");
-
-        if (!matcherNewPassword.matches())
-            throw new BadRequestException("New password must be contain at least 1 uppercase, 1 lowercase, 1 numeric, 1 special character and no spaces");
-
-        if (!matcherConfirmPassword.matches())
-            throw new BadRequestException("The confirm password must be contain at least 1 uppercase, 1 lowercase, 1 numeric, 1 special character and no spaces");
-
         if (!changePasswordRequest.getConfirmNewPassword().equals(changePasswordRequest.getNewPassword()))
-            throw new BadRequestException("Your new password doesn't match with your confirm password");
+            throw new BadRequestException("Mật khẩu không khớp với mật khẩu xác nhận");
 
         if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword()))
-            throw new BadRequestException("Your old password doesn't correct");
+            throw new BadRequestException("Mật khẩu cũ không hợp lệ");
 
         if (passwordEncoder.matches(changePasswordRequest.getNewPassword(), user.getPassword()))
-            throw new BadRequestException("New password can't be the same as old password");
+            throw new BadRequestException("Mật khẩu mới không được khớp với mật khẩu cũ");
 
-        user.setPassword(passwordEncoder.encode(changePasswordRequest.getNewPassword()));
+        updatePassword(changePasswordRequest.getOtpCode(), changePasswordRequest.getNewPassword());
 
-        userRepository.save(user);
+        List<SessionActiveEntity> sessionActiveEntityList = sessionActiveService.getSessionActiveList(user.getUserId(), SessionActiveTypeEnum.REFRESH_TOKEN);
 
-    }
+        invalidTokenService.insertInvalidTokenList(sessionActiveEntityList, InvalidTokenTypeEnum.CHANGE_PASSWORD);
 
+        sessionActiveRepository.deleteAll(sessionActiveEntityList);
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+        SessionActiveEntity sessionActive = sessionActiveService.saveSessionActive((UserDetails) authentication.getPrincipal());
 
-    @Transactional
-    @Override
-    public void changePassword(UserChangePasswordRequest changePasswordRequest) {
-
-        String otp = changePasswordRequest.getCode();
-        String newPassword = changePasswordRequest.getNewPassword();
-        String confirmPassword = changePasswordRequest.getConfirmNewPassword();
-
-        // Regex để kiểm tra mật khẩu
-        String regexPassword = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,20}$";
-
-        if (!otpService.validateOtp(otp))
-            throw new BadRequestException("The OTP code is expired");
-
-        if (newPassword == null || newPassword.isEmpty() || confirmPassword == null || confirmPassword.isEmpty())
-            throw new BadRequestException("Please fill your password and your confirm password");
-
-        // Kiểm tra mật khẩu mới có đúng định dạng theo regex hay không
-        if (!newPassword.matches(regexPassword))
-            throw new BadRequestException("The new password must contain at least 1 digit, " +
-                    "1 lowercase letter, 1 uppercase letter, 1 special character, " +
-                    "and must not contain any spaces, with a length of 8 to 20 characters.");
-
-        if (!newPassword.equals(confirmPassword))
-            throw new BadRequestException("The new password doesn't match confirm password");
-
-        boolean isPasswordUpdated = updatePassword(otp, newPassword);
-
-        if (!isPasswordUpdated)
-            throw new BadRequestException("Cannot update your password, please try again");
-
-        otpService.deleteOtp(otp);
-    }
-
-
-    @Override
-    public String confirmForgetPassword(String token) {
-
-        ConfirmationTokenEntity confirmToken = confirmationTokenRepository.findByCodeAndType(token, ConfirmRegisterTypeEnum.RESET_PASSWORD);
-
-        if (confirmToken == null)
-            throw new BadRequestException("Invalid reset code");
-
-        if (confirmToken.getCreateAt().plusMinutes(5).isBefore(LocalDateTime.now()))
-            throw new BadRequestException("Reset code has expired");
-
-        return token;
+        return UserAuthResponse.builder()
+                .accessToken(sessionActive.getToken())
+                .refreshToken(sessionActive.getCode())
+                .build();
     }
 
 
     @Override
     public UserAuthResponse refreshToken(UserRefreshTokenRequest refreshTokenDTO) {
 
-        String refresh = refreshTokenDTO.getRequestRefresh();
+        UUID refresh = refreshTokenDTO.getRequestRefresh();
 
-        ConfirmationTokenEntity token = refreshTokenService.findByToken(refresh);
+        SessionActiveEntity token = sessionActiveService.getByCode(refresh);
 
         if (token == null)
             throw new BadRequestException("Refresh token isn't existed");
 
-        refreshTokenService.verifyExpiration(token);
+        sessionActiveService.verifyExpiration(token);
 
         UserDetails userDetails = userDetailsService.loadUserByUsername(token.getUser().getEmail());
 
@@ -334,6 +272,7 @@ public class AuthService implements IAuthService {
 
         return UserAuthResponse.builder()
                 .accessToken(newToken)
+                .refreshToken(refresh)
                 .build();
     }
 
@@ -345,13 +284,13 @@ public class AuthService implements IAuthService {
         boolean logoutSuccessfully = logoutUser();
 
         if(!logoutSuccessfully)
-            throw new AuthenticationServiceException("You aren't logged in");
+            throw new AuthenticationServiceException("Bạn chưa đăng nhập");
 
-        invalidTokenService.insertInvalidToken(userLogoutRequest.getAccessToken());
+        invalidTokenService.insertInvalidToken(userLogoutRequest.getRefreshToken(), InvalidTokenTypeEnum.LOGOUT);
 
-        String refreshToken = userLogoutRequest.getRefreshToken();
+        UUID refreshToken = userLogoutRequest.getRefreshToken();
 
-        refreshTokenService.deleteRefreshToken(refreshToken);
+        sessionActiveService.deleteSessionCode(refreshToken);
 
     }
 
@@ -367,26 +306,22 @@ public class AuthService implements IAuthService {
         return false;
     }
 
-
+    @Transactional
     @Override
-    public boolean updatePassword(String otp, String newPassword) {
+    public void updatePassword(String otp, String newPassword) {
 
-        OtpEntity otpRecord = otpRepository.findById(otp).orElse(null);
+        OtpEntity otpRecord = otpService.getOtp(otp);
 
-        if (otpRecord == null || !"Verified".equals(otpRecord.getStatus()))
-            return false;
+        if (!OtpStatusEnum.Verified.equals(otpRecord.getStatus()))
+            throw new BadRequestException("Vui lòng xác thực mã OTP");
 
-        UserEntity user = userRepository.findByEmail(otpRecord.getEmail()).orElse(null);
-
-        if (user == null) return false;
+        UserEntity user = userService.getUserByEmail(otpRecord.getEmail());
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
-        otpRecord.setStatus("Used");
+        otpRecord.setStatus(OtpStatusEnum.Verified);
         otpRepository.save(otpRecord);
-
-        return true;
     }
 
 

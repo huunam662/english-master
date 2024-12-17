@@ -74,17 +74,17 @@ public class MailerUtil {
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
-        String otpMessage = "This is a OTP code for your verify and it's valid in 1 minute";
-        String otpTemplate = "<b>" + otp + "</b>";
+        String titleText = "Mã xác thực OTP";
+        String otpMessage = "Đây là mã xác thực OTP được cấp để bạn đổi mật khẩu mới, hiệu lực trong vòng 1 phút.";
 
         // Nếu bạn vẫn muốn sử dụng template, thay thế nội dung theo cách này:
         String templateContent = readTemplateContent("sendOtpEmail.html");
-        templateContent = templateContent.replace("{{otpMessage}}", otpMessage)
-                .replace("{{btnConfirm}}", otpTemplate)
-                .replace("{{nameLink}}", "Verify by OTP");
+        templateContent = templateContent.replace("{{titleText}}", titleText)
+                                        .replace("{{otpMessage}}", otpMessage)
+                                        .replace("{{otpCode}}", otp);
 
         helper.setTo(email);
-        helper.setSubject("Forgot your password");
+        helper.setSubject("Quên mật khẩu");
         helper.setText(templateContent, true);
         mailSender.send(message);
     }

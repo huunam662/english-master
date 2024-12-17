@@ -31,7 +31,10 @@ public class JwtUtil {
     JwtValue jwtValue;
 
     Boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
+
+        Date now = new Date(System.currentTimeMillis());
+
+        return !now.before(extractExpiration(token));
     }
 
     Date extractExpiration(String token) {
@@ -73,19 +76,19 @@ public class JwtUtil {
 
     public LocalDateTime getTokenExpireFromJWT(String token){
 
-        long expirationTime  = extractClaim(token, Claims::getExpiration).getTime();
+        long expirationTimeMs = extractClaim(token, Claims::getExpiration).getTime();
 
-        return LocalDateTime.ofInstant(
-                Instant.ofEpochMilli(expirationTime), ZoneId.systemDefault()
-        );
+        return Instant.ofEpochMilli(expirationTimeMs)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime();
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
+    public Boolean validateToken(String token) {
 
         try{
 
-            final String tokenExtracted = extractUsername(token);
-            return (tokenExtracted.equals(userDetails.getUsername()) && !isTokenExpired(token));
+            return !isTokenExpired(token);
+
         } catch (MalformedJwtException e) {
             log.error("Invalid JWT token: {}", e.getMessage());
         } catch (ExpiredJwtException e) {
@@ -106,17 +109,14 @@ public class JwtUtil {
         Map<String, Object> payload = new HashMap<>();
         payload.put("sub", userDetails.getUsername());
         payload.put("scp", buildScope(userDetails.getAuthorities()));
-        payload.put("iat", new Date());
-        payload.put("exp", Date.from(
-                Instant.now()
-                        .atZone(ZoneId.systemDefault())
-                        .toInstant()
-                        .plusMillis(jwtValue.getJwtExpiration())
-        ));
 
         return Jwts
                 .builder()
                 .setClaims(payload)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(
+                        new Date(System.currentTimeMillis() + jwtValue.getJwtExpiration())
+                )
                 .signWith(
                         getSignKey(),
                         SignatureAlgorithm.HS512
