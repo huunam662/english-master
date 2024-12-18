@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.shared.dto.response.word;
+package com.example.englishmaster_be.shared.word.dto.response;
 
 
 import lombok.*;

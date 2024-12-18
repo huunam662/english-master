@@ -13,9 +13,9 @@ import com.example.englishmaster_be.model.otp.OtpRepository;
 import com.example.englishmaster_be.model.role.RoleRepository;
 import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
 import com.example.englishmaster_be.model.user.UserRepository;
-import com.example.englishmaster_be.shared.service.invalid_token.IInvalidTokenService;
-import com.example.englishmaster_be.shared.service.otp.IOtpService;
-import com.example.englishmaster_be.shared.service.session_active.ISessionActiveService;
+import com.example.englishmaster_be.shared.invalid_token.service.IInvalidTokenService;
+import com.example.englishmaster_be.shared.otp.service.IOtpService;
+import com.example.englishmaster_be.shared.session_active.service.ISessionActiveService;
 import com.example.englishmaster_be.util.AuthUtil;
 import com.example.englishmaster_be.util.JwtUtil;
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;
@@ -35,10 +35,8 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,7 +45,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 
@@ -67,8 +64,6 @@ public class AuthService implements IAuthService {
 
     PasswordEncoder passwordEncoder;
 
-    UserDetailsService userDetailsService;
-
     IUserService userService;
 
     ISessionActiveService sessionActiveService;
@@ -76,8 +71,6 @@ public class AuthService implements IAuthService {
     IInvalidTokenService invalidTokenService;
 
     IOtpService otpService;
-
-    OtpRepository otpRepository;
 
     UserRepository userRepository;
 
@@ -106,7 +99,7 @@ public class AuthService implements IAuthService {
 
         String jwtToken = jwtUtil.generateToken(userDetails);
 
-        SessionActiveEntity sessionActive = sessionActiveService.saveSessionActive(userDetails, jwtToken);
+        SessionActiveEntity sessionActive = sessionActiveService.saveSessionActive(user, jwtToken);
 
         return AuthMapper.INSTANCE.toUserAuthResponse(sessionActive, jwtToken);
     }
@@ -212,12 +205,12 @@ public class AuthService implements IAuthService {
         if (otp == null || otp.isEmpty())
             throw new BadRequestException("Mã OTP là bắt buộc");
 
-        UserEntity user = userService.currentUser();
+        OtpEntity otpEntity = otpService.getByOtp(otp);
 
-        if (!otpService.isValidOtp(user.getEmail(), otp))
+        if (!otpService.isValidOtp(otpEntity))
             throw new BadRequestException("Mã OTP đã hết hiệu lực");
 
-        otpService.updateOtpStatus(user.getEmail(), otp, OtpStatusEnum.Verified);
+        otpService.updateOtpStatus(otpEntity.getEmail(), otp, OtpStatusEnum.VERIFIED);
     }
 
 
@@ -225,11 +218,12 @@ public class AuthService implements IAuthService {
     @Override
     public UserAuthResponse changePasswordForgot(UserChangePwForgotRequest changePasswordRequest) {
 
-        UserEntity user = userService.currentUser();
+        OtpEntity otpEntity = otpService.getByOtp(changePasswordRequest.getOtpCode());
 
-        return authUtil.saveNewPassword(user, changePasswordRequest.getNewPassword(), changePasswordRequest.getOtpCode());
+        return authUtil.saveNewPassword(otpEntity.getUser(), changePasswordRequest.getNewPassword(), changePasswordRequest.getOtpCode());
     }
 
+    @Transactional
     @Override
     public UserAuthResponse changePassword(UserChangePasswordRequest changePasswordRequest) {
 
@@ -242,29 +236,29 @@ public class AuthService implements IAuthService {
     }
 
 
-
+    @Transactional
     @Override
     public UserAuthResponse refreshToken(UserRefreshTokenRequest refreshTokenDTO) {
 
         UUID refresh = refreshTokenDTO.getRequestRefresh();
 
-        SessionActiveEntity token = sessionActiveService.getByCode(refresh);
+        SessionActiveEntity sessionActive = sessionActiveService.getByCode(refresh);
 
-        if (token == null)
-            throw new BadRequestException("Refresh token isn't existed");
+        if (sessionActive == null)
+            throw new BadRequestException("Mã làm mới không hợp lệ");
 
-        sessionActiveService.verifyExpiration(token);
+        sessionActiveService.verifyExpiration(sessionActive);
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(token.getUser().getEmail());
+        String newToken = jwtUtil.generateToken(sessionActive.getUser());
 
-        String newToken = jwtUtil.generateToken(userDetails);
+        SessionActiveEntity sessionActiveNew = sessionActiveService.saveSessionActive(sessionActive.getUser(), newToken);
 
-        return UserAuthResponse.builder()
-                .accessToken(newToken)
-                .refreshToken(refresh)
-                .build();
+        invalidTokenService.insertInvalidToken(sessionActive, InvalidTokenTypeEnum.REPLACED);
+
+        sessionActiveRepository.delete(sessionActive);
+
+        return AuthMapper.INSTANCE.toUserAuthResponse(sessionActiveNew, newToken);
     }
-
 
 
     @Override
@@ -272,32 +266,13 @@ public class AuthService implements IAuthService {
 
         authUtil.logoutUser();
 
-        invalidTokenService.insertInvalidToken(userLogoutRequest.getRefreshToken(), InvalidTokenTypeEnum.LOGOUT);
+        SessionActiveEntity sessionActive = sessionActiveService.getByCode(userLogoutRequest.getRefreshToken());
 
-        UUID refreshToken = userLogoutRequest.getRefreshToken();
+        if(sessionActive != null){
 
-        sessionActiveService.deleteSessionCode(refreshToken);
+            invalidTokenService.insertInvalidToken(sessionActive, InvalidTokenTypeEnum.LOGOUT);
 
+            sessionActiveRepository.delete(sessionActive);
+        }
     }
-
-
-    @Transactional
-    @Override
-    public void updatePassword(String otp, String email, String newPassword) {
-
-        OtpEntity otpRecord = otpService.getByEmailAndOtp(email, otp);
-
-        if (!OtpStatusEnum.Verified.equals(otpRecord.getStatus()))
-            throw new BadRequestException("Vui lòng xác thực mã OTP");
-
-        UserEntity user = userService.getUserByEmail(otpRecord.getEmail());
-
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
-
-        otpRecord.setStatus(OtpStatusEnum.Verified);
-        otpRepository.save(otpRecord);
-    }
-
-
 }

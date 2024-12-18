@@ -1,12 +1,10 @@
-package com.example.englishmaster_be.shared.service.invalid_token;
+package com.example.englishmaster_be.shared.invalid_token.service;
 
 import com.example.englishmaster_be.common.constant.InvalidTokenTypeEnum;
-import com.example.englishmaster_be.common.constant.SessionActiveTypeEnum;
 import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
-import com.example.englishmaster_be.model.session_active.SessionActiveRepository;
+import com.example.englishmaster_be.shared.session_active.service.ISessionActiveService;
 import com.example.englishmaster_be.util.JwtUtil;
 import com.example.englishmaster_be.model.invalid_token.InvalidTokenEntity;
-import com.example.englishmaster_be.shared.dto.response.invalid_token.InvalidTokenResponse;
 import com.example.englishmaster_be.model.invalid_token.InvalidTokenRepository;
 import com.example.englishmaster_be.value.JwtValue;
 import lombok.AccessLevel;
@@ -36,8 +34,6 @@ public class InvalidTokenService implements IInvalidTokenService {
 
     InvalidTokenRepository invalidTokenRepository;
 
-    SessionActiveRepository sessionActiveRepository;
-
 
     @Override
     public boolean inValidToken(String token) {
@@ -51,9 +47,9 @@ public class InvalidTokenService implements IInvalidTokenService {
 
     @Transactional
     @Override
-    public void insertInvalidToken(UUID sessionCode, InvalidTokenTypeEnum typeInvalid) {
+    public void insertInvalidToken(SessionActiveEntity sessionActive, InvalidTokenTypeEnum typeInvalid) {
 
-        SessionActiveEntity sessionActive = sessionActiveRepository.findByCode(sessionCode);
+        if(sessionActive == null) return;
 
         LocalDateTime expireTime = new Date(
                 sessionActive.getCreateAt().toInstant(ZoneOffset.UTC).toEpochMilli() + jwtValue.getJwtExpiration()
@@ -65,8 +61,8 @@ public class InvalidTokenService implements IInvalidTokenService {
                 .expireTime(expireTime)
                 .createAt(LocalDateTime.now())
                 .token(sessionActive.getToken())
-                .type(typeInvalid)
                 .user(sessionActive.getUser())
+                .type(typeInvalid)
                 .build();
 
         invalidTokenRepository.save(invalidToken);
@@ -79,7 +75,7 @@ public class InvalidTokenService implements IInvalidTokenService {
 
         sessionActiveEntityList.forEach(sessionActiveEntity -> {
 
-            this.insertInvalidToken(sessionActiveEntity.getCode(), typeInvalid);
+            this.insertInvalidToken(sessionActiveEntity, typeInvalid);
         });
     }
 }

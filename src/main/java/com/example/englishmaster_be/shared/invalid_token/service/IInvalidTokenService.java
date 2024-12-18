@@ -1,16 +1,15 @@
-package com.example.englishmaster_be.shared.service.invalid_token;
+package com.example.englishmaster_be.shared.invalid_token.service;
 
 import com.example.englishmaster_be.common.constant.InvalidTokenTypeEnum;
 import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
 
 import java.util.List;
-import java.util.UUID;
 
 public interface IInvalidTokenService {
 
     boolean inValidToken(String token);
 
-    void insertInvalidToken(UUID sessionCode, InvalidTokenTypeEnum typeInvalid);
+    void insertInvalidToken(SessionActiveEntity sessionActive, InvalidTokenTypeEnum typeInvalid);
 
     void insertInvalidTokenList(List<SessionActiveEntity> sessionActiveEntityList, InvalidTokenTypeEnum typeInvalid);
 }

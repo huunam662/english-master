@@ -11,6 +11,11 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 @Configuration
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -24,18 +29,35 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
 
-        configurer.addPathPrefix(appValue.getEndpoint_prefix(), clazz -> clazz.isAnnotationPresent(RestController.class));
+        configurer.addPathPrefix(
+                appValue.getEndpoint_prefix(),
+                clazz -> clazz.isAnnotationPresent(RestController.class)
+        );
     }
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
 
+        List<String> pathLocal = List.of(
+                appValue.getEndpoint_prefix() + "/v3/api-docs/**",
+                appValue.getEndpoint_prefix() + "/swagger-resources/**",
+                appValue.getEndpoint_prefix() + "/webjars/**"
+        );
+
+        List<String> pathProduction = pathLocal
+                .stream()
+                .map(path -> "/englishmaster" + path)
+                .toList();
+
+        List<String> pathMerge = Stream.concat(
+                pathProduction.stream(),
+                pathLocal.stream()
+        ).toList();
+
         registry.addInterceptor(globalInterceptorHandler)
-                .addPathPatterns("/**")
+                .addPathPatterns("/api/**")
                 .excludePathPatterns(
-                        "/api-docs/**",
-                        "/swagger-ui/**",
-                        "/swagger-ui.html"
+                        pathMerge
                 );
     }
 
