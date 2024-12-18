@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.shared.dto.request.upload_file;
+package com.example.englishmaster_be.shared.upload_file.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

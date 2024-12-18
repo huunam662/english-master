@@ -5,7 +5,7 @@ import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.mapper.PartMapper;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
-import com.example.englishmaster_be.shared.dto.request.upload_file.UploadMultipleFileRequest;
+import com.example.englishmaster_be.shared.upload_file.dto.request.UploadMultipleFileRequest;
 import com.example.englishmaster_be.domain.part.dto.request.PartSaveContentRequest;
 import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
 import com.example.englishmaster_be.model.part.PartEntity;

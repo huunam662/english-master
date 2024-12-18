@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.shared.service.otp;
+package com.example.englishmaster_be.shared.otp.service;
 
 import com.example.englishmaster_be.common.constant.OtpStatusEnum;
 import com.example.englishmaster_be.domain.user.service.IUserService;
@@ -29,7 +29,7 @@ public class OtpService implements IOtpService {
 
 
     @Override
-    public OtpEntity getOtp(String otp) {
+    public OtpEntity getByOtp(String otp) {
 
         return otpRepository.findByOtp(otp).orElseThrow(
                 () -> new BadRequestException("Mã OTP không hợp lệ")
@@ -60,7 +60,7 @@ public class OtpService implements IOtpService {
                 .otp(otpCode)
                 .email(email)
                 .user(user)
-                .status(OtpStatusEnum.UnVerified)
+                .status(OtpStatusEnum.UN_VERIFIED)
                 .expirationTime(LocalDateTime.now().plusMinutes(2))
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -69,9 +69,10 @@ public class OtpService implements IOtpService {
     }
 
     @Override
-    public boolean isValidOtp(String email, String otp) {
+    public boolean isValidOtp(OtpEntity otpEntity) {
 
-        OtpEntity otpEntity = getByEmailAndOtp(email, otp);
+        if(otpEntity == null)
+            throw new BadRequestException("Mã OTP không hợp lệ");
 
         return LocalDateTime.now().isBefore(otpEntity.getExpirationTime());
     }
@@ -91,9 +92,7 @@ public class OtpService implements IOtpService {
     @Override
     public void deleteOtp(String otp) {
 
-        OtpEntity otpEntity = otpRepository.findByOtp(otp).orElseThrow(
-                () -> new RuntimeException("Không tìm thấy mã OTP")
-        );
+        OtpEntity otpEntity = getByOtp(otp);
 
         otpRepository.delete(otpEntity);
     }

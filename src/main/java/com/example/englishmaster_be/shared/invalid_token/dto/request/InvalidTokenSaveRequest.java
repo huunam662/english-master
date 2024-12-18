@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.shared.dto.request.Invalid_token;
+package com.example.englishmaster_be.shared.invalid_token.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
