@@ -49,7 +49,7 @@ public class AuthController {
     }
 
 
-    @PostMapping("/forgot/password")
+    @PostMapping("/mailer/otp")
     @DefaultMessage("Hãy kiểm tra email của bạn để nhận mã xác thực")
     public void forgetPassword(@RequestParam("email") String email) {
 
