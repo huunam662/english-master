@@ -28,6 +28,9 @@ public class InvalidTokenEntity {
     @Column(name = "expire_time")
     LocalDateTime expireTime;
 
+    @Column(name = "create_at")
+    LocalDateTime createAt;
+
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
     InvalidTokenTypeEnum type;

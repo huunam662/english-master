@@ -233,7 +233,7 @@ public class MockTestService implements IMockTestService {
     @Override
     public List<MockTestEntity> getListMockTestToUser(int index, UUID userId) {
 
-        UserEntity user = userService.findUserById(userId);
+        UserEntity user = userService.getUserById(userId);
 
         return getTop10MockTestToUser(index, user);
     }

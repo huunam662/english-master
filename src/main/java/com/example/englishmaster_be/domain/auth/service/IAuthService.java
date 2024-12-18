@@ -3,6 +3,7 @@ package com.example.englishmaster_be.domain.auth.service;
 import com.example.englishmaster_be.domain.auth.dto.request.*;
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;
 import com.example.englishmaster_be.domain.auth.dto.response.UserConfirmTokenResponse;
+import com.example.englishmaster_be.model.user.UserEntity;
 
 import java.util.UUID;
 
@@ -20,14 +21,14 @@ public interface IAuthService {
 
     UserAuthResponse changePassword(UserChangePasswordRequest changePasswordRequest);
 
+    UserAuthResponse changePasswordForgot(UserChangePwForgotRequest changePasswordRequest);
+
     UserAuthResponse refreshToken(UserRefreshTokenRequest refreshTokenRequest);
 
     void logoutOf(UserLogoutRequest userLogoutRequest);
 
-    boolean logoutUser();
+    void updatePassword(String otp, String email, String newPassword);
 
-    void updatePassword(String otp,String newPassword);
-
-    UserConfirmTokenResponse createConfirmationToken(UserConfirmTokenRequest confirmationTokenRequest);
+    UserConfirmTokenResponse createConfirmationToken(UUID userId);
 
 }

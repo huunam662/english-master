@@ -7,6 +7,7 @@ import com.example.englishmaster_be.common.constant.RoleEnum;
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
 import com.example.englishmaster_be.domain.auth.dto.request.*;
 import com.example.englishmaster_be.domain.user.service.IUserService;
+import com.example.englishmaster_be.mapper.AuthMapper;
 import com.example.englishmaster_be.model.session_active.SessionActiveRepository;
 import com.example.englishmaster_be.model.otp.OtpRepository;
 import com.example.englishmaster_be.model.role.RoleRepository;
@@ -15,6 +16,7 @@ import com.example.englishmaster_be.model.user.UserRepository;
 import com.example.englishmaster_be.shared.service.invalid_token.IInvalidTokenService;
 import com.example.englishmaster_be.shared.service.otp.IOtpService;
 import com.example.englishmaster_be.shared.service.session_active.ISessionActiveService;
+import com.example.englishmaster_be.util.AuthUtil;
 import com.example.englishmaster_be.util.JwtUtil;
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;
 import com.example.englishmaster_be.domain.auth.dto.response.UserConfirmTokenResponse;
@@ -59,6 +61,8 @@ public class AuthService implements IAuthService {
 
     MailerUtil mailerUtil;
 
+    AuthUtil authUtil;
+
     AuthenticationManager authenticationManager;
 
     PasswordEncoder passwordEncoder;
@@ -82,8 +86,6 @@ public class AuthService implements IAuthService {
     RoleRepository roleRepository;
 
 
-
-
     @Transactional
     @Override
     public UserAuthResponse login(UserLoginRequest userLoginRequest) {
@@ -102,12 +104,11 @@ public class AuthService implements IAuthService {
         sessionActiveService.deleteAllTokenExpired(user);
         sessionActiveRepository.deleteByUserAndType(user, SessionActiveTypeEnum.CONFIRM);
 
-        SessionActiveEntity sessionActive = sessionActiveService.saveSessionActive(userDetails);
+        String jwtToken = jwtUtil.generateToken(userDetails);
 
-        return UserAuthResponse.builder()
-                .accessToken(sessionActive.getToken())
-                .refreshToken(sessionActive.getCode())
-                .build();
+        SessionActiveEntity sessionActive = sessionActiveService.saveSessionActive(userDetails, jwtToken);
+
+        return AuthMapper.INSTANCE.toUserAuthResponse(sessionActive, jwtToken);
     }
 
 
@@ -132,9 +133,7 @@ public class AuthService implements IAuthService {
 
         userRegister = userRepository.save(userRegister);
 
-        UserConfirmTokenResponse confirmationTokenResponse = this.createConfirmationToken(
-                UserConfirmTokenRequest.builder().user(userRegister).build()
-        );
+        UserConfirmTokenResponse confirmationTokenResponse = this.createConfirmationToken(userRegister.getUserId());
 
         try {
             mailerUtil.sendConfirmationEmail(userRegister.getEmail(), confirmationTokenResponse.getCode());
@@ -146,14 +145,17 @@ public class AuthService implements IAuthService {
 
     @Transactional
     @Override
-    public UserConfirmTokenResponse createConfirmationToken(UserConfirmTokenRequest confirmationTokenRequest) {
+    public UserConfirmTokenResponse createConfirmationToken(UUID userId) {
 
-        SessionActiveEntity sessionActive = ConfirmationTokenMapper.INSTANCE.toConfirmationTokenEntity(confirmationTokenRequest);
+        UserEntity user = userService.getUserById(userId);
 
-        sessionActive.setType(SessionActiveTypeEnum.CONFIRM);
-        sessionActive.setUser(confirmationTokenRequest.getUser());
-        sessionActive.setCode(UUID.randomUUID());
-        sessionActive.setCreateAt(LocalDateTime.now());
+        SessionActiveEntity sessionActive = SessionActiveEntity.builder()
+                .type(SessionActiveTypeEnum.CONFIRM)
+                .user(user)
+                .code(UUID.randomUUID())
+                .createAt(LocalDateTime.now())
+                .build();
+
         sessionActive = sessionActiveRepository.save(sessionActive);
 
         return ConfirmationTokenMapper.INSTANCE.toConfirmationTokenResponse(sessionActive);
@@ -196,8 +198,6 @@ public class AuthService implements IAuthService {
         if(!emailExisting)
             throw new BadRequestException("Email bạn đã đăng ký không tồn tại");
 
-        otpRepository.deleteByEmailAndStatus(email, OtpStatusEnum.UnVerified);
-
         OtpEntity otpEntity = otpService.generateOtp(email);
 
         mailerUtil.sendOtpToEmail(email, otpEntity.getOtp());
@@ -212,46 +212,35 @@ public class AuthService implements IAuthService {
         if (otp == null || otp.isEmpty())
             throw new BadRequestException("Mã OTP là bắt buộc");
 
-        if (otpService.isValidateOtp(otp))
+        UserEntity user = userService.currentUser();
+
+        if (!otpService.isValidOtp(user.getEmail(), otp))
             throw new BadRequestException("Mã OTP đã hết hiệu lực");
 
-        otpService.updateOtpStatusToVerified(otp);
-
+        otpService.updateOtpStatus(user.getEmail(), otp, OtpStatusEnum.Verified);
     }
 
 
     @Transactional
     @Override
+    public UserAuthResponse changePasswordForgot(UserChangePwForgotRequest changePasswordRequest) {
+
+        UserEntity user = userService.currentUser();
+
+        return authUtil.saveNewPassword(user, changePasswordRequest.getNewPassword(), changePasswordRequest.getOtpCode());
+    }
+
+    @Override
     public UserAuthResponse changePassword(UserChangePasswordRequest changePasswordRequest) {
 
         UserEntity user = userService.currentUser();
 
-        if (!changePasswordRequest.getConfirmNewPassword().equals(changePasswordRequest.getNewPassword()))
-            throw new BadRequestException("Mật khẩu không khớp với mật khẩu xác nhận");
-
         if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword()))
             throw new BadRequestException("Mật khẩu cũ không hợp lệ");
 
-        if (passwordEncoder.matches(changePasswordRequest.getNewPassword(), user.getPassword()))
-            throw new BadRequestException("Mật khẩu mới không được khớp với mật khẩu cũ");
-
-        updatePassword(changePasswordRequest.getOtpCode(), changePasswordRequest.getNewPassword());
-
-        List<SessionActiveEntity> sessionActiveEntityList = sessionActiveService.getSessionActiveList(user.getUserId(), SessionActiveTypeEnum.REFRESH_TOKEN);
-
-        invalidTokenService.insertInvalidTokenList(sessionActiveEntityList, InvalidTokenTypeEnum.CHANGE_PASSWORD);
-
-        sessionActiveRepository.deleteAll(sessionActiveEntityList);
-
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-
-        SessionActiveEntity sessionActive = sessionActiveService.saveSessionActive((UserDetails) authentication.getPrincipal());
-
-        return UserAuthResponse.builder()
-                .accessToken(sessionActive.getToken())
-                .refreshToken(sessionActive.getCode())
-                .build();
+        return authUtil.saveNewPassword(user, changePasswordRequest.getNewPassword(), changePasswordRequest.getOtpCode());
     }
+
 
 
     @Override
@@ -281,10 +270,7 @@ public class AuthService implements IAuthService {
     @Override
     public void logoutOf(UserLogoutRequest userLogoutRequest) {
 
-        boolean logoutSuccessfully = logoutUser();
-
-        if(!logoutSuccessfully)
-            throw new AuthenticationServiceException("Bạn chưa đăng nhập");
+        authUtil.logoutUser();
 
         invalidTokenService.insertInvalidToken(userLogoutRequest.getRefreshToken(), InvalidTokenTypeEnum.LOGOUT);
 
@@ -295,22 +281,11 @@ public class AuthService implements IAuthService {
     }
 
 
-    @Override
-    public boolean logoutUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof UserDetails) {
-            SecurityContextHolder.getContext().setAuthentication(null);
-            return true;
-        }
-
-        return false;
-    }
-
     @Transactional
     @Override
-    public void updatePassword(String otp, String newPassword) {
+    public void updatePassword(String otp, String email, String newPassword) {
 
-        OtpEntity otpRecord = otpService.getOtp(otp);
+        OtpEntity otpRecord = otpService.getByEmailAndOtp(email, otp);
 
         if (!OtpStatusEnum.Verified.equals(otpRecord.getStatus()))
             throw new BadRequestException("Vui lòng xác thực mã OTP");

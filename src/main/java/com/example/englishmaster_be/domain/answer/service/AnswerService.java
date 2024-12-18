@@ -48,20 +48,20 @@ public class AnswerService implements IAnswerService {
 
         QuestionEntity question = questionService.getQuestionById(answerRequest.getQuestionId());
 
-        boolean questionHadCorrectAnswer = question.getAnswers().stream().anyMatch(
-                answer -> {
-                    if(
-                            Objects.nonNull(answerRequest.getAnswerId())
-                            && answer.getCorrectAnswer()
-                            && answerRequest.getCorrectAnswer()
-                            && !answer.getAnswerId().equals(answerRequest.getAnswerId())
-                    ) return true;
-
-                    else return answer.getCorrectAnswer() && answerRequest.getCorrectAnswer();
-                }
-        );
-
-        if (questionHadCorrectAnswer) throw new BadRequestException("Had correct AnswerEntity");
+//        boolean questionHadCorrectAnswer = question.getAnswers().stream().anyMatch(
+//                answer -> {
+//                    if(
+//                            Objects.nonNull(answerRequest.getAnswerId())
+//                            && answer.getCorrectAnswer()
+//                            && answerRequest.getCorrectAnswer()
+//                            && !answer.getAnswerId().equals(answerRequest.getAnswerId())
+//                    ) return true;
+//
+//                    else return answer.getCorrectAnswer() && answerRequest.getCorrectAnswer();
+//                }
+//        );
+//
+//        if (questionHadCorrectAnswer) throw new BadRequestException("Had correct AnswerEntity");
 
         AnswerEntity answer;
 

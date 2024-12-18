@@ -20,8 +20,6 @@ public interface IUserService {
 
     UserEntity getUserByEmail(String email);
 
-    UserEntity findUserById(UUID userId);
-
     boolean existsEmail(String email);
 
 }

@@ -5,14 +5,19 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.bouncycastle.util.encoders.Hex;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
+import java.security.MessageDigest;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -29,6 +34,7 @@ import java.util.function.Function;
 public class JwtUtil {
 
     JwtValue jwtValue;
+
 
     Boolean isTokenExpired(String token) {
 
@@ -70,6 +76,20 @@ public class JwtUtil {
                 .split("ROLE_")[1];
     }
 
+    @SneakyThrows
+    public String hashToHex(String token){
+
+        Key key = Keys.hmacShaKeyFor(jwtValue.getSaltHashToken().getBytes(StandardCharsets.UTF_8));
+
+        Mac mac = Mac.getInstance(key.getAlgorithm());
+
+        mac.init(key);
+
+        byte[] rawHmac = mac.doFinal(token.getBytes(StandardCharsets.UTF_8));
+
+        return Hex.toHexString(rawHmac);
+    }
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -83,7 +103,7 @@ public class JwtUtil {
                 .toLocalDateTime();
     }
 
-    public Boolean validateToken(String token) {
+    public Boolean isValidToken(String token) {
 
         try{
 

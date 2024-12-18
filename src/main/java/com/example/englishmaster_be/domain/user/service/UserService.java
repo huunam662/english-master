@@ -167,13 +167,6 @@ public class UserService implements IUserService {
         );
     }
 
-    @Override
-    public UserEntity findUserById(UUID userId) {
-        return userRepository.findById(userId).orElseThrow(
-                () -> new BadRequestException("UserEntity not found")
-        );
-    }
-
 
     @Override
     public boolean existsEmail(String email) {

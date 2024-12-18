@@ -63,7 +63,7 @@ public class AdminService implements IAdminService {
     @Override
     public void deleteUser(UUID userId) {
 
-        UserEntity userEntity = userService.findUserById(userId);
+        UserEntity userEntity = userService.getUserById(userId);
 
         userRepository.delete(userEntity);
     }
@@ -123,7 +123,7 @@ public class AdminService implements IAdminService {
         if(enable == null)
             throw new BadRequestException("The enable parameter is required");
 
-        UserEntity user = userService.findUserById(userId);
+        UserEntity user = userService.getUserById(userId);
 
         user.setEnabled(enable);
         userRepository.save(user);
