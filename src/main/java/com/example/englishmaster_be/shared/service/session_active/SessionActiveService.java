@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.*;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -40,28 +41,30 @@ public class SessionActiveService implements ISessionActiveService {
         return sessionActiveRepository.findByCodeAndType(code, SessionActiveTypeEnum.REFRESH_TOKEN);
     }
 
+    @Transactional
     @Override
     public void deleteSessionCode(UUID sessionCode) {
 
-        SessionActiveEntity confirmationToken = sessionActiveRepository.findByCodeAndType(sessionCode, SessionActiveTypeEnum.REFRESH_TOKEN);
+        SessionActiveEntity confirmationToken = sessionActiveRepository.findByCode(sessionCode);
 
         if(confirmationToken != null)
             sessionActiveRepository.delete(confirmationToken);
 
     }
 
+    @Transactional
     @Override
-    public SessionActiveEntity saveSessionActive(UserDetails userDetails) {
+    public SessionActiveEntity saveSessionActive(UserDetails userDetails, String jwtToken) {
 
         UserEntity user = userService.getUserByEmail(userDetails.getUsername());
 
-        String tokenJwt = jwtUtil.generateToken(userDetails);
+        String tokenHash = jwtUtil.hashToHex(jwtToken);
 
         SessionActiveEntity sessionActiveEntity = SessionActiveEntity.builder()
                 .createAt(LocalDateTime.now())
                 .user(user)
                 .code(UUID.randomUUID())
-                .token(tokenJwt)
+                .token(tokenHash)
                 .type(SessionActiveTypeEnum.REFRESH_TOKEN)
                 .build();
 
@@ -76,6 +79,7 @@ public class SessionActiveService implements ISessionActiveService {
 
     }
 
+    @Transactional
     @Override
     public void deleteAllTokenExpired(UserEntity user) {
         try{

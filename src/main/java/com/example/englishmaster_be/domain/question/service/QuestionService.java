@@ -1,12 +1,19 @@
 package com.example.englishmaster_be.domain.question.service;
 
+import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
+import com.example.englishmaster_be.domain.answer_matching.dto.response.AnswerMatchingBasicResponse;
+import com.example.englishmaster_be.domain.answer_matching.service.IAnswerMatchingService;
+import com.example.englishmaster_be.domain.cloudinary.service.ICloudinaryService;
 import com.example.englishmaster_be.domain.content.service.IContentService;
 import com.example.englishmaster_be.domain.file_storage.service.IFileStorageService;
 import com.example.englishmaster_be.domain.part.service.IPartService;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionDto;
+import com.example.englishmaster_be.domain.question_label.service.IQuestionLabelService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
+import com.example.englishmaster_be.model.question_label.QuestionLabelEntity;
 import com.example.englishmaster_be.util.GetExtensionUtil;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
@@ -39,7 +46,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -67,7 +76,9 @@ public class QuestionService implements IQuestionService {
 
     IAnswerService answerService;
 
+    IAnswerMatchingService answerMatchingService;
 
+    IQuestionLabelService labelService;
 
     @Transactional
     @Override
@@ -338,5 +349,56 @@ public class QuestionService implements IQuestionService {
         QuestionEntity question = getQuestionById(questionId);
 
         return listQuestionGroup(question);
+    }
+
+    @Override
+    public List<QuestionDto> getAllQuestionFromPart(UUID partId) {
+        PartEntity part = partRepository.findByPartId(partId)
+                .orElseThrow(
+                        () -> new IllegalArgumentException("PartEntity not found with ID: " + partId)
+                );
+
+        List<QuestionEntity> questionEntities= questionRepository.findByPart(part);
+
+        if(questionEntities == null)
+            return null;
+
+        List<QuestionDto> questionDtos = new ArrayList<>();
+
+        for(QuestionEntity questionEntity: questionEntities){
+            QuestionDto questionDto=new QuestionDto();
+            questionDto.setQuestionId(questionEntity.getQuestionId());
+            questionDto.setContent(questionEntity.getQuestionContent());
+            questionDto.setQuestionType(questionEntity.getQuestionType());
+            if(questionEntity.getQuestionType()== QuestionTypeEnum.Multiple_Choice || questionEntity.getQuestionType()== QuestionTypeEnum.T_F_Not_Given){
+                List<AnswerEntity> answerEntities=questionEntity.getAnswers();
+                questionDto.setAnswers(
+                        answerEntities.stream().map(AnswerEntity::getAnswerContent).collect(Collectors.toList())
+                );
+
+            }
+            else if(questionEntity.getQuestionType()== QuestionTypeEnum.Matching ){
+                List<AnswerMatchingBasicResponse> answerMatchingBasicResponses=answerMatchingService.getListAnswerMatchingWithShuffle(questionEntity.getQuestionId());
+                questionDto.setOptions(answerMatchingBasicResponses);
+            }
+
+            else if(questionEntity.getQuestionType()== QuestionTypeEnum.Label ){
+                if(questionEntity.getHasHints()){
+                    List<QuestionLabelEntity> questionLabelEntities=questionEntity.getLabels();
+                    if(questionLabelEntities==null){
+                        questionDto.setLabels(null);
+                    }
+                    else{
+                        questionDto.setLabels(
+                                questionLabelEntities.stream().map(QuestionLabelEntity::getLabel).collect(Collectors.toList())
+                        );
+                    }
+
+                }
+            }
+            questionDtos.add(questionDto);
+
+        }
+        return questionDtos;
     }
 }

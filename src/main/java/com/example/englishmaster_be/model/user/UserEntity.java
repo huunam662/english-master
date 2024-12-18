@@ -2,6 +2,7 @@ package com.example.englishmaster_be.model.user;
 
 import com.example.englishmaster_be.model.comment.CommentEntity;
 import com.example.englishmaster_be.model.invalid_token.InvalidTokenEntity;
+import com.example.englishmaster_be.model.otp.OtpEntity;
 import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
 import com.example.englishmaster_be.model.flash_card.FlashCardEntity;
 import com.example.englishmaster_be.model.post.PostEntity;
@@ -68,6 +69,9 @@ public class UserEntity {
     @ManyToOne
     @JoinColumn(name = "role", referencedColumnName = "id")
     RoleEntity role;
+
+    @OneToMany(mappedBy = "user")
+    List<OtpEntity> OTPs;
 
     @OneToMany(mappedBy = "user")
     List<SessionActiveEntity> sessionActives;

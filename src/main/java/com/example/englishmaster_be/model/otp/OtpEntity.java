@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.model.otp;
 
 import com.example.englishmaster_be.common.constant.OtpStatusEnum;
+import com.example.englishmaster_be.model.user.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
@@ -45,4 +46,7 @@ public class OtpEntity {
     @Column(name = "expiration_time")
     LocalDateTime expirationTime;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    UserEntity user;
 }

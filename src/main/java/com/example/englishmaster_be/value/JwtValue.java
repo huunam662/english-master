@@ -17,6 +17,9 @@ public class JwtValue {
     @Value("${englishmaster.jwtSecret}")
     String jwtSecret;
 
+    @Value("${englishmaster.salt.hash.jwtToken}")
+    String saltHashToken;
+
     @Value("${englishmaster.jwtExpiration}")
     long jwtExpiration;
 

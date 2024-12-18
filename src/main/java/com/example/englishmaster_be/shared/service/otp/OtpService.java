@@ -1,10 +1,12 @@
 package com.example.englishmaster_be.shared.service.otp;
 
 import com.example.englishmaster_be.common.constant.OtpStatusEnum;
+import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.helper.OtpHelper;
 import com.example.englishmaster_be.model.otp.OtpEntity;
 import com.example.englishmaster_be.model.otp.OtpRepository;
+import com.example.englishmaster_be.model.user.UserEntity;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -21,6 +23,8 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OtpService implements IOtpService {
 
+    IUserService userService;
+
     OtpRepository otpRepository;
 
 
@@ -32,9 +36,21 @@ public class OtpService implements IOtpService {
         );
     }
 
+    @Override
+    public OtpEntity getByEmailAndOtp(String email, String otp) {
+
+        return otpRepository.findByEmailAndOtp(email, otp).orElseThrow(
+                () -> new BadRequestException("Mã OTP không hợp lệ")
+        );
+    }
+
     @Transactional
     @Override
     public OtpEntity generateOtp(String email) {
+
+        otpRepository.deleteByEmail(email);
+
+        UserEntity user = userService.getUserByEmail(email);
 
         int codeLength = 6;
 
@@ -43,6 +59,7 @@ public class OtpService implements IOtpService {
         OtpEntity otp = OtpEntity.builder()
                 .otp(otpCode)
                 .email(email)
+                .user(user)
                 .status(OtpStatusEnum.UnVerified)
                 .expirationTime(LocalDateTime.now().plusMinutes(2))
                 .createdAt(LocalDateTime.now())
@@ -52,23 +69,25 @@ public class OtpService implements IOtpService {
     }
 
     @Override
-    public boolean isValidateOtp(String otp) {
+    public boolean isValidOtp(String email, String otp) {
 
-        OtpEntity otpEntity = getOtp(otp);
+        OtpEntity otpEntity = getByEmailAndOtp(email, otp);
 
-        return otpEntity.getExpirationTime().isBefore(LocalDateTime.now());
+        return LocalDateTime.now().isBefore(otpEntity.getExpirationTime());
     }
 
     @Transactional
     @Override
-    public void updateOtpStatusToVerified(String otp) {
+    public void updateOtpStatus(String email, String otp, OtpStatusEnum status) {
 
-        OtpEntity otpEntity = getOtp(otp);
+        OtpEntity otpEntity = getByEmailAndOtp(email, otp);
 
-        otpEntity.setStatus(OtpStatusEnum.Verified);
+        otpEntity.setStatus(status);
 
         otpRepository.save(otpEntity);
     }
+
+    @Transactional
     @Override
     public void deleteOtp(String otp) {
 

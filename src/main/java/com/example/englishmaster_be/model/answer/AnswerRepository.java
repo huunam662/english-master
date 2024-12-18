@@ -16,4 +16,6 @@ public interface AnswerRepository extends JpaRepository<AnswerEntity, UUID> {
     Optional<AnswerEntity> findByQuestionAndCorrectAnswer(QuestionEntity question, boolean isCorrect);
 
     List<AnswerEntity> findByQuestion(QuestionEntity question);
+
+    AnswerEntity findByQuestionAndAnswerContent(QuestionEntity question, String answerContent);
 }

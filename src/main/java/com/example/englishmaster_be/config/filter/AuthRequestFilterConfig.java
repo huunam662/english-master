@@ -55,7 +55,7 @@ public class AuthRequestFilterConfig extends OncePerRequestFilter {
 
                 String jwtToken = headerAuth.substring(prefixHeaderAuth.length()).trim();
 
-                if (!jwtUtil.validateToken(jwtToken) || invalidTokenService.invalidToken(jwtToken))
+                if (!jwtUtil.isValidToken(jwtToken) || invalidTokenService.inValidToken(jwtToken))
                     throw new CustomException(ErrorEnum.UNAUTHENTICATED);
 
                 String username = jwtUtil.extractUsername(jwtToken);

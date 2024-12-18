@@ -29,8 +29,6 @@ public class UserAnswerEntity {
 
     String content;
 
-    @Column(name = "number_choice")
-    Integer numberChoice;
 
     @ManyToOne
     @JoinColumn(name = "question_id")
