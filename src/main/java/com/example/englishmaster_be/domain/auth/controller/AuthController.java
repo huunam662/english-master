@@ -9,7 +9,6 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -50,7 +49,7 @@ public class AuthController {
     }
 
 
-    @PostMapping("/forgetPassword")
+    @PostMapping("/forgot/password")
     @DefaultMessage("Hãy kiểm tra email của bạn để nhận mã xác thực")
     public void forgetPassword(@RequestParam("email") String email) {
 
@@ -58,24 +57,31 @@ public class AuthController {
     }
 
 
-    @PostMapping("/verifyOtp")
+    @PostMapping("/verify/otp")
     @DefaultMessage("Xác thực mã OTP thành công")
     public void verifyOtp(@RequestParam String otp) {
 
         authService.verifyOtp(otp);
     }
 
-
-    @PostMapping("/changePassword")
+    @PostMapping("/change/password")
     @DefaultMessage("Cập nhật mật khẩu thành công")
-    public UserAuthResponse changePassword(@Valid @RequestBody UserChangePasswordRequest changePasswordDTO) {
+    public UserAuthResponse changePassword(@Valid @RequestBody UserChangePasswordRequest changePasswordRequest){
 
-        return authService.changePassword(changePasswordDTO);
+        return authService.changePassword(changePasswordRequest);
+    }
+
+
+    @PostMapping("/change/password/forgot")
+    @DefaultMessage("Cập nhật mật khẩu thành công")
+    public UserAuthResponse changePasswordForgot(@Valid @RequestBody UserChangePwForgotRequest changePwForgotRequest) {
+
+        return authService.changePasswordForgot(changePwForgotRequest);
     }
 
 
 
-    @PostMapping("/refreshToken")
+    @PostMapping("/refresh/token")
     @DefaultMessage("Mã truy cập được tạo thành công")
     public UserAuthResponse refreshToken(@RequestBody UserRefreshTokenRequest refreshTokenDTO) {
 

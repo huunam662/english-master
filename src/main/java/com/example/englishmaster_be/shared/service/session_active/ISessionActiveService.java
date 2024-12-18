@@ -15,7 +15,7 @@ public interface ISessionActiveService {
 
     void deleteSessionCode(UUID sessionCode);
 
-    SessionActiveEntity saveSessionActive(UserDetails userDetails);
+    SessionActiveEntity saveSessionActive(UserDetails userDetails, String jwtToken);
 
     void verifyExpiration(SessionActiveEntity token);
 

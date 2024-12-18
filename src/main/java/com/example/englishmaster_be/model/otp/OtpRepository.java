@@ -16,5 +16,10 @@ public interface OtpRepository extends JpaRepository<OtpEntity, UUID> {
     @Query("DELETE FROM OtpEntity o WHERE o.email = :email AND o.status = :status")
     void deleteByEmailAndStatus(@Param("email") String email, @Param("status") OtpStatusEnum status);
 
+    @Modifying
+    void deleteByEmail(String email);
+
     Optional<OtpEntity> findByOtp(String otp);
+
+    Optional<OtpEntity> findByEmailAndOtp(String email, String otp);
 }

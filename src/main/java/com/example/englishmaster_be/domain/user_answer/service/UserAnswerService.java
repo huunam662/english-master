@@ -140,7 +140,7 @@ public class UserAnswerService implements IUserAnswerService {
     @Override
     public boolean checkCorrectAnswerBlank(UUID questionId, UUID userId) {
 
-        UserEntity user = userService.findUserById(userId);
+        UserEntity user = userService.getUserById(userId);
 
         QuestionEntity question = questionService.getQuestionById(questionId);
 
@@ -193,7 +193,7 @@ public class UserAnswerService implements IUserAnswerService {
     @Override
     public boolean checkCorrectAnswerMultipleChoice(UUID questionId, UUID userId){
 
-        UserEntity user = userService.findUserById(userId);
+        UserEntity user = userService.getUserById(userId);
 
         QuestionEntity question = questionService.getQuestionById(questionId);
 
@@ -235,7 +235,7 @@ public class UserAnswerService implements IUserAnswerService {
     @Override
     public UserAnswerScoreResponse scoreAnswerMatching(UUID questionId, UUID userId){
 
-        UserEntity user = userService.findUserById(userId);
+        UserEntity user = userService.getUserById(userId);
 
         QuestionEntity question = questionService.getQuestionById(questionId);
 
