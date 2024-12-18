@@ -2,6 +2,7 @@ package com.example.englishmaster_be.domain.question.service;
 
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionDto;
 import com.example.englishmaster_be.shared.dto.request.upload_file.UploadMultipleFileRequest;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,4 +35,5 @@ public interface IQuestionService {
 
     List<QuestionEntity> getQuestionGroupListByQuestionId(UUID questionId);
 
+    List<QuestionDto> getAllQuestionFromPart(UUID partId);
 }
