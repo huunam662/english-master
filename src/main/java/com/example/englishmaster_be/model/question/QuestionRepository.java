@@ -26,6 +26,7 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, UUID> 
 
     boolean existsByQuestionGroupParent(QuestionEntity question);
 
+    List<QuestionEntity> findByPart(PartEntity part);
 
 
 }

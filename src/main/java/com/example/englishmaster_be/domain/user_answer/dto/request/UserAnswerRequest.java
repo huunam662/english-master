@@ -3,6 +3,7 @@ package com.example.englishmaster_be.domain.user_answer.dto.request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -15,6 +16,6 @@ public class UserAnswerRequest {
 
     UUID questionId;
 
-    UUID answerId;
+    List<String> answer;
 
 }

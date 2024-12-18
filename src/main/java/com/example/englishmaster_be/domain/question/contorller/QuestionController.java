@@ -3,6 +3,7 @@ package com.example.englishmaster_be.domain.question.contorller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionDto;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.mapper.AnswerMapper;
 import com.example.englishmaster_be.mapper.QuestionMapper;
@@ -163,6 +164,11 @@ public class QuestionController {
         QuestionEntity question = questionService.getQuestionById(questionId);
 
         return QuestionMapper.INSTANCE.toQuestionResponse(question);
+    }
+
+    @GetMapping("/{partId}/list-question")
+    public List<QuestionDto> getAllQuestionFromPart(@PathVariable UUID partId) {
+        return questionService.getAllQuestionFromPart(partId);
     }
 
 }

@@ -13,6 +13,9 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -33,5 +36,12 @@ public class QuestionLabelService implements IQuestionLabelService {
         labelEntity.setLabel(request.getLabel());
         labelEntity.setContent(request.getTitle());
         return labelRepository.save(labelEntity);
+    }
+
+    @Override
+    public List<QuestionLabelEntity> getLabelByIdQuestion(UUID questionId) {
+        QuestionEntity questionEntity = questionService.getQuestionById(questionId);
+
+        return labelRepository.findByQuestion(questionEntity);
     }
 }

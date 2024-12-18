@@ -69,32 +69,26 @@ public class UserAnswerService implements IUserAnswerService {
 
         QuestionEntity question = questionService.getQuestionById(userAnswerRequest.getQuestionId());
 
-        AnswerEntity answer = answerService.getAnswerById(userAnswerRequest.getAnswerId());
-
-        UserAnswerEntity userAns = userAnswerRepository.findByUserAndQuestion(user, question);
-
-        if(Objects.isNull(userAns)){
-
-            userAns = UserAnswerEntity.builder()
-                    .user(user)
-                    .question(question)
-                    .answers(Collections.singletonList(answer))
-                    .numberChoice(1)
-                    .build();
-
-            return userAnswerRepository.save(userAns);
+        if(userAnswerRequest.getAnswer().size() > question.getNumberChoice()){
+            throw new BadRequestException("The number of choices must be less than or equal to " + question.getNumberChoice());
         }
 
-        int numberChoice = userAns.getNumberChoice();
 
-        if(question.getNumberChoice() < numberChoice + 1)
-            throw new BadRequestException("The number of choices must be less than or equal to " + question.getNumberChoice());
+        UserAnswerEntity userAns = UserAnswerEntity.builder()
+                .user(user)
+                .question(question)
+                .answers(new ArrayList<>())
+                .build();
 
-        if(userAns.getAnswers() == null)
-            userAns.setAnswers(new ArrayList<>());
+        for(int i=0;i<userAnswerRequest.getAnswer().size();i++){
+            AnswerEntity answerEntity = answerRepository.findByQuestionAndAnswerContent(question, userAnswerRequest.getAnswer().get(i));
 
-        userAns.getAnswers().add(answer);
-        userAns.setNumberChoice(numberChoice + 1);
+            if(Objects.isNull(answerEntity)){
+                throw new BadRequestException("The answer is not exist");
+            }
+            userAns.getAnswers().add(answerEntity);
+
+        }
 
         return userAnswerRepository.save(userAns);
     }
@@ -304,26 +298,9 @@ public class UserAnswerService implements IUserAnswerService {
         UserAnswerScoreResponse scoreAnswerResponse = new UserAnswerScoreResponse();
 
         if(Objects.equals(question.getQuestionType(), QuestionTypeEnum.Fill_In_Blank) || Objects.equals(question.getQuestionType(), QuestionTypeEnum.Label)){
-//            if(!checkCorrectAnswerBlank(questionId)){
-//                score.put("scoreAnswer",0);
-//            }
-//            else{
-//                List<UserBlankAnswerEntity> answers= userBlankAnswerRepository.getByUserAndQuestion(user,question);
-//                List<AnswerBlankEntity> answerBlanks= answerBlankRepository.findByQuestion(question);
-//                score.put("scoreAnswer",(question.getQuestionScore()/answerBlanks.size())* answers.size());
-//            }
             scoreAnswerResponse.setScoreAnswer(scoreAnswerBlank(questionId));
-            System.out.println(" diem "+scoreAnswerResponse.getScoreAnswer());
         }
         else if(Objects.equals(question.getQuestionType(), QuestionTypeEnum.Multiple_Choice)){
-//            if (checkCorrectAnswerMultipleChoice(questionId)){
-//                UserAnswerEntity userAnswer=userAnswerRepository.findByUserAndQuestion(user,question);
-//                int n=question.getAnswers().size();
-//                score.put("scoreAnswer",question.getQuestionScore()/n*userAnswer.getAnswers().size());
-//            }
-//            else{
-//                score.put("scoreAnswer",0);
-//            }
             scoreAnswerResponse.setScoreAnswer(scoreAnswerMultipleChoice(questionId));
         }
         else if (Objects.equals(question.getQuestionType(), QuestionTypeEnum.T_F_Not_Given))
