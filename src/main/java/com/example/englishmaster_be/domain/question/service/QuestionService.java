@@ -7,8 +7,7 @@ import com.example.englishmaster_be.domain.answer_matching.service.IAnswerMatchi
 import com.example.englishmaster_be.domain.content.service.IContentService;
 import com.example.englishmaster_be.domain.file_storage.service.IFileStorageService;
 import com.example.englishmaster_be.domain.part.service.IPartService;
-import com.example.englishmaster_be.domain.question.dto.response.QuestionDto;
-import com.example.englishmaster_be.domain.question_label.service.IQuestionLabelService;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionFromPartResponse;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
@@ -22,7 +21,6 @@ import com.example.englishmaster_be.model.content.ContentEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.shared.upload_file.dto.request.UploadMultipleFileRequest;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.QuestionMapper;
 import com.example.englishmaster_be.model.answer.AnswerRepository;
@@ -75,8 +73,6 @@ public class QuestionService implements IQuestionService {
     IAnswerService answerService;
 
     IAnswerMatchingService answerMatchingService;
-
-    IQuestionLabelService labelService;
 
     @Transactional
     @Override
@@ -258,7 +254,10 @@ public class QuestionService implements IQuestionService {
 
     @Transactional
     @Override
-    public QuestionEntity uploadFileQuestion(UUID questionId, UploadMultipleFileRequest uploadMultiFileDTO) {
+    public QuestionEntity uploadFileQuestion(UUID questionId, List<MultipartFile> uploadMultiFileDTO) {
+
+        if(uploadMultiFileDTO == null || uploadMultiFileDTO.isEmpty())
+            throw new BadRequestException("File upload required");
 
         UserEntity user = userService.currentUser();
 
@@ -267,7 +266,7 @@ public class QuestionService implements IQuestionService {
         if(question.getContentCollection() == null)
             question.setContentCollection(new ArrayList<>());
 
-        for(var file : uploadMultiFileDTO.getContentData()){
+        for(var file : uploadMultiFileDTO){
 
             if(file == null || file.isEmpty()) continue;
 
@@ -350,7 +349,7 @@ public class QuestionService implements IQuestionService {
     }
 
     @Override
-    public List<QuestionDto> getAllQuestionFromPart(UUID partId) {
+    public List<QuestionFromPartResponse> getAllQuestionFromPart(UUID partId) {
         PartEntity part = partRepository.findByPartId(partId)
                 .orElseThrow(
                         () -> new IllegalArgumentException("PartEntity not found with ID: " + partId)
@@ -361,10 +360,10 @@ public class QuestionService implements IQuestionService {
         if(questionEntities == null)
             return null;
 
-        List<QuestionDto> questionDtos = new ArrayList<>();
+        List<QuestionFromPartResponse> questionDtos = new ArrayList<>();
 
         for(QuestionEntity questionEntity: questionEntities){
-            QuestionDto questionDto=new QuestionDto();
+            QuestionFromPartResponse questionDto=new QuestionFromPartResponse();
             questionDto.setQuestionId(questionEntity.getQuestionId());
             questionDto.setContent(questionEntity.getQuestionContent());
             questionDto.setQuestionType(questionEntity.getQuestionType());

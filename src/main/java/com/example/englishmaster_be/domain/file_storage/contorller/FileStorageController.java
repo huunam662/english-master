@@ -29,7 +29,7 @@ public class FileStorageController {
     IFileStorageService fileStorageService;
 
     @GetMapping("/{filename:.+}")
-    @DefaultMessage("Load file_storage successfully")
+    @DefaultMessage("Tải file thành công")
     public Resource getFile(
             @Parameter(hidden = true) HttpServletResponse response,
             @PathVariable String filename
@@ -46,7 +46,7 @@ public class FileStorageController {
     }
 
     @GetMapping("/showImage/{filename:.+}")
-    @DefaultMessage("Load file_storage successfully")
+    @DefaultMessage("Tải file thành công")
     public Resource showImage(
             @Parameter(hidden = true) HttpServletResponse response,
             @PathVariable String filename
@@ -61,7 +61,7 @@ public class FileStorageController {
 
 
     @GetMapping("/showAudio/{filename:.+}")
-    @DefaultMessage("Load file_storage successfully")
+    @DefaultMessage("Tải file thành công")
     public Resource showAudio(
             @Parameter(hidden = true) HttpServletResponse response,
             @PathVariable String filename
@@ -75,14 +75,14 @@ public class FileStorageController {
     }
 
     @GetMapping("/getImageName")
-    @DefaultMessage("Load file_storage names successfully")
+    @DefaultMessage("Danh sách tên file hiện có")
     public List<String> showImages() {
 
         return fileStorageService.loadAll();
     }
 
     @PostMapping(value = "/saveImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @DefaultMessage("Save file_storage successfully")
+    @DefaultMessage("Lưu file thành công")
     public FileResponse saveImage(@RequestParam("file") MultipartFile file) {
 
         Blob blob = fileStorageService.save(file);
@@ -93,7 +93,7 @@ public class FileStorageController {
     }
 
     @DeleteMapping("/deleteImage/{fileName}")
-    @DefaultMessage("Delete file_storage successfully")
+    @DefaultMessage("Xóa file thành công")
     public void deleteImage(@PathVariable("fileName") String fileName) {
 
         fileStorageService.delete(fileName);

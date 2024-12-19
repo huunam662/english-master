@@ -31,7 +31,7 @@ public class UserController {
 
     @GetMapping("/information")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Information UserEntity successfully")
+    @DefaultMessage("Information user successfully")
     public UserProfileResponse informationUser() {
 
         UserEntity currentUser = userService.currentUser();
@@ -41,7 +41,7 @@ public class UserController {
 
     @PatchMapping(value = "/changeProfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Change profile UserEntity successfully")
+    @DefaultMessage("Change profile user successfully")
     public UserProfileResponse changeProfile(
             @ModelAttribute("profileUser") UserChangeProfileRequest changeProfileRequest
     ) {

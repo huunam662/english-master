@@ -15,14 +15,15 @@ public interface FeedbackMapper {
 
     FeedbackMapper INSTANCE = Mappers.getMapper(FeedbackMapper.class);
 
+    @Mapping(target = "feedbackId", source = "id")
     FeedbackResponse toFeedbackResponse(FeedbackEntity feedback);
 
     List<FeedbackResponse> toFeedbackResponseList(List<FeedbackEntity> feedbackList);
 
-    @Mapping(target = "avatar", ignore = true)
+    @Mapping(target = "id", ignore = true)
     FeedbackEntity toFeedbackEntity(FeedbackRequest feedbackRequest);
 
-    @Mapping(target = "avatar", ignore = true)
+    @Mapping(target = "id", ignore = true)
     void flowToFeedbackEntity(FeedbackRequest feedbackRequest, @MappingTarget FeedbackEntity feedback);
 
 }

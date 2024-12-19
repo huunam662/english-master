@@ -1,37 +1,47 @@
 package com.example.englishmaster_be.scheduled;
 
+import com.example.englishmaster_be.common.constant.InvalidTokenTypeEnum;
+import com.example.englishmaster_be.common.constant.SessionActiveTypeEnum;
 import com.example.englishmaster_be.model.invalid_token.InvalidTokenEntity;
 import com.example.englishmaster_be.model.invalid_token.QInvalidTokenEntity;
+import com.example.englishmaster_be.model.session_active.QSessionActiveEntity;
+import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
 import com.example.englishmaster_be.model.user.QUserEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.model.session_active.SessionActiveRepository;
 import com.example.englishmaster_be.model.invalid_token.InvalidTokenRepository;
 import com.example.englishmaster_be.model.user.UserRepository;
-import com.querydsl.core.types.dsl.DateTimeTemplate;
+import com.example.englishmaster_be.shared.invalid_token.service.IInvalidTokenService;
+import com.example.englishmaster_be.value.JwtValue;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 
 
 @Slf4j
 @Component
-@EnableScheduling
 public class TaskScheduled {
 
-    UserRepository userRepository;
-
-    SessionActiveRepository confirmationTokenRepository;
+    JwtValue jwtValue;
 
     JPAQueryFactory queryFactory;
 
+    IInvalidTokenService invalidTokenService;
+
+    UserRepository userRepository;
+
     InvalidTokenRepository invalidTokenRepository;
+
+    SessionActiveRepository sessionActiveRepository;
+
 
 
     @Transactional
@@ -48,7 +58,7 @@ public class TaskScheduled {
                     .fetch();
 
             for (UserEntity user : usersToDelete) {
-                confirmationTokenRepository.deleteAll(confirmationTokenRepository.findByUserId(user.getUserId()));
+                sessionActiveRepository.deleteAll(sessionActiveRepository.findByUserId(user.getUserId()));
                 userRepository.delete(user);
             }
 
@@ -103,6 +113,62 @@ public class TaskScheduled {
         }
         catch (Exception e){
             log.error("ErrorEnum in deleteInvalidToken task", e);
+        }
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0 3 * * ?") // Run at 3 AM every day
+    public void deleteAllSessionConfirm(){
+
+        log.info("Starting deleteAllSessionActiveConfirm task");
+
+        try {
+
+            JPAQuery<SessionActiveEntity> query = queryFactory
+                    .selectFrom(QSessionActiveEntity.sessionActiveEntity)
+                    .where(
+                            QSessionActiveEntity.sessionActiveEntity.type.eq(SessionActiveTypeEnum.CONFIRM)
+                    );
+
+            List<SessionActiveEntity> sessionActiveEntityList = query.fetch();
+
+            sessionActiveRepository.deleteAll(sessionActiveEntityList);
+
+        }
+        catch (Exception e){
+            log.error("Error in deleteAllSessionActiveConfirm task", e);
+        }
+    }
+
+
+    @Transactional
+    @Scheduled(cron = "0 0 3 * * ?")
+    public void invalidTokenExpired(){
+
+        log.info("Starting invalidTokenExpired task");
+
+        try {
+
+            JPAQuery<SessionActiveEntity> query = queryFactory
+                    .selectFrom(QSessionActiveEntity.sessionActiveEntity)
+                    .where(
+                        Expressions.booleanTemplate(
+                                "{0} <= {1}",
+                                QInvalidTokenEntity.invalidTokenEntity.createAt,
+                                new Date(System.currentTimeMillis() - jwtValue.getJwtExpiration())
+                                        .toInstant()
+                                        .atZone(ZoneId.systemDefault())
+                                        .toLocalDateTime()
+                        )
+                    );
+
+            List<SessionActiveEntity> sessionActiveEntityList = query.fetch();
+
+            invalidTokenService.insertInvalidTokenList(sessionActiveEntityList, InvalidTokenTypeEnum.EXPIRED);
+
+        }
+        catch (Exception e){
+            log.error("Error in invalidTokenExpired task", e);
         }
     }
 }

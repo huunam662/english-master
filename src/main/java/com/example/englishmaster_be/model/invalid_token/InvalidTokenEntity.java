@@ -39,4 +39,11 @@ public class InvalidTokenEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     UserEntity user;
 
+
+
+    @PrePersist
+    void onCreate() {
+        createAt = LocalDateTime.now();
+    }
+
 }

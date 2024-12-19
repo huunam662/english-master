@@ -5,6 +5,8 @@ import com.example.englishmaster_be.common.constant.StatusEnum;
 import com.example.englishmaster_be.common.thread.MessageResponseHolder;
 import com.example.englishmaster_be.common.constant.RoleEnum;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
+import com.example.englishmaster_be.domain.cloudinary.dto.response.CloudiaryUploadFileResponse;
+import com.example.englishmaster_be.domain.cloudinary.service.ICloudinaryService;
 import com.example.englishmaster_be.domain.content.service.IContentService;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
 import com.example.englishmaster_be.domain.excel_fill.service.IExcelFillService;
@@ -103,7 +105,7 @@ public class TopicService implements ITopicService {
 
     IPartService partService;
 
-    IFileStorageService fileStorageService;
+    ICloudinaryService cloudinaryService;
 
     IExcelFillService excelService;
 
@@ -128,13 +130,6 @@ public class TopicService implements ITopicService {
 
             topic = getTopicById(topicRequest.getTopicId());
 
-            if (
-                    topicRequest.getTopicImage() != null
-                    && !topicRequest.getTopicImage().isEmpty()
-                    && topic.getTopicImage() != null
-                    && fileStorageService.load(topic.getTopicImage()) != null
-            ) fileStorageService.delete(topic.getTopicImage());
-
         }
         else{
             topic = TopicEntity.builder()
@@ -157,15 +152,6 @@ public class TopicService implements ITopicService {
                     .toList();
 
             topic.setParts(partList);
-        }
-
-        if(topicRequest.getTopicImage() != null && !topicRequest.getTopicImage().isEmpty()){
-
-            Blob blobResponse = fileStorageService.save(topicRequest.getTopicImage());
-
-            String fileName = blobResponse.getName();
-
-            topic.setTopicImage(fileName);
         }
 
         return topicRepository.save(topic);
@@ -236,23 +222,18 @@ public class TopicService implements ITopicService {
 
     @Transactional
     @Override
-    public TopicEntity uploadFileImage(UUID topicId, TopicUploadFileRequest uploadFileRequest) {
+    public TopicEntity uploadFileImage(UUID topicId, MultipartFile contentData) {
 
-        if(uploadFileRequest == null) throw new BadRequestException("Object required non null");
-
-        if(uploadFileRequest.getContentData() == null || uploadFileRequest.getContentData().isEmpty())
+        if(contentData == null || contentData.isEmpty())
             throw new BadRequestException("File required non empty or null content");
 
         UserEntity user = userService.currentUser();
 
         TopicEntity topic = getTopicById(topicId);
 
-        if(topic.getTopicImage() != null && !topic.getTopicImage().isEmpty())
-            fileStorageService.delete(topic.getTopicImage());
+        CloudiaryUploadFileResponse fileResponse = cloudinaryService.uploadFile(contentData);
 
-        Blob blobResponse = fileStorageService.save(uploadFileRequest.getContentData());
-
-        String fileName = blobResponse.getName();
+        String fileName = fileResponse.getUrl();
 
         topic.setTopicImage(fileName);
         topic.setUserUpdate(user);
@@ -378,9 +359,6 @@ public class TopicService implements ITopicService {
     public void deleteTopic(UUID topicId) {
 
         TopicEntity topic = getTopicById(topicId);
-
-        if(topic.getTopicImage() != null && !topic.getTopicImage().isEmpty())
-            fileStorageService.delete(topic.getTopicImage());
 
         topicRepository.delete(topic);
     }
@@ -801,13 +779,13 @@ public class TopicService implements ITopicService {
 
             if (questionRequest.getContentImage() != null && !questionRequest.getContentImage().isEmpty()) {
 
-                Blob blobResponse = fileStorageService.save(questionRequest.getContentImage());
+                CloudiaryUploadFileResponse fileResponse = cloudinaryService.uploadFile(questionRequest.getContentImage());
 
-                String fileName = blobResponse.getName();
+                String fileName = fileResponse.getUrl();
 
                 ContentEntity content = ContentEntity.builder()
                         .contentData(fileName)
-                        .contentType(getExtensionHelper.typeFile(fileName))
+                        .contentType(fileResponse.getType())
                         .question(question)
                         .userCreate(user)
                         .userUpdate(user)
@@ -822,13 +800,13 @@ public class TopicService implements ITopicService {
             }
             if (questionRequest.getContentAudio() != null && !questionRequest.getContentAudio().isEmpty()) {
 
-                Blob blobResponse = fileStorageService.save(questionRequest.getContentAudio());
+                CloudiaryUploadFileResponse fileResponse = cloudinaryService.uploadFile(questionRequest.getContentAudio());
 
-                String fileName = blobResponse.getName();
+                String fileName = fileResponse.getUrl();
 
                 ContentEntity content = ContentEntity.builder()
                         .contentData(fileName)
-                        .contentType(getExtensionHelper.typeFile(fileName))
+                        .contentType(fileResponse.getType())
                         .question(question)
                         .userCreate(user)
                         .userUpdate(user)
@@ -939,13 +917,13 @@ public class TopicService implements ITopicService {
 
         if (questionRequest.getContentImage() != null && !questionRequest.getContentImage().isEmpty()) {
 
-            Blob blobResponse = fileStorageService.save(questionRequest.getContentImage());
+            CloudiaryUploadFileResponse fileResponse = cloudinaryService.uploadFile(questionRequest.getContentImage());
 
-            String fileName = blobResponse.getName();
+            String fileName = fileResponse.getUrl();
 
             ContentEntity content = ContentEntity.builder()
                     .contentData(fileName)
-                    .contentType(getExtensionHelper.typeFile(fileName))
+                    .contentType(fileResponse.getType())
                     .question(question)
                     .userCreate(user)
                     .userUpdate(user)
@@ -959,13 +937,13 @@ public class TopicService implements ITopicService {
 
         if (questionRequest.getContentAudio() != null && !questionRequest.getContentAudio().isEmpty()) {
 
-            Blob blobResponse = fileStorageService.save(questionRequest.getContentAudio());
+            CloudiaryUploadFileResponse fileResponse = cloudinaryService.uploadFile(questionRequest.getContentAudio());
 
-            String fileName = blobResponse.getName();
+            String fileName = fileResponse.getUrl();
 
             ContentEntity content = ContentEntity.builder()
                     .contentData(fileName)
-                    .contentType(getExtensionHelper.typeFile(fileName))
+                    .contentType(fileResponse.getType())
                     .question(question)
                     .userCreate(user)
                     .userUpdate(user)

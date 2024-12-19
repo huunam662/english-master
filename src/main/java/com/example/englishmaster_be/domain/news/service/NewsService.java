@@ -2,6 +2,8 @@ package com.example.englishmaster_be.domain.news.service;
 
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
 import com.example.englishmaster_be.common.thread.MessageResponseHolder;
+import com.example.englishmaster_be.domain.cloudinary.dto.response.CloudiaryUploadFileResponse;
+import com.example.englishmaster_be.domain.cloudinary.service.ICloudinaryService;
 import com.example.englishmaster_be.mapper.NewsMapper;
 import com.example.englishmaster_be.domain.news.dto.request.NewsRequest;
 import com.example.englishmaster_be.domain.news.dto.request.NewsFilterRequest;
@@ -38,7 +40,7 @@ public class NewsService implements INewsService {
 
     NewsRepository newsRepository;
 
-    IFileStorageService fileStorageService;
+    ICloudinaryService cloudinaryService;
 
 
     @Override
@@ -130,20 +132,6 @@ public class NewsService implements INewsService {
 
         NewsMapper.INSTANCE.flowToNewsEntity(newsRequest, news);
 
-        news.setUpdateAt(LocalDateTime.now());
-
-        if(newsRequest.getImage() != null && !newsRequest.getImage().isEmpty()){
-
-            if (news.getImage() != null && !news.getImage().isEmpty())
-                fileStorageService.delete(news.getImage());
-
-            Blob blob = fileStorageService.save(newsRequest.getImage());
-
-            String fileName = blob.getName();
-
-            news.setImage(fileName);
-        }
-
         return newsRepository.save(news);
     }
 
@@ -166,8 +154,8 @@ public class NewsService implements INewsService {
 
         NewsEntity news = findNewsById(newsId);
 
-        if(news.getImage() != null && !news.getImage().isEmpty())
-            fileStorageService.delete(news.getImage());
+//        if(news.getImage() != null && !news.getImage().isEmpty())
+//            fileStorageService.delete(news.getImage());
 
         newsRepository.delete(news);
 

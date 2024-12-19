@@ -2,8 +2,7 @@ package com.example.englishmaster_be.domain.question.service;
 
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
-import com.example.englishmaster_be.domain.question.dto.response.QuestionDto;
-import com.example.englishmaster_be.shared.upload_file.dto.request.UploadMultipleFileRequest;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionFromPartResponse;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,7 +16,7 @@ public interface IQuestionService {
 
     QuestionEntity getQuestionById(UUID questionId);
 
-    QuestionEntity uploadFileQuestion(UUID questionId, UploadMultipleFileRequest uploadMultiFileDTO);
+    QuestionEntity uploadFileQuestion(UUID questionId, List<MultipartFile> uploadMultiFileDTO);
 
     QuestionEntity updateFileQuestion(UUID questionId, String oldFileName, MultipartFile newFile);
 
@@ -35,5 +34,5 @@ public interface IQuestionService {
 
     List<QuestionEntity> getQuestionGroupListByQuestionId(UUID questionId);
 
-    List<QuestionDto> getAllQuestionFromPart(UUID partId);
+    List<QuestionFromPartResponse> getAllQuestionFromPart(UUID partId);
 }

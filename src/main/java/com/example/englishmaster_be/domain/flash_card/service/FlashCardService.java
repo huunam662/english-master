@@ -79,7 +79,6 @@ public class FlashCardService implements IFlashCardService {
 
         else flashCard = FlashCardEntity.builder()
                 .userCreate(user)
-                .createAt(LocalDateTime.now())
                 .build();
 
         FlashCardMapper.INSTANCE.flowToFlashCardEntity(flashCardRequest, flashCard);

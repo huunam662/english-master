@@ -34,7 +34,6 @@ public interface TopicMapper {
 
     List<TopicResponse> toTopicResponseList(List<TopicEntity> topicEntityList);
 
-    @Mapping(target = "topicImage", ignore = true)
     @Mapping(target = "topicId", ignore = true)
     @Mapping(target = "numberQuestion", defaultValue = "0")
     void flowToTopicEntity(TopicRequest topicRequest, @MappingTarget TopicEntity topicEntity);

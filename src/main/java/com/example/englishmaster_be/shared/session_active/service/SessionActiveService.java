@@ -6,6 +6,7 @@ import com.example.englishmaster_be.model.session_active.SessionActiveRepository
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
+import com.example.englishmaster_be.model.user.UserRepository;
 import com.example.englishmaster_be.util.JwtUtil;
 import com.example.englishmaster_be.value.JwtValue;
 import lombok.AccessLevel;
@@ -28,11 +29,14 @@ public class SessionActiveService implements ISessionActiveService {
 
     JwtValue jwtValue;
 
+    JwtUtil jwtUtil;
+
     IUserService userService;
 
     SessionActiveRepository sessionActiveRepository;
 
-    JwtUtil jwtUtil;
+    UserRepository userRepository;
+
 
 
     @Override
@@ -62,6 +66,10 @@ public class SessionActiveService implements ISessionActiveService {
     public SessionActiveEntity saveSessionActive(UserEntity user, String jwtToken) {
 
         String tokenHash = jwtUtil.hashToHex(jwtToken);
+
+        user.setLastLogin(LocalDateTime.now());
+
+        user = userRepository.save(user);
 
         SessionActiveEntity sessionActiveEntity = SessionActiveEntity.builder()
                 .createAt(LocalDateTime.now())

@@ -5,9 +5,7 @@ import com.example.englishmaster_be.domain.answer_matching.dto.response.AnswerMa
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Getter
@@ -16,13 +14,17 @@ import java.util.UUID;
 @NoArgsConstructor
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class QuestionDto {
+public class QuestionFromPartResponse {
 
     UUID questionId;
+
     QuestionTypeEnum questionType;
+
     String content;
 
     List<AnswerMatchingBasicResponse> options; // lua chon cau hoi matching
+
     List<String> answers;
+
     List<String> labels;
 }

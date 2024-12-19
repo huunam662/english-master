@@ -27,7 +27,7 @@ public class UploadController {
     @PostMapping(value = "/file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @DefaultMessage("Successfully uploaded file_storage")
     public String uploadFile(
-            @RequestParam("file") MultipartFile file,
+            @RequestPart("file") MultipartFile file,
             @RequestParam(value = "dir", defaultValue = "/") String dir,
             @RequestParam(value = "isPrivateFile", defaultValue = "false") boolean isPrivateFile,
             @RequestParam(value = "topicId", required = false) UUID topicId,

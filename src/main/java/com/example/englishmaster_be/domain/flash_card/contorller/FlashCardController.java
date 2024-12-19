@@ -31,7 +31,7 @@ public class FlashCardController {
 
     @GetMapping(value = "/{flashCardId:.+}/listFlashCardWord")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show list flashcard word successfully")
+    @DefaultMessage("Show list successfully")
     public FlashCardWordListResponse getWordToFlashCard(@PathVariable UUID flashCardId){
 
         FlashCardEntity flashCard = flashCardService.getFlashCardById(flashCardId);
@@ -42,7 +42,7 @@ public class FlashCardController {
 
     @GetMapping(value = "/listFlashCardUser")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show list flashcard successfully")
+    @DefaultMessage("Show list successfully")
     public List<FlashCardResponse> listFlashCardUser(){
 
         List<FlashCardEntity> flashCardList = flashCardService.getListFlashCardByCurrentUser();
@@ -53,7 +53,7 @@ public class FlashCardController {
 
     @PostMapping(value = "/addFlashCardUser", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Create flashcard successfully")
+    @DefaultMessage("Save successfully")
     public FlashCardResponse addFlashCardUser(@ModelAttribute FlashCardRequest flashCardRequest){
 
         FlashCardEntity flashCard = flashCardService.saveFlashCard(flashCardRequest);
@@ -63,7 +63,7 @@ public class FlashCardController {
 
     @PutMapping(value = "/{flashCardId:.+}/updateFlashCard", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Update flashcard successfully")
+    @DefaultMessage("Save successfully")
     public FlashCardResponse updateFlashCard(@PathVariable UUID flashCardId, @ModelAttribute FlashCardRequest flashCardRequest){
 
         flashCardRequest.setFlashCardId(flashCardId);
@@ -75,7 +75,7 @@ public class FlashCardController {
 
     @DeleteMapping(value = "/{flashCardId:.+}/removeFlashCard")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Delete flashcard successfully")
+    @DefaultMessage("Delete successfully")
     public void removeWord(@PathVariable UUID flashCardId){
 
         flashCardService.delete(flashCardId);

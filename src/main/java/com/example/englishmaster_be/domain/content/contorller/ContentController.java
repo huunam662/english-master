@@ -28,7 +28,7 @@ public class ContentController {
 
 
     @GetMapping
-    @DefaultMessage("Get content successfully")
+    @DefaultMessage("Get successfully")
     public ContentResponse getContentById(@RequestParam UUID id) {
 
         ContentEntity content = contentService.getContentByContentId(id);
@@ -37,7 +37,7 @@ public class ContentController {
     }
 
     @GetMapping("/contentData")
-    @DefaultMessage("Get content successfully")
+    @DefaultMessage("Get successfully")
     public ContentResponse getContentData(@RequestParam UUID topicId, @RequestParam String code) {
 
         ContentEntity content = contentService.getContentByTopicIdAndCode(topicId, code);
@@ -47,14 +47,14 @@ public class ContentController {
 
     @DeleteMapping("/{contentId}")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Delete content successfully")
+    @DefaultMessage("Delete successfully")
     public void getContentData(@PathVariable UUID contentId) {
 
         contentService.deleteContent(contentId);
     }
 
     @GetMapping("/content")
-    @DefaultMessage("Get content successfully")
+    @DefaultMessage("Get successfully")
     public ContentResponse getContent(@RequestParam String contentData) {
 
         ContentEntity content = contentService.getContentByContentData(contentData);
@@ -62,10 +62,10 @@ public class ContentController {
         return ContentMapper.INSTANCE.toContentResponse(content);
     }
 
-    @PostMapping(value = "/create-content", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @DefaultMessage("Create content successfully")
+    @PostMapping(value = "/create-content")
+    @DefaultMessage("Create successfully")
     public ContentResponse createContent(
-            @ModelAttribute ContentRequest contentRequest
+            @RequestBody ContentRequest contentRequest
     ) {
 
         ContentEntity content = contentService.saveContent(contentRequest);
@@ -73,11 +73,11 @@ public class ContentController {
         return ContentMapper.INSTANCE.toContentResponse(content);
     }
 
-    @PutMapping(value = "/{contentId}/update-content", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @DefaultMessage("Update content successfully")
+    @PutMapping(value = "/{contentId}/update-content")
+    @DefaultMessage("Update successfully")
     public ContentResponse updateContent(
             @PathVariable UUID contentId,
-            @ModelAttribute ContentRequest contentRequest
+            @RequestBody ContentRequest contentRequest
     ) {
 
         contentRequest.setContentId(contentId);

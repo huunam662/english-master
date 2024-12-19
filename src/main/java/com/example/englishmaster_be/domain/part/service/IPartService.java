@@ -4,6 +4,7 @@ import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
 import com.example.englishmaster_be.shared.upload_file.dto.request.UploadMultipleFileRequest;
 import com.example.englishmaster_be.domain.part.dto.request.PartSaveContentRequest;
 import com.example.englishmaster_be.model.part.PartEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -16,7 +17,7 @@ public interface IPartService {
 
     PartEntity getPartToName(String partName);
 
-    PartEntity uploadFilePart(UUID partId, UploadMultipleFileRequest uploadMultiFileRequest);
+    PartEntity uploadFilePart(UUID partId, MultipartFile contentData);
 
     PartEntity uploadTextPart(UUID partId, PartSaveContentRequest uploadTextRequest);
 

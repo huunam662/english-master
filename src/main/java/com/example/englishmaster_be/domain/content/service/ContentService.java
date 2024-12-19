@@ -33,8 +33,6 @@ public class ContentService implements IContentService {
 
     ContentRepository contentRepository;
 
-    ICloudinaryService cloudinaryService;
-
     IQuestionService questionService;
 
     IUserService userService;
@@ -88,24 +86,13 @@ public class ContentService implements IContentService {
             content = getContentByContentId(contentRequest.getContentId());
 
         else content = ContentEntity.builder()
-                .createAt(LocalDateTime.now())
                 .userCreate(user)
                 .build();
 
         ContentMapper.INSTANCE.flowToContentEntity(contentRequest, content);
 
         content.setQuestion(question);
-        content.setUpdateAt(LocalDateTime.now());
         content.setUserUpdate(user);
-
-        if(contentRequest.getFile() != null){
-
-            CloudiaryUploadFileResponse cloudiaryUploadFileResponse = cloudinaryService.uploadFile(contentRequest.getFile());
-
-            content.setContentType(cloudiaryUploadFileResponse.getType());
-            content.setContentData(cloudiaryUploadFileResponse.getUrl());
-
-        }
 
         return contentRepository.save(content);
     }

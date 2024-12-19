@@ -94,10 +94,7 @@ public class AuthService implements IAuthService {
 
         UserEntity user = userService.getUserByEmail(userDetails.getUsername());
 
-        sessionActiveService.deleteAllTokenExpired(user);
-        sessionActiveRepository.deleteByUserAndType(user, SessionActiveTypeEnum.CONFIRM);
-
-        String jwtToken = jwtUtil.generateToken(userDetails);
+        String jwtToken = jwtUtil.generateToken(user);
 
         SessionActiveEntity sessionActive = sessionActiveService.saveSessionActive(user, jwtToken);
 
@@ -175,6 +172,8 @@ public class AuthService implements IAuthService {
         user.setEnabled(Boolean.TRUE);
 
         userRepository.save(user);
+
+        sessionActiveRepository.deleteByUserAndType(user, SessionActiveTypeEnum.CONFIRM);
     }
 
 

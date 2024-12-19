@@ -28,7 +28,7 @@ public class CommentController {
 
 
     @GetMapping(value = "/{commentId:.+}/getAllComment")
-    @DefaultMessage("Show list CommentEntity child successfully")
+    @DefaultMessage("Show list successfully")
     public List<CommentResponse> getListCommentToCommentId(@PathVariable UUID commentId){
 
         List<CommentEntity> commentList = commentService.getListCommentByCommentId(commentId);
@@ -38,7 +38,7 @@ public class CommentController {
 
     @PostMapping(value = "/{topicId:.+}/addCommentToTopic")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Create CommentEntity successfully")
+    @DefaultMessage("Create successfully")
     public CommentResponse createCommentToTopic(
             @PathVariable UUID topicId,
             @RequestBody CommentRequest commentRequest
@@ -51,7 +51,7 @@ public class CommentController {
 
     @PostMapping(value = "/{postId:.+}/addCommentToPost")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Create CommentEntity successfully")
+    @DefaultMessage("Create successfully")
     public CommentResponse createCommentToPost(
             @PathVariable UUID postId,
             @RequestBody CommentRequest commentRequest
@@ -65,7 +65,7 @@ public class CommentController {
 
     @PostMapping(value = "/{commentId:.+}/addCommentToComment")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Create CommentEntity successfully")
+    @DefaultMessage("Create successfully")
     public CommentResponse createCommentToComment(
             @PathVariable UUID commentId,
             @RequestBody CommentRequest commentRequest
@@ -78,7 +78,7 @@ public class CommentController {
 
     @PatchMapping(value = "/{commentId:.+}/updateComment")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Update CommentEntity successfully")
+    @DefaultMessage("Update successfully")
     public CommentResponse updateComment(
             @PathVariable UUID commentId,
             @RequestBody CommentRequest commentRequest
@@ -91,7 +91,7 @@ public class CommentController {
 
     @DeleteMapping(value = "/{commentId:.+}/deleteComment")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Delete CommentEntity successfully")
+    @DefaultMessage("Delete successfully")
     public void deleteComment(@PathVariable UUID commentId){
 
         commentService.deleteComment(commentId);
