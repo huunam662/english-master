@@ -3,6 +3,7 @@ package com.example.englishmaster_be.domain.part.service;
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
 import com.example.englishmaster_be.domain.cloudinary.dto.response.CloudiaryUploadFileResponse;
 import com.example.englishmaster_be.domain.cloudinary.service.ICloudinaryService;
+import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.util.GetExtensionUtil;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
 import com.example.englishmaster_be.model.part.PartRepository;
@@ -33,13 +34,11 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PartService implements IPartService {
 
-    GetExtensionUtil getExtensionHelper;
-
     PartRepository partRepository;
 
     IUserService userService;
 
-    ICloudinaryService cloudinaryService;
+    IFileStorageService fileStorageService;
 
 
     @Transactional
@@ -71,13 +70,10 @@ public class PartService implements IPartService {
 
         if(partRequest.getFile() != null && !partRequest.getFile().isEmpty()){
 
-            CloudiaryUploadFileResponse uploadFileResponse = cloudinaryService.uploadFile(partRequest.getFile());
+            FileResponse fileResponse = fileStorageService.save(partRequest.getFile());
 
-            String fileName = uploadFileResponse.getUrl();
-            String contentType = uploadFileResponse.getType();
-
-            partEntity.setContentData(fileName);
-            partEntity.setContentType(contentType);
+            partEntity.setContentData(fileResponse.getFileName());
+            partEntity.setContentType(fileResponse.getContentType());
         }
 
         PartMapper.INSTANCE.flowToPartEntity(partRequest, partEntity);
@@ -150,14 +146,10 @@ public class PartService implements IPartService {
 
         PartEntity partEntity = getPartToId(partId);
 
-        CloudiaryUploadFileResponse uploadFileResponse = cloudinaryService.uploadFile(contentData);
+        FileResponse fileResponse = fileStorageService.save(contentData);
 
-        String fileName = uploadFileResponse.getUrl();
-        String contentType = uploadFileResponse.getType();
-
-
-        partEntity.setContentType(contentType);
-        partEntity.setContentData(fileName);
+        partEntity.setContentType(fileResponse.getContentType());
+        partEntity.setContentData(fileResponse.getFileName());
         partEntity.setUserUpdate(user);
 
 

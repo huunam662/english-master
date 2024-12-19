@@ -2,6 +2,7 @@ package com.example.englishmaster_be.domain.cloudinary.service;
 
 import com.cloudinary.Cloudinary;
 import com.example.englishmaster_be.domain.cloudinary.dto.response.CloudiaryUploadFileResponse;
+import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -20,16 +21,16 @@ public class CloudinaryService implements ICloudinaryService {
 	Cloudinary cloudinary;
 
 	@SneakyThrows
-	public CloudiaryUploadFileResponse uploadFile(MultipartFile file){
+	public FileResponse uploadFile(MultipartFile file){
 
 			Map uploadResultResponse = cloudinary.uploader().upload(file.getBytes(), Map.of());
 
 			String imageUrl = String.valueOf(uploadResultResponse.get("url"));
-			String fileType = String.valueOf(uploadResultResponse.get("type"));
+//			String fileType = String.valueOf(uploadResultResponse.get("type"));
 
-			return CloudiaryUploadFileResponse.builder()
-					.url(imageUrl)
-					.type(fileType)
+			return FileResponse.builder()
+					.fileName(imageUrl)
+					.contentType(file.getContentType())
 					.build();
 	}
 

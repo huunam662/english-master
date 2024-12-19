@@ -5,6 +5,7 @@ import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.answer_matching.dto.response.AnswerMatchingBasicResponse;
 import com.example.englishmaster_be.domain.answer_matching.service.IAnswerMatchingService;
 import com.example.englishmaster_be.domain.content.service.IContentService;
+import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.file_storage.service.IFileStorageService;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionFromPartResponse;
@@ -270,13 +271,11 @@ public class QuestionService implements IQuestionService {
 
             if(file == null || file.isEmpty()) continue;
 
-            Blob blobResponse = fileStorageService.save(file);
-
-            String fileName = blobResponse.getName();
+            FileResponse fileResponse = fileStorageService.save(file);
 
             ContentEntity content = ContentEntity.builder()
-                    .contentData(fileName)
-                    .contentType(getExtensionHelper.getExtension(fileName))
+                    .contentData(fileResponse.getFileName())
+                    .contentType(fileResponse.getContentType())
                     .userCreate(user)
                     .userUpdate(user)
                     .question(question)
@@ -307,17 +306,11 @@ public class QuestionService implements IQuestionService {
 
         fileStorageService.delete(content.getContentData());
 
-        Blob blobResponse = fileStorageService.save(newFile);
+        FileResponse fileResponse = fileStorageService.save(newFile);
 
-        String fileNameNew = blobResponse.getName();
-
-        content.setContentData(fileNameNew);
-        content.setContentType(getExtensionHelper.typeFile(fileNameNew));
-        content.setUpdateAt(LocalDateTime.now());
+        content.setContentData(fileResponse.getFileName());
+        content.setContentType(fileResponse.getContentType());
         content.setUserUpdate(user);
-
-        question.setUpdateAt(LocalDateTime.now());
-        question.setUserUpdate(user);
 
         return questionRepository.save(question);
     }

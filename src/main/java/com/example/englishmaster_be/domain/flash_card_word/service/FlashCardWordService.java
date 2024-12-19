@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.flash_card_word.service;
 
+import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.file_storage.service.IFileStorageService;
 import com.example.englishmaster_be.domain.flash_card.service.IFlashCardService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
@@ -111,8 +112,8 @@ public class FlashCardWordService implements IFlashCardWordService {
 
         if(flashCardWordRequest.getImage() != null){
 
-            Blob blobResponse = fileStorageService.save(flashCardWordRequest.getImage());
-            flashCardWord.setImage(blobResponse.getName());
+            FileResponse fileResponse = fileStorageService.save(flashCardWordRequest.getImage());
+            flashCardWord.setImage(fileResponse.getFileName());
         }
 
         return flashCardWordRepository.save(flashCardWord);

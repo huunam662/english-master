@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.flash_card.service;
 
+import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.flash_card.dto.request.FlashCardRequest;
 import com.example.englishmaster_be.mapper.FlashCardMapper;
 import com.example.englishmaster_be.model.flash_card.FlashCardEntity;
@@ -85,9 +86,9 @@ public class FlashCardService implements IFlashCardService {
 
         if(flashCardRequest.getFlashCardImage() != null){
 
-            Blob blobResponse = fileStorageService.save(flashCardRequest.getFlashCardImage());
+            FileResponse fileResponse = fileStorageService.save(flashCardRequest.getFlashCardImage());
 
-            flashCard.setFlashCardImage(blobResponse.getName());
+            flashCard.setFlashCardImage(fileResponse.getFileName());
         }
 
         return flashCardRepository.save(flashCard);

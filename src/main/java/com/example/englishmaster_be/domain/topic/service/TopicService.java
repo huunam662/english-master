@@ -10,6 +10,7 @@ import com.example.englishmaster_be.domain.cloudinary.service.ICloudinaryService
 import com.example.englishmaster_be.domain.content.service.IContentService;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
 import com.example.englishmaster_be.domain.excel_fill.service.IExcelFillService;
+import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.file_storage.service.IFileStorageService;
 import com.example.englishmaster_be.domain.pack.service.IPackService;
 import com.example.englishmaster_be.domain.part.service.IPartService;
@@ -231,11 +232,9 @@ public class TopicService implements ITopicService {
 
         TopicEntity topic = getTopicById(topicId);
 
-        CloudiaryUploadFileResponse fileResponse = cloudinaryService.uploadFile(contentData);
+        FileResponse fileResponse = cloudinaryService.uploadFile(contentData);
 
-        String fileName = fileResponse.getUrl();
-
-        topic.setTopicImage(fileName);
+        topic.setTopicImage(fileResponse.getFileName());
         topic.setUserUpdate(user);
         topic.setUpdateAt(LocalDateTime.now());
 
@@ -779,13 +778,12 @@ public class TopicService implements ITopicService {
 
             if (questionRequest.getContentImage() != null && !questionRequest.getContentImage().isEmpty()) {
 
-                CloudiaryUploadFileResponse fileResponse = cloudinaryService.uploadFile(questionRequest.getContentImage());
+                FileResponse fileResponse = cloudinaryService.uploadFile(questionRequest.getContentImage());
 
-                String fileName = fileResponse.getUrl();
 
                 ContentEntity content = ContentEntity.builder()
-                        .contentData(fileName)
-                        .contentType(fileResponse.getType())
+                        .contentData(fileResponse.getFileName())
+                        .contentType(fileResponse.getContentType())
                         .question(question)
                         .userCreate(user)
                         .userUpdate(user)
@@ -800,13 +798,11 @@ public class TopicService implements ITopicService {
             }
             if (questionRequest.getContentAudio() != null && !questionRequest.getContentAudio().isEmpty()) {
 
-                CloudiaryUploadFileResponse fileResponse = cloudinaryService.uploadFile(questionRequest.getContentAudio());
-
-                String fileName = fileResponse.getUrl();
+                FileResponse fileResponse = cloudinaryService.uploadFile(questionRequest.getContentAudio());
 
                 ContentEntity content = ContentEntity.builder()
-                        .contentData(fileName)
-                        .contentType(fileResponse.getType())
+                        .contentData(fileResponse.getFileName())
+                        .contentType(fileResponse.getContentType())
                         .question(question)
                         .userCreate(user)
                         .userUpdate(user)
@@ -917,13 +913,12 @@ public class TopicService implements ITopicService {
 
         if (questionRequest.getContentImage() != null && !questionRequest.getContentImage().isEmpty()) {
 
-            CloudiaryUploadFileResponse fileResponse = cloudinaryService.uploadFile(questionRequest.getContentImage());
+            FileResponse fileResponse = cloudinaryService.uploadFile(questionRequest.getContentImage());
 
-            String fileName = fileResponse.getUrl();
 
             ContentEntity content = ContentEntity.builder()
-                    .contentData(fileName)
-                    .contentType(fileResponse.getType())
+                    .contentData(fileResponse.getFileName())
+                    .contentType(fileResponse.getContentType())
                     .question(question)
                     .userCreate(user)
                     .userUpdate(user)
@@ -937,13 +932,11 @@ public class TopicService implements ITopicService {
 
         if (questionRequest.getContentAudio() != null && !questionRequest.getContentAudio().isEmpty()) {
 
-            CloudiaryUploadFileResponse fileResponse = cloudinaryService.uploadFile(questionRequest.getContentAudio());
-
-            String fileName = fileResponse.getUrl();
+            FileResponse fileResponse = cloudinaryService.uploadFile(questionRequest.getContentAudio());
 
             ContentEntity content = ContentEntity.builder()
-                    .contentData(fileName)
-                    .contentType(fileResponse.getType())
+                    .contentData(fileResponse.getFileName())
+                    .contentType(fileResponse.getContentType())
                     .question(question)
                     .userCreate(user)
                     .userUpdate(user)
