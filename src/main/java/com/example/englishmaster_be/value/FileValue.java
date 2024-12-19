@@ -17,4 +17,7 @@ public class FileValue {
     @Value("${englishmaster.fileSave}")
     String fileSave;
 
+    @Value("${englishmaster.linkFileShowImageBE}")
+    String prefixLinkFileShow;
+
 }
