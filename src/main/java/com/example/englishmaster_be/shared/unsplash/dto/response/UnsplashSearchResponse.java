@@ -1,7 +1,9 @@
-package com.example.englishmaster_be.shared.dto.response.unsplash;
+package com.example.englishmaster_be.shared.unsplash.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
+import java.util.List;
 
 @Getter
 @Setter
@@ -9,8 +11,9 @@ import lombok.experimental.FieldDefaults;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UnsplashResultResponse {
+public class UnsplashSearchResponse {
 
-    String urls;
+    List<UnsplashResultResponse> results;
 
 }
+

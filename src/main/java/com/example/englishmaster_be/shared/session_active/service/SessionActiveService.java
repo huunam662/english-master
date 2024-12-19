@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.shared.service.session_active;
+package com.example.englishmaster_be.shared.session_active.service;
 
 import com.example.englishmaster_be.common.constant.SessionActiveTypeEnum;
 import com.example.englishmaster_be.exception.template.BadRequestException;
@@ -38,7 +38,12 @@ public class SessionActiveService implements ISessionActiveService {
     @Override
     public SessionActiveEntity getByCode(UUID code) {
 
-        return sessionActiveRepository.findByCodeAndType(code, SessionActiveTypeEnum.REFRESH_TOKEN);
+        return sessionActiveRepository.findByCode(code);
+    }
+
+    public SessionActiveEntity getByCodeAndType(UUID code, SessionActiveTypeEnum type) {
+
+        return sessionActiveRepository.findByCodeAndType(code, type);
     }
 
     @Transactional
@@ -54,9 +59,7 @@ public class SessionActiveService implements ISessionActiveService {
 
     @Transactional
     @Override
-    public SessionActiveEntity saveSessionActive(UserDetails userDetails, String jwtToken) {
-
-        UserEntity user = userService.getUserByEmail(userDetails.getUsername());
+    public SessionActiveEntity saveSessionActive(UserEntity user, String jwtToken) {
 
         String tokenHash = jwtUtil.hashToHex(jwtToken);
 

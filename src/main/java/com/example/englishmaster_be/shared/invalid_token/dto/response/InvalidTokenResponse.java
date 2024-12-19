@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.shared.dto.response.invalid_token;
+package com.example.englishmaster_be.shared.invalid_token.dto.response;
 
 import com.example.englishmaster_be.model.invalid_token.InvalidTokenEntity;
 import lombok.*;

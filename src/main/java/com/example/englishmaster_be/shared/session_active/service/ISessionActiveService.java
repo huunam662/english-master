@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.shared.service.session_active;
+package com.example.englishmaster_be.shared.session_active.service;
 
 import com.example.englishmaster_be.common.constant.SessionActiveTypeEnum;
 import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
@@ -13,9 +13,11 @@ public interface ISessionActiveService {
 
     SessionActiveEntity getByCode(UUID code);
 
+    SessionActiveEntity getByCodeAndType(UUID code, SessionActiveTypeEnum type);
+
     void deleteSessionCode(UUID sessionCode);
 
-    SessionActiveEntity saveSessionActive(UserDetails userDetails, String jwtToken);
+    SessionActiveEntity saveSessionActive(UserEntity user, String jwtToken);
 
     void verifyExpiration(SessionActiveEntity token);
 

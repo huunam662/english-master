@@ -27,8 +27,6 @@ public interface IAuthService {
 
     void logoutOf(UserLogoutRequest userLogoutRequest);
 
-    void updatePassword(String otp, String email, String newPassword);
-
     UserConfirmTokenResponse createConfirmationToken(UUID userId);
 
 }

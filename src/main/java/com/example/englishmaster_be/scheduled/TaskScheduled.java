@@ -79,7 +79,7 @@ public class TaskScheduled {
 
 
     @Transactional
-    @Scheduled(cron = "0 0 3 4/3 * *") // Run at 3 AM every 3 days
+    @Scheduled(cron = "0 0 3 * * ?") // Run at 3 AM every day
     public void deleteInvalidToken(){
 
         log.info("Starting deleteInvalidToken task");
@@ -92,7 +92,7 @@ public class TaskScheduled {
                             Expressions.booleanTemplate(
                                     "{0} <= {1}",
                                     QInvalidTokenEntity.invalidTokenEntity.createAt,
-                                    LocalDateTime.now().minusDays(7)
+                                    LocalDateTime.now().minusDays(3)
                             )
                     );
 
