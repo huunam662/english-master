@@ -26,5 +26,7 @@ public interface ContentMapper {
     List<ContentBasicResponse> toContentBasicResponseList(List<ContentEntity> contentEntityList);
 
     @Mapping(target = "contentId", ignore = true)
+    @Mapping(target = "contentData", source = "image")
+    @Mapping(target = "contentType", source = "contentTypeImage")
     void flowToContentEntity(ContentRequest contentRequest, @MappingTarget ContentEntity content);
 }

@@ -39,10 +39,17 @@ public class SessionActiveEntity {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "create_at")
     @CreationTimestamp
-    LocalDateTime createAt = LocalDateTime.now();
+    LocalDateTime createAt;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     UserEntity user;
+
+
+
+    @PrePersist
+    void onCreate() {
+        createAt = LocalDateTime.now();
+    }
 
 }

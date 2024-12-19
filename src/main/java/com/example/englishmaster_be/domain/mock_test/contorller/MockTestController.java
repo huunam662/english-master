@@ -48,7 +48,7 @@ public class MockTestController {
 
     @GetMapping(value = "/getMockTestById")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Find MockTestEntity successfully")
+    @DefaultMessage("Find mock test successfully")
     public MockTestResponse getMockTest(@RequestParam UUID id) {
 
         MockTestEntity mockTest = mockTestService.findMockTestById(id);
@@ -129,7 +129,7 @@ public class MockTestController {
 
     @GetMapping(value = "/{mockTestId:.+}/listPart")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show PartEntity to mock test successfully")
+    @DefaultMessage("Show part to mock test successfully")
     public MockTestPartResponse getPartToMockTest(@PathVariable UUID mockTestId) {
 
         return mockTestService.getPartToMockTest(mockTestId);
@@ -137,7 +137,7 @@ public class MockTestController {
 
     @GetMapping(value = "/{mockTestId:.+}/listQuestionToPart")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show QuestionEntity of PartEntity to mock test successfully")
+    @DefaultMessage("Show question of part to mock test successfully")
     public List<QuestionMockTestResponse> getQuestionOfToMockTest(@PathVariable UUID mockTestId, @RequestParam UUID partId) {
 
         return mockTestService.getQuestionOfToMockTest(mockTestId, partId);

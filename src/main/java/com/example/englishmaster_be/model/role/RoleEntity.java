@@ -40,6 +40,7 @@ public class RoleEntity implements GrantedAuthority {
     @Override
     @JsonIgnore
     public String getAuthority() {
+
         return String.format("ROLE_%s", this.getRoleName().name());
     }
 }

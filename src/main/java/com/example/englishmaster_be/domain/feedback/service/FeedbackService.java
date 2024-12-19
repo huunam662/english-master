@@ -5,6 +5,7 @@ import com.example.englishmaster_be.common.thread.MessageResponseHolder;
 import com.example.englishmaster_be.domain.file_storage.service.IFileStorageService;
 import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackRequest;
 import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackFilterRequest;
+import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.FeedbackMapper;
 import com.example.englishmaster_be.model.feedback.FeedbackRepository;
@@ -12,7 +13,7 @@ import com.example.englishmaster_be.model.feedback.QFeedbackEntity;
 import com.example.englishmaster_be.helper.FeedbackHelper;
 import com.example.englishmaster_be.model.feedback.FeedbackEntity;
 import com.example.englishmaster_be.domain.feedback.dto.response.FeedbackResponse;
-import com.google.cloud.storage.Blob;
+import com.example.englishmaster_be.model.user.UserEntity;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -38,6 +39,9 @@ public class FeedbackService implements IFeedbackService {
     FeedbackRepository feedbackRepository;
 
     IFileStorageService fileStorageService;
+
+    IUserService userService;
+
 
 
     @Override
@@ -143,24 +147,18 @@ public class FeedbackService implements IFeedbackService {
     @Override
     public FeedbackEntity saveFeedback(FeedbackRequest feedbackRequest) {
 
+        UserEntity user = userService.currentUser();
+
         FeedbackEntity feedback;
 
         if(feedbackRequest.getFeedbackId() != null)
             feedback = getFeedbackById(feedbackRequest.getFeedbackId());
 
-        else feedback = FeedbackEntity.builder()
-                .createAt(LocalDateTime.now())
-                .build();
+        else feedback = FeedbackEntity.builder().build();
 
         FeedbackMapper.INSTANCE.flowToFeedbackEntity(feedbackRequest, feedback);
+        feedback.setAvatar(user.getAvatar());
         feedback.setEnable(Boolean.TRUE);
-
-        if (feedbackRequest.getAvatar() != null && !feedbackRequest.getAvatar().isEmpty()) {
-
-            Blob blobResultResponse = fileStorageService.save(feedbackRequest.getAvatar());
-
-            feedback.setAvatar(blobResultResponse.getName());
-        }
 
         return feedbackRepository.save(feedback);
     }

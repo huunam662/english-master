@@ -44,7 +44,7 @@ public class TopicController {
 
     @GetMapping(value = "/{topicId:.+}/inforTopic")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show list TopicEntity successfully")
+    @DefaultMessage("Show list topic successfully")
     public TopicResponse getInformationTopic(@PathVariable UUID topicId) {
 
         TopicEntity topic = topicService.getTopicById(topicId);
@@ -54,7 +54,7 @@ public class TopicController {
 
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Create TopicEntity successfully")
+    @DefaultMessage("Create topic successfully")
     public TopicResponse createTopic(@ModelAttribute TopicRequest topicRequest) {
 
         TopicEntity topic = topicService.saveTopic(topicRequest);
@@ -64,7 +64,7 @@ public class TopicController {
 
     @PostMapping(value = "/createTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Create TopicEntity successfully")
+    @DefaultMessage("Create topic successfully")
     public TopicResponse createTopicByExcelFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam("url") String url
@@ -77,7 +77,7 @@ public class TopicController {
 
 
     @PutMapping(value = "/{topicId:.+}/updateTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @DefaultMessage("Update TopicEntity successfully")
+    @DefaultMessage("Update topic successfully")
     public TopicResponse updateTopicByExcelFile(@PathVariable UUID topicId, @RequestParam("file") MultipartFile file, @RequestParam("url") String url) {
 
         TopicEntity topic = topicService.updateTopicByExcelFile(topicId, file, url);
@@ -87,10 +87,10 @@ public class TopicController {
 
 
 
-    @PutMapping(value = "/{topicId:.+}/updateTopic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{topicId:.+}/updateTopic")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Update TopicEntity successfully")
-    public TopicResponse updateTopic(@PathVariable UUID topicId, @ModelAttribute TopicRequest topicRequest) {
+    @DefaultMessage("Update topic successfully")
+    public TopicResponse updateTopic(@PathVariable UUID topicId, @RequestBody TopicRequest topicRequest) {
 
         topicRequest.setTopicId(topicId);
 
@@ -102,9 +102,9 @@ public class TopicController {
     @PutMapping(value = "/{topicId:.+}/uploadImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Upload TopicEntity file_storage successfully")
-    public TopicResponse uploadFileImage(@PathVariable UUID topicId, @ModelAttribute TopicUploadFileRequest uploadFileDTO) {
+    public TopicResponse uploadFileImage(@PathVariable UUID topicId, @RequestPart("contentData") MultipartFile contentData) {
 
-        TopicEntity topic = topicService.uploadFileImage(topicId, uploadFileDTO);
+        TopicEntity topic = topicService.uploadFileImage(topicId, contentData);
 
         return TopicMapper.INSTANCE.toTopicResponse(topic);
     }

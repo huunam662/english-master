@@ -16,7 +16,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FeedbackResponse {
 
-    UUID FeedbackId;
+    UUID feedbackId;
 
     String name;
 
@@ -25,6 +25,8 @@ public class FeedbackResponse {
     String avatar;
 
     String content;
+
+    Integer star;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
     LocalDateTime createAt;

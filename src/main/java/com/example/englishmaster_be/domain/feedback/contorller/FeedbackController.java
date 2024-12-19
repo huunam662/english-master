@@ -11,6 +11,7 @@ import com.example.englishmaster_be.mapper.FeedbackMapper;
 import com.example.englishmaster_be.domain.feedback.dto.response.FeedbackResponse;
 import com.example.englishmaster_be.model.feedback.FeedbackEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
@@ -35,7 +36,7 @@ public class FeedbackController {
 
     @GetMapping(value = "/listFeedbackAdmin")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("List FeedbackEntity successfully")
+    @DefaultMessage("List successfully")
     public FilterResponse<?> listFeedbackOfAdmin(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
@@ -59,7 +60,7 @@ public class FeedbackController {
     }
 
     @GetMapping(value = "/listFeedbackUser")
-    @DefaultMessage("List FeedbackEntity successfully")
+    @DefaultMessage("List successfully")
     public FilterResponse<?> listFeedbackOfUser(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
@@ -82,9 +83,9 @@ public class FeedbackController {
 
     @PostMapping(value = "/createFeedback" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Create FeedbackEntity successfully")
+    @DefaultMessage("Đánh giá thành công")
     public FeedbackResponse createFeedback(
-            @ModelAttribute("contentFeedback") FeedbackRequest feedbackRequest
+            @RequestBody @Valid FeedbackRequest feedbackRequest
     ){
 
         FeedbackEntity feedback = feedbackService.saveFeedback(feedbackRequest);
@@ -94,6 +95,7 @@ public class FeedbackController {
 
     @PatchMapping (value = "/{FeedbackId:.+}/enableFeedback")
     @PreAuthorize("hasRole('ADMIN')")
+    @DefaultMessage("Save successfully")
     public void enableFeedback(
             @PathVariable UUID FeedbackId,
             @RequestParam(defaultValue = "true") Boolean enable
@@ -104,10 +106,10 @@ public class FeedbackController {
 
     @PatchMapping(value = "/{feedbackId:.+}/updateFeedback", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Update FeedbackEntity successfully")
+    @DefaultMessage("Save successfully")
     public FeedbackResponse updateFeedback(
             @PathVariable UUID feedbackId,
-            @ModelAttribute(name = "contentFeedback") FeedbackRequest feedbackRequest
+            @RequestBody @Valid FeedbackRequest feedbackRequest
     ){
 
         feedbackRequest.setFeedbackId(feedbackId);
@@ -119,7 +121,7 @@ public class FeedbackController {
 
     @DeleteMapping(value = "/{FeedbackId:.+}/deleteFeedback")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Delete FeedbackEntity successfully")
+    @DefaultMessage("Delete successfully")
     public void deleteFeedback(@PathVariable UUID FeedbackId){
 
         feedbackService.deleteFeedback(FeedbackId);

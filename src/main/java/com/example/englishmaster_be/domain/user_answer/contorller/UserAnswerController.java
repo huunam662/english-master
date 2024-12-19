@@ -36,7 +36,7 @@ public class UserAnswerController {
 
 
     @GetMapping("/check-blank")
-    @DefaultMessage("AnswerEntity Checking")
+    @DefaultMessage("Answer Checked")
     public void checkAnswer(
             @RequestParam(value = "user_id") UUID userId,
             @RequestParam(value = "question_id") UUID questionId
@@ -46,7 +46,7 @@ public class UserAnswerController {
     }
 
     @GetMapping("/check-multiple-choice")
-    @DefaultMessage("AnswerEntity Checking")
+    @DefaultMessage("Answer Checked")
     public void checkAnswerMultipleChoice(
             @RequestParam(value = "user_id") UUID userId,
             @RequestParam(value = "question_id") UUID questionId

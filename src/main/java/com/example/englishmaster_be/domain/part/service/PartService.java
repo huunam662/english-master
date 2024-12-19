@@ -1,6 +1,8 @@
 package com.example.englishmaster_be.domain.part.service;
 
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
+import com.example.englishmaster_be.domain.cloudinary.dto.response.CloudiaryUploadFileResponse;
+import com.example.englishmaster_be.domain.cloudinary.service.ICloudinaryService;
 import com.example.englishmaster_be.util.GetExtensionUtil;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
 import com.example.englishmaster_be.model.part.PartRepository;
@@ -37,7 +39,7 @@ public class PartService implements IPartService {
 
     IUserService userService;
 
-    IFileStorageService fileStorageService;
+    ICloudinaryService cloudinaryService;
 
 
     @Transactional
@@ -48,7 +50,7 @@ public class PartService implements IPartService {
 
         PartEntity partEntity;
 
-        String messageBadRequestException = "Create PartEntity fail: The PartEntity name is already exist";
+        String messageBadRequestException = "Create part fail: The part name is already exist";
 
         if(partRequest.getPartId() != null){
 
@@ -63,17 +65,16 @@ public class PartService implements IPartService {
                 throw new BadRequestException(messageBadRequestException);
 
             partEntity = PartEntity.builder()
-                    .createAt(LocalDateTime.now())
                     .userCreate(user)
                     .build();
         }
 
         if(partRequest.getFile() != null && !partRequest.getFile().isEmpty()){
 
-            Blob blobResponse = fileStorageService.save(partRequest.getFile());
+            CloudiaryUploadFileResponse uploadFileResponse = cloudinaryService.uploadFile(partRequest.getFile());
 
-            String fileName = blobResponse.getName();
-            String contentType = blobResponse.getContentType();
+            String fileName = uploadFileResponse.getUrl();
+            String contentType = uploadFileResponse.getType();
 
             partEntity.setContentData(fileName);
             partEntity.setContentType(contentType);
@@ -137,33 +138,28 @@ public class PartService implements IPartService {
 
     @Transactional
     @Override
-    public PartEntity uploadFilePart(UUID partId, UploadMultipleFileRequest uploadMultiFileRequest) {
+    public PartEntity uploadFilePart(UUID partId, MultipartFile contentData) {
+
+        if(
+                contentData == null
+                        ||
+                        contentData.isEmpty()
+        ) throw new CustomException(ErrorEnum.NULL_OR_EMPTY_FILE);
 
         UserEntity user = userService.currentUser();
 
         PartEntity partEntity = getPartToId(partId);
 
-        if(
-                uploadMultiFileRequest == null
-                        || uploadMultiFileRequest.getContentData() == null
-                        || uploadMultiFileRequest.getContentData().isEmpty()
-        ) throw new CustomException(ErrorEnum.NULL_OR_EMPTY_FILE);
+        CloudiaryUploadFileResponse uploadFileResponse = cloudinaryService.uploadFile(contentData);
+
+        String fileName = uploadFileResponse.getUrl();
+        String contentType = uploadFileResponse.getType();
 
 
-        for(MultipartFile file : uploadMultiFileRequest.getContentData()){
+        partEntity.setContentType(contentType);
+        partEntity.setContentData(fileName);
+        partEntity.setUserUpdate(user);
 
-            if(file == null || file.isEmpty()) continue;
-
-            if (partEntity.getContentType() != null && !partEntity.getContentType().isEmpty())
-                fileStorageService.delete(partEntity.getContentData());
-
-            Blob blobResponse = fileStorageService.save(file);
-
-            partEntity.setContentType(getExtensionHelper.typeFile(blobResponse.getName()));
-            partEntity.setContentData(blobResponse.getName());
-            partEntity.setUserUpdate(user);
-            partEntity.setUpdateAt(LocalDateTime.now());
-        }
 
         return partRepository.save(partEntity);
     }

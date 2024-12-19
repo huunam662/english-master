@@ -24,7 +24,7 @@ public class CloudinaryController {
 
 	@PostMapping(value = "/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@DefaultMessage("File uploaded successfully")
-	public CloudiaryUploadFileResponse uploadImage(@RequestParam("image") MultipartFile file) {
+	public CloudiaryUploadFileResponse uploadImage(@RequestPart("image") MultipartFile file) {
 
 		return cloudinaryService.uploadFile(file);
 	}

@@ -29,7 +29,7 @@ public interface ITopicService {
 
     TopicEntity updateTopicByExcelFile(@PathVariable UUID topicId, MultipartFile file, String url);
 
-    TopicEntity uploadFileImage(UUID topicId, TopicUploadFileRequest uploadFileRequest);
+    TopicEntity uploadFileImage(UUID topicId, MultipartFile contentData);
 
     TopicEntity getTopicById(UUID topicId);
 

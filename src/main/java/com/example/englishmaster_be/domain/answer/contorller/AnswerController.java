@@ -29,7 +29,7 @@ public class AnswerController {
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Save answer successfully")
+    @DefaultMessage("Save successfully")
     public AnswerResponse createAnswer(@RequestBody AnswerRequest answerRequest) {
 
         AnswerEntity answer = answerService.saveAnswer(answerRequest);
@@ -39,7 +39,7 @@ public class AnswerController {
 
     @PutMapping(value = "/{answerId:.+}/update")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Save answer successfully")
+    @DefaultMessage("Save successfully")
     public AnswerResponse updateAnswer(@PathVariable UUID answerId, @RequestBody AnswerRequest answerRequest) {
 
         answerRequest.setAnswerId(answerId);
@@ -51,7 +51,7 @@ public class AnswerController {
 
     @DeleteMapping(value = "/{answerId:.+}/delete")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Delete AnswerEntity successfully")
+    @DefaultMessage("Delete successfully")
     public void deleteAnswer(@PathVariable UUID answerId) {
 
         answerService.deleteAnswer(answerId);
@@ -59,7 +59,7 @@ public class AnswerController {
 
     @GetMapping(value = "/{answerId:.+}/getDetailAnswer")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Detail AnswerEntity successfully")
+    @DefaultMessage("Detail successfully")
     public AnswerResponse getDetailAnswer(@PathVariable UUID answerId) {
 
         AnswerEntity answer = answerService.getAnswerById(answerId);
@@ -69,7 +69,7 @@ public class AnswerController {
 
     @GetMapping(value = "/{answerId:.+}/checkCorrect")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Check AnswerEntity successfully")
+    @DefaultMessage("Check successfully")
     public AnswerCorrectResponse checkCorrectAnswer(@PathVariable UUID answerId) {
 
         AnswerEntity answer = answerService.getAnswerById(answerId);

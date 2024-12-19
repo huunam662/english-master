@@ -32,7 +32,7 @@ public class FlashCardWordController {
 
     @DeleteMapping(value = "/{flashCardWordId:.+}/removeWord")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Delete flashcard word successfully")
+    @DefaultMessage("Delete successfully")
     public void removeWord(@PathVariable UUID flashCardWordId){
 
         flashCardWordService.delete(flashCardWordId);
@@ -40,7 +40,7 @@ public class FlashCardWordController {
 
     @PostMapping(value = "/{flashCardId:.+}/addWordToFlashCard", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Create word for flashcard successfully")
+    @DefaultMessage("Save successfully")
     public FlashCardWordResponse addWordToFlashCard(@PathVariable UUID flashCardId, @ModelAttribute FlashCardWordRequest flashCardWordRequest){
 
         flashCardWordRequest.setFlashCardId(flashCardId);
@@ -53,7 +53,7 @@ public class FlashCardWordController {
 
     @PutMapping(value = "/{flashCardWordId:.+}/updateWord", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Update flashcard word successfully")
+    @DefaultMessage("Save successfully")
     public FlashCardWordResponse updateWord(@PathVariable UUID flashCardWordId, @ModelAttribute FlashCardWordRequest flashCardWordRequest){
 
         flashCardWordRequest.setFlashCardWordId(flashCardWordId);
@@ -64,7 +64,7 @@ public class FlashCardWordController {
     }
 
     @GetMapping("/searchByWord")
-    @DefaultMessage("Show list flashcard word successfully")
+    @DefaultMessage("Show list successfully")
     public List<String> searchFlashCardByWord(@RequestParam(value = "query") String query) {
 
         return flashCardWordService.searchByFlashCardWord(query);

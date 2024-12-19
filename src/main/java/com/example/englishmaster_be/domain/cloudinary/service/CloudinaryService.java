@@ -22,7 +22,7 @@ public class CloudinaryService implements ICloudinaryService {
 	@SneakyThrows
 	public CloudiaryUploadFileResponse uploadFile(MultipartFile file){
 
-			Map<String, Object> uploadResultResponse = cloudinary.uploader().upload(file.getBytes(), Map.of());
+			Map uploadResultResponse = cloudinary.uploader().upload(file.getBytes(), Map.of());
 
 			String imageUrl = String.valueOf(uploadResultResponse.get("url"));
 			String fileType = String.valueOf(uploadResultResponse.get("type"));

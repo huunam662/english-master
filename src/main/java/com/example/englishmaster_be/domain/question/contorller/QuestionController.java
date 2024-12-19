@@ -3,13 +3,12 @@ package com.example.englishmaster_be.domain.question.contorller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
-import com.example.englishmaster_be.domain.question.dto.response.QuestionDto;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionFromPartResponse;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.mapper.AnswerMapper;
 import com.example.englishmaster_be.mapper.QuestionMapper;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
-import com.example.englishmaster_be.shared.upload_file.dto.request.UploadMultipleFileRequest;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionBasicResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
@@ -40,7 +39,7 @@ public class QuestionController {
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Create QuestionEntity successfully")
+    @DefaultMessage("Create question successfully")
     public QuestionResponse createQuestion(
             @ModelAttribute QuestionRequest questionRequest
     ) {
@@ -52,7 +51,7 @@ public class QuestionController {
 
     @PutMapping(value = "/{questionId:.+}/editQuestion")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Update QuestionEntity to TopicEntity successfully")
+    @DefaultMessage("Update question to topic successfully")
     public QuestionResponse editQuestion(
             @PathVariable UUID questionId,
             @ModelAttribute QuestionRequest questionRequest
@@ -68,10 +67,10 @@ public class QuestionController {
 
     @PutMapping(value = "/{questionId:.+}/uploadfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Upload QuestionEntity successfully")
+    @DefaultMessage("Upload question successfully")
     public QuestionBasicResponse uploadFileQuestion(
             @PathVariable UUID questionId,
-            @ModelAttribute UploadMultipleFileRequest uploadMultiFileRequest
+            @ModelAttribute List<MultipartFile> uploadMultiFileRequest
     ) {
 
         QuestionEntity question = questionService.uploadFileQuestion(questionId, uploadMultiFileRequest);
@@ -81,7 +80,7 @@ public class QuestionController {
 
     @PutMapping(value = "/{questionId:.+}/updatefile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Update file_storage QuestionEntity successfully")
+    @DefaultMessage("Update file question successfully")
     public QuestionBasicResponse updateFileQuestion(
             @PathVariable UUID questionId,
             @RequestParam("oldFileName") String oldFileName,
@@ -95,7 +94,7 @@ public class QuestionController {
 
     @PostMapping(value = "/create/groupQuestion")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Create QuestionEntity successfully")
+    @DefaultMessage("Create question successfully")
     public QuestionResponse createGroupQuestion(
             @RequestBody QuestionGroupRequest groupQuestionRequest
     ) {
@@ -108,7 +107,7 @@ public class QuestionController {
 
     @GetMapping(value = "/{partId:.+}/listTop10Question")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("List top 10 QuestionEntity successfully")
+    @DefaultMessage("List top 10 question successfully")
     public List<QuestionBasicResponse> getTop10Question(
             @PathVariable UUID partId,
             @RequestParam int indexp
@@ -121,7 +120,7 @@ public class QuestionController {
 
     @GetMapping(value = "/{questionId:.+}/checkQuestionGroup")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("QuestionEntity has QuestionEntity group")
+    @DefaultMessage("Question has question group")
     public void checkQuestionGroup(@PathVariable UUID questionId) {
 
         questionService.checkQuestionGroup(questionId);
@@ -129,7 +128,7 @@ public class QuestionController {
 
     @GetMapping(value = "/{questionId:.+}/listQuestionGroup")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("List QuestionEntity group successfully")
+    @DefaultMessage("List question group successfully")
     public List<QuestionResponse> getQuestionGroupToQuestion(@PathVariable UUID questionId) {
 
         List<QuestionEntity> questionEntityList = questionService.getQuestionGroupListByQuestionId(questionId);
@@ -139,7 +138,7 @@ public class QuestionController {
 
     @GetMapping(value = "/{questionId:.+}/listAnswer")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("List AnswerEntity to QuestionEntity successfully")
+    @DefaultMessage("List answer to question successfully")
     public List<AnswerResponse> getAnswerToQuestion(@PathVariable UUID questionId) {
 
         List<AnswerEntity> answerList = answerService.getListAnswerByQuestionId(questionId);
@@ -149,7 +148,7 @@ public class QuestionController {
 
     @DeleteMapping(value = "/{questionId:.+}/deleteQuestion")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Delete QuestionEntity successfully")
+    @DefaultMessage("Delete question successfully")
     public void deleteQuestion(@PathVariable UUID questionId) {
 
         questionService.deleteQuestion(questionId);
@@ -158,7 +157,7 @@ public class QuestionController {
 
     @GetMapping(value = "/{questionId:.+}/content")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show ContentEntity QuestionEntity successfully")
+    @DefaultMessage("Show content question successfully")
     public QuestionResponse getContentToQuestion(@PathVariable UUID questionId) {
 
         QuestionEntity question = questionService.getQuestionById(questionId);
@@ -167,7 +166,8 @@ public class QuestionController {
     }
 
     @GetMapping("/{partId}/list-question")
-    public List<QuestionDto> getAllQuestionFromPart(@PathVariable UUID partId) {
+    @DefaultMessage("All question from part successfully")
+    public List<QuestionFromPartResponse> getAllQuestionFromPart(@PathVariable UUID partId) {
         return questionService.getAllQuestionFromPart(partId);
     }
 

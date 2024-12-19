@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.question_label.contorller;
 
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.question_label.dto.request.QuestionLabelRequest;
 import com.example.englishmaster_be.domain.question_label.service.IQuestionLabelService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,6 +24,7 @@ public class QuestionLabelController {
     IQuestionLabelService labelService;
 
     @PostMapping("/add-label")
+    @DefaultMessage("Save label successfully")
     public void addLabel(@RequestBody QuestionLabelRequest request) {
         labelService.addLabel(request);
     }

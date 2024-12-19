@@ -27,7 +27,7 @@ public class AnswerBlankController {
 
 
     @GetMapping("/get-list-answer/{questionId}")
-    @DefaultMessage("List AnswerEntity to QuestionEntity successfully")
+    @DefaultMessage("List successfully")
     public List<AnswerBlankResponse> getAnswer(@PathVariable UUID questionId){
 
         List<AnswerBlankEntity> answerBlankList = answerService.getAnswerBlankListByQuestionBlank(questionId);
@@ -36,6 +36,7 @@ public class AnswerBlankController {
     }
 
     @PostMapping("/create-answer-blank")
+    @DefaultMessage("Save successfully")
     public AnswerBlankResponse createAnswer(@RequestBody AnswerBlankRequest request){
 
         AnswerBlankEntity answerBlank = answerService.saveAnswerBlank(request);

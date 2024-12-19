@@ -7,6 +7,7 @@ import org.springframework.core.env.StandardEnvironment;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 
+@EnableScheduling
 @SpringBootApplication
 public class EnglishmasterBeApplication {
 
@@ -18,7 +19,7 @@ public class EnglishmasterBeApplication {
 
         SpringApplication application = new SpringApplication(EnglishmasterBeApplication.class);
         ConfigurableEnvironment environment = new StandardEnvironment();
-        environment.setActiveProfiles(staging);
+        environment.setActiveProfiles(local);
         application.setEnvironment(environment);
         application.run(args);
     }

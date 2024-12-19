@@ -9,7 +9,10 @@ import com.example.englishmaster_be.domain.news.dto.request.NewsFilterRequest;
 import com.example.englishmaster_be.domain.news.dto.request.NewsRequest;
 import com.example.englishmaster_be.domain.news.dto.response.NewsResponse;
 import com.example.englishmaster_be.model.news.NewsEntity;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
@@ -19,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -35,7 +39,7 @@ public class NewsController {
 
     @GetMapping(value = "/listNewsAdmin")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("List News successfully")
+    @DefaultMessage("List news successfully")
     public FilterResponse<?> listNewsOfAdmin(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
@@ -74,11 +78,11 @@ public class NewsController {
     }
 
 
-    @PostMapping(value = "/createNews" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/createNews")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Create NewsEntity successfully")
+    @DefaultMessage("Create news successfully")
     public NewsResponse createNews(
-            @ModelAttribute("contentNews") NewsRequest newsRequest
+            @RequestBody NewsRequest newsRequest
     ){
 
         NewsEntity news = newsService.saveNews(newsRequest);
@@ -87,12 +91,12 @@ public class NewsController {
     }
 
 
-    @PatchMapping(value = "/{newsId:.+}/updateNews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/{newsId:.+}/updateNews")
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Update NewsEntity successfully")
     public NewsResponse updateNews(
             @PathVariable UUID newsId,
-            @ModelAttribute("contentNews") NewsRequest newsRequest
+            @ModelAttribute NewsRequest newsRequest
     ){
 
         newsRequest.setNewsId(newsId);
@@ -113,7 +117,7 @@ public class NewsController {
 
     @DeleteMapping(value = "/{newsId:.+}/deleteNews")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Delete NewsEntity successfully")
+    @DefaultMessage("Delete news successfully")
     public void deleteNews(@PathVariable UUID newsId){
 
         newsService.deleteNews(newsId);
