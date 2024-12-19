@@ -25,26 +25,26 @@ public class FileStorageController {
 
     IFileStorageService fileStorageService;
 
-    @GetMapping("/download/{filename:.+}")
+    @GetMapping("/download")
     @DefaultMessage("Load file successfully")
     public ResourceResponse getFile(
-            @PathVariable String filename
+            @RequestParam("fileName") String fileName
     ) {
 
-        ResourceResponse resourceResponse = fileStorageService.load(filename);
+        ResourceResponse resourceResponse = fileStorageService.load(fileName);
 
         resourceResponse.setTypeLoad(ResourceTypeLoadEnum.ATTACHMENT); // Tải tập tin
 
         return resourceResponse;
     }
 
-    @GetMapping("/show/{filename:.+}")
+    @GetMapping("/show/{fileName:.+}")
     @DefaultMessage("Load file successfully")
     public ResourceResponse showImage(
-            @PathVariable String filename
+            @PathVariable String fileName
     ) {
 
-        ResourceResponse resourceResponse = fileStorageService.load(filename);
+        ResourceResponse resourceResponse = fileStorageService.load(fileName);
 
         resourceResponse.setTypeLoad(ResourceTypeLoadEnum.INLINE); // Xem tập tin
 
@@ -70,7 +70,7 @@ public class FileStorageController {
 
     @PostMapping(value = "/save", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @DefaultMessage("Save file successfully")
-    public FileResponse saveImage(@RequestParam("file") MultipartFile file) {
+    public FileResponse saveImage(@RequestPart("file") MultipartFile file) {
 
         return fileStorageService.save(file);
     }

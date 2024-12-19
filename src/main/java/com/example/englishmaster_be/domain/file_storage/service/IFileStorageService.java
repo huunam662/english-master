@@ -13,7 +13,7 @@ public interface IFileStorageService {
 
     void init();
 
-    ResourceResponse load(String filename);
+    ResourceResponse load(String fileName);
 
     FileResponse save(MultipartFile file);
 
