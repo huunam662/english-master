@@ -25,7 +25,7 @@ public class UploadController {
     IUploadService uploadService;
 
     @PostMapping(value = "/file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @DefaultMessage("Successfully uploaded file_storage")
+    @DefaultMessage("Uploaded file successfully")
     public String uploadFile(
             @RequestPart("file") MultipartFile file,
             @RequestParam(value = "dir", defaultValue = "/") String dir,
@@ -38,7 +38,7 @@ public class UploadController {
     }
 
     @DeleteMapping
-    @DefaultMessage("Successfully delete file_storage")
+    @DefaultMessage("Delete file successfully")
     @SneakyThrows
     public void deleteFile(@RequestBody FileDeleteRequest dto) {
 

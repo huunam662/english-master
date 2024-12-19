@@ -64,13 +64,16 @@ public class FileStorageService implements IFileStorageService {
 
 
     @Override
-    public ResourceResponse load(String filename) {
+    public ResourceResponse load(String fileName) {
 
         Bucket bucket = StorageClient.getInstance().bucket(bucketValue.getBucketNameStudentNodejs());
 
         Storage storage = bucket.getStorage();
 
-        Blob blob = storage.get(bucketValue.getBucketNameStudentNodejs(), filename);
+        if(fileName.contains(fileValue.getPrefixLinkFileShow()))
+            fileName = fileName.replaceFirst(fileValue.getPrefixLinkFileShow(), "");
+
+        Blob blob = storage.get(bucketValue.getBucketNameStudentNodejs(), fileName);
 
         if(blob == null) throw new ResourceNotFoundException("Image not found");
 
