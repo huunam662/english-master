@@ -81,7 +81,10 @@ public class PartController {
     @PutMapping(value = "/{partId:.+}/uploadText")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Upload file part content successfully")
-    public PartResponse uploadTextPart(@PathVariable UUID partId, @RequestBody PartSaveContentRequest uploadTextRequest) {
+    public PartResponse uploadTextPart(
+            @PathVariable UUID partId,
+            @RequestBody PartSaveContentRequest uploadTextRequest
+    ) {
 
         PartEntity part = partService.uploadTextPart(partId, uploadTextRequest);
 

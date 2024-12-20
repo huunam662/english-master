@@ -38,7 +38,7 @@ public class QuestionController {
     IAnswerService answerService;
 
 
-    @PostMapping(value = "/create")
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Create question successfully")
     public QuestionResponse createQuestion(
@@ -47,20 +47,27 @@ public class QuestionController {
             @RequestPart(value = "contentAudio", required = false) MultipartFile contentAudio
     ) {
 
+        questionRequest.setContentImage(contentImage);
+        questionRequest.setContentAudio(contentAudio);
+
         QuestionEntity question = questionService.saveQuestion(questionRequest);
 
         return QuestionMapper.INSTANCE.toQuestionResponse(question);
     }
 
-    @PutMapping(value = "/{questionId:.+}/editQuestion")
+    @PutMapping(value = "/{questionId:.+}/editQuestion", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Update question to topic successfully")
     public QuestionResponse editQuestion(
             @PathVariable UUID questionId,
-            @ModelAttribute QuestionRequest questionRequest
+            @ModelAttribute QuestionRequest questionRequest,
+            @RequestPart(value = "contentImage", required = false) MultipartFile contentImage,
+            @RequestPart(value = "contentAudio", required = false) MultipartFile contentAudio
     ) {
 
         questionRequest.setQuestionId(questionId);
+        questionRequest.setContentImage(contentImage);
+        questionRequest.setContentAudio(contentAudio);
 
         QuestionEntity question = questionService.saveQuestion(questionRequest);
 
@@ -73,7 +80,7 @@ public class QuestionController {
     @DefaultMessage("Upload question successfully")
     public QuestionBasicResponse uploadFileQuestion(
             @PathVariable UUID questionId,
-            @ModelAttribute List<MultipartFile> uploadMultiFileRequest
+            @RequestPart List<MultipartFile> uploadMultiFileRequest
     ) {
 
         QuestionEntity question = questionService.uploadFileQuestion(questionId, uploadMultiFileRequest);
