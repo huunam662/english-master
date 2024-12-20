@@ -7,9 +7,10 @@ import com.example.englishmaster_be.domain.answer_matching.service.IAnswerMatchi
 import com.example.englishmaster_be.domain.content.service.IContentService;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.part.service.IPartService;
-import com.example.englishmaster_be.domain.question.dto.response.QuestionFromPartResponse;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
+import com.example.englishmaster_be.domain.question.dto.response.*;
+import com.example.englishmaster_be.domain.question_label.service.IQuestionLabelService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
@@ -73,6 +74,7 @@ public class QuestionService implements IQuestionService {
 
     IUploadService uploadService;
 
+    IQuestionLabelService labelService;
 
 
     @Transactional
@@ -137,8 +139,8 @@ public class QuestionService implements IQuestionService {
                         contentService.deleteContent(content.getContentId());
                         uploadService.delete(
                                 FileDeleteRequest.builder()
-                                .filepath(content.getContentData())
-                                .build()
+                                        .filepath(content.getContentData())
+                                        .build()
                         );
                     }
                 }
@@ -205,6 +207,26 @@ public class QuestionService implements IQuestionService {
             question.setUserUpdate(user);
             question.setPart(part);
             question.setHasHints(questionRequest.isHasHints());
+
+            QuestionEntity createQuestion = questionRepository.save(question);
+
+            FileResponse fileResponse = uploadService.upload(questionRequest.getContentImage());
+
+            ContentEntity content = ContentEntity.builder()
+                    .question(createQuestion)
+                    .contentType(fileResponse.getType())
+                    .contentData(fileResponse.getUrl())
+                    .userCreate(user)
+                    .userUpdate(user)
+                    .createAt(LocalDateTime.now())
+                    .updateAt(LocalDateTime.now())
+                    .build();
+
+            if (question.getContentCollection() == null)
+                question.setContentCollection(new ArrayList<>());
+
+            question.getContentCollection().add(content);
+            contentRepository.save(content);
 
             return questionRepository.save(question);
         }
@@ -331,6 +353,7 @@ public class QuestionService implements IQuestionService {
         return questionRepository.save(question);
     }
 
+
     @Transactional
     @Override
     public QuestionEntity createGroupQuestion(QuestionGroupRequest createGroupQuestionDTO) {
@@ -358,7 +381,7 @@ public class QuestionService implements IQuestionService {
     }
 
     @Override
-    public List<QuestionFromPartResponse> getAllQuestionFromPart(UUID partId) {
+    public QuestionDto getAllQuestionFromPart(UUID partId) {
         PartEntity part = partRepository.findByPartId(partId)
                 .orElseThrow(
                         () -> new IllegalArgumentException("PartEntity not found with ID: " + partId)
@@ -369,41 +392,112 @@ public class QuestionService implements IQuestionService {
         if(questionEntities == null)
             return null;
 
-        List<QuestionFromPartResponse> questionDtos = new ArrayList<>();
+        QuestionDto questionDto = new QuestionDto();
 
-        for(QuestionEntity questionEntity: questionEntities){
-            QuestionFromPartResponse questionDto=new QuestionFromPartResponse();
-            questionDto.setQuestionId(questionEntity.getQuestionId());
-            questionDto.setContent(questionEntity.getQuestionContent());
-            questionDto.setQuestionType(questionEntity.getQuestionType());
-            if(questionEntity.getQuestionType()== QuestionTypeEnum.Multiple_Choice || questionEntity.getQuestionType()== QuestionTypeEnum.T_F_Not_Given){
-                List<AnswerEntity> answerEntities=questionEntity.getAnswers();
-                questionDto.setAnswers(
-                        answerEntities.stream().map(AnswerEntity::getAnswerContent).collect(Collectors.toList())
+        List<QuestionEntity> questionMultipleChoices= filterQuestionByType(questionEntities,QuestionTypeEnum.Multiple_Choice);
+        List<QuestionEntity> questionTFNotgiven= filterQuestionByType(questionEntities,QuestionTypeEnum.T_F_Not_Given);
+        List<QuestionEntity> questionMatchings= filterQuestionByType(questionEntities,QuestionTypeEnum.Matching);
+        List<QuestionEntity> questionFillInBlanks= filterQuestionByType(questionEntities,QuestionTypeEnum.Fill_In_Blank);
+        List<QuestionEntity> questionLabels= filterQuestionByType(questionEntities,QuestionTypeEnum.Label);
+
+        List<QuestionMultipleChoiceDto> questionMultipleChoiceDtos = new ArrayList<>();
+        List<QuestionMultipleChoiceDto> questionTFNotgivenDtos = new ArrayList<>();
+        List<QuestionMatchingDto> questionMatchingDtos = new ArrayList<>();
+        List<QuestionFillInBlankDto> questionFillInBlankDtos = new ArrayList<>();
+        List<QuestionLabelDto> questionLabelDtos = new ArrayList<>();
+
+        for(QuestionEntity questionEntity: questionMultipleChoices){
+            QuestionMultipleChoiceDto questionMultipleChoiceDto = new QuestionMultipleChoiceDto();
+
+            questionMultipleChoiceDto.setQuestionId(questionEntity.getQuestionId());
+            questionMultipleChoiceDto.setQuestion(questionEntity.getQuestionContent());
+            questionMultipleChoiceDto.setAnswers(
+                    questionEntity.getAnswers().stream().map(AnswerEntity::getAnswerContent).collect(Collectors.toList())
+            );
+            questionMultipleChoiceDto.setNumberOfChoices(questionEntity.getAnswers().size());
+
+            questionMultipleChoiceDtos.add(questionMultipleChoiceDto);
+        }
+
+        for(QuestionEntity questionEntity: questionTFNotgiven){
+            QuestionMultipleChoiceDto questionMultipleChoiceDto = new QuestionMultipleChoiceDto();
+
+            questionMultipleChoiceDto.setQuestionId(questionEntity.getQuestionId());
+            questionMultipleChoiceDto.setQuestion(questionEntity.getQuestionContent());
+            List<String> answers = questionMultipleChoiceDto.getAnswers();
+            questionMultipleChoiceDto.setAnswers(answers);
+
+            questionMultipleChoiceDtos.add(questionMultipleChoiceDto);
+        }
+
+        for( QuestionEntity questionEntity: questionMatchings){
+            QuestionMatchingDto questionMatchingDto = new QuestionMatchingDto();
+
+            questionMatchingDto.setQuestionId(questionEntity.getQuestionId());
+            questionMatchingDto.setQuestion(questionEntity.getQuestionContent());
+            List<AnswerMatchingBasicResponse> answerMatchingBasicResponses=answerMatchingService.getListAnswerMatchingWithShuffle(questionEntity.getQuestionId());
+            questionMatchingDto.setOptions(answerMatchingBasicResponses);
+            questionMatchingDtos.add(questionMatchingDto);
+        }
+
+        for (QuestionEntity questionEntity: questionFillInBlanks){
+            QuestionFillInBlankDto questionFillInBlankDto = new QuestionFillInBlankDto();
+
+            questionFillInBlankDto.setQuestion(questionEntity.getQuestionContent());
+            questionFillInBlankDto.setQuestionId(questionEntity.getQuestionId());
+
+            questionFillInBlankDtos.add(questionFillInBlankDto);
+        }
+
+        for (QuestionEntity questionEntity: questionLabels){
+
+            QuestionLabelDto questionLabelDto = new QuestionLabelDto();
+            questionLabelDto.setQuestion(questionEntity.getQuestionContent());
+            questionLabelDto.setQuestionId(questionEntity.getQuestionId());
+
+            ContentEntity contentEntity= contentService.getContentByContentId(questionEntity.getContentCollection().get(0).getContentId());
+
+            questionLabelDto.setImage(contentEntity.getContentData());
+            questionLabelDto.setHasHints(questionEntity.getHasHints());
+
+            if(questionEntity.getHasHints()){
+                List<QuestionLabelEntity> questionLabelEntities=labelService.getLabelByIdQuestion(questionEntity.getQuestionId());
+                questionLabelDto.setLabels(
+                        questionLabelEntities.stream().map(QuestionLabelEntity::getLabel).collect(Collectors.toList())
                 );
-
             }
-            else if(questionEntity.getQuestionType()== QuestionTypeEnum.Matching ){
-                List<AnswerMatchingBasicResponse> answerMatchingBasicResponses=answerMatchingService.getListAnswerMatchingWithShuffle(questionEntity.getQuestionId());
-                questionDto.setOptions(answerMatchingBasicResponses);
-            }
-
             else if(questionEntity.getQuestionType()== QuestionTypeEnum.Label ){
                 if(questionEntity.getHasHints()){
-                    List<QuestionLabelEntity> questionLabelEntities=questionEntity.getLabels();
-                    if(questionLabelEntities==null){
-                        questionDto.setLabels(null);
+                    List<QuestionLabelEntity> questionLabelEntities = questionEntity.getLabels();
+                    if(questionLabelEntities == null){
+                        questionLabelDto.setLabels(null);
                     }
                     else{
-                        questionDto.setLabels(
+                        questionLabelDto.setLabels(
                                 questionLabelEntities.stream().map(QuestionLabelEntity::getLabel).collect(Collectors.toList())
                         );
                     }
                 }
             }
-            questionDtos.add(questionDto);
 
+            questionLabelDtos.add(questionLabelDto);
         }
-        return questionDtos;
+
+        questionDto.setQuestionMultipleChoices(questionMultipleChoiceDtos);
+        questionDto.setQuestionTFNotgivens(questionTFNotgivenDtos);
+        questionDto.setQuestionFillInBlank(questionFillInBlankDtos);
+        questionDto.setQuestionMatchings(questionMatchingDtos);
+        questionDto.setQuestionLabels(questionLabelDtos);
+        return questionDto;
+    }
+
+    List<QuestionEntity> filterQuestionByType( List<QuestionEntity> questionEntities,QuestionTypeEnum type ){
+        List<QuestionEntity> filteredQuestionEntities = new ArrayList<>();
+        for(QuestionEntity questionEntity: questionEntities){
+            if(questionEntity.getQuestionType()== type){
+                filteredQuestionEntities.add(questionEntity);
+            }
+        }
+        return filteredQuestionEntities;
     }
 }
