@@ -36,6 +36,7 @@ public interface TopicMapper {
 
     @Mapping(target = "topicId", ignore = true)
     @Mapping(target = "numberQuestion", defaultValue = "0")
+    @Mapping(target = "topicImage", ignore = true)
     void flowToTopicEntity(TopicRequest topicRequest, @MappingTarget TopicEntity topicEntity);
 
     void flowToTopicEntity(ExcelTopicResponse topicByExcelFileResponse, @MappingTarget TopicEntity topicEntity);

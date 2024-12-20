@@ -41,7 +41,9 @@ public class QuestionController {
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Create question successfully")
     public QuestionResponse createQuestion(
-            @ModelAttribute QuestionRequest questionRequest
+            @ModelAttribute QuestionRequest questionRequest,
+            @RequestPart(value = "contentImage", required = false) MultipartFile contentImage,
+            @RequestPart(value = "contentAudio", required = false) MultipartFile contentAudio
     ) {
 
         QuestionEntity question = questionService.saveQuestion(questionRequest);

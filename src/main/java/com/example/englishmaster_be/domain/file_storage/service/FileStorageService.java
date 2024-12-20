@@ -115,8 +115,8 @@ public class FileStorageService implements IFileStorageService {
             Blob blob = bucket.create(fileName, file.getBytes(), file.getContentType());
 
             return FileResponse.builder()
-                    .fileName(fileValue.getPrefixLinkFileShow() + blob.getName())
-                    .contentType(blob.getContentType())
+                    .url(fileValue.getPrefixLinkFileShow() + blob.getName())
+                    .type(blob.getContentType())
                     .build();
 
         } catch (Exception e) {

@@ -78,12 +78,15 @@ public class NewsController {
     }
 
 
-    @PostMapping(value = "/createNews")
+    @PostMapping(value = "/createNews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Create news successfully")
     public NewsResponse createNews(
-            @RequestBody NewsRequest newsRequest
+            @ModelAttribute NewsRequest newsRequest,
+            @RequestPart("image") MultipartFile image
     ){
+
+        newsRequest.setImage(image);
 
         NewsEntity news = newsService.saveNews(newsRequest);
 

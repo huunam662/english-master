@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 
@@ -67,12 +68,12 @@ public class SessionActiveService implements ISessionActiveService {
 
         String tokenHash = jwtUtil.hashToHex(jwtToken);
 
-        user.setLastLogin(LocalDateTime.now());
+        user.setLastLogin(LocalDateTime.now(ZoneId.systemDefault()));
 
         user = userRepository.save(user);
 
         SessionActiveEntity sessionActiveEntity = SessionActiveEntity.builder()
-                .createAt(LocalDateTime.now())
+                .createAt(LocalDateTime.now(ZoneId.systemDefault()))
                 .user(user)
                 .code(UUID.randomUUID())
                 .token(tokenHash)

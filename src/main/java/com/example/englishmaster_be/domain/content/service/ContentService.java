@@ -2,6 +2,8 @@ package com.example.englishmaster_be.domain.content.service;
 
 import com.example.englishmaster_be.common.thread.MessageResponseHolder;
 import com.example.englishmaster_be.domain.content.dto.request.ContentRequest;
+import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
+import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.ContentMapper;
 import com.example.englishmaster_be.model.content.ContentEntity;
@@ -36,6 +38,8 @@ public class ContentService implements IContentService {
     IQuestionService questionService;
 
     IUserService userService;
+
+    IUploadService uploadService;
 
 
     @Transactional
@@ -90,6 +94,14 @@ public class ContentService implements IContentService {
                 .build();
 
         ContentMapper.INSTANCE.flowToContentEntity(contentRequest, content);
+
+        if(contentRequest.getImage() != null && !contentRequest.getImage().isEmpty()){
+
+            FileResponse fileResponse = uploadService.upload(contentRequest.getImage());
+
+            content.setContentData(fileResponse.getUrl());
+            content.setContentType(fileResponse.getType());
+        }
 
         content.setQuestion(question);
         content.setUserUpdate(user);

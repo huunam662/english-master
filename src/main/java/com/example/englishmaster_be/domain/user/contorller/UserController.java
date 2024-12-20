@@ -13,10 +13,12 @@ import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @Tag(name = "User")
@@ -43,8 +45,11 @@ public class UserController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Change profile user successfully")
     public UserProfileResponse changeProfile(
-            @ModelAttribute("profileUser") UserChangeProfileRequest changeProfileRequest
+            @ModelAttribute UserChangeProfileRequest changeProfileRequest,
+            @RequestPart("avatar") MultipartFile avatar
     ) {
+
+        changeProfileRequest.setAvatar(avatar);
 
         UserEntity user = userService.changeProfile(changeProfileRequest);
 

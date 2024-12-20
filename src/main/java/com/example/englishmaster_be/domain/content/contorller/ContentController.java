@@ -14,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -48,7 +49,7 @@ public class ContentController {
     @DeleteMapping("/{contentId}")
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Delete successfully")
-    public void getContentData(@PathVariable UUID contentId) {
+    public void deleteContentData(@PathVariable UUID contentId) {
 
         contentService.deleteContent(contentId);
     }
@@ -62,25 +63,30 @@ public class ContentController {
         return ContentMapper.INSTANCE.toContentResponse(content);
     }
 
-    @PostMapping(value = "/create-content")
+    @PostMapping(value = "/create-content", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @DefaultMessage("Create successfully")
     public ContentResponse createContent(
-            @RequestBody ContentRequest contentRequest
+            @RequestBody ContentRequest contentRequest,
+            @RequestPart MultipartFile image
     ) {
+
+        contentRequest.setImage(image);
 
         ContentEntity content = contentService.saveContent(contentRequest);
 
         return ContentMapper.INSTANCE.toContentResponse(content);
     }
 
-    @PutMapping(value = "/{contentId}/update-content")
+    @PutMapping(value = "/{contentId}/update-content", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @DefaultMessage("Update successfully")
     public ContentResponse updateContent(
             @PathVariable UUID contentId,
-            @RequestBody ContentRequest contentRequest
+            @ModelAttribute ContentRequest contentRequest,
+            @RequestPart MultipartFile image
     ) {
 
         contentRequest.setContentId(contentId);
+        contentRequest.setImage(image);
 
         ContentEntity content = contentService.saveContent(contentRequest);
 

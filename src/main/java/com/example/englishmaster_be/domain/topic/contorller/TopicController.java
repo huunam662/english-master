@@ -55,7 +55,12 @@ public class TopicController {
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Create topic successfully")
-    public TopicResponse createTopic(@ModelAttribute TopicRequest topicRequest) {
+    public TopicResponse createTopic(
+            @ModelAttribute TopicRequest topicRequest,
+            @RequestPart(value = "topicImage", required = false) MultipartFile topicImage
+    ) {
+
+        topicRequest.setTopicImage(topicImage);
 
         TopicEntity topic = topicService.saveTopic(topicRequest);
 
@@ -67,7 +72,7 @@ public class TopicController {
     @DefaultMessage("Create topic successfully")
     public TopicResponse createTopicByExcelFile(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("url") String url
+            @RequestParam(value = "url", required = false) String url
     ) {
 
         TopicEntity topic = topicService.saveTopicByExcelFile(file, url);

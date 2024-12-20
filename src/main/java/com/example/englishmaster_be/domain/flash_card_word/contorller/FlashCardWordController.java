@@ -14,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import java.util.List;
@@ -41,9 +42,14 @@ public class FlashCardWordController {
     @PostMapping(value = "/{flashCardId:.+}/addWordToFlashCard", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Save successfully")
-    public FlashCardWordResponse addWordToFlashCard(@PathVariable UUID flashCardId, @ModelAttribute FlashCardWordRequest flashCardWordRequest){
+    public FlashCardWordResponse addWordToFlashCard(
+            @PathVariable UUID flashCardId,
+            @ModelAttribute FlashCardWordRequest flashCardWordRequest,
+            @RequestPart(required = false) MultipartFile image
+    ){
 
         flashCardWordRequest.setFlashCardId(flashCardId);
+        flashCardWordRequest.setImage(image);
 
         FlashCardWordEntity flashCardWord = flashCardWordService.saveFlashCardWord(flashCardWordRequest);
 
@@ -54,9 +60,14 @@ public class FlashCardWordController {
     @PutMapping(value = "/{flashCardWordId:.+}/updateWord", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Save successfully")
-    public FlashCardWordResponse updateWord(@PathVariable UUID flashCardWordId, @ModelAttribute FlashCardWordRequest flashCardWordRequest){
+    public FlashCardWordResponse updateWord(
+            @PathVariable UUID flashCardWordId,
+            @ModelAttribute FlashCardWordRequest flashCardWordRequest,
+            @RequestPart(required = false) MultipartFile image
+    ){
 
         flashCardWordRequest.setFlashCardWordId(flashCardWordId);
+        flashCardWordRequest.setImage(image);
 
         FlashCardWordEntity flashCardWord = flashCardWordService.saveFlashCardWord(flashCardWordRequest);
 

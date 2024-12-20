@@ -81,7 +81,7 @@ public class FeedbackController {
         return feedbackService.getListFeedbackOfUser(filterRequest);
     }
 
-    @PostMapping(value = "/createFeedback" , consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/createFeedback" )
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Đánh giá thành công")
     public FeedbackResponse createFeedback(
@@ -104,7 +104,7 @@ public class FeedbackController {
         feedbackService.enableFeedback(FeedbackId, enable);
     }
 
-    @PatchMapping(value = "/{feedbackId:.+}/updateFeedback", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/{feedbackId:.+}/updateFeedback")
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Save successfully")
     public FeedbackResponse updateFeedback(

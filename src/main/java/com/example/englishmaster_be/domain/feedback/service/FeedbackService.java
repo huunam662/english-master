@@ -5,6 +5,8 @@ import com.example.englishmaster_be.common.thread.MessageResponseHolder;
 import com.example.englishmaster_be.domain.file_storage.service.IFileStorageService;
 import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackRequest;
 import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackFilterRequest;
+import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
+import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.FeedbackMapper;
@@ -20,12 +22,12 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -38,9 +40,9 @@ public class FeedbackService implements IFeedbackService {
 
     FeedbackRepository feedbackRepository;
 
-    IFileStorageService fileStorageService;
-
     IUserService userService;
+
+    IUploadService uploadService;
 
 
 
@@ -92,9 +94,8 @@ public class FeedbackService implements IFeedbackService {
 
         OrderSpecifier<?> orderSpecifier = FeedbackHelper.buildFeedbackOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
 
-        if(orderSpecifier != null) query.orderBy(orderSpecifier);
-
-        query.offset(filterResponse.getOffset())
+        query.orderBy(orderSpecifier)
+                .offset(filterResponse.getOffset())
                 .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
@@ -103,6 +104,8 @@ public class FeedbackService implements IFeedbackService {
 
         return filterResponse;
     }
+
+
     @Override
     public FilterResponse<?> getListFeedbackOfUser(FeedbackFilterRequest filterRequest) {
 
@@ -180,12 +183,17 @@ public class FeedbackService implements IFeedbackService {
 
     @Transactional
     @Override
+    @SneakyThrows
     public void deleteFeedback(UUID feedbackId) {
 
         FeedbackEntity feedback = getFeedbackById(feedbackId);
 
         if(feedback.getAvatar() != null)
-            fileStorageService.delete(feedback.getAvatar());
+            uploadService.delete(
+                    FileDeleteRequest.builder()
+                            .filepath(feedback.getAvatar())
+                            .build()
+            );
 
         feedbackRepository.delete(feedback);
     }

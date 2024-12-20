@@ -29,8 +29,8 @@ public class CloudinaryService implements ICloudinaryService {
 //			String fileType = String.valueOf(uploadResultResponse.get("type"));
 
 			return FileResponse.builder()
-					.fileName(imageUrl)
-					.contentType(file.getContentType())
+					.url(imageUrl)
+					.type(file.getContentType())
 					.build();
 	}
 

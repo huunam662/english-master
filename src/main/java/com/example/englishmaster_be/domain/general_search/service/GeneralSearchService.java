@@ -30,12 +30,29 @@ public class GeneralSearchService implements IGeneralSearchService {
     @Override
     public GeneralSearchAllResponse searchAll(String keyword) {
 
-        List<TopicEntity> topics = queryFactory.selectFrom(QTopicEntity.topicEntity).where(QTopicEntity.topicEntity.topicName.containsIgnoreCase(keyword)).fetch();
+        int offset = 0;
+
+        int limit = 5;
+
+        String likeExpression = "%" + keyword.trim().replaceAll("\\s+", "%") + "%";
+
+        List<TopicEntity> topics = queryFactory.selectFrom(QTopicEntity.topicEntity)
+                .where(QTopicEntity.topicEntity.topicName.like(likeExpression))
+                .offset(offset)
+                .limit(limit)
+                .fetch();
 
         List<FlashCardWordEntity> flashCardWords = queryFactory.selectFrom(QFlashCardWordEntity.flashCardWordEntity)
-                .where(QFlashCardWordEntity.flashCardWordEntity.word.containsIgnoreCase(keyword)).fetch();
+                .where(QFlashCardWordEntity.flashCardWordEntity.word.like(likeExpression))
+                .offset(offset)
+                .limit(limit)
+                .fetch();
 
-        List<NewsEntity> newsList = queryFactory.selectFrom(QNewsEntity.newsEntity).where(QNewsEntity.newsEntity.title.containsIgnoreCase(keyword)).fetch();
+        List<NewsEntity> newsList = queryFactory.selectFrom(QNewsEntity.newsEntity)
+                .where(QNewsEntity.newsEntity.title.like(likeExpression))
+                .offset(offset)
+                .limit(limit)
+                .fetch();
 
         return GeneralSearchAllResponse.builder()
                 .topicList(TopicMapper.INSTANCE.toTopicResponseList(topics))

@@ -1,22 +1,17 @@
 package com.example.englishmaster_be.domain.part.service;
 
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
-import com.example.englishmaster_be.domain.cloudinary.dto.response.CloudiaryUploadFileResponse;
-import com.example.englishmaster_be.domain.cloudinary.service.ICloudinaryService;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
-import com.example.englishmaster_be.util.GetExtensionUtil;
+import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
 import com.example.englishmaster_be.model.part.PartRepository;
-import com.example.englishmaster_be.shared.upload_file.dto.request.UploadMultipleFileRequest;
 import com.example.englishmaster_be.domain.part.dto.request.PartSaveContentRequest;
 import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.PartMapper;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.domain.file_storage.service.IFileStorageService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.google.cloud.storage.Blob;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -38,7 +33,7 @@ public class PartService implements IPartService {
 
     IUserService userService;
 
-    IFileStorageService fileStorageService;
+    IUploadService uploadService;
 
 
     @Transactional
@@ -70,10 +65,10 @@ public class PartService implements IPartService {
 
         if(partRequest.getFile() != null && !partRequest.getFile().isEmpty()){
 
-            FileResponse fileResponse = fileStorageService.save(partRequest.getFile());
+            FileResponse fileResponse = uploadService.upload(partRequest.getFile());
 
-            partEntity.setContentData(fileResponse.getFileName());
-            partEntity.setContentType(fileResponse.getContentType());
+            partEntity.setContentData(fileResponse.getUrl());
+            partEntity.setContentType(fileResponse.getType());
         }
 
         PartMapper.INSTANCE.flowToPartEntity(partRequest, partEntity);
@@ -146,10 +141,10 @@ public class PartService implements IPartService {
 
         PartEntity partEntity = getPartToId(partId);
 
-        FileResponse fileResponse = fileStorageService.save(contentData);
+        FileResponse fileResponse = uploadService.upload(contentData);
 
-        partEntity.setContentType(fileResponse.getContentType());
-        partEntity.setContentData(fileResponse.getFileName());
+        partEntity.setContentType(fileResponse.getUrl());
+        partEntity.setContentData(fileResponse.getType());
         partEntity.setUserUpdate(user);
 
 
