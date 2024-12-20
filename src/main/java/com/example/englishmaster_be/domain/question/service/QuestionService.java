@@ -6,14 +6,15 @@ import com.example.englishmaster_be.domain.answer_matching.dto.response.AnswerMa
 import com.example.englishmaster_be.domain.answer_matching.service.IAnswerMatchingService;
 import com.example.englishmaster_be.domain.content.service.IContentService;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
-import com.example.englishmaster_be.domain.file_storage.service.IFileStorageService;
 import com.example.englishmaster_be.domain.part.service.IPartService;
-import com.example.englishmaster_be.domain.question.dto.response.QuestionFromPartResponse;
+import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
+import com.example.englishmaster_be.domain.upload.service.IUploadService;
+import com.example.englishmaster_be.domain.question.dto.response.*;
+import com.example.englishmaster_be.domain.question_label.service.IQuestionLabelService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
 import com.example.englishmaster_be.model.question_label.QuestionLabelEntity;
-import com.example.englishmaster_be.util.GetExtensionUtil;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
@@ -28,9 +29,9 @@ import com.example.englishmaster_be.model.answer.AnswerRepository;
 import com.example.englishmaster_be.model.content.ContentRepository;
 import com.example.englishmaster_be.model.part.PartRepository;
 import com.example.englishmaster_be.model.question.QuestionRepository;
-import com.google.cloud.storage.Blob;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -53,8 +54,6 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class QuestionService implements IQuestionService {
 
-    GetExtensionUtil getExtensionHelper;
-
     QuestionRepository questionRepository;
 
     ContentRepository contentRepository;
@@ -69,13 +68,17 @@ public class QuestionService implements IQuestionService {
 
     IContentService contentService;
 
-    IFileStorageService fileStorageService;
-
     IAnswerService answerService;
 
     IAnswerMatchingService answerMatchingService;
 
+    IUploadService uploadService;
+
+    IQuestionLabelService labelService;
+
+
     @Transactional
+    @SneakyThrows
     @Override
     public QuestionEntity saveQuestion(QuestionRequest questionRequest) {
 
@@ -131,17 +134,23 @@ public class QuestionService implements IQuestionService {
 
             if (questionRequest.getContentImage() != null && !questionRequest.getContentImage().isEmpty()) {
                 for (ContentEntity content : question.getContentCollection()) {
-                    if (content.getContentType().equals("IMAGE")) {
+                    if (content.getContentType().contains("image")) {
                         question.getContentCollection().remove(content);
                         contentService.deleteContent(content.getContentId());
-                        fileStorageService.delete(content.getContentData());
+                        uploadService.delete(
+                                FileDeleteRequest.builder()
+                                        .filepath(content.getContentData())
+                                        .build()
+                        );
                     }
                 }
-                String filename = fileStorageService.nameFile(questionRequest.getContentImage());
+
+                FileResponse fileResponse = uploadService.upload(questionRequest.getContentImage());
+
                 ContentEntity content = ContentEntity.builder()
                         .question(question)
-                        .contentType(getExtensionHelper.typeFile(filename))
-                        .contentData(filename)
+                        .contentData(fileResponse.getUrl())
+                        .contentType(fileResponse.getType())
                         .userCreate(user)
                         .userUpdate(user)
                         .createAt(LocalDateTime.now())
@@ -153,21 +162,26 @@ public class QuestionService implements IQuestionService {
 
                 question.getContentCollection().add(content);
                 contentRepository.save(content);
-                fileStorageService.save(questionRequest.getContentImage());
             }
             if (questionRequest.getContentAudio() != null && !questionRequest.getContentAudio().isEmpty()) {
                 for (ContentEntity content : question.getContentCollection()) {
-                    if (content.getContentType().equals("AUDIO")) {
+                    if (content.getContentType().contains("audio")) {
                         question.getContentCollection().remove(content);
                         contentService.deleteContent(content.getContentId());
-                        fileStorageService.delete(content.getContentData());
+                        uploadService.delete(
+                                FileDeleteRequest.builder()
+                                        .filepath(content.getContentData())
+                                        .build()
+                        );
                     }
                 }
-                String filename = fileStorageService.nameFile(questionRequest.getContentAudio());
+
+                FileResponse fileResponse = uploadService.upload(questionRequest.getContentAudio());
+
                 ContentEntity content = ContentEntity.builder()
                         .question(question)
-                        .contentType(getExtensionHelper.typeFile(filename))
-                        .contentData(filename)
+                        .contentData(fileResponse.getUrl())
+                        .contentType(fileResponse.getType())
                         .userCreate(user)
                         .userUpdate(user)
                         .createAt(LocalDateTime.now())
@@ -179,7 +193,6 @@ public class QuestionService implements IQuestionService {
 
                 question.getContentCollection().add(content);
                 contentRepository.save(content);
-                fileStorageService.save(questionRequest.getContentAudio());
             }
 
             questionRepository.save(question);
@@ -194,6 +207,26 @@ public class QuestionService implements IQuestionService {
             question.setUserUpdate(user);
             question.setPart(part);
             question.setHasHints(questionRequest.isHasHints());
+
+            QuestionEntity createQuestion = questionRepository.save(question);
+
+            FileResponse fileResponse = uploadService.upload(questionRequest.getContentImage());
+
+            ContentEntity content = ContentEntity.builder()
+                    .question(createQuestion)
+                    .contentType(fileResponse.getType())
+                    .contentData(fileResponse.getUrl())
+                    .userCreate(user)
+                    .userUpdate(user)
+                    .createAt(LocalDateTime.now())
+                    .updateAt(LocalDateTime.now())
+                    .build();
+
+            if (question.getContentCollection() == null)
+                question.setContentCollection(new ArrayList<>());
+
+            question.getContentCollection().add(content);
+            contentRepository.save(content);
 
             return questionRepository.save(question);
         }
@@ -225,11 +258,10 @@ public class QuestionService implements IQuestionService {
 
     @Override
     public int countQuestionToQuestionGroup(QuestionEntity question) {
-        int total = 0;
-        for(QuestionEntity questionChild: listQuestionGroup(question)){
-            total++;
-        }
-        return total;
+
+        if(question == null) return 0;
+
+        return listQuestionGroup(question).size();
     }
 
     @Override
@@ -271,11 +303,11 @@ public class QuestionService implements IQuestionService {
 
             if(file == null || file.isEmpty()) continue;
 
-            FileResponse fileResponse = fileStorageService.save(file);
+            FileResponse fileResponse = uploadService.upload(file);
 
             ContentEntity content = ContentEntity.builder()
-                    .contentData(fileResponse.getFileName())
-                    .contentType(fileResponse.getContentType())
+                    .contentData(fileResponse.getUrl())
+                    .contentType(fileResponse.getType())
                     .userCreate(user)
                     .userUpdate(user)
                     .question(question)
@@ -287,8 +319,10 @@ public class QuestionService implements IQuestionService {
         return questionRepository.save(question);
     }
 
+
     @Transactional
     @Override
+    @SneakyThrows
     public QuestionEntity updateFileQuestion(UUID questionId, String oldFileName, MultipartFile newFile) {
 
         if(newFile == null || newFile.isEmpty())
@@ -304,16 +338,21 @@ public class QuestionService implements IQuestionService {
                 () -> new BadRequestException("ContentEntity not found with content image name: " + oldFileName)
         );
 
-        fileStorageService.delete(content.getContentData());
+        uploadService.delete(
+                FileDeleteRequest.builder()
+                        .filepath(content.getContentData())
+                        .build()
+        );
 
-        FileResponse fileResponse = fileStorageService.save(newFile);
+        FileResponse fileResponse = uploadService.upload(newFile);
 
-        content.setContentData(fileResponse.getFileName());
-        content.setContentType(fileResponse.getContentType());
+        content.setContentData(fileResponse.getUrl());
+        content.setContentType(fileResponse.getType());
         content.setUserUpdate(user);
 
         return questionRepository.save(question);
     }
+
 
     @Transactional
     @Override
@@ -342,7 +381,7 @@ public class QuestionService implements IQuestionService {
     }
 
     @Override
-    public List<QuestionFromPartResponse> getAllQuestionFromPart(UUID partId) {
+    public QuestionDto getAllQuestionFromPart(UUID partId) {
         PartEntity part = partRepository.findByPartId(partId)
                 .orElseThrow(
                         () -> new IllegalArgumentException("PartEntity not found with ID: " + partId)
@@ -353,42 +392,112 @@ public class QuestionService implements IQuestionService {
         if(questionEntities == null)
             return null;
 
-        List<QuestionFromPartResponse> questionDtos = new ArrayList<>();
+        QuestionDto questionDto = new QuestionDto();
 
-        for(QuestionEntity questionEntity: questionEntities){
-            QuestionFromPartResponse questionDto=new QuestionFromPartResponse();
-            questionDto.setQuestionId(questionEntity.getQuestionId());
-            questionDto.setContent(questionEntity.getQuestionContent());
-            questionDto.setQuestionType(questionEntity.getQuestionType());
-            if(questionEntity.getQuestionType()== QuestionTypeEnum.Multiple_Choice || questionEntity.getQuestionType()== QuestionTypeEnum.T_F_Not_Given){
-                List<AnswerEntity> answerEntities=questionEntity.getAnswers();
-                questionDto.setAnswers(
-                        answerEntities.stream().map(AnswerEntity::getAnswerContent).collect(Collectors.toList())
+        List<QuestionEntity> questionMultipleChoices= filterQuestionByType(questionEntities,QuestionTypeEnum.Multiple_Choice);
+        List<QuestionEntity> questionTFNotgiven= filterQuestionByType(questionEntities,QuestionTypeEnum.T_F_Not_Given);
+        List<QuestionEntity> questionMatchings= filterQuestionByType(questionEntities,QuestionTypeEnum.Matching);
+        List<QuestionEntity> questionFillInBlanks= filterQuestionByType(questionEntities,QuestionTypeEnum.Fill_In_Blank);
+        List<QuestionEntity> questionLabels= filterQuestionByType(questionEntities,QuestionTypeEnum.Label);
+
+        List<QuestionMultipleChoiceDto> questionMultipleChoiceDtos = new ArrayList<>();
+        List<QuestionMultipleChoiceDto> questionTFNotgivenDtos = new ArrayList<>();
+        List<QuestionMatchingDto> questionMatchingDtos = new ArrayList<>();
+        List<QuestionFillInBlankDto> questionFillInBlankDtos = new ArrayList<>();
+        List<QuestionLabelDto> questionLabelDtos = new ArrayList<>();
+
+        for(QuestionEntity questionEntity: questionMultipleChoices){
+            QuestionMultipleChoiceDto questionMultipleChoiceDto = new QuestionMultipleChoiceDto();
+
+            questionMultipleChoiceDto.setQuestionId(questionEntity.getQuestionId());
+            questionMultipleChoiceDto.setQuestion(questionEntity.getQuestionContent());
+            questionMultipleChoiceDto.setAnswers(
+                    questionEntity.getAnswers().stream().map(AnswerEntity::getAnswerContent).collect(Collectors.toList())
+            );
+            questionMultipleChoiceDto.setNumberOfChoices(questionEntity.getAnswers().size());
+
+            questionMultipleChoiceDtos.add(questionMultipleChoiceDto);
+        }
+
+        for(QuestionEntity questionEntity: questionTFNotgiven){
+            QuestionMultipleChoiceDto questionMultipleChoiceDto = new QuestionMultipleChoiceDto();
+
+            questionMultipleChoiceDto.setQuestionId(questionEntity.getQuestionId());
+            questionMultipleChoiceDto.setQuestion(questionEntity.getQuestionContent());
+            List<String> answers = questionMultipleChoiceDto.getAnswers();
+            questionMultipleChoiceDto.setAnswers(answers);
+
+            questionMultipleChoiceDtos.add(questionMultipleChoiceDto);
+        }
+
+        for( QuestionEntity questionEntity: questionMatchings){
+            QuestionMatchingDto questionMatchingDto = new QuestionMatchingDto();
+
+            questionMatchingDto.setQuestionId(questionEntity.getQuestionId());
+            questionMatchingDto.setQuestion(questionEntity.getQuestionContent());
+            List<AnswerMatchingBasicResponse> answerMatchingBasicResponses=answerMatchingService.getListAnswerMatchingWithShuffle(questionEntity.getQuestionId());
+            questionMatchingDto.setOptions(answerMatchingBasicResponses);
+            questionMatchingDtos.add(questionMatchingDto);
+        }
+
+        for (QuestionEntity questionEntity: questionFillInBlanks){
+            QuestionFillInBlankDto questionFillInBlankDto = new QuestionFillInBlankDto();
+
+            questionFillInBlankDto.setQuestion(questionEntity.getQuestionContent());
+            questionFillInBlankDto.setQuestionId(questionEntity.getQuestionId());
+
+            questionFillInBlankDtos.add(questionFillInBlankDto);
+        }
+
+        for (QuestionEntity questionEntity: questionLabels){
+
+            QuestionLabelDto questionLabelDto = new QuestionLabelDto();
+            questionLabelDto.setQuestion(questionEntity.getQuestionContent());
+            questionLabelDto.setQuestionId(questionEntity.getQuestionId());
+
+            ContentEntity contentEntity= contentService.getContentByContentId(questionEntity.getContentCollection().get(0).getContentId());
+
+            questionLabelDto.setImage(contentEntity.getContentData());
+            questionLabelDto.setHasHints(questionEntity.getHasHints());
+
+            if(questionEntity.getHasHints()){
+                List<QuestionLabelEntity> questionLabelEntities=labelService.getLabelByIdQuestion(questionEntity.getQuestionId());
+                questionLabelDto.setLabels(
+                        questionLabelEntities.stream().map(QuestionLabelEntity::getLabel).collect(Collectors.toList())
                 );
-
             }
-            else if(questionEntity.getQuestionType()== QuestionTypeEnum.Matching ){
-                List<AnswerMatchingBasicResponse> answerMatchingBasicResponses=answerMatchingService.getListAnswerMatchingWithShuffle(questionEntity.getQuestionId());
-                questionDto.setOptions(answerMatchingBasicResponses);
-            }
-
             else if(questionEntity.getQuestionType()== QuestionTypeEnum.Label ){
                 if(questionEntity.getHasHints()){
-                    List<QuestionLabelEntity> questionLabelEntities=questionEntity.getLabels();
-                    if(questionLabelEntities==null){
-                        questionDto.setLabels(null);
+                    List<QuestionLabelEntity> questionLabelEntities = questionEntity.getLabels();
+                    if(questionLabelEntities == null){
+                        questionLabelDto.setLabels(null);
                     }
                     else{
-                        questionDto.setLabels(
+                        questionLabelDto.setLabels(
                                 questionLabelEntities.stream().map(QuestionLabelEntity::getLabel).collect(Collectors.toList())
                         );
                     }
-
                 }
             }
-            questionDtos.add(questionDto);
 
+            questionLabelDtos.add(questionLabelDto);
         }
-        return questionDtos;
+
+        questionDto.setQuestionMultipleChoices(questionMultipleChoiceDtos);
+        questionDto.setQuestionTFNotgivens(questionTFNotgivenDtos);
+        questionDto.setQuestionFillInBlank(questionFillInBlankDtos);
+        questionDto.setQuestionMatchings(questionMatchingDtos);
+        questionDto.setQuestionLabels(questionLabelDtos);
+        return questionDto;
+    }
+
+    List<QuestionEntity> filterQuestionByType( List<QuestionEntity> questionEntities,QuestionTypeEnum type ){
+        List<QuestionEntity> filteredQuestionEntities = new ArrayList<>();
+        for(QuestionEntity questionEntity: questionEntities){
+            if(questionEntity.getQuestionType()== type){
+                filteredQuestionEntities.add(questionEntity);
+            }
+        }
+        return filteredQuestionEntities;
     }
 }

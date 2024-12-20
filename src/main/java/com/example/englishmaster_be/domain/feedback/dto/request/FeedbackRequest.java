@@ -27,7 +27,4 @@ public class FeedbackRequest {
 
     String content;
 
-    @Min(1) @Max(5)
-    Integer star;
-
 }

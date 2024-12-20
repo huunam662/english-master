@@ -2,6 +2,8 @@ package com.example.englishmaster_be.domain.flash_card.service;
 
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.flash_card.dto.request.FlashCardRequest;
+import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
+import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.mapper.FlashCardMapper;
 import com.example.englishmaster_be.model.flash_card.FlashCardEntity;
 import com.example.englishmaster_be.model.flash_card.FlashCardRepository;
@@ -11,6 +13,7 @@ import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.google.cloud.storage.Blob;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -31,7 +34,7 @@ public class FlashCardService implements IFlashCardService {
 
     IUserService userService;
 
-    IFileStorageService fileStorageService;
+    IUploadService uploadService;
 
 
     @Override
@@ -57,12 +60,17 @@ public class FlashCardService implements IFlashCardService {
 
     @Transactional
     @Override
+    @SneakyThrows
     public void delete(UUID flashCardId) {
 
         FlashCardEntity flashCard = getFlashCardById(flashCardId);
 
         if(flashCard.getFlashCardImage() != null && !flashCard.getFlashCardImage().isEmpty())
-            fileStorageService.delete(flashCard.getFlashCardImage());
+            uploadService.delete(
+                    FileDeleteRequest.builder()
+                            .filepath(flashCard.getFlashCardImage())
+                            .build()
+            );
 
         flashCardRepository.delete(flashCard);
     }
@@ -86,9 +94,9 @@ public class FlashCardService implements IFlashCardService {
 
         if(flashCardRequest.getFlashCardImage() != null){
 
-            FileResponse fileResponse = fileStorageService.save(flashCardRequest.getFlashCardImage());
+            FileResponse fileResponse = uploadService.upload(flashCardRequest.getFlashCardImage());
 
-            flashCard.setFlashCardImage(fileResponse.getFileName());
+            flashCard.setFlashCardImage(fileResponse.getUrl());
         }
 
         return flashCardRepository.save(flashCard);

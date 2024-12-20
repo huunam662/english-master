@@ -25,7 +25,7 @@ public class ContentRequest {
 
     String code;
 
-    String image;
+    @Hidden
+    MultipartFile image;
 
-    String contentTypeImage;
 }

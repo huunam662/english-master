@@ -21,5 +21,6 @@ public interface NewsMapper {
 
     @Mapping(target = "newsId", ignore = true)
     @Mapping(target = "enable", defaultValue = "false")
+    @Mapping(target = "image", ignore = true)
     void flowToNewsEntity(NewsRequest newsRequest, @MappingTarget NewsEntity newsEntity);
 }

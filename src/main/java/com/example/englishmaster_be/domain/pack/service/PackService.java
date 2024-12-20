@@ -38,8 +38,6 @@ public class PackService implements IPackService {
 
         PackEntity pack = PackEntity.builder()
                 .packName(packRequest.getPackName())
-                .createAt(LocalDateTime.now())
-                .updateAt(LocalDateTime.now())
                 .userCreate(user)
                 .userUpdate(user)
                 .build();

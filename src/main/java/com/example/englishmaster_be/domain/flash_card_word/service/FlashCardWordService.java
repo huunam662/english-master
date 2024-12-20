@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.domain.flash_card_word.service;
 
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
-import com.example.englishmaster_be.domain.file_storage.service.IFileStorageService;
 import com.example.englishmaster_be.domain.flash_card.service.IFlashCardService;
+import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.domain.flash_card_word.dto.request.FlashCardWordRequest;
 import com.example.englishmaster_be.mapper.FlashCardWordMapper;
@@ -11,7 +11,6 @@ import com.example.englishmaster_be.model.flash_card_word.FlashCardWordEntity;
 import com.example.englishmaster_be.model.flash_card_word.FlashCardWordRepository;
 import com.example.englishmaster_be.model.flash_card_word.QFlashCardWordEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
-import com.google.cloud.storage.Blob;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -27,6 +26,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+
+
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -40,7 +41,7 @@ public class FlashCardWordService implements IFlashCardWordService {
 
     IFlashCardService flashCardService;
 
-    IFileStorageService fileStorageService;
+    IUploadService uploadService;
 
 
 
@@ -112,8 +113,8 @@ public class FlashCardWordService implements IFlashCardWordService {
 
         if(flashCardWordRequest.getImage() != null){
 
-            FileResponse fileResponse = fileStorageService.save(flashCardWordRequest.getImage());
-            flashCardWord.setImage(fileResponse.getFileName());
+            FileResponse fileResponse = uploadService.upload(flashCardWordRequest.getImage());
+            flashCardWord.setImage(fileResponse.getUrl());
         }
 
         return flashCardWordRepository.save(flashCardWord);

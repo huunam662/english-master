@@ -18,12 +18,13 @@ import java.util.UUID;
 public class FlashCardRequest {
 
     @Hidden
-    UUID flashCardId;;
+    UUID flashCardId;
 
     String flashCardTitle;
 
     String flashCardDescription;
 
+    @Hidden
     MultipartFile flashCardImage;
 
 }
