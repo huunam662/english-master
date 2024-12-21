@@ -35,6 +35,7 @@ public class TopicRequest {
 
 	Integer numberQuestion;
 
+	@Hidden
 	MultipartFile topicImage;
 
 	List<UUID> listPart;

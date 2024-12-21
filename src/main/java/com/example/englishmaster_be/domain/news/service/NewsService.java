@@ -2,15 +2,15 @@ package com.example.englishmaster_be.domain.news.service;
 
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
 import com.example.englishmaster_be.common.thread.MessageResponseHolder;
+import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
+import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.mapper.NewsMapper;
 import com.example.englishmaster_be.domain.news.dto.request.NewsRequest;
 import com.example.englishmaster_be.domain.news.dto.request.NewsFilterRequest;
 import com.example.englishmaster_be.domain.news.dto.response.NewsResponse;
 import com.example.englishmaster_be.model.news.NewsRepository;
-import com.example.englishmaster_be.domain.file_storage.service.IFileStorageService;
 import com.example.englishmaster_be.model.news.NewsEntity;
 import com.example.englishmaster_be.model.news.QNewsEntity;
-import com.google.cloud.storage.Blob;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -24,10 +24,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+
+
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
@@ -38,7 +40,7 @@ public class NewsService implements INewsService {
 
     NewsRepository newsRepository;
 
-    IFileStorageService fileStorageService;
+    IUploadService uploadService;
 
 
     @Override
@@ -57,7 +59,6 @@ public class NewsService implements INewsService {
                 .pageNumber(filterRequest.getPage())
                 .pageSize(filterRequest.getPageSize())
                 .offset((long) (filterRequest.getPage() - 1) * filterRequest.getPageSize())
-                .content(new ArrayList<>())
                 .build();
 
         BooleanExpression wherePattern = QNewsEntity.newsEntity.isNotNull();
@@ -130,18 +131,11 @@ public class NewsService implements INewsService {
 
         NewsMapper.INSTANCE.flowToNewsEntity(newsRequest, news);
 
-        news.setUpdateAt(LocalDateTime.now());
-
         if(newsRequest.getImage() != null && !newsRequest.getImage().isEmpty()){
 
-            if (news.getImage() != null && !news.getImage().isEmpty())
-                fileStorageService.delete(news.getImage());
+            FileResponse fileResponse = uploadService.upload(newsRequest.getImage());
 
-            Blob blob = fileStorageService.save(newsRequest.getImage());
-
-            String fileName = blob.getName();
-
-            news.setImage(fileName);
+            news.setImage(fileResponse.getUrl());
         }
 
         return newsRepository.save(news);
@@ -155,8 +149,8 @@ public class NewsService implements INewsService {
 
         news.setEnable(enable);
 
-        if(enable) MessageResponseHolder.setMessage("Enable NewsEntity successfully");
-        else MessageResponseHolder.setMessage("Disable NewsEntity successfully");
+        if(enable) MessageResponseHolder.setMessage("Enable news successfully");
+        else MessageResponseHolder.setMessage("Disable news successfully");
 
         newsRepository.save(news);
     }
@@ -166,8 +160,8 @@ public class NewsService implements INewsService {
 
         NewsEntity news = findNewsById(newsId);
 
-        if(news.getImage() != null && !news.getImage().isEmpty())
-            fileStorageService.delete(news.getImage());
+//        if(news.getImage() != null && !news.getImage().isEmpty())
+//            fileStorageService.delete(news.getImage());
 
         newsRepository.delete(news);
 

@@ -44,7 +44,7 @@ public class TopicController {
 
     @GetMapping(value = "/{topicId:.+}/inforTopic")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show list TopicEntity successfully")
+    @DefaultMessage("Show list topic successfully")
     public TopicResponse getInformationTopic(@PathVariable UUID topicId) {
 
         TopicEntity topic = topicService.getTopicById(topicId);
@@ -54,8 +54,13 @@ public class TopicController {
 
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Create TopicEntity successfully")
-    public TopicResponse createTopic(@ModelAttribute TopicRequest topicRequest) {
+    @DefaultMessage("Create topic successfully")
+    public TopicResponse createTopic(
+            @ModelAttribute TopicRequest topicRequest,
+            @RequestPart(value = "topicImage", required = false) MultipartFile topicImage
+    ) {
+
+        topicRequest.setTopicImage(topicImage);
 
         TopicEntity topic = topicService.saveTopic(topicRequest);
 
@@ -64,10 +69,10 @@ public class TopicController {
 
     @PostMapping(value = "/createTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Create TopicEntity successfully")
+    @DefaultMessage("Create topic successfully")
     public TopicResponse createTopicByExcelFile(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("url") String url
+            @RequestParam(value = "url", required = false) String url
     ) {
 
         TopicEntity topic = topicService.saveTopicByExcelFile(file, url);
@@ -77,8 +82,12 @@ public class TopicController {
 
 
     @PutMapping(value = "/{topicId:.+}/updateTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @DefaultMessage("Update TopicEntity successfully")
-    public TopicResponse updateTopicByExcelFile(@PathVariable UUID topicId, @RequestParam("file") MultipartFile file, @RequestParam("url") String url) {
+    @DefaultMessage("Update topic successfully")
+    public TopicResponse updateTopicByExcelFile(
+            @PathVariable UUID topicId,
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("url") String url
+    ) {
 
         TopicEntity topic = topicService.updateTopicByExcelFile(topicId, file, url);
 
@@ -89,10 +98,15 @@ public class TopicController {
 
     @PutMapping(value = "/{topicId:.+}/updateTopic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Update TopicEntity successfully")
-    public TopicResponse updateTopic(@PathVariable UUID topicId, @ModelAttribute TopicRequest topicRequest) {
+    @DefaultMessage("Update topic successfully")
+    public TopicResponse updateTopic(
+            @PathVariable UUID topicId,
+            @RequestBody TopicRequest topicRequest,
+            @RequestPart(value = "topicImage", required = false) MultipartFile topicImage
+    ) {
 
         topicRequest.setTopicId(topicId);
+        topicRequest.setTopicImage(topicImage);
 
         TopicEntity topic = topicService.saveTopic(topicRequest);
 
@@ -102,9 +116,12 @@ public class TopicController {
     @PutMapping(value = "/{topicId:.+}/uploadImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Upload TopicEntity file_storage successfully")
-    public TopicResponse uploadFileImage(@PathVariable UUID topicId, @ModelAttribute TopicUploadFileRequest uploadFileDTO) {
+    public TopicResponse uploadFileImage(
+            @PathVariable UUID topicId,
+            @RequestPart("contentData") MultipartFile contentData
+    ) {
 
-        TopicEntity topic = topicService.uploadFileImage(topicId, uploadFileDTO);
+        TopicEntity topic = topicService.uploadFileImage(topicId, contentData);
 
         return TopicMapper.INSTANCE.toTopicResponse(topic);
     }
@@ -176,16 +193,27 @@ public class TopicController {
         topicService.deletePartToTopic(topicId, partId);
     }
 
-    @PostMapping(value = "/{topicId:.+}/addQuestion")
+    @PostMapping(value = "/{topicId:.+}/addQuestion", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public QuestionResponse addQuestionToTopic(@PathVariable UUID topicId, @ModelAttribute QuestionRequest createQuestionDTO) {
+    public QuestionResponse addQuestionToTopic(
+            @PathVariable UUID topicId,
+            @ModelAttribute QuestionRequest createQuestionDTO,
+            @RequestPart(required = false) MultipartFile contentImage,
+            @RequestPart(required = false) MultipartFile contentAudio
+    ) {
+
+        createQuestionDTO.setContentImage(contentImage);
+        createQuestionDTO.setContentAudio(contentAudio);
 
         return topicService.addQuestionToTopic(topicId, createQuestionDTO);
     }
 
     @PostMapping(value = "/{topicId:.+}/addListQuestion", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public void addListQuestionToTopic(@PathVariable UUID topicId, @ModelAttribute("listQuestion") TopicQuestionListRequest createQuestionDTOList) {
+    public void addListQuestionToTopic(
+            @PathVariable UUID topicId,
+            @ModelAttribute("listQuestion") TopicQuestionListRequest createQuestionDTOList
+    ) {
 
         topicService.addListQuestionToTopic(topicId, createQuestionDTOList);
     }

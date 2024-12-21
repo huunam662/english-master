@@ -5,6 +5,7 @@ import com.example.englishmaster_be.common.dto.response.ExceptionResponseModel;
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
 import com.example.englishmaster_be.common.dto.response.ResponseModel;
 import com.example.englishmaster_be.common.thread.MessageResponseHolder;
+import com.example.englishmaster_be.domain.file_storage.dto.response.ResourceResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,8 @@ import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+
+import java.net.URLConnection;
 
 @RestControllerAdvice
 @RequiredArgsConstructor
@@ -89,7 +93,16 @@ public class GlobalResponseConfig implements ResponseBodyAdvice<Object> {
 
         response.setStatusCode(HttpStatus.OK);
 
-        if(body instanceof Resource) return body;
+        if(body instanceof ResourceResponse resourceResponse) {
+
+            String typeLoad = resourceResponse.getTypeLoad().name().toLowerCase();
+
+            response.getHeaders().set(HttpHeaders.CONTENT_TYPE, resourceResponse.getContentType());
+            response.getHeaders().set(HttpHeaders.CONTENT_DISPOSITION, typeLoad + "; filename=\"" + resourceResponse.getFileName() + "\"");
+            response.getHeaders().setContentLength(resourceResponse.getContentLength());
+
+            return resourceResponse.getResource();
+        }
 
         if(body instanceof ResponseModel responseModel)
             body = responseModel.getResponseData();

@@ -14,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -28,7 +29,7 @@ public class ContentController {
 
 
     @GetMapping
-    @DefaultMessage("Get content successfully")
+    @DefaultMessage("Get successfully")
     public ContentResponse getContentById(@RequestParam UUID id) {
 
         ContentEntity content = contentService.getContentByContentId(id);
@@ -37,7 +38,7 @@ public class ContentController {
     }
 
     @GetMapping("/contentData")
-    @DefaultMessage("Get content successfully")
+    @DefaultMessage("Get successfully")
     public ContentResponse getContentData(@RequestParam UUID topicId, @RequestParam String code) {
 
         ContentEntity content = contentService.getContentByTopicIdAndCode(topicId, code);
@@ -47,14 +48,14 @@ public class ContentController {
 
     @DeleteMapping("/{contentId}")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Delete content successfully")
-    public void getContentData(@PathVariable UUID contentId) {
+    @DefaultMessage("Delete successfully")
+    public void deleteContentData(@PathVariable UUID contentId) {
 
         contentService.deleteContent(contentId);
     }
 
     @GetMapping("/content")
-    @DefaultMessage("Get content successfully")
+    @DefaultMessage("Get successfully")
     public ContentResponse getContent(@RequestParam String contentData) {
 
         ContentEntity content = contentService.getContentByContentData(contentData);
@@ -63,10 +64,13 @@ public class ContentController {
     }
 
     @PostMapping(value = "/create-content", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @DefaultMessage("Create content successfully")
+    @DefaultMessage("Create successfully")
     public ContentResponse createContent(
-            @ModelAttribute ContentRequest contentRequest
+            @RequestBody ContentRequest contentRequest,
+            @RequestPart MultipartFile image
     ) {
+
+        contentRequest.setImage(image);
 
         ContentEntity content = contentService.saveContent(contentRequest);
 
@@ -74,13 +78,15 @@ public class ContentController {
     }
 
     @PutMapping(value = "/{contentId}/update-content", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @DefaultMessage("Update content successfully")
+    @DefaultMessage("Update successfully")
     public ContentResponse updateContent(
             @PathVariable UUID contentId,
-            @ModelAttribute ContentRequest contentRequest
+            @ModelAttribute ContentRequest contentRequest,
+            @RequestPart MultipartFile image
     ) {
 
         contentRequest.setContentId(contentId);
+        contentRequest.setImage(image);
 
         ContentEntity content = contentService.saveContent(contentRequest);
 

@@ -1,6 +1,8 @@
 package com.example.englishmaster_be.domain.feedback.dto.request;
 
 import io.swagger.v3.oas.annotations.Hidden;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
@@ -24,7 +26,5 @@ public class FeedbackRequest {
     String description;
 
     String content;
-
-    MultipartFile avatar;
 
 }

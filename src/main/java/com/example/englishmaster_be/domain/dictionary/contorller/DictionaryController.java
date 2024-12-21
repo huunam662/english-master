@@ -31,7 +31,7 @@ public class DictionaryController {
 
 
     @GetMapping("/suggest/{word}")
-    @DefaultMessage("Show word successfully")
+    @DefaultMessage("Show successfully")
     public DictionarySuggestionResponse getSuggestions(@PathVariable String word) {
 
         return dictionaryService.getSuggestions(word);
@@ -39,7 +39,7 @@ public class DictionaryController {
 
 
     @GetMapping("/image/{word}")
-    @DefaultMessage("show image to word successfully")
+    @DefaultMessage("show successfully")
     public JsonNode getImage(@PathVariable String word) {
 
         return dictionaryService.getImage(word);

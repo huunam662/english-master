@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.image_cdn_link.contorller;
 
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.content.service.IContentService;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.enterprise.inject.Default;
 import java.util.List;
 
 @Tag(name = "Image CDN Link")
@@ -24,12 +26,14 @@ public class ImageCdnLinkController {
     ITopicService topicService;
 
     @GetMapping
+    @DefaultMessage("Get successfully")
     public List<String> getImageCdnLink() {
 
         return contentService.getImageCdnLink();
     }
 
     @GetMapping("topic")
+    @DefaultMessage("Get successfully")
     public List<String> getImageCdnLinkTopic() {
 
         return topicService.getImageCdnLinkTopic();

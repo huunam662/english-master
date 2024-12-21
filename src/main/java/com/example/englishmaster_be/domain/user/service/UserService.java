@@ -2,6 +2,7 @@ package com.example.englishmaster_be.domain.user.service;
 
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.exam.dto.response.ExamResultResponse;
+import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.user.dto.request.*;
 import com.example.englishmaster_be.mapper.MockTestMapper;
@@ -62,9 +63,9 @@ public class UserService implements IUserService {
             if (user.getAvatar() != null && !user.getAvatar().isEmpty() && user.getAvatar().startsWith("https://s3.meu-solutions.com/"))
                 contentRepository.deleteByContentData(user.getAvatar());
 
-            String avatarPathResponse = uploadService.upload(changeProfileRequest.getAvatar(), "/", false, null, null);
+            FileResponse fileResponse = uploadService.upload(changeProfileRequest.getAvatar(), "/", Boolean.FALSE);
 
-            user.setAvatar(avatarPathResponse);
+            user.setAvatar(fileResponse.getUrl());
         }
 
         UserMapper.INSTANCE.flowToUserEntity(changeProfileRequest, user);

@@ -33,12 +33,12 @@ public class DetailMockTestEntity {
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
     @Column(name = "create_at")
-    LocalDateTime createAt = LocalDateTime.now();
+    LocalDateTime createAt;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@UpdateTimestamp
 	@Column(name = "update_at")
-	LocalDateTime updateAt = LocalDateTime.now();
+	LocalDateTime updateAt;
 
     @ManyToOne
     @JoinColumn(name = "mock_test_id", referencedColumnName = "id")
@@ -56,4 +56,16 @@ public class DetailMockTestEntity {
     @JoinColumn(name = "update_by", referencedColumnName = "id")
     UserEntity userUpdate;
 
+
+
+    @PrePersist
+    void onCreate() {
+        createAt = LocalDateTime.now();
+        updateAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    void onUpdate() {
+        updateAt = LocalDateTime.now();
+    }
 }

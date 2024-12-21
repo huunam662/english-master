@@ -1,6 +1,8 @@
 package com.example.englishmaster_be.domain.file_storage.service;
 
 
+import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
+import com.example.englishmaster_be.domain.file_storage.dto.response.ResourceResponse;
 import com.example.englishmaster_be.exception.template.ResourceNotFoundException;
 import com.example.englishmaster_be.value.BucketValue;
 import com.example.englishmaster_be.value.FileValue;
@@ -62,19 +64,29 @@ public class FileStorageService implements IFileStorageService {
 
 
     @Override
-    public Resource load(String filename) {
+    public ResourceResponse load(String fileName) {
 
         Bucket bucket = StorageClient.getInstance().bucket(bucketValue.getBucketNameStudentNodejs());
 
         Storage storage = bucket.getStorage();
 
-        Blob blob = storage.get(bucketValue.getBucketNameStudentNodejs(), filename);
+        if(fileName.contains(fileValue.getPrefixLinkFileShow()))
+            fileName = fileName.replaceFirst(fileValue.getPrefixLinkFileShow(), "");
+
+        Blob blob = storage.get(bucketValue.getBucketNameStudentNodejs(), fileName);
 
         if(blob == null) throw new ResourceNotFoundException("Image not found");
 
-        byte[] content = blob.getContent();
+        byte[] inputStream = blob.getContent();
 
-        return new ByteArrayResource(content);
+        String contentType = blob.getContentType() != null ? blob.getContentType() : "application/octet-stream";
+
+        return ResourceResponse.builder()
+                .fileName(blob.getName())
+                .contentType(contentType)
+                .contentLength(blob.getSize())
+                .resource(new ByteArrayResource(inputStream))
+                .build();
     }
 
 //    @Override
@@ -93,14 +105,19 @@ public class FileStorageService implements IFileStorageService {
 
     @SneakyThrows
     @Override
-    public Blob save(MultipartFile file) {
+    public FileResponse save(MultipartFile file) {
         try {
 
             String fileName = nameFile(file);
 
             Bucket bucket = StorageClient.getInstance().bucket(bucketValue.getBucketNameStudentNodejs());
 
-            return bucket.create(fileName, file.getBytes(), file.getContentType());
+            Blob blob = bucket.create(fileName, file.getBytes(), file.getContentType());
+
+            return FileResponse.builder()
+                    .url(fileValue.getPrefixLinkFileShow() + blob.getName())
+                    .type(blob.getContentType())
+                    .build();
 
         } catch (Exception e) {
             if (e instanceof FileAlreadyExistsException) {
@@ -143,6 +160,9 @@ public class FileStorageService implements IFileStorageService {
 
     @Override
     public boolean delete(String filename) {
+
+        if(filename.contains(fileValue.getPrefixLinkFileShow()))
+            filename = filename.replaceFirst(fileValue.getPrefixLinkFileShow(), "");
 
         Bucket bucket = StorageClient.getInstance().bucket(bucketValue.getBucketNameStudentNodejs());
 

@@ -1,6 +1,8 @@
 package com.example.englishmaster_be.domain.news.dto.request;
 
+import io.swagger.annotations.ApiModelProperty;
 import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
@@ -19,12 +21,16 @@ public class NewsRequest {
     @Hidden
     UUID newsId;
 
+    @Schema(description = "Tiêu đề")
     String title;
 
+    @Schema(description = "Nội dung")
     String content;
 
+    @Schema(description = "Kích hoạt")
     Boolean enable;
 
+    @Hidden
     MultipartFile image;
 
 }

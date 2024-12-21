@@ -29,7 +29,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 @Component
@@ -77,8 +76,6 @@ public class AuthUtil {
 
         SessionActiveEntity sessionActive = sessionActiveService.saveSessionActive(user, jwtToken);
 
-        otpService.updateOtpStatus(user.getEmail(), otpCode, OtpStatusEnum.USED);
-
         logoutUser();
 
         return AuthMapper.INSTANCE.toUserAuthResponse(sessionActive, jwtToken);
@@ -98,7 +95,7 @@ public class AuthUtil {
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
-        otpRecord.setStatus(OtpStatusEnum.VERIFIED);
+        otpRecord.setStatus(OtpStatusEnum.USED);
         otpRepository.save(otpRecord);
     }
 

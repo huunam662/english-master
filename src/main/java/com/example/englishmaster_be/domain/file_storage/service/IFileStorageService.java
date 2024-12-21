@@ -1,5 +1,7 @@
 package com.example.englishmaster_be.domain.file_storage.service;
 
+import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
+import com.example.englishmaster_be.domain.file_storage.dto.response.ResourceResponse;
 import com.google.cloud.storage.Blob;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,9 +13,9 @@ public interface IFileStorageService {
 
     void init();
 
-    Resource load(String filename);
+    ResourceResponse load(String fileName);
 
-    Blob save(MultipartFile file);
+    FileResponse save(MultipartFile file);
 
     String nameFile(MultipartFile file);
 

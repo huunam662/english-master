@@ -59,7 +59,7 @@ public class InvalidTokenService implements IInvalidTokenService {
 
         InvalidTokenEntity invalidToken = InvalidTokenEntity.builder()
                 .expireTime(expireTime)
-                .createAt(LocalDateTime.now())
+                .createAt(LocalDateTime.now(ZoneId.systemDefault()))
                 .token(sessionActive.getToken())
                 .user(sessionActive.getUser())
                 .type(typeInvalid)

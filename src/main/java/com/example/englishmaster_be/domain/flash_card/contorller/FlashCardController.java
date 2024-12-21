@@ -15,6 +15,8 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -31,7 +33,7 @@ public class FlashCardController {
 
     @GetMapping(value = "/{flashCardId:.+}/listFlashCardWord")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show list flashcard word successfully")
+    @DefaultMessage("Show list successfully")
     public FlashCardWordListResponse getWordToFlashCard(@PathVariable UUID flashCardId){
 
         FlashCardEntity flashCard = flashCardService.getFlashCardById(flashCardId);
@@ -42,7 +44,7 @@ public class FlashCardController {
 
     @GetMapping(value = "/listFlashCardUser")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show list flashcard successfully")
+    @DefaultMessage("Show list successfully")
     public List<FlashCardResponse> listFlashCardUser(){
 
         List<FlashCardEntity> flashCardList = flashCardService.getListFlashCardByCurrentUser();
@@ -53,8 +55,13 @@ public class FlashCardController {
 
     @PostMapping(value = "/addFlashCardUser", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Create flashcard successfully")
-    public FlashCardResponse addFlashCardUser(@ModelAttribute FlashCardRequest flashCardRequest){
+    @DefaultMessage("Save successfully")
+    public FlashCardResponse addFlashCardUser(
+            @ModelAttribute FlashCardRequest flashCardRequest,
+            @RequestPart MultipartFile flashCardImage
+    ){
+
+        flashCardRequest.setFlashCardImage(flashCardImage);
 
         FlashCardEntity flashCard = flashCardService.saveFlashCard(flashCardRequest);
 
@@ -63,10 +70,15 @@ public class FlashCardController {
 
     @PutMapping(value = "/{flashCardId:.+}/updateFlashCard", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Update flashcard successfully")
-    public FlashCardResponse updateFlashCard(@PathVariable UUID flashCardId, @ModelAttribute FlashCardRequest flashCardRequest){
+    @DefaultMessage("Save successfully")
+    public FlashCardResponse updateFlashCard(
+            @PathVariable UUID flashCardId,
+            @ModelAttribute FlashCardRequest flashCardRequest,
+            @RequestPart MultipartFile flashCardImage
+    ){
 
         flashCardRequest.setFlashCardId(flashCardId);
+        flashCardRequest.setFlashCardImage(flashCardImage);
 
         FlashCardEntity flashCard = flashCardService.saveFlashCard(flashCardRequest);
 
@@ -75,7 +87,7 @@ public class FlashCardController {
 
     @DeleteMapping(value = "/{flashCardId:.+}/removeFlashCard")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Delete flashcard successfully")
+    @DefaultMessage("Delete successfully")
     public void removeWord(@PathVariable UUID flashCardId){
 
         flashCardService.delete(flashCardId);

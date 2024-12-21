@@ -39,16 +39,30 @@ public class FeedbackEntity {
     @Column(name = "avatar")
     String avatar;
 
+    Integer star;
+
     Boolean enable;
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
     @Column(name = "create_at")
-    LocalDateTime createAt = LocalDateTime.now();
+    LocalDateTime createAt;
 
     @Temporal(TemporalType.TIMESTAMP)
     @UpdateTimestamp
     @Column(name = "update_at")
-    LocalDateTime updateAt = LocalDateTime.now();
+    LocalDateTime updateAt;
 
+
+
+    @PrePersist
+    void onCreate() {
+        createAt = LocalDateTime.now();
+        updateAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    void onUpdate() {
+        updateAt = LocalDateTime.now();
+    }
 }

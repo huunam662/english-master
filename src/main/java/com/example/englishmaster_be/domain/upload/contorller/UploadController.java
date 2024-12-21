@@ -2,8 +2,10 @@ package com.example.englishmaster_be.domain.upload.contorller;
 
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +15,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.UUID;
 
 @Tag(name = "Upload")
@@ -25,12 +28,14 @@ public class UploadController {
     IUploadService uploadService;
 
     @PostMapping(value = "/file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @DefaultMessage("Successfully uploaded file_storage")
-    public String uploadFile(
-            @RequestParam("file") MultipartFile file,
+    @DefaultMessage("Uploaded file successfully")
+    public FileResponse uploadFile(
+            @RequestPart("file") MultipartFile file,
             @RequestParam(value = "dir", defaultValue = "/") String dir,
             @RequestParam(value = "isPrivateFile", defaultValue = "false") boolean isPrivateFile,
+            @Schema(description = "id of topic type UUID, required is false")
             @RequestParam(value = "topicId", required = false) UUID topicId,
+            @Schema(description = "id of topic type UUID, required is false")
             @RequestParam(value = "code", required = false) String code
     ) {
 
@@ -38,7 +43,7 @@ public class UploadController {
     }
 
     @DeleteMapping
-    @DefaultMessage("Successfully delete file_storage")
+    @DefaultMessage("Delete file successfully")
     @SneakyThrows
     public void deleteFile(@RequestBody FileDeleteRequest dto) {
 

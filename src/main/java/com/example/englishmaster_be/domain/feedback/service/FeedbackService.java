@@ -5,6 +5,9 @@ import com.example.englishmaster_be.common.thread.MessageResponseHolder;
 import com.example.englishmaster_be.domain.file_storage.service.IFileStorageService;
 import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackRequest;
 import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackFilterRequest;
+import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
+import com.example.englishmaster_be.domain.upload.service.IUploadService;
+import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.FeedbackMapper;
 import com.example.englishmaster_be.model.feedback.FeedbackRepository;
@@ -12,19 +15,19 @@ import com.example.englishmaster_be.model.feedback.QFeedbackEntity;
 import com.example.englishmaster_be.helper.FeedbackHelper;
 import com.example.englishmaster_be.model.feedback.FeedbackEntity;
 import com.example.englishmaster_be.domain.feedback.dto.response.FeedbackResponse;
-import com.google.cloud.storage.Blob;
+import com.example.englishmaster_be.model.user.UserEntity;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -37,7 +40,10 @@ public class FeedbackService implements IFeedbackService {
 
     FeedbackRepository feedbackRepository;
 
-    IFileStorageService fileStorageService;
+    IUserService userService;
+
+    IUploadService uploadService;
+
 
 
     @Override
@@ -88,9 +94,8 @@ public class FeedbackService implements IFeedbackService {
 
         OrderSpecifier<?> orderSpecifier = FeedbackHelper.buildFeedbackOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
 
-        if(orderSpecifier != null) query.orderBy(orderSpecifier);
-
-        query.offset(filterResponse.getOffset())
+        query.orderBy(orderSpecifier)
+                .offset(filterResponse.getOffset())
                 .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
@@ -99,6 +104,8 @@ public class FeedbackService implements IFeedbackService {
 
         return filterResponse;
     }
+
+
     @Override
     public FilterResponse<?> getListFeedbackOfUser(FeedbackFilterRequest filterRequest) {
 
@@ -143,24 +150,18 @@ public class FeedbackService implements IFeedbackService {
     @Override
     public FeedbackEntity saveFeedback(FeedbackRequest feedbackRequest) {
 
+        UserEntity user = userService.currentUser();
+
         FeedbackEntity feedback;
 
         if(feedbackRequest.getFeedbackId() != null)
             feedback = getFeedbackById(feedbackRequest.getFeedbackId());
 
-        else feedback = FeedbackEntity.builder()
-                .createAt(LocalDateTime.now())
-                .build();
+        else feedback = FeedbackEntity.builder().build();
 
         FeedbackMapper.INSTANCE.flowToFeedbackEntity(feedbackRequest, feedback);
+        feedback.setAvatar(user.getAvatar());
         feedback.setEnable(Boolean.TRUE);
-
-        if (feedbackRequest.getAvatar() != null && !feedbackRequest.getAvatar().isEmpty()) {
-
-            Blob blobResultResponse = fileStorageService.save(feedbackRequest.getAvatar());
-
-            feedback.setAvatar(blobResultResponse.getName());
-        }
 
         return feedbackRepository.save(feedback);
     }
@@ -182,12 +183,17 @@ public class FeedbackService implements IFeedbackService {
 
     @Transactional
     @Override
+    @SneakyThrows
     public void deleteFeedback(UUID feedbackId) {
 
         FeedbackEntity feedback = getFeedbackById(feedbackId);
 
         if(feedback.getAvatar() != null)
-            fileStorageService.delete(feedback.getAvatar());
+            uploadService.delete(
+                    FileDeleteRequest.builder()
+                            .filepath(feedback.getAvatar())
+                            .build()
+            );
 
         feedbackRepository.delete(feedback);
     }

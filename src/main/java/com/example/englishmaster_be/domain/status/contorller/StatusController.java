@@ -25,7 +25,7 @@ public class StatusController {
     IStatusService statusService;
 
     @PostMapping("/createStatus")
-    @DefaultMessage("Create StatusEntity successfully")
+    @DefaultMessage("Create status successfully")
     public StatusResponse createStatus(@RequestBody StatusRequest statusRequest) {
 
         StatusEntity statusEntity = statusService.saveStatus(statusRequest);
@@ -34,7 +34,7 @@ public class StatusController {
     }
 
     @PutMapping("/updateStatus")
-    @DefaultMessage("Update StatusEntity successfully")
+    @DefaultMessage("Update status successfully")
     public StatusResponse updateStatus(@RequestBody StatusRequest statusRequest) {
 
         StatusEntity status = statusService.saveStatus(statusRequest);
@@ -43,7 +43,7 @@ public class StatusController {
     }
 
     @GetMapping("/getStatusByTypeId/{id}")
-    @DefaultMessage("List StatusEntity successfully")
+    @DefaultMessage("List status successfully")
     public List<StatusResponse> getStatusByTypeId(@PathVariable("id") UUID id) {
 
         List<StatusEntity> statusEntityList = statusService.getAllStatusByType(id);
@@ -52,7 +52,7 @@ public class StatusController {
     }
 
     @GetMapping("/getStatusById/{id}")
-    @DefaultMessage("Get StatusEntity successfully")
+    @DefaultMessage("Get status successfully")
     public StatusResponse getStatusById(@PathVariable("id") UUID id) {
 
         StatusEntity status = statusService.getStatusById(id);

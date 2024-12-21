@@ -2,6 +2,8 @@ package com.example.englishmaster_be.domain.content.service;
 
 import com.example.englishmaster_be.common.thread.MessageResponseHolder;
 import com.example.englishmaster_be.domain.content.dto.request.ContentRequest;
+import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
+import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.ContentMapper;
 import com.example.englishmaster_be.model.content.ContentEntity;
@@ -13,6 +15,8 @@ import com.example.englishmaster_be.domain.cloudinary.service.ICloudinaryService
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.value.LinkValue;
+import com.google.cloud.storage.Bucket;
+import com.google.firebase.cloud.StorageClient;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -33,11 +39,11 @@ public class ContentService implements IContentService {
 
     ContentRepository contentRepository;
 
-    ICloudinaryService cloudinaryService;
-
     IQuestionService questionService;
 
     IUserService userService;
+
+    IUploadService uploadService;
 
 
     @Transactional
@@ -88,24 +94,21 @@ public class ContentService implements IContentService {
             content = getContentByContentId(contentRequest.getContentId());
 
         else content = ContentEntity.builder()
-                .createAt(LocalDateTime.now())
                 .userCreate(user)
                 .build();
 
         ContentMapper.INSTANCE.flowToContentEntity(contentRequest, content);
 
-        content.setQuestion(question);
-        content.setUpdateAt(LocalDateTime.now());
-        content.setUserUpdate(user);
+        if(contentRequest.getImage() != null && !contentRequest.getImage().isEmpty()){
 
-        if(contentRequest.getFile() != null){
+            FileResponse fileResponse = uploadService.upload(contentRequest.getImage());
 
-            CloudiaryUploadFileResponse cloudiaryUploadFileResponse = cloudinaryService.uploadFile(contentRequest.getFile());
-
-            content.setContentType(cloudiaryUploadFileResponse.getType());
-            content.setContentData(cloudiaryUploadFileResponse.getUrl());
-
+            content.setContentData(fileResponse.getUrl());
+            content.setContentType(fileResponse.getType());
         }
+
+        content.setQuestion(question);
+        content.setUserUpdate(user);
 
         return contentRepository.save(content);
     }
@@ -122,6 +125,7 @@ public class ContentService implements IContentService {
                 .map(linkCdn -> linkValue.getLinkFileShowImageBE() + linkCdn)
                 .toList();
     }
+
 
 
 }

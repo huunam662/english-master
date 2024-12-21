@@ -16,6 +16,8 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -30,27 +32,33 @@ public class PartController {
     IPartService partService;
 
 
-    @PostMapping(value = "/create")
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Create PartEntity successfully")
+    @DefaultMessage("Create part successfully")
     public PartResponse createPart(
-            @ModelAttribute PartRequest partRequest
+            @ModelAttribute("partRequest") PartRequest partRequest,
+            @RequestPart("file") MultipartFile file
     ) {
+
+        partRequest.setFile(file);
 
         PartEntity part = partService.savePart(partRequest);
 
         return PartMapper.INSTANCE.toPartResponse(part);
     }
 
-    @PutMapping(value = "/{partId:.+}/update")
+
+    @PutMapping(value = "/{partId:.+}/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Update PartEntity successfully")
+    @DefaultMessage("Update part successfully")
     public PartResponse updatePart(
             @PathVariable UUID partId,
-            @ModelAttribute PartRequest partRequest
+            @ModelAttribute("partRequest") PartRequest partRequest,
+            @RequestPart("file") MultipartFile file
     ) {
 
         partRequest.setPartId(partId);
+        partRequest.setFile(file);
 
         PartEntity part = partService.savePart(partRequest);
 
@@ -59,21 +67,24 @@ public class PartController {
 
     @PutMapping(value = "/{partId:.+}/uploadfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Upload file_storage PartEntity successfully")
+    @DefaultMessage("Upload file content part successfully")
     public PartResponse uploadFilePart(
             @PathVariable UUID partId,
-            @ModelAttribute UploadMultipleFileRequest uploadMultiFileRequest
+            @RequestPart("contentData") MultipartFile contentData
     ) {
 
-        PartEntity part = partService.uploadFilePart(partId, uploadMultiFileRequest);
+        PartEntity part = partService.uploadFilePart(partId, contentData);
 
         return PartMapper.INSTANCE.toPartResponse(part);
     }
 
     @PutMapping(value = "/{partId:.+}/uploadText")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Upload file_storage PartEntity successfully")
-    public PartResponse uploadTextPart(@PathVariable UUID partId, @RequestBody PartSaveContentRequest uploadTextRequest) {
+    @DefaultMessage("Upload file part content successfully")
+    public PartResponse uploadTextPart(
+            @PathVariable UUID partId,
+            @RequestBody PartSaveContentRequest uploadTextRequest
+    ) {
 
         PartEntity part = partService.uploadTextPart(partId, uploadTextRequest);
 
@@ -81,7 +92,7 @@ public class PartController {
     }
 
     @GetMapping(value = "/listPart")
-    @DefaultMessage("Show PartEntity successfully")
+    @DefaultMessage("Show part successfully")
     public List<PartResponse> getAllPart() {
 
         List<PartEntity> partEntityList = partService.getListPart();
@@ -91,7 +102,7 @@ public class PartController {
 
     @DeleteMapping(value = "/{partId:.+}/delete")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Delete PartEntity successfully")
+    @DefaultMessage("Delete part successfully")
     public void deletePart(@PathVariable UUID partId) {
 
         partService.deletePart(partId);
@@ -99,7 +110,7 @@ public class PartController {
 
 
     @GetMapping(value = "/{partId:.+}/content")
-    @DefaultMessage("Show information PartEntity successfully")
+    @DefaultMessage("Show information part successfully")
     public PartResponse getPartToId(
             @PathVariable UUID partId
     ) {

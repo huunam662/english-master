@@ -152,7 +152,6 @@ public class CommentService implements ICommentService {
             throw new BadRequestException("Don't update CommentEntity");
 
         comment.setContent(commentRequest.getCommentContent());
-        comment.setUpdateAt(LocalDateTime.now());
 
         comment  = commentRepository.save(comment);
 

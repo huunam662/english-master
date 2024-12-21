@@ -1,19 +1,17 @@
 package com.example.englishmaster_be.domain.part.service;
 
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
-import com.example.englishmaster_be.util.GetExtensionUtil;
+import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
+import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
 import com.example.englishmaster_be.model.part.PartRepository;
-import com.example.englishmaster_be.shared.upload_file.dto.request.UploadMultipleFileRequest;
 import com.example.englishmaster_be.domain.part.dto.request.PartSaveContentRequest;
 import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.PartMapper;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.domain.file_storage.service.IFileStorageService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.google.cloud.storage.Blob;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -31,13 +29,11 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PartService implements IPartService {
 
-    GetExtensionUtil getExtensionHelper;
-
     PartRepository partRepository;
 
     IUserService userService;
 
-    IFileStorageService fileStorageService;
+    IUploadService uploadService;
 
 
     @Transactional
@@ -48,7 +44,7 @@ public class PartService implements IPartService {
 
         PartEntity partEntity;
 
-        String messageBadRequestException = "Create PartEntity fail: The PartEntity name is already exist";
+        String messageBadRequestException = "Create part fail: The part name is already exist";
 
         if(partRequest.getPartId() != null){
 
@@ -63,20 +59,16 @@ public class PartService implements IPartService {
                 throw new BadRequestException(messageBadRequestException);
 
             partEntity = PartEntity.builder()
-                    .createAt(LocalDateTime.now())
                     .userCreate(user)
                     .build();
         }
 
         if(partRequest.getFile() != null && !partRequest.getFile().isEmpty()){
 
-            Blob blobResponse = fileStorageService.save(partRequest.getFile());
+            FileResponse fileResponse = uploadService.upload(partRequest.getFile());
 
-            String fileName = blobResponse.getName();
-            String contentType = blobResponse.getContentType();
-
-            partEntity.setContentData(fileName);
-            partEntity.setContentType(contentType);
+            partEntity.setContentData(fileResponse.getUrl());
+            partEntity.setContentType(fileResponse.getType());
         }
 
         PartMapper.INSTANCE.flowToPartEntity(partRequest, partEntity);
@@ -137,33 +129,24 @@ public class PartService implements IPartService {
 
     @Transactional
     @Override
-    public PartEntity uploadFilePart(UUID partId, UploadMultipleFileRequest uploadMultiFileRequest) {
+    public PartEntity uploadFilePart(UUID partId, MultipartFile contentData) {
+
+        if(
+                contentData == null
+                        ||
+                        contentData.isEmpty()
+        ) throw new CustomException(ErrorEnum.NULL_OR_EMPTY_FILE);
 
         UserEntity user = userService.currentUser();
 
         PartEntity partEntity = getPartToId(partId);
 
-        if(
-                uploadMultiFileRequest == null
-                        || uploadMultiFileRequest.getContentData() == null
-                        || uploadMultiFileRequest.getContentData().isEmpty()
-        ) throw new CustomException(ErrorEnum.NULL_OR_EMPTY_FILE);
+        FileResponse fileResponse = uploadService.upload(contentData);
 
+        partEntity.setContentType(fileResponse.getUrl());
+        partEntity.setContentData(fileResponse.getType());
+        partEntity.setUserUpdate(user);
 
-        for(MultipartFile file : uploadMultiFileRequest.getContentData()){
-
-            if(file == null || file.isEmpty()) continue;
-
-            if (partEntity.getContentType() != null && !partEntity.getContentType().isEmpty())
-                fileStorageService.delete(partEntity.getContentData());
-
-            Blob blobResponse = fileStorageService.save(file);
-
-            partEntity.setContentType(getExtensionHelper.typeFile(blobResponse.getName()));
-            partEntity.setContentData(blobResponse.getName());
-            partEntity.setUserUpdate(user);
-            partEntity.setUpdateAt(LocalDateTime.now());
-        }
 
         return partRepository.save(partEntity);
     }

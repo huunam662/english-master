@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.upload.service;
 
+import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.util.GetExtensionUtil;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.exception.template.CustomException;
@@ -12,7 +13,9 @@ import com.example.englishmaster_be.model.content.ContentRepository;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.annotation.PostConstruct;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
@@ -36,8 +39,6 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UploadService implements IUploadService {
 
-    GetExtensionUtil getExtensionHelper;
-
     RestTemplate restTemplate;
 
     ContentRepository contentRepository;
@@ -59,22 +60,32 @@ public class UploadService implements IUploadService {
         return headers;
     }
 
+    @Transactional
+    @Override
+    public FileResponse upload(MultipartFile file, String dir, boolean isPrivateFile, UUID topicId, String code) {
+
+        FileResponse fileResponse = upload(file, dir, isPrivateFile);
+
+        if(topicId != null && code != null && !code.isEmpty())
+            return handleSuccessfulUpload(fileResponse, topicId, code);
+
+        return fileResponse;
+    }
 
     @SneakyThrows
     @Override
-    public String upload(MultipartFile file, String dir, boolean isPrivateFile, UUID topicId, String code) {
+    public FileResponse upload(MultipartFile file, String dir, boolean isPrivateFile) {
 
-        if (file == null || file.isEmpty()) {
+        if (file == null || file.isEmpty())
             throw new BadRequestException("File is null or empty");
-        }
-        if (file.getContentType() == null) {
+
+        if (file.getContentType() == null)
             throw new BadRequestException("Invalid file_storage TypeEntity");
-        }
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         HttpHeaders headers = createHttpHeaders(MediaType.MULTIPART_FORM_DATA);
 
-        builder.part("file_storage", new ByteArrayResource(file.getBytes()) {
+        builder.part("file", new ByteArrayResource(file.getBytes()) {
             @Override
             public String getFilename() {
                 return file.getOriginalFilename();
@@ -85,33 +96,48 @@ public class UploadService implements IUploadService {
 
         HttpEntity<?> entity = new HttpEntity<>(builder.build(), headers);
         ResponseEntity<String> response = restTemplate.exchange(uploadValue.getUploadApiUrl(), HttpMethod.POST, entity, String.class);
-        if (response.getBody() == null) {
+
+        if (response.getBody() == null)
             throw new RuntimeException("Server response is empty");
-        }
+
         ObjectMapper objectMapper = new ObjectMapper();
         JsonNode jsonResponse = objectMapper.readTree(response.getBody());
         boolean isSuccess = jsonResponse.path("success").asBoolean();
-        if (isSuccess) {
-            String url = jsonResponse.path("responseData").path("url").asText();
-            if (topicId != null && code != null && !code.isEmpty()) {
-                return handleSuccessfulUpload(jsonResponse, topicId, code, file);
-            }
 
-            if(url == null || !url.startsWith("https"))
-                throw new RuntimeException("Upload failed");
-
-            return url;
-        } else {
+        if(!isSuccess){
             String errorMessage = jsonResponse.path("message").asText("Upload failed");
             throw new RuntimeException("ErrorEnum: " + errorMessage);
         }
 
+        JsonNode responseData = jsonResponse.path("responseData");
+        String url = responseData.path("url").asText();
 
+        if(url == null || !url.startsWith("https"))
+            throw new RuntimeException("Upload failed");
+
+        String typeFile = responseData.path("mimetype").asText(null);
+
+        return FileResponse.builder()
+                .url(url)
+                .type(typeFile)
+                .build();
     }
 
-    private String handleSuccessfulUpload(JsonNode jsonResponse, UUID topicId, String code, MultipartFile file) {
+    @Override
+    public FileResponse upload(MultipartFile file) {
+
+        String dir = "/";
+
+        boolean isPrivateFile = false;
+
+        return upload(file, dir, isPrivateFile);
+    }
+
+    @Transactional
+    protected FileResponse handleSuccessfulUpload(FileResponse fileResponse, UUID topicId, String code) {
+        
         UserEntity currentUser = userService.currentUser();
-        String url = jsonResponse.path("responseData").path("url").asText();
+
         String existsContent = contentRepository.findContentDataByTopicIdAndCode(topicId, code);
 
         if(existsContent != null)
@@ -120,13 +146,14 @@ public class UploadService implements IUploadService {
         ContentEntity content = ContentEntity.builder()
                 .topicId(topicId)
                 .code(code)
-                .contentType(getExtensionHelper.typeFile(file.getOriginalFilename()))
-                .contentData(url)
+                .contentType(fileResponse.getType())
+                .contentData(fileResponse.getUrl())
                 .userCreate(currentUser)
                 .userUpdate(currentUser)
                 .build();
         contentRepository.save(content);
-        return url;
+
+        return fileResponse;
     }
 
 

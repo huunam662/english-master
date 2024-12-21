@@ -5,6 +5,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -12,10 +13,15 @@ import java.util.List;
 @NoArgsConstructor
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class QuestionDto {
-    List<QuestionMultipleChoiceDto> questionMultipleChoices;
-    List<QuestionFillInBlankDto> questionFillInBlank;
-    List<QuestionMultipleChoiceDto> questionTFNotgivens;
-    List<QuestionMatchingDto> questionMatchings;
-    List<QuestionLabelDto> questionLabels;
+public class QuestionLabelDto {
+    UUID questionId;
+    String question;
+
+    boolean hasHints;
+
+    String image;
+
+    List<String> labels;
+
+
 }
