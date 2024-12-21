@@ -36,11 +36,9 @@ public class QuestionRequest {
 
     QuestionTypeEnum questionType;
 
-    @Hidden
-    MultipartFile contentImage;
+    String contentImage;
 
-    @Hidden
-    MultipartFile contentAudio;
+    String contentAudio;
 
     List<AnswerBasicRequest> listAnswer;
 

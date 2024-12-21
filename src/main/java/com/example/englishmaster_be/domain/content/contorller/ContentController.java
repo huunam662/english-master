@@ -63,30 +63,25 @@ public class ContentController {
         return ContentMapper.INSTANCE.toContentResponse(content);
     }
 
-    @PostMapping(value = "/create-content", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/create-content")
     @DefaultMessage("Create successfully")
     public ContentResponse createContent(
-            @RequestBody ContentRequest contentRequest,
-            @RequestPart MultipartFile image
+            @RequestBody ContentRequest contentRequest
     ) {
-
-        contentRequest.setImage(image);
 
         ContentEntity content = contentService.saveContent(contentRequest);
 
         return ContentMapper.INSTANCE.toContentResponse(content);
     }
 
-    @PutMapping(value = "/{contentId}/update-content", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{contentId}/update-content")
     @DefaultMessage("Update successfully")
     public ContentResponse updateContent(
             @PathVariable UUID contentId,
-            @ModelAttribute ContentRequest contentRequest,
-            @RequestPart MultipartFile image
+            @RequestBody ContentRequest contentRequest
     ) {
 
         contentRequest.setContentId(contentId);
-        contentRequest.setImage(image);
 
         ContentEntity content = contentService.saveContent(contentRequest);
 

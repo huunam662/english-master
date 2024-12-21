@@ -28,6 +28,7 @@ public class QuestionLabelService implements IQuestionLabelService {
     @Transactional
     @Override
     public QuestionLabelEntity addLabel(QuestionLabelRequest request) {
+
         QuestionEntity questionEntity = questionService.getQuestionById(request.getQuestionId());
 
         QuestionLabelEntity labelEntity=labelRepository.findByLabelAndQuestion(request.getLabel(),questionEntity).orElse(new QuestionLabelEntity());
@@ -40,6 +41,7 @@ public class QuestionLabelService implements IQuestionLabelService {
 
     @Override
     public List<QuestionLabelEntity> getLabelByIdQuestion(UUID questionId) {
+
         QuestionEntity questionEntity = questionService.getQuestionById(questionId);
 
         return labelRepository.findByQuestion(questionEntity);

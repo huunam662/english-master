@@ -3,6 +3,7 @@ package com.example.englishmaster_be.domain.news.service;
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
 import com.example.englishmaster_be.common.thread.MessageResponseHolder;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
+import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.mapper.NewsMapper;
 import com.example.englishmaster_be.domain.news.dto.request.NewsRequest;
@@ -17,6 +18,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -118,6 +120,7 @@ public class NewsService implements INewsService {
 
     @Transactional
     @Override
+    @SneakyThrows
     public NewsEntity saveNews(NewsRequest newsRequest) {
 
         NewsEntity news;
@@ -133,9 +136,14 @@ public class NewsService implements INewsService {
 
         if(newsRequest.getImage() != null && !newsRequest.getImage().isEmpty()){
 
-            FileResponse fileResponse = uploadService.upload(newsRequest.getImage());
+            if(news.getImage() != null && !news.getImage().isEmpty())
+                uploadService.delete(
+                        FileDeleteRequest.builder()
+                                .filepath(news.getImage())
+                                .build()
+                );
 
-            news.setImage(fileResponse.getUrl());
+            news.setImage(newsRequest.getImage());
         }
 
         return newsRepository.save(news);

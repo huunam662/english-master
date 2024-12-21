@@ -53,32 +53,27 @@ public class FlashCardController {
     }
 
 
-    @PostMapping(value = "/addFlashCardUser", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/addFlashCardUser")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Save successfully")
     public FlashCardResponse addFlashCardUser(
-            @ModelAttribute FlashCardRequest flashCardRequest,
-            @RequestPart MultipartFile flashCardImage
+            @RequestBody FlashCardRequest flashCardRequest
     ){
-
-        flashCardRequest.setFlashCardImage(flashCardImage);
 
         FlashCardEntity flashCard = flashCardService.saveFlashCard(flashCardRequest);
 
         return FlashCardMapper.INSTANCE.toFlashCardResponse(flashCard);
     }
 
-    @PutMapping(value = "/{flashCardId:.+}/updateFlashCard", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{flashCardId:.+}/updateFlashCard")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Save successfully")
     public FlashCardResponse updateFlashCard(
             @PathVariable UUID flashCardId,
-            @ModelAttribute FlashCardRequest flashCardRequest,
-            @RequestPart MultipartFile flashCardImage
+            @ModelAttribute FlashCardRequest flashCardRequest
     ){
 
         flashCardRequest.setFlashCardId(flashCardId);
-        flashCardRequest.setFlashCardImage(flashCardImage);
 
         FlashCardEntity flashCard = flashCardService.saveFlashCard(flashCardRequest);
 
