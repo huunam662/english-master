@@ -26,7 +26,6 @@ public class PartRequest {
 
 	String partType;
 
-	@Hidden
-	MultipartFile file;
+	String file;
 
 }

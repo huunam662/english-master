@@ -2,6 +2,7 @@ package com.example.englishmaster_be.domain.part.service;
 
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
+import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
 import com.example.englishmaster_be.model.part.PartRepository;
@@ -12,8 +13,10 @@ import com.example.englishmaster_be.mapper.PartMapper;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.domain.user.service.IUserService;
+import com.example.englishmaster_be.util.FileUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -29,6 +32,8 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PartService implements IPartService {
 
+    FileUtil fileUtil;
+
     PartRepository partRepository;
 
     IUserService userService;
@@ -38,6 +43,7 @@ public class PartService implements IPartService {
 
     @Transactional
     @Override
+    @SneakyThrows
     public PartEntity savePart(PartRequest partRequest) {
 
         UserEntity user = userService.currentUser();
@@ -65,10 +71,15 @@ public class PartService implements IPartService {
 
         if(partRequest.getFile() != null && !partRequest.getFile().isEmpty()){
 
-            FileResponse fileResponse = uploadService.upload(partRequest.getFile());
+            if(partEntity.getContentData() != null && !partEntity.getContentData().isEmpty())
+                uploadService.delete(
+                        FileDeleteRequest.builder()
+                                .filepath(partEntity.getContentData())
+                                .build()
+                );
 
-            partEntity.setContentData(fileResponse.getUrl());
-            partEntity.setContentType(fileResponse.getType());
+            partEntity.setContentData(partRequest.getFile());
+            partEntity.setContentType(fileUtil.typeFile(partRequest.getFile()));
         }
 
         PartMapper.INSTANCE.flowToPartEntity(partRequest, partEntity);

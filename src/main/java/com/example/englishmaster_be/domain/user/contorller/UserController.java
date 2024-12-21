@@ -7,6 +7,7 @@ import com.example.englishmaster_be.domain.user.dto.response.UserProfileResponse
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.mapper.UserMapper;
 import com.example.englishmaster_be.domain.user.service.IUserService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -41,15 +42,12 @@ public class UserController {
         return UserMapper.INSTANCE.toInformationUserResponse(currentUser);
     }
 
-    @PatchMapping(value = "/changeProfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PatchMapping(value = "/changeProfile")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Change profile user successfully")
     public UserProfileResponse changeProfile(
-            @ModelAttribute UserChangeProfileRequest changeProfileRequest,
-            @RequestPart("avatar") MultipartFile avatar
+            @RequestBody UserChangeProfileRequest changeProfileRequest
     ) {
-
-        changeProfileRequest.setAvatar(avatar);
 
         UserEntity user = userService.changeProfile(changeProfileRequest);
 

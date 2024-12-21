@@ -13,6 +13,7 @@ import com.example.englishmaster_be.domain.pack.service.IPackService;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.status.service.IStatusService;
+import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.mapper.AnswerMapper;
@@ -46,6 +47,7 @@ import com.example.englishmaster_be.model.topic.QTopicEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.topic.TopicRepository;
 import com.example.englishmaster_be.model.user.UserEntity;
+import com.example.englishmaster_be.util.FileUtil;
 import com.example.englishmaster_be.value.LinkValue;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -76,6 +78,8 @@ import java.util.stream.Collectors;
 public class TopicService implements ITopicService {
 
     LinkValue linkValue;
+
+    FileUtil fileUtil;
 
     JPAQueryFactory queryFactory;
 
@@ -112,6 +116,7 @@ public class TopicService implements ITopicService {
 
     @Transactional
     @Override
+    @SneakyThrows
     public TopicEntity saveTopic(TopicRequest topicRequest) {
 
         TopicEntity topic;
@@ -130,11 +135,17 @@ public class TopicService implements ITopicService {
 
         TopicMapper.INSTANCE.flowToTopicEntity(topicRequest, topic);
 
-        topic.setStatus(statusService.getStatusByName(StatusEnum.ACTIVE));
-        topic.setUserUpdate(user);
-        topic.setPack(pack);
+        if(topicRequest.getTopicImage() != null && !topicRequest.getTopicImage().isEmpty()){
 
+            if(topic.getTopicImage() != null && !topic.getTopicImage().isEmpty())
+                uploadService.delete(
+                        FileDeleteRequest.builder()
+                                .filepath(topic.getTopicImage())
+                                .build()
+                );
 
+            topic.setTopicImage(topicRequest.getTopicImage());
+        }
 
         if(topicRequest.getListPart() != null){
 
@@ -145,6 +156,10 @@ public class TopicService implements ITopicService {
 
             topic.setParts(partList);
         }
+
+        topic.setStatus(statusService.getStatusByName(StatusEnum.ACTIVE));
+        topic.setUserUpdate(user);
+        topic.setPack(pack);
 
         return topicRepository.save(topic);
     }
@@ -769,12 +784,9 @@ public class TopicService implements ITopicService {
 
             if (questionRequest.getContentImage() != null && !questionRequest.getContentImage().isEmpty()) {
 
-                FileResponse fileResponse = uploadService.upload(questionRequest.getContentImage());
-
-
                 ContentEntity content = ContentEntity.builder()
-                        .contentData(fileResponse.getUrl())
-                        .contentType(fileResponse.getType())
+                        .contentData(questionRequest.getContentImage())
+                        .contentType(fileUtil.typeFile(questionRequest.getContentImage()))
                         .question(question)
                         .userCreate(user)
                         .userUpdate(user)
@@ -789,11 +801,9 @@ public class TopicService implements ITopicService {
             }
             if (questionRequest.getContentAudio() != null && !questionRequest.getContentAudio().isEmpty()) {
 
-                FileResponse fileResponse = uploadService.upload(questionRequest.getContentAudio());
-
                 ContentEntity content = ContentEntity.builder()
-                        .contentData(fileResponse.getUrl())
-                        .contentType(fileResponse.getType())
+                        .contentData(questionRequest.getContentAudio())
+                        .contentType(fileUtil.typeFile(questionRequest.getContentAudio()))
                         .question(question)
                         .userCreate(user)
                         .userUpdate(user)
@@ -904,12 +914,9 @@ public class TopicService implements ITopicService {
 
         if (questionRequest.getContentImage() != null && !questionRequest.getContentImage().isEmpty()) {
 
-            FileResponse fileResponse = uploadService.upload(questionRequest.getContentImage());
-
-
             ContentEntity content = ContentEntity.builder()
-                    .contentData(fileResponse.getUrl())
-                    .contentType(fileResponse.getType())
+                    .contentData(questionRequest.getContentImage())
+                    .contentType(fileUtil.typeFile(questionRequest.getContentImage()))
                     .question(question)
                     .userCreate(user)
                     .userUpdate(user)
@@ -923,11 +930,9 @@ public class TopicService implements ITopicService {
 
         if (questionRequest.getContentAudio() != null && !questionRequest.getContentAudio().isEmpty()) {
 
-            FileResponse fileResponse = uploadService.upload(questionRequest.getContentAudio());
-
             ContentEntity content = ContentEntity.builder()
-                    .contentData(fileResponse.getUrl())
-                    .contentType(fileResponse.getType())
+                    .contentData(questionRequest.getContentImage())
+                    .contentType(fileUtil.typeFile(questionRequest.getContentAudio()))
                     .question(question)
                     .userCreate(user)
                     .userUpdate(user)

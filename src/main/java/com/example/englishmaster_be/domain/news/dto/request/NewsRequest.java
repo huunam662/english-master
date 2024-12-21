@@ -30,7 +30,6 @@ public class NewsRequest {
     @Schema(description = "Kích hoạt")
     Boolean enable;
 
-    @Hidden
-    MultipartFile image;
+    String image;
 
 }

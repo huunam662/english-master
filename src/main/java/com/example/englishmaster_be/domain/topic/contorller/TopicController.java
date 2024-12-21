@@ -52,16 +52,13 @@ public class TopicController {
         return TopicMapper.INSTANCE.toTopicResponse(topic);
     }
 
-    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Create topic successfully")
     public TopicResponse createTopic(
-            @ModelAttribute TopicRequest topicRequest,
-            @RequestPart(value = "topicImage", required = false) MultipartFile topicImage
+            @RequestBody TopicRequest topicRequest
     ) {
-
-        topicRequest.setTopicImage(topicImage);
-
+        
         TopicEntity topic = topicService.saveTopic(topicRequest);
 
         return TopicMapper.INSTANCE.toTopicResponse(topic);
@@ -96,17 +93,15 @@ public class TopicController {
 
 
 
-    @PutMapping(value = "/{topicId:.+}/updateTopic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{topicId:.+}/updateTopic")
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Update topic successfully")
     public TopicResponse updateTopic(
             @PathVariable UUID topicId,
-            @RequestBody TopicRequest topicRequest,
-            @RequestPart(value = "topicImage", required = false) MultipartFile topicImage
+            @RequestBody TopicRequest topicRequest
     ) {
 
         topicRequest.setTopicId(topicId);
-        topicRequest.setTopicImage(topicImage);
 
         TopicEntity topic = topicService.saveTopic(topicRequest);
 
@@ -193,22 +188,17 @@ public class TopicController {
         topicService.deletePartToTopic(topicId, partId);
     }
 
-    @PostMapping(value = "/{topicId:.+}/addQuestion", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{topicId:.+}/addQuestion")
     @PreAuthorize("hasRole('ADMIN')")
     public QuestionResponse addQuestionToTopic(
             @PathVariable UUID topicId,
-            @ModelAttribute QuestionRequest createQuestionDTO,
-            @RequestPart(required = false) MultipartFile contentImage,
-            @RequestPart(required = false) MultipartFile contentAudio
+            @ModelAttribute QuestionRequest createQuestionDTO
     ) {
-
-        createQuestionDTO.setContentImage(contentImage);
-        createQuestionDTO.setContentAudio(contentAudio);
 
         return topicService.addQuestionToTopic(topicId, createQuestionDTO);
     }
 
-    @PostMapping(value = "/{topicId:.+}/addListQuestion", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{topicId:.+}/addListQuestion")
     @PreAuthorize("hasRole('ADMIN')")
     public void addListQuestionToTopic(
             @PathVariable UUID topicId,

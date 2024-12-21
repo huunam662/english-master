@@ -34,7 +34,6 @@ public class FlashCardWordRequest {
 
     String note;
 
-    @Hidden
-    MultipartFile image;
+    String image;
 
 }

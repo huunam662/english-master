@@ -24,7 +24,6 @@ public class FlashCardRequest {
 
     String flashCardDescription;
 
-    @Hidden
-    MultipartFile flashCardImage;
+    String flashCardImage;
 
 }

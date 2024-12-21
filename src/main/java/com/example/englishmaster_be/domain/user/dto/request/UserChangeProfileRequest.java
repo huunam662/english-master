@@ -24,7 +24,6 @@ public class UserChangeProfileRequest {
     @Schema(description = "Phone number for the user", example = "0123456789")
     String phone;
 
-    @Hidden
-    MultipartFile avatar;
+    String avatar;
 
 }

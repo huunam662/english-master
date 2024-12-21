@@ -2,6 +2,7 @@ package com.example.englishmaster_be.domain.flash_card_word.service;
 
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.flash_card.service.IFlashCardService;
+import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.domain.flash_card_word.dto.request.FlashCardWordRequest;
@@ -17,6 +18,7 @@ import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -87,6 +89,7 @@ public class FlashCardWordService implements IFlashCardWordService {
 
     @Transactional
     @Override
+    @SneakyThrows
     public FlashCardWordEntity saveFlashCardWord(FlashCardWordRequest flashCardWordRequest) {
 
         UserEntity user = userService.currentUser();
@@ -111,10 +114,16 @@ public class FlashCardWordService implements IFlashCardWordService {
         flashCardWord.setUserUpdate(user);
         flashCardWord.setUpdateAt(LocalDateTime.now());
 
-        if(flashCardWordRequest.getImage() != null){
+        if(flashCardWordRequest.getImage() != null && !flashCardWordRequest.getImage().isEmpty()){
 
-            FileResponse fileResponse = uploadService.upload(flashCardWordRequest.getImage());
-            flashCardWord.setImage(fileResponse.getUrl());
+            if(flashCardWord.getImage() != null && !flashCardWord.getImage().isEmpty())
+                uploadService.delete(
+                        FileDeleteRequest.builder()
+                                .filepath(flashCardWord.getImage())
+                                .build()
+                );
+
+            flashCardWord.setImage(flashCardWordRequest.getImage());
         }
 
         return flashCardWordRepository.save(flashCardWord);

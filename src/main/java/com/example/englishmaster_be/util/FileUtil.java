@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor
-public class GetExtensionUtil {
+public class FileUtil {
 
     LinkValue linkValue;
 
@@ -26,8 +26,7 @@ public class GetExtensionUtil {
         String extension = this.getExtension(name);
 
         return switch (extension) {
-            case ".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG", ".gif", ".GIF" -> linkValue.getLinkBE() + "file_storage/showImage/";
-            case ".mp3" -> linkValue.getLinkBE() + "file_storage/showAudio/";
+            case ".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG", ".gif", ".GIF", ".mp3" -> linkValue.getLinkBE() + "file/show/";
             default -> "";
         };
     }
@@ -37,8 +36,8 @@ public class GetExtensionUtil {
         String extension = this.getExtension(filename);
 
         return switch (extension) {
-            case ".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG", ".gif", ".GIF" -> "IMAGE";
-            case ".mp3" -> "AUDIO";
+            case ".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG", ".gif", ".GIF" -> String.format("image/%s", extension.replaceFirst(".", "").toLowerCase());
+            case ".mp3" -> "audio/mpeg";
             default -> "TEXT";
         };
     }

@@ -32,15 +32,12 @@ public class PartController {
     IPartService partService;
 
 
-    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/create")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Create part successfully")
     public PartResponse createPart(
-            @ModelAttribute("partRequest") PartRequest partRequest,
-            @RequestPart("file") MultipartFile file
+            @RequestBody PartRequest partRequest
     ) {
-
-        partRequest.setFile(file);
 
         PartEntity part = partService.savePart(partRequest);
 
@@ -48,17 +45,15 @@ public class PartController {
     }
 
 
-    @PutMapping(value = "/{partId:.+}/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{partId:.+}/update")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Update part successfully")
     public PartResponse updatePart(
             @PathVariable UUID partId,
-            @ModelAttribute("partRequest") PartRequest partRequest,
-            @RequestPart("file") MultipartFile file
+            @RequestBody PartRequest partRequest
     ) {
 
         partRequest.setPartId(partId);
-        partRequest.setFile(file);
 
         PartEntity part = partService.savePart(partRequest);
 
