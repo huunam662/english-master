@@ -77,6 +77,7 @@ public class FlashCardService implements IFlashCardService {
 
     @Transactional
     @Override
+    @SneakyThrows
     public FlashCardEntity saveFlashCard(FlashCardRequest flashCardRequest) {
 
         UserEntity user = userService.currentUser();
@@ -92,11 +93,16 @@ public class FlashCardService implements IFlashCardService {
 
         FlashCardMapper.INSTANCE.flowToFlashCardEntity(flashCardRequest, flashCard);
 
-        if(flashCardRequest.getFlashCardImage() != null){
+        if(flashCardRequest.getFlashCardImage() != null && !flashCardRequest.getFlashCardImage().isEmpty()){
 
-            FileResponse fileResponse = uploadService.upload(flashCardRequest.getFlashCardImage());
+            if(flashCard.getFlashCardImage() != null && !flashCard.getFlashCardImage().isEmpty())
+                uploadService.delete(
+                        FileDeleteRequest.builder()
+                                .filepath(flashCard.getFlashCardImage())
+                                .build()
+                );
 
-            flashCard.setFlashCardImage(fileResponse.getUrl());
+            flashCard.setFlashCardImage(flashCardRequest.getFlashCardImage());
         }
 
         return flashCardRepository.save(flashCard);

@@ -78,15 +78,12 @@ public class NewsController {
     }
 
 
-    @PostMapping(value = "/createNews", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/createNews")
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Create news successfully")
     public NewsResponse createNews(
-            @ModelAttribute NewsRequest newsRequest,
-            @RequestPart("image") MultipartFile image
+            @RequestBody NewsRequest newsRequest
     ){
-
-        newsRequest.setImage(image);
 
         NewsEntity news = newsService.saveNews(newsRequest);
 
@@ -99,7 +96,7 @@ public class NewsController {
     @DefaultMessage("Update NewsEntity successfully")
     public NewsResponse updateNews(
             @PathVariable UUID newsId,
-            @ModelAttribute NewsRequest newsRequest
+            @RequestBody NewsRequest newsRequest
     ){
 
         newsRequest.setNewsId(newsId);

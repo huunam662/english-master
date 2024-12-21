@@ -29,6 +29,7 @@ import com.example.englishmaster_be.model.answer.AnswerRepository;
 import com.example.englishmaster_be.model.content.ContentRepository;
 import com.example.englishmaster_be.model.part.PartRepository;
 import com.example.englishmaster_be.model.question.QuestionRepository;
+import com.example.englishmaster_be.util.FileUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -53,6 +54,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class QuestionService implements IQuestionService {
+
+    FileUtil fileUtil;
 
     QuestionRepository questionRepository;
 
@@ -145,12 +148,10 @@ public class QuestionService implements IQuestionService {
                     }
                 }
 
-                FileResponse fileResponse = uploadService.upload(questionRequest.getContentImage());
-
                 ContentEntity content = ContentEntity.builder()
                         .question(question)
-                        .contentData(fileResponse.getUrl())
-                        .contentType(fileResponse.getType())
+                        .contentData(questionRequest.getContentImage())
+                        .contentType(fileUtil.typeFile(questionRequest.getContentImage()))
                         .userCreate(user)
                         .userUpdate(user)
                         .createAt(LocalDateTime.now())
@@ -176,12 +177,10 @@ public class QuestionService implements IQuestionService {
                     }
                 }
 
-                FileResponse fileResponse = uploadService.upload(questionRequest.getContentAudio());
-
                 ContentEntity content = ContentEntity.builder()
                         .question(question)
-                        .contentData(fileResponse.getUrl())
-                        .contentType(fileResponse.getType())
+                        .contentData(questionRequest.getContentAudio())
+                        .contentType(fileUtil.typeFile(questionRequest.getContentAudio()))
                         .userCreate(user)
                         .userUpdate(user)
                         .createAt(LocalDateTime.now())
@@ -210,12 +209,10 @@ public class QuestionService implements IQuestionService {
 
             QuestionEntity createQuestion = questionRepository.save(question);
 
-            FileResponse fileResponse = uploadService.upload(questionRequest.getContentImage());
-
             ContentEntity content = ContentEntity.builder()
                     .question(createQuestion)
-                    .contentType(fileResponse.getType())
-                    .contentData(fileResponse.getUrl())
+                    .contentType(questionRequest.getContentImage())
+                    .contentData(fileUtil.typeFile(questionRequest.getContentImage()))
                     .userCreate(user)
                     .userUpdate(user)
                     .createAt(LocalDateTime.now())

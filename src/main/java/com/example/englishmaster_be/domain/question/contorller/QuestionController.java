@@ -38,36 +38,27 @@ public class QuestionController {
     IAnswerService answerService;
 
 
-    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Create question successfully")
     public QuestionResponse createQuestion(
-            @ModelAttribute QuestionRequest questionRequest,
-            @RequestPart(value = "contentImage", required = false) MultipartFile contentImage,
-            @RequestPart(value = "contentAudio", required = false) MultipartFile contentAudio
+            @RequestBody QuestionRequest questionRequest
     ) {
-
-        questionRequest.setContentImage(contentImage);
-        questionRequest.setContentAudio(contentAudio);
 
         QuestionEntity question = questionService.saveQuestion(questionRequest);
 
         return QuestionMapper.INSTANCE.toQuestionResponse(question);
     }
 
-    @PutMapping(value = "/{questionId:.+}/editQuestion", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{questionId:.+}/editQuestion")
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Update question to topic successfully")
     public QuestionResponse editQuestion(
             @PathVariable UUID questionId,
-            @ModelAttribute QuestionRequest questionRequest,
-            @RequestPart(value = "contentImage", required = false) MultipartFile contentImage,
-            @RequestPart(value = "contentAudio", required = false) MultipartFile contentAudio
+            @RequestBody QuestionRequest questionRequest
     ) {
 
         questionRequest.setQuestionId(questionId);
-        questionRequest.setContentImage(contentImage);
-        questionRequest.setContentAudio(contentAudio);
 
         QuestionEntity question = questionService.saveQuestion(questionRequest);
 
@@ -178,6 +169,7 @@ public class QuestionController {
     @GetMapping("/{partId}/list-question")
     @DefaultMessage("All question from part successfully")
     public QuestionDto getAllQuestionFromPart(@PathVariable UUID partId) {
+
         return questionService.getAllQuestionFromPart(partId);
     }
 

@@ -33,9 +33,9 @@ public class UploadController {
             @RequestPart("file") MultipartFile file,
             @RequestParam(value = "dir", defaultValue = "/") String dir,
             @RequestParam(value = "isPrivateFile", defaultValue = "false") boolean isPrivateFile,
-            @Schema(description = "id of topic type UUID, required is false")
+            @Schema(description = "Id of topic -> type UUID, required is false")
             @RequestParam(value = "topicId", required = false) UUID topicId,
-            @Schema(description = "id of topic type UUID, required is false")
+            @Schema(description = "Code -> type String, required is false")
             @RequestParam(value = "code", required = false) String code
     ) {
 

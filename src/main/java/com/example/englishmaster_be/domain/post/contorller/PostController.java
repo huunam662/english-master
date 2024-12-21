@@ -38,7 +38,7 @@ public class PostController {
 
 
     @GetMapping(value = "/listPost")
-    @DefaultMessage("List PostEntity successfully")
+    @DefaultMessage("List post successfully")
     public FilterResponse<?> listPost(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) int page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) int size,
@@ -58,7 +58,7 @@ public class PostController {
 
     @PostMapping(value = "/createPost")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Create PostEntity successfully")
+    @DefaultMessage("Create post successfully")
     public PostResponse createPost(@RequestBody PostRequest postRequest){
 
         PostEntity post = postService.savePost(postRequest);
@@ -68,7 +68,7 @@ public class PostController {
 
     @PatchMapping(value = "/{postId:.+}/updatePost")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Update PostEntity successfully")
+    @DefaultMessage("Update post successfully")
     public PostResponse updatePost(@PathVariable UUID postId, @RequestBody PostRequest postRequest){
 
         postRequest.setPostId(postId);
@@ -79,7 +79,7 @@ public class PostController {
     }
 
     @GetMapping(value = "/{postId:.+}/getAllCommentToPost")
-    @DefaultMessage("Show list CommentEntity successfully")
+    @DefaultMessage("Show list comment successfully")
     public List<CommentResponse> getListCommentToPostId(@PathVariable UUID postId){
 
         List<CommentEntity> commentEntityList = postService.getListCommentToPostId(postId);
@@ -89,7 +89,7 @@ public class PostController {
 
     @DeleteMapping(value = "/{postId:.+}/deletePost")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Delete PostEntity successfully")
+    @DefaultMessage("Delete post successfully")
     public void deletePost(@PathVariable UUID postId){
 
         postService.deletePost(postId);

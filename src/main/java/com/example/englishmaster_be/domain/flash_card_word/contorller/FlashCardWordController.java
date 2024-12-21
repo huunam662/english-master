@@ -39,17 +39,15 @@ public class FlashCardWordController {
         flashCardWordService.delete(flashCardWordId);
     }
 
-    @PostMapping(value = "/{flashCardId:.+}/addWordToFlashCard", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{flashCardId:.+}/addWordToFlashCard")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Save successfully")
     public FlashCardWordResponse addWordToFlashCard(
             @PathVariable UUID flashCardId,
-            @ModelAttribute FlashCardWordRequest flashCardWordRequest,
-            @RequestPart(required = false) MultipartFile image
+            @RequestBody FlashCardWordRequest flashCardWordRequest
     ){
 
         flashCardWordRequest.setFlashCardId(flashCardId);
-        flashCardWordRequest.setImage(image);
 
         FlashCardWordEntity flashCardWord = flashCardWordService.saveFlashCardWord(flashCardWordRequest);
 
@@ -57,17 +55,15 @@ public class FlashCardWordController {
     }
 
 
-    @PutMapping(value = "/{flashCardWordId:.+}/updateWord", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{flashCardWordId:.+}/updateWord")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Save successfully")
     public FlashCardWordResponse updateWord(
             @PathVariable UUID flashCardWordId,
-            @ModelAttribute FlashCardWordRequest flashCardWordRequest,
-            @RequestPart(required = false) MultipartFile image
+            @RequestBody FlashCardWordRequest flashCardWordRequest
     ){
 
         flashCardWordRequest.setFlashCardWordId(flashCardWordId);
-        flashCardWordRequest.setImage(image);
 
         FlashCardWordEntity flashCardWord = flashCardWordService.saveFlashCardWord(flashCardWordRequest);
 
