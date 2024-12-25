@@ -21,6 +21,7 @@ public interface TopicMapper {
 
     @Mapping(target = "parts", expression = "java(toListPartId(topicEntity.getParts()))")
     @Mapping(target = "packId", source = "pack.packId")
+    @Mapping(target = "packName", source = "pack.packName")
     @Mapping(target = "statusId", source = "status.statusId")
     @Mapping(target = "numberQuestion", defaultValue = "0")
     TopicResponse toTopicResponse(TopicEntity topicEntity);

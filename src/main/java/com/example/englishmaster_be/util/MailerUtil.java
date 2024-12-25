@@ -96,8 +96,9 @@ public class MailerUtil {
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
         String confirmationLink = linkValue.getLinkFE() + "register/confirm?token=" + confirmationToken;
 
-        String templateContent = readTemplateContent("email_templates.html");
-        templateContent = templateContent.replace("{{linkConfirm}}", confirmationLink)
+        String templateContent = readTemplateContent("email_templates.html")
+                .replace("*|MC:SUBJECT|*", "MeU English")
+                .replace("{{linkConfirm}}", confirmationLink)
                 .replace("{{btnConfirm}}", "Xác nhận")
                 .replace("{{nameLink}}", "Vui lòng chọn xác nhận để tiến hành đăng ký tài khoản.")
                 .replace("*|current_year|*", String.valueOf(LocalDateTime.now().getYear()));

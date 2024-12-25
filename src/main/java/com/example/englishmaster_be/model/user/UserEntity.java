@@ -84,7 +84,7 @@ public class UserEntity implements UserDetails {
     @OneToMany(mappedBy = "user")
     List<InvalidTokenEntity> invalidTokens;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     List<SessionActiveEntity> confirmTokens;
 
     @OneToMany(mappedBy = "userComment", cascade = CascadeType.ALL)

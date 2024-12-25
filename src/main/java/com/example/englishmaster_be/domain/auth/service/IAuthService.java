@@ -27,6 +27,6 @@ public interface IAuthService {
 
     void logoutOf(UserLogoutRequest userLogoutRequest);
 
-    UserConfirmTokenResponse createConfirmationToken(UUID userId);
+    UserConfirmTokenResponse createConfirmationToken(UserEntity user);
 
 }

@@ -36,7 +36,7 @@ public class FileUtil {
         String extension = this.getExtension(filename);
 
         return switch (extension) {
-            case ".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG", ".gif", ".GIF" -> String.format("image/%s", extension.replaceFirst(".", "").toLowerCase());
+            case ".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG", ".gif", ".GIF" -> String.format("image/%s", extension.replaceFirst(".", "").trim().toLowerCase());
             case ".mp3" -> "audio/mpeg";
             default -> "TEXT";
         };
