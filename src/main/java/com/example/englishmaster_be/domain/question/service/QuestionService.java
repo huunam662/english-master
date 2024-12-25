@@ -209,21 +209,24 @@ public class QuestionService implements IQuestionService {
 
             QuestionEntity createQuestion = questionRepository.save(question);
 
-            ContentEntity content = ContentEntity.builder()
-                    .question(createQuestion)
-                    .contentType(questionRequest.getContentImage())
-                    .contentData(fileUtil.typeFile(questionRequest.getContentImage()))
-                    .userCreate(user)
-                    .userUpdate(user)
-                    .createAt(LocalDateTime.now())
-                    .updateAt(LocalDateTime.now())
-                    .build();
+            if(questionRequest.getContentImage() != null && !questionRequest.getContentImage().isEmpty()) {
+                ContentEntity content = ContentEntity.builder()
+                        .question(createQuestion)
+                        .contentType(questionRequest.getContentImage())
+                        .contentData(fileUtil.typeFile(questionRequest.getContentImage()))
+                        .userCreate(user)
+                        .userUpdate(user)
+                        .createAt(LocalDateTime.now())
+                        .updateAt(LocalDateTime.now())
+                        .build();
 
-            if (question.getContentCollection() == null)
-                question.setContentCollection(new ArrayList<>());
+                if (question.getContentCollection() == null)
+                    question.setContentCollection(new ArrayList<>());
 
-            question.getContentCollection().add(content);
-            contentRepository.save(content);
+                question.getContentCollection().add(content);
+                contentRepository.save(content);
+            }
+
 
             return questionRepository.save(question);
         }
@@ -424,7 +427,7 @@ public class QuestionService implements IQuestionService {
             List<String> answers = questionMultipleChoiceDto.getAnswers();
             questionMultipleChoiceDto.setAnswers(answers);
 
-            questionMultipleChoiceDtos.add(questionMultipleChoiceDto);
+            questionTFNotgivenDtos.add(questionMultipleChoiceDto);
         }
 
         for( QuestionEntity questionEntity: questionMatchings){
@@ -454,7 +457,7 @@ public class QuestionService implements IQuestionService {
 
             ContentEntity contentEntity= contentService.getContentByContentId(questionEntity.getContentCollection().get(0).getContentId());
 
-            questionLabelDto.setImage(contentEntity.getContentData());
+            questionLabelDto.setImage(contentEntity.getContentType());
             questionLabelDto.setHasHints(questionEntity.getHasHints());
 
             if(questionEntity.getHasHints()){
