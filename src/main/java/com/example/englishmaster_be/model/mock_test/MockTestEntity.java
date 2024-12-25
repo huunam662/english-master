@@ -69,8 +69,6 @@ public class MockTestEntity {
     @OneToMany(mappedBy = "mockTest",cascade = CascadeType.ALL,orphanRemoval = true)
     List<ResultMockTestEntity> resultMockTests;
 
-
-
     @PrePersist
     void onCreate() {
         createAt = LocalDateTime.now();
