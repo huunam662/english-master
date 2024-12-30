@@ -6,6 +6,7 @@ import com.example.englishmaster_be.domain.answer_matching.dto.response.AnswerMa
 import com.example.englishmaster_be.domain.answer_matching.service.IAnswerMatchingService;
 import com.example.englishmaster_be.domain.content.service.IContentService;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
+import com.example.englishmaster_be.domain.part.dto.response.PartQuestionResponse;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
@@ -14,14 +15,15 @@ import com.example.englishmaster_be.domain.question_label.service.IQuestionLabel
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
-import com.example.englishmaster_be.model.question_label.QuestionLabelEntity;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.content.ContentEntity;
+import com.example.englishmaster_be.model.matching_pair.MatchingPairEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
+import com.example.englishmaster_be.model.question_label.QuestionLabelEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.QuestionMapper;
@@ -44,9 +46,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -91,7 +91,7 @@ public class QuestionService implements IQuestionService {
 
         QuestionEntity question;
 
-        if(questionRequest.getQuestionId() != null){
+        if (questionRequest.getQuestionId() != null) {
 
             question = getQuestionById(questionRequest.getQuestionId());
 
@@ -197,8 +197,7 @@ public class QuestionService implements IQuestionService {
             questionRepository.save(question);
 
             return getQuestionById(questionRequest.getQuestionId());
-        }
-        else{
+        } else {
 
             question = QuestionMapper.INSTANCE.toQuestionEntity(questionRequest);
             question.setCreateAt(LocalDateTime.now());
@@ -209,7 +208,7 @@ public class QuestionService implements IQuestionService {
 
             QuestionEntity createQuestion = questionRepository.save(question);
 
-            if(questionRequest.getContentImage() != null && !questionRequest.getContentImage().isEmpty()) {
+            if (questionRequest.getContentImage() != null && !questionRequest.getContentImage().isEmpty()) {
                 ContentEntity content = ContentEntity.builder()
                         .question(createQuestion)
                         .contentType(questionRequest.getContentImage())
@@ -251,7 +250,7 @@ public class QuestionService implements IQuestionService {
 
         Pageable pageable = PageRequest.of(index, 10, Sort.by(Sort.Order.desc("updateAt")));
 
-        Page<QuestionEntity> questionPage= questionRepository.findAllByQuestionGroupParentAndPart(null, part, pageable);
+        Page<QuestionEntity> questionPage = questionRepository.findAllByQuestionGroupParentAndPart(null, part, pageable);
 
         return questionPage.getContent();
     }
@@ -259,7 +258,7 @@ public class QuestionService implements IQuestionService {
     @Override
     public int countQuestionToQuestionGroup(QuestionEntity question) {
 
-        if(question == null) return 0;
+        if (question == null) return 0;
 
         return listQuestionGroup(question).size();
     }
@@ -289,19 +288,19 @@ public class QuestionService implements IQuestionService {
     @Override
     public QuestionEntity uploadFileQuestion(UUID questionId, List<MultipartFile> uploadMultiFileDTO) {
 
-        if(uploadMultiFileDTO == null || uploadMultiFileDTO.isEmpty())
+        if (uploadMultiFileDTO == null || uploadMultiFileDTO.isEmpty())
             throw new BadRequestException("File upload required");
 
         UserEntity user = userService.currentUser();
 
         QuestionEntity question = getQuestionById(questionId);
 
-        if(question.getContentCollection() == null)
+        if (question.getContentCollection() == null)
             question.setContentCollection(new ArrayList<>());
 
-        for(var file : uploadMultiFileDTO){
+        for (var file : uploadMultiFileDTO) {
 
-            if(file == null || file.isEmpty()) continue;
+            if (file == null || file.isEmpty()) continue;
 
             FileResponse fileResponse = uploadService.upload(file);
 
@@ -325,7 +324,7 @@ public class QuestionService implements IQuestionService {
     @SneakyThrows
     public QuestionEntity updateFileQuestion(UUID questionId, String oldFileName, MultipartFile newFile) {
 
-        if(newFile == null || newFile.isEmpty())
+        if (newFile == null || newFile.isEmpty())
             throw new CustomException(ErrorEnum.NULL_OR_EMPTY_FILE);
 
         UserEntity user = userService.currentUser();
@@ -381,115 +380,107 @@ public class QuestionService implements IQuestionService {
     }
 
     @Override
-    public QuestionDto getAllQuestionFromPart(UUID partId) {
+    public List<PartQuestionResponse> getAllPartQuestions(UUID partId) {
         PartEntity part = partRepository.findByPartId(partId)
                 .orElseThrow(
                         () -> new IllegalArgumentException("PartEntity not found with ID: " + partId)
                 );
 
-        List<QuestionEntity> questionEntities= questionRepository.findByPart(part);
+        List<QuestionEntity> questionEntities = questionRepository.findByPart(part);
 
-        if(questionEntities == null)
+        if (questionEntities == null)
             return null;
 
-        QuestionDto questionDto = new QuestionDto();
+        List<PartQuestionResponse> partQuestionResponses = new ArrayList<>();
+        for (QuestionEntity questionEntity : questionEntities) {
+            PartQuestionResponse partQuestionResponse = new PartQuestionResponse();
 
-        List<QuestionEntity> questionMultipleChoices= filterQuestionByType(questionEntities,QuestionTypeEnum.Multiple_Choice);
-        List<QuestionEntity> questionTFNotgiven= filterQuestionByType(questionEntities,QuestionTypeEnum.T_F_Not_Given);
-        List<QuestionEntity> questionMatchings= filterQuestionByType(questionEntities,QuestionTypeEnum.Matching);
-        List<QuestionEntity> questionFillInBlanks= filterQuestionByType(questionEntities,QuestionTypeEnum.Fill_In_Blank);
-        List<QuestionEntity> questionLabels= filterQuestionByType(questionEntities,QuestionTypeEnum.Label);
+            partQuestionResponse.setContentData(questionEntity.getQuestionContent());
+            partQuestionResponse.setContentType(questionEntity.getQuestionType().toString());
+            partQuestionResponse.setPartId(partId);
 
-        List<QuestionMultipleChoiceDto> questionMultipleChoiceDtos = new ArrayList<>();
-        List<QuestionMultipleChoiceDto> questionTFNotgivenDtos = new ArrayList<>();
-        List<QuestionMatchingDto> questionMatchingDtos = new ArrayList<>();
-        List<QuestionFillInBlankDto> questionFillInBlankDtos = new ArrayList<>();
-        List<QuestionLabelDto> questionLabelDtos = new ArrayList<>();
+            QuestionDto questionDto=new QuestionDto();
+            List<QuestionEntity> questionEntityList = listQuestionGroup(questionEntity);
+            if (questionEntityList.get(0).getQuestionType() == QuestionTypeEnum.Multiple_Choice || questionEntityList.get(0).getQuestionType() == QuestionTypeEnum.T_F_Not_Given) {
+                List<Object> questions = new ArrayList<>();
+                for (QuestionEntity question : questionEntityList) {
+                    QuestionMultipleChoiceDto questionMultipleChoiceDto = new QuestionMultipleChoiceDto();
 
-        for(QuestionEntity questionEntity: questionMultipleChoices){
-            QuestionMultipleChoiceDto questionMultipleChoiceDto = new QuestionMultipleChoiceDto();
+                    questionMultipleChoiceDto.setQuestionId(question.getQuestionId());
+                    questionMultipleChoiceDto.setContent(question.getQuestionContent());
+                    questionMultipleChoiceDto.setAnswers(
+                            question.getAnswers().stream().map(AnswerEntity::getAnswerContent).collect(Collectors.toList())
+                    );
 
-            questionMultipleChoiceDto.setQuestionId(questionEntity.getQuestionId());
-            questionMultipleChoiceDto.setQuestion(questionEntity.getQuestionContent());
-            questionMultipleChoiceDto.setAnswers(
-                    questionEntity.getAnswers().stream().map(AnswerEntity::getAnswerContent).collect(Collectors.toList())
-            );
-            questionMultipleChoiceDto.setNumberOfChoices(questionEntity.getAnswers().size());
+                    questionMultipleChoiceDto.setType(question.getQuestionType());
+                    questionMultipleChoiceDto.setNumberOfChoices(question.getNumberChoice());
 
-            questionMultipleChoiceDtos.add(questionMultipleChoiceDto);
-        }
+                    questions.add(questionMultipleChoiceDto);
 
-        for(QuestionEntity questionEntity: questionTFNotgiven){
-            QuestionMultipleChoiceDto questionMultipleChoiceDto = new QuestionMultipleChoiceDto();
-
-            questionMultipleChoiceDto.setQuestionId(questionEntity.getQuestionId());
-            questionMultipleChoiceDto.setQuestion(questionEntity.getQuestionContent());
-            List<String> answers = questionMultipleChoiceDto.getAnswers();
-            questionMultipleChoiceDto.setAnswers(answers);
-
-            questionTFNotgivenDtos.add(questionMultipleChoiceDto);
-        }
-
-        for( QuestionEntity questionEntity: questionMatchings){
-            QuestionMatchingDto questionMatchingDto = new QuestionMatchingDto();
-
-            questionMatchingDto.setQuestionId(questionEntity.getQuestionId());
-            questionMatchingDto.setQuestion(questionEntity.getQuestionContent());
-            List<AnswerMatchingBasicResponse> answerMatchingBasicResponses=answerMatchingService.getListAnswerMatchingWithShuffle(questionEntity.getQuestionId());
-            questionMatchingDto.setOptions(answerMatchingBasicResponses);
-            questionMatchingDtos.add(questionMatchingDto);
-        }
-
-        for (QuestionEntity questionEntity: questionFillInBlanks){
-            QuestionFillInBlankDto questionFillInBlankDto = new QuestionFillInBlankDto();
-
-            questionFillInBlankDto.setQuestion(questionEntity.getQuestionContent());
-            questionFillInBlankDto.setQuestionId(questionEntity.getQuestionId());
-
-            questionFillInBlankDtos.add(questionFillInBlankDto);
-        }
-
-        for (QuestionEntity questionEntity: questionLabels){
-
-            QuestionLabelDto questionLabelDto = new QuestionLabelDto();
-            questionLabelDto.setQuestion(questionEntity.getQuestionContent());
-            questionLabelDto.setQuestionId(questionEntity.getQuestionId());
-
-            ContentEntity contentEntity= contentService.getContentByContentId(questionEntity.getContentCollection().get(0).getContentId());
-
-            questionLabelDto.setImage(contentEntity.getContentType());
-            questionLabelDto.setHasHints(questionEntity.getHasHints());
-
-            if(questionEntity.getHasHints()){
-                List<QuestionLabelEntity> questionLabelEntities=labelService.getLabelByIdQuestion(questionEntity.getQuestionId());
-                questionLabelDto.setLabels(
-                        questionLabelEntities.stream().map(QuestionLabelEntity::getLabel).collect(Collectors.toList())
-                );
-            }
-            else if(questionEntity.getQuestionType()== QuestionTypeEnum.Label ){
-                if(questionEntity.getHasHints()){
-                    List<QuestionLabelEntity> questionLabelEntities = questionEntity.getLabels();
-                    if(questionLabelEntities == null){
-                        questionLabelDto.setLabels(null);
-                    }
-                    else{
-                        questionLabelDto.setLabels(
-                                questionLabelEntities.stream().map(QuestionLabelEntity::getLabel).collect(Collectors.toList())
-                        );
-                    }
                 }
+                questionDto.setTitle(questionEntity.getTitle());
+                questionDto.setQuestion(questions);
+                partQuestionResponse.setQuestions(questionDto);
+
             }
+            else if(questionEntityList.get(0).getQuestionType() == QuestionTypeEnum.Fill_In_Blank){
+                List<Object> questions = new ArrayList<>();
+                for (QuestionEntity question: questionEntityList){
+                    QuestionFillInBlankDto questionFillInBlankDto = new QuestionFillInBlankDto();
 
-            questionLabelDtos.add(questionLabelDto);
+                    questionFillInBlankDto.setContent(question.getQuestionContent());
+                    questionFillInBlankDto.setQuestionId(question.getQuestionId());
+                    questionFillInBlankDto.setType(question.getQuestionType());
+                    questionFillInBlankDto.setCountBlank(question.getCountBlank());
+                    questions.add(questionFillInBlankDto);
+                }
+                questionDto.setTitle(questionEntity.getTitle());
+                questionDto.setQuestion(questions);
+                partQuestionResponse.setQuestions(questionDto);
+            }
+            else if(questionEntityList.get(0).getQuestionType() == QuestionTypeEnum.Matching){
+                List<Object> questions = new ArrayList<>();
+                for (QuestionEntity question: questionEntityList){
+                    QuestionMatchingDto questionMatchingDto = answerMatchingService.getListAnswerMatchingWithShuffle1(question.getQuestionId());
+
+                    questions.add(questionMatchingDto);
+                }
+                questionDto.setTitle(questionEntity.getTitle());
+                questionDto.setQuestion(questions);
+                partQuestionResponse.setQuestions(questionDto);
+            } else if (questionEntityList.get(0).getQuestionType() == QuestionTypeEnum.Label) {
+                List<Object> questions = new ArrayList<>();
+                for (QuestionEntity question: questionEntityList){
+                    QuestionLabelDto questionLabelDto = new QuestionLabelDto();
+                    questionLabelDto.setQuestionId(question.getQuestionId());
+
+                    ContentEntity content= question.getContentCollection().get(0);
+
+                    questionLabelDto.setImage(content.getContentData());
+                    questionLabelDto.setHasHints(question.getHasHints());
+
+                    questionLabelDto.setType(question.getQuestionType());
+
+                    if(question.getHasHints()){
+                        List<String> labelHints = new ArrayList<>();
+                        labelHints= labelService.getLabelByIdQuestion(question.getQuestionId())
+                                .stream().map(QuestionLabelEntity::getLabel).toList();
+                        questionLabelDto.setLabels(labelHints);
+                    }
+                    questions.add(questionLabelDto);
+
+                }
+                questionDto.setTitle(questionEntity.getTitle());
+                questionDto.setQuestion(questions);
+                partQuestionResponse.setQuestions(questionDto);
+            }
+            partQuestionResponses.add(partQuestionResponse);
+
+
         }
-
-        questionDto.setQuestionMultipleChoices(questionMultipleChoiceDtos);
-        questionDto.setQuestionTFNotgivens(questionTFNotgivenDtos);
-        questionDto.setQuestionFillInBlank(questionFillInBlankDtos);
-        questionDto.setQuestionMatchings(questionMatchingDtos);
-        questionDto.setQuestionLabels(questionLabelDtos);
-        return questionDto;
+        return partQuestionResponses;
     }
+
 
     List<QuestionEntity> filterQuestionByType( List<QuestionEntity> questionEntities,QuestionTypeEnum type ){
         List<QuestionEntity> filteredQuestionEntities = new ArrayList<>();

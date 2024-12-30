@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.question.dto.response;
 
+import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
 import com.example.englishmaster_be.domain.answer_matching.dto.response.AnswerMatchingBasicResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -16,7 +17,9 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class QuestionMatchingDto {
     UUID questionId;
-    String question;
 
-    List<AnswerMatchingBasicResponse> options;
+
+    List<String> contentLeft;
+    List<String> contentRight;
+    QuestionTypeEnum type;
 }

@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
@@ -51,10 +52,16 @@ public class QuestionEntity {
 
     @Column(name="question_type")
     @Enumerated(EnumType.STRING)
+    @ColumnTransformer(write = "?::questions_type_enum")
     QuestionTypeEnum questionType;
 
     @Column(name = "number_choice",columnDefinition = "int default 1")
     Integer numberChoice;
+
+    String title;
+
+    @Column(name = "count_blank")
+    Integer countBlank;
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp

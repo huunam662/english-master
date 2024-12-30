@@ -13,9 +13,7 @@ import java.util.List;
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class QuestionDto {
-    List<QuestionMultipleChoiceDto> questionMultipleChoices;
-    List<QuestionFillInBlankDto> questionFillInBlank;
-    List<QuestionMultipleChoiceDto> questionTFNotgivens;
-    List<QuestionMatchingDto> questionMatchings;
-    List<QuestionLabelDto> questionLabels;
+
+    String title;
+    List<Object> question;
 }

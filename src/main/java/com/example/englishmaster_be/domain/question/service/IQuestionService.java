@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.question.service;
 
+import com.example.englishmaster_be.domain.part.dto.response.PartQuestionResponse;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionDto;
@@ -34,5 +35,5 @@ public interface IQuestionService {
 
     List<QuestionEntity> getQuestionGroupListByQuestionId(UUID questionId);
 
-    QuestionDto getAllQuestionFromPart(UUID partId);
+    List<PartQuestionResponse> getAllPartQuestions(UUID partId);
 }

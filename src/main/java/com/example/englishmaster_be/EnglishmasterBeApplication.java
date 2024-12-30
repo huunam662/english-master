@@ -19,7 +19,7 @@ public class EnglishmasterBeApplication {
 
         SpringApplication application = new SpringApplication(EnglishmasterBeApplication.class);
         ConfigurableEnvironment environment = new StandardEnvironment();
-        environment.setActiveProfiles(staging);
+        environment.setActiveProfiles(local);
         application.setEnvironment(environment);
         application.run(args);
     }
