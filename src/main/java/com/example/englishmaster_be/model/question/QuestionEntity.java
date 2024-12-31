@@ -52,7 +52,6 @@ public class QuestionEntity {
 
     @Column(name="question_type")
     @Enumerated(EnumType.STRING)
-    @ColumnTransformer(write = "?::questions_type_enum")
     QuestionTypeEnum questionType;
 
     @Column(name = "number_choice",columnDefinition = "int default 1")

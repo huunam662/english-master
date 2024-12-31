@@ -1,9 +1,10 @@
 package com.example.englishmaster_be.domain.user_answer.service;
 
+import com.example.englishmaster_be.domain.user_answer.dto.request.UserAnswerRequest;
 import com.example.englishmaster_be.mapper.AnswerMatchingMapper;
 import com.example.englishmaster_be.domain.answer_blank.dto.request.AnswerBlankRequest;
 import com.example.englishmaster_be.domain.answer_matching.dto.request.AnswerMatchingQuestionRequest;
-import com.example.englishmaster_be.domain.user_answer.dto.request.UserAnswerRequest;
+import com.example.englishmaster_be.domain.user_answer.dto.request.UserAnswerRequest1;
 import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.domain.answer_matching.dto.response.AnswerMatchingBasicResponse;
@@ -61,15 +62,20 @@ public class UserAnswerService implements IUserAnswerService {
     IAnswerService answerService;
 
 
+    public void createUserAnswer(UserAnswerRequest request) {
+
+    }
+
+
     @Transactional
     @Override
-    public UserAnswerEntity saveUserAnswer(UserAnswerRequest userAnswerRequest){
+    public UserAnswerEntity saveUserAnswer(UserAnswerRequest1 userAnswerRequest1){
 
         UserEntity user = userService.currentUser();
 
-        QuestionEntity question = questionService.getQuestionById(userAnswerRequest.getQuestionId());
+        QuestionEntity question = questionService.getQuestionById(userAnswerRequest1.getQuestionId());
 
-        if(userAnswerRequest.getAnswer().size() > question.getNumberChoice()){
+        if(userAnswerRequest1.getAnswer().size() > question.getNumberChoice()){
             throw new BadRequestException("The number of choices must be less than or equal to " + question.getNumberChoice());
         }
 
@@ -80,8 +86,8 @@ public class UserAnswerService implements IUserAnswerService {
                 .answers(new ArrayList<>())
                 .build();
 
-        for(int i=0;i<userAnswerRequest.getAnswer().size();i++){
-            AnswerEntity answerEntity = answerRepository.findByQuestionAndAnswerContent(question, userAnswerRequest.getAnswer().get(i));
+        for(int i = 0; i< userAnswerRequest1.getAnswer().size(); i++){
+            AnswerEntity answerEntity = answerRepository.findByQuestionAndAnswerContent(question, userAnswerRequest1.getAnswer().get(i));
 
             if(Objects.isNull(answerEntity)){
                 throw new BadRequestException("The answer is not exist");

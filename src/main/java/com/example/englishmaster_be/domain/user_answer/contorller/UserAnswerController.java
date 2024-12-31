@@ -8,7 +8,7 @@ import com.example.englishmaster_be.mapper.UserAnswerMapper;
 import com.example.englishmaster_be.mapper.UserBlankAnswerMapper;
 import com.example.englishmaster_be.domain.answer_blank.dto.request.AnswerBlankRequest;
 import com.example.englishmaster_be.domain.answer_matching.dto.request.AnswerMatchingQuestionRequest;
-import com.example.englishmaster_be.domain.user_answer.dto.request.UserAnswerRequest;
+import com.example.englishmaster_be.domain.user_answer.dto.request.UserAnswerRequest1;
 import com.example.englishmaster_be.domain.answer_matching.dto.response.AnswerMatchingBasicResponse;
 import com.example.englishmaster_be.domain.user_answer.dto.response.UserAnswerScoreResponse;
 import com.example.englishmaster_be.domain.user_answer.dto.response.UserAnswerResponse;
@@ -67,9 +67,9 @@ public class UserAnswerController {
 
     @PostMapping("/create-user-answer")
     @DefaultMessage("Create user answer successfully")
-    public UserAnswerResponse createUserAnswer(@RequestBody UserAnswerRequest userAnswerRequest) {
+    public UserAnswerResponse createUserAnswer(@RequestBody UserAnswerRequest1 userAnswerRequest1) {
 
-        UserAnswerEntity answer = userAnswerService.saveUserAnswer(userAnswerRequest);
+        UserAnswerEntity answer = userAnswerService.saveUserAnswer(userAnswerRequest1);
 
         return UserAnswerMapper.INSTANCE.toUserAnswerResponse(answer);
     }

@@ -5,14 +5,14 @@ import com.example.englishmaster_be.model.user_answer_matching.UserAnswerMatchin
 import com.example.englishmaster_be.model.user_blank_answer.UserBlankAnswerEntity;
 import com.example.englishmaster_be.domain.answer_blank.dto.request.AnswerBlankRequest;
 import com.example.englishmaster_be.domain.answer_matching.dto.request.AnswerMatchingQuestionRequest;
-import com.example.englishmaster_be.domain.user_answer.dto.request.UserAnswerRequest;
+import com.example.englishmaster_be.domain.user_answer.dto.request.UserAnswerRequest1;
 import com.example.englishmaster_be.domain.user_answer.dto.response.UserAnswerScoreResponse;
 
 import java.util.UUID;
 
 public interface IUserAnswerService {
 
-    UserAnswerEntity saveUserAnswer(UserAnswerRequest userAnswerRequest);
+    UserAnswerEntity saveUserAnswer(UserAnswerRequest1 userAnswerRequest1);
 
     UserBlankAnswerEntity createUserBlankAnswer(AnswerBlankRequest request);
 
