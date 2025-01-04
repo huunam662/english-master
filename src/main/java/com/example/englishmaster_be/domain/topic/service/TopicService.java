@@ -160,6 +160,7 @@ public class TopicService implements ITopicService {
         topic.setStatus(statusService.getStatusByName(StatusEnum.ACTIVE));
         topic.setUserUpdate(user);
         topic.setPack(pack);
+        topic.setEnable(Boolean.TRUE);
 
         return topicRepository.save(topic);
     }

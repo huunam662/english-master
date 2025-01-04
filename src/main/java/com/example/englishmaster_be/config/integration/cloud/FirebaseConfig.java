@@ -21,7 +21,7 @@ public class FirebaseConfig {
     BucketValue bucketValue;
 
     @Bean
-    public  FirebaseApp firebaseInit() throws IOException{
+    public FirebaseApp firebaseInit() throws IOException{
         FirebaseOptions options = FirebaseOptions.builder()
                 .setCredentials(GoogleCredentials
                         .fromStream(new ClassPathResource(bucketValue.getAdminSdkPath()).getInputStream()))
