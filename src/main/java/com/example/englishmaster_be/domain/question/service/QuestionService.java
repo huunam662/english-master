@@ -398,6 +398,8 @@ public class QuestionService implements IQuestionService {
             partQuestionResponse.setContentData(questionEntity.getQuestionContent());
             partQuestionResponse.setContentType(questionEntity.getQuestionType().toString());
             partQuestionResponse.setPartId(partId);
+            partQuestionResponse.setPartName(questionEntity.getPart().getPartName());
+
 
             QuestionDto questionDto=new QuestionDto();
             List<QuestionEntity> questionEntityList = listQuestionGroup(questionEntity);
