@@ -111,7 +111,7 @@ public class PartService implements IPartService {
         List<PartEntity> listPart = partRepository.findAll();
 
         return listPart.stream().filter(
-                part -> part.getPartName().substring(0, 6).equalsIgnoreCase(partName)
+                part -> part.getPartName().equalsIgnoreCase(partName)
         ).findFirst().orElseThrow(
                 () -> new CustomException(ErrorEnum.PART_NOT_FOUND)
         );

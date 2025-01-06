@@ -4,13 +4,14 @@ import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestRequest
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestPartResponse;
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestResponse;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;
+import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper
+@Mapper(builder = @Builder(disableBuilder = true))
 public interface MockTestMapper {
 
     MockTestMapper INSTANCE = Mappers.getMapper(MockTestMapper.class);

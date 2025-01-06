@@ -52,7 +52,7 @@ public class ExcelFillService implements IExcelFillService {
     public ExcelTopicResponse parseCreateTopicDTO(MultipartFile file) {
 
         if(file == null || file.isEmpty())
-            throw new BadRequestException("Please select a file_storage to upload");
+            throw new BadRequestException("Please select a file storage to upload");
 
         if(ExcelHelper.isExcelFile(file))
             throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
@@ -90,10 +90,10 @@ public class ExcelFillService implements IExcelFillService {
     public ExcelQuestionListResponse parseListeningPart12DTO(UUID topicId, MultipartFile file, int part) {
 
         if (file == null || file.isEmpty())
-            throw new BadRequestException("Please select a file_storage to upload");
+            throw new BadRequestException("Please select a file to upload");
 
         if (part != 1 && part != 2)
-            throw new BadRequestException("Invalid PartEntity Value. It must be either 1 or 2");
+            throw new BadRequestException("Invalid Part value. It must be either 1 or 2");
 
         if (ExcelHelper.isExcelFile(file))
             throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
@@ -117,36 +117,37 @@ public class ExcelFillService implements IExcelFillService {
             // Cập nhật thông tin cho câu hỏi lớn
             questionBig.setContentAudio(contentAudioLink);
             questionBig.setQuestionScore(scoreBig);
-            UUID partId = part == 1 ? partRepository.findByPartName(PartEnum.PART_1.getContent()).orElseThrow(() -> new CustomException(ErrorEnum.PART_NOT_FOUND)).getPartId()
-                    : partRepository.findByPartName(PartEnum.PART_2.getContent()).orElseThrow(() -> new CustomException(ErrorEnum.PART_NOT_FOUND)).getPartId();
+            UUID partId = part == 1 ? partService.getPartToName(PartEnum.PART_1.getName()).getPartId()
+                    : partService.getPartToName(PartEnum.PART_2.getName()).getPartId();
             questionBig.setPartId(partId);
 
             // Lấy các câu hỏi con từ sheet
             for (int i = 4; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
-                if (row != null) {
-                    ExcelQuestionResponse question = new ExcelQuestionResponse();
-                    question.setPartId(partId);
 
-                    // Xử lý câu trả lời với các tuỳ chọn A, B, C, D (phần 1) hoặc A, B, C (phần 2)
-                    String[] options = part == 1 ? new String[]{"A", "B", "C", "D"} : new String[]{"A", "B", "C"};
-                    String correctAnswer = getStringCellValue(row.getCell(1));
-                    int score = (int) getNumericCellValue(row.getCell(2));
-                    question.setQuestionScore(score);
+                if(row == null) continue;
 
-                    // Tạo danh sách câu trả lời
-                    List<AnswerBasicRequest> listAnswerDTO = new ArrayList<>();
-                    for (String option : options) {
-                        AnswerBasicRequest answer = new AnswerBasicRequest();
-                        answer.setAnswerContent(option);
-                        answer.setCorrectAnswer(correctAnswer.equalsIgnoreCase(option));
-                        listAnswerDTO.add(answer);
-                    }
-                    question.setListAnswer(listAnswerDTO);
+                ExcelQuestionResponse question = new ExcelQuestionResponse();
+                question.setPartId(partId);
 
-                    // Thêm câu hỏi vào danh sách câu hỏi con
-                    listQuestionDTOMini.add(question);
+                // Xử lý câu trả lời với các tuỳ chọn A, B, C, D (phần 1) hoặc A, B, C (phần 2)
+                String[] options = part == 1 ? new String[]{"A", "B", "C", "D"} : new String[]{"A", "B", "C"};
+                String correctAnswer = getStringCellValue(row.getCell(1));
+                int score = (int) getNumericCellValue(row.getCell(2));
+                question.setQuestionScore(score);
+
+                // Tạo danh sách câu trả lời
+                List<AnswerBasicRequest> listAnswerDTO = new ArrayList<>();
+                for (String option : options) {
+                    AnswerBasicRequest answer = new AnswerBasicRequest();
+                    answer.setAnswerContent(option);
+                    answer.setCorrectAnswer(correctAnswer.equalsIgnoreCase(option));
+                    listAnswerDTO.add(answer);
                 }
+                question.setListAnswer(listAnswerDTO);
+
+                // Thêm câu hỏi vào danh sách câu hỏi con
+                listQuestionDTOMini.add(question);
             }
 
             // Cập nhật thông tin câu hỏi lớn với danh sách câu hỏi con
@@ -169,7 +170,7 @@ public class ExcelFillService implements IExcelFillService {
     public ExcelQuestionListResponse parseReadingPart5DTO(UUID topicId, MultipartFile file) throws IOException {
 
         if(file == null || file.isEmpty())
-            throw new BadRequestException("Please select a file_storage to upload");
+            throw new BadRequestException("Please select a file storage to upload");
 
         if(ExcelHelper.isExcelFile(file))
             throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
@@ -182,7 +183,7 @@ public class ExcelFillService implements IExcelFillService {
             List<ExcelQuestionResponse> listQuestionDTOMini = new ArrayList<>();
             int scoreBig = (int) getNumericCellValue(sheet.getRow(1).getCell(1));
             questionBig.setQuestionScore(scoreBig);
-            questionBig.setPartId(partRepository.findByPartName(PartEnum.PART_5.getContent()).orElseThrow(() -> new CustomException(ErrorEnum.PART_NOT_FOUND)).getPartId());
+            questionBig.setPartId(partService.getPartToName(PartEnum.PART_5.getName()).getPartId());
             for (int i = 3; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
                 if (row != null) {
@@ -216,10 +217,10 @@ public class ExcelFillService implements IExcelFillService {
     public ExcelQuestionListResponse parseListeningPart34DTO(UUID topicId, MultipartFile file, int part) {
 
         if(file == null || file.isEmpty())
-            throw new BadRequestException("Please select a file_storage to upload");
+            throw new BadRequestException("Please select a file storage to upload");
 
         if (part != 3 && part != 4)
-            throw new BadRequestException("Invalid PartEntity Value. It must be either 3 or 4");
+            throw new BadRequestException("Invalid Part value. It must be either 3 or 4");
 
         if(ExcelHelper.isExcelFile(file))
             throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
@@ -238,7 +239,7 @@ public class ExcelFillService implements IExcelFillService {
                         listeningParts.add(currentListeningPart);
                     }
                     currentListeningPart = new ExcelQuestionResponse();
-                    currentListeningPart.setPartId(part == 3 ? partService.getPartToName(PartEnum.PART_3.getContent()).getPartId() : partService.getPartToName(PartEnum.PART_4.getContent()).getPartId());
+                    currentListeningPart.setPartId(part == 3 ? partService.getPartToName(PartEnum.PART_3.getName()).getPartId() : partService.getPartToName(PartEnum.PART_4.getName()).getPartId());
                     String contentAudio = getStringCellValue(row, 1) == null ? null : getStringCellValue(row, 1);
                     if (contentAudio != null) {
                         String contentAudioLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentAudio);
@@ -292,13 +293,13 @@ public class ExcelFillService implements IExcelFillService {
     public ExcelQuestionListResponse parseReadingPart67DTO(UUID topicId, MultipartFile file, int part) {
 
         if(file == null || file.isEmpty())
-            throw new BadRequestException("Please select a file_storage to upload");
+            throw new BadRequestException("Please select a file storage to upload");
 
         if (ExcelHelper.isExcelFile(file))
             throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
 
         if (part != 6 && part != 7)
-            throw new BadRequestException("Invalid PartEntity Value. It must be either 6 or 7");
+            throw new BadRequestException("Invalid Part value. It must be either 6 or 7");
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
 
@@ -314,7 +315,7 @@ public class ExcelFillService implements IExcelFillService {
                         readingParts.add(currentReadingPart);
                     }
                     currentReadingPart = new ExcelQuestionResponse();
-                    currentReadingPart.setPartId(part == 6 ? partService.getPartToName(PartEnum.PART_6.getContent()).getPartId() : partService.getPartToName(PartEnum.PART_5.getContent()).getPartId());
+                    currentReadingPart.setPartId(part == 6 ? partService.getPartToName(PartEnum.PART_6.getName()).getPartId() : partService.getPartToName(PartEnum.PART_5.getName()).getPartId());
                     currentReadingPart.setQuestionContent(getStringCellValue(row, 1));
                 } else if (firstCellValue.equalsIgnoreCase("Score")) {
                     // Nếu là "Score", set điểm cho phần reading hiện tại
@@ -365,7 +366,7 @@ public class ExcelFillService implements IExcelFillService {
     public ExcelQuestionListResponse parseAllPartsDTO(UUID topicId, MultipartFile file) throws IOException {
 
         if(file == null || file.isEmpty())
-            throw new BadRequestException("Please select a file_storage to upload");
+            throw new BadRequestException("Please select a file storage to upload");
 
         if (ExcelHelper.isExcelFile(file))
             throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);

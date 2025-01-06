@@ -11,7 +11,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper
+@Mapper(builder = @Builder(disableBuilder = true))
 public interface QuestionMapper {
 
     QuestionMapper INSTANCE = Mappers.getMapper(QuestionMapper.class);

@@ -2,13 +2,14 @@ package com.example.englishmaster_be.mapper;
 
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestDetailResponse;
 import com.example.englishmaster_be.model.detail_mock_test.DetailMockTestEntity;
+import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper
+@Mapper(builder = @Builder(disableBuilder = true))
 public interface DetailMockTestMapper {
 
     DetailMockTestMapper INSTANCE = Mappers.getMapper(DetailMockTestMapper.class);

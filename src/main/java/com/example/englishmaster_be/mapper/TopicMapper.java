@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
-@Mapper
+@Mapper(builder = @Builder(disableBuilder = true))
 public interface TopicMapper {
 
     TopicMapper INSTANCE = Mappers.getMapper(TopicMapper.class);

@@ -57,7 +57,6 @@ public class ContentEntity {
     @JoinColumn(name = "update_by", referencedColumnName = "id")
     UserEntity userUpdate;
 
-
     @ManyToOne
     @JoinColumn(name = "topic_id", referencedColumnName = "id")
     TopicEntity topic;

@@ -1,18 +1,19 @@
-package com.example.englishmaster_be.domain.user.dto.response;
+package com.example.englishmaster_be.domain.auth.dto.response;
 
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import com.example.englishmaster_be.common.constant.RoleEnum;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+
 import java.util.UUID;
 
 @Getter
 @Setter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserResponse {
+public class UserAuthProfileResponse {
 
     UUID userId;
 
@@ -20,10 +21,8 @@ public class UserResponse {
 
     String email;
 
-    String phone;
-
-    String address;
-
     String avatar;
+
+    RoleEnum role;
 
 }
