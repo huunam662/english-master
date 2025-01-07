@@ -11,5 +11,3 @@ services:
     restart: unless-stopped
     pull_policy: always
 
-volumes:
-  data:
