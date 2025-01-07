@@ -20,7 +20,7 @@ public class FilterRequest {
     @Min(1)
     Integer page;
 
-    @Schema(description = "Kích thước (số phần tử) của trang)", example = "8")
+    @Schema(description = "Kích thước (số phần tử) của trang", example = "8")
     @Min(1) @Max(100)
     Integer pageSize;
 

@@ -2,13 +2,14 @@ package com.example.englishmaster_be.mapper;
 
 import com.example.englishmaster_be.model.comment.CommentEntity;
 import com.example.englishmaster_be.domain.comment.dto.response.CommentResponse;
+import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper
+@Mapper(builder = @Builder(disableBuilder = true))
 public interface CommentMapper {
 
     CommentMapper INSTANCE = Mappers.getMapper(CommentMapper.class);

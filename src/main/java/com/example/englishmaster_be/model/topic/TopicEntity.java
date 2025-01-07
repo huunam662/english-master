@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.model.topic;
 
 import com.example.englishmaster_be.model.comment.CommentEntity;
+import com.example.englishmaster_be.model.content.ContentEntity;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;
 import com.example.englishmaster_be.model.pack.PackEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
@@ -91,6 +92,9 @@ public class TopicEntity {
     StatusEntity status;
 
     @OneToMany(mappedBy = "topic")
+    List<ContentEntity> contents;
+
+    @OneToMany(mappedBy = "topic")
     List<CommentEntity> comments;
 
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -99,16 +103,16 @@ public class TopicEntity {
     @ManyToMany
     @JoinTable(name = "topic_question",
             joinColumns = @JoinColumn(name = "topic_id"),
-            inverseJoinColumns = @JoinColumn(name = "question_id"))
+            inverseJoinColumns = @JoinColumn(name = "question_id")
+    )
     List<QuestionEntity> questions;
 
     @ManyToMany
     @JoinTable(name = "topic_part",
             joinColumns = @JoinColumn(name = "topic_id"),
-            inverseJoinColumns = @JoinColumn(name = "part_id"))
+            inverseJoinColumns = @JoinColumn(name = "part_id")
+    )
     List<PartEntity> parts;
-
-
 
     @PrePersist
     void onCreate() {

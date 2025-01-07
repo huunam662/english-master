@@ -5,6 +5,7 @@ import com.example.englishmaster_be.domain.auth.dto.request.UserRegisterRequest;
 import com.example.englishmaster_be.domain.user.dto.response.UserProfileResponse;
 import com.example.englishmaster_be.domain.user.dto.response.UserResponse;
 import com.example.englishmaster_be.model.user.UserEntity;
+import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -13,7 +14,7 @@ import org.mapstruct.factory.Mappers;
 import java.util.List;
 
 
-@Mapper
+@Mapper(builder = @Builder(disableBuilder = true))
 public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);

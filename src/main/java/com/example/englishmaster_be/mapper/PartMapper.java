@@ -4,6 +4,7 @@ package com.example.englishmaster_be.mapper;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
+import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -11,7 +12,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper
+@Mapper(builder = @Builder(disableBuilder = true))
 public interface PartMapper {
 
     PartMapper INSTANCE = Mappers.getMapper(PartMapper.class);

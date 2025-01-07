@@ -1,31 +1,45 @@
 package com.example.englishmaster_be.domain.excel_fill.service;
 
+import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
 import com.example.englishmaster_be.common.constant.PartEnum;
+import com.example.englishmaster_be.common.constant.excel.ExcelHeaderContentConstant;
+import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionContentResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
-import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionListResponse;
+import com.example.englishmaster_be.domain.topic.service.ITopicService;
+import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.mapper.QuestionMapper;
+import com.example.englishmaster_be.model.answer.AnswerEntity;
+import com.example.englishmaster_be.model.answer.AnswerRepository;
+import com.example.englishmaster_be.model.content.ContentEntity;
 import com.example.englishmaster_be.model.content.ContentRepository;
+import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.part.PartRepository;
 import com.example.englishmaster_be.domain.pack.service.IPackService;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.helper.ExcelHelper;
+import com.example.englishmaster_be.model.question.QuestionEntity;
+import com.example.englishmaster_be.model.question.QuestionRepository;
+import com.example.englishmaster_be.model.topic.TopicEntity;
+import com.example.englishmaster_be.model.user.UserEntity;
+import com.example.englishmaster_be.util.ContentUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.apache.poi.ss.usermodel.DateUtil;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,17 +48,27 @@ import java.util.UUID;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ExcelFillService implements IExcelFillService {
+
+    ContentUtil contentUtil;
 
     PartRepository partRepository;
 
     ContentRepository contentRepository;
 
+    QuestionRepository questionRepository;
+
+    AnswerRepository answerRepository;
+
     IPackService packService;
 
     IPartService partService;
+
+    ITopicService topicService;
+
+    IUserService userService;
 
 
     @Transactional
@@ -52,7 +76,7 @@ public class ExcelFillService implements IExcelFillService {
     public ExcelTopicResponse parseCreateTopicDTO(MultipartFile file) {
 
         if(file == null || file.isEmpty())
-            throw new BadRequestException("Please select a file_storage to upload");
+            throw new BadRequestException("Please select a file storage to upload");
 
         if(ExcelHelper.isExcelFile(file))
             throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
@@ -60,14 +84,18 @@ public class ExcelFillService implements IExcelFillService {
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
 
             Sheet sheet = workbook.getSheetAt(0);
-            String topicName = getCellValueAsString(sheet, 0, 1);
-            String topicImageName = getCellValueAsString(sheet, 1, 1);
-            String topicDescription = getCellValueAsString(sheet, 2, 1);
-            String topicType = getCellValueAsString(sheet, 3, 1);
-            String workTime = getCellValueAsString(sheet, 4, 1).replace(".0", "");
-            int numberQuestion = getIntCellValue(sheet, 5, 1);
-            String topicPackName = getCellValueAsString(sheet, 6, 1);
-            List<UUID> parts = parseParts(getCellValueAsString(sheet, 7, 1));
+
+            if (sheet == null)
+                throw new BadRequestException(String.format("Sheet %s does not exist", 0));
+
+            String topicName = ExcelHelper.getCellValueAsString(sheet, 0, 1);
+            String topicImageName = ExcelHelper.getCellValueAsString(sheet, 1, 1);
+            String topicDescription = ExcelHelper.getCellValueAsString(sheet, 2, 1);
+            String topicType = ExcelHelper.getCellValueAsString(sheet, 3, 1);
+            String workTime = ExcelHelper.getCellValueAsString(sheet, 4, 1).replace(".0", "");
+            int numberQuestion = ExcelHelper.getIntCellValue(sheet, 5, 1);
+            String topicPackName = ExcelHelper.getCellValueAsString(sheet, 6, 1);
+            List<UUID> parts = parseParts(ExcelHelper.getCellValueAsString(sheet, 7, 1));
             return ExcelTopicResponse.builder()
                     .topicName(topicName)
                     .topicImageName(topicImageName)
@@ -87,375 +115,736 @@ public class ExcelFillService implements IExcelFillService {
 
     @Transactional
     @Override
-    public ExcelQuestionListResponse parseListeningPart12DTO(UUID topicId, MultipartFile file, int part) {
+    @SneakyThrows
+    public ExcelQuestionListResponse importQuestionListeningPart12Excel(UUID topicId, MultipartFile file, int part) {
 
-        if (file == null || file.isEmpty())
-            throw new BadRequestException("Please select a file_storage to upload");
+        if(file == null || file.isEmpty())
+            throw new BadRequestException("Please select a file excel to upload");
 
         if (part != 1 && part != 2)
-            throw new BadRequestException("Invalid PartEntity Value. It must be either 1 or 2");
-
-        if (ExcelHelper.isExcelFile(file))
-            throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
-
-        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
-
-            Sheet sheet = workbook.getSheetAt(part); // Truy cập sheet theo phần (part)
-            ExcelQuestionListResponse resultDTO = new ExcelQuestionListResponse();
-            List<ExcelQuestionResponse> listQuestionDTO = new ArrayList<>();
-            ExcelQuestionResponse questionBig = new ExcelQuestionResponse();
-            List<ExcelQuestionResponse> listQuestionDTOMini = new ArrayList<>();
-
-            // Lấy thông tin câu hỏi lớn từ các hàng đầu tiên của sheet
-            Row rowAudio = sheet.getRow(1);
-            String contentAudio = rowAudio != null ? getStringCellValue(rowAudio.getCell(1)) : "";
-            String contentAudioLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentAudio);
-
-            Row rowScoreBig = sheet.getRow(2);
-            int scoreBig = rowScoreBig != null ? (int) getNumericCellValue(rowScoreBig.getCell(1)) : 0;
-
-            // Cập nhật thông tin cho câu hỏi lớn
-            questionBig.setContentAudio(contentAudioLink);
-            questionBig.setQuestionScore(scoreBig);
-            UUID partId = part == 1 ? partRepository.findByPartName(PartEnum.PART_1.getContent()).orElseThrow(() -> new CustomException(ErrorEnum.PART_NOT_FOUND)).getPartId()
-                    : partRepository.findByPartName(PartEnum.PART_2.getContent()).orElseThrow(() -> new CustomException(ErrorEnum.PART_NOT_FOUND)).getPartId();
-            questionBig.setPartId(partId);
-
-            // Lấy các câu hỏi con từ sheet
-            for (int i = 4; i <= sheet.getLastRowNum(); i++) {
-                Row row = sheet.getRow(i);
-                if (row != null) {
-                    ExcelQuestionResponse question = new ExcelQuestionResponse();
-                    question.setPartId(partId);
-
-                    // Xử lý câu trả lời với các tuỳ chọn A, B, C, D (phần 1) hoặc A, B, C (phần 2)
-                    String[] options = part == 1 ? new String[]{"A", "B", "C", "D"} : new String[]{"A", "B", "C"};
-                    String correctAnswer = getStringCellValue(row.getCell(1));
-                    int score = (int) getNumericCellValue(row.getCell(2));
-                    question.setQuestionScore(score);
-
-                    // Tạo danh sách câu trả lời
-                    List<AnswerBasicRequest> listAnswerDTO = new ArrayList<>();
-                    for (String option : options) {
-                        AnswerBasicRequest answer = new AnswerBasicRequest();
-                        answer.setAnswerContent(option);
-                        answer.setCorrectAnswer(correctAnswer.equalsIgnoreCase(option));
-                        listAnswerDTO.add(answer);
-                    }
-                    question.setListAnswer(listAnswerDTO);
-
-                    // Thêm câu hỏi vào danh sách câu hỏi con
-                    listQuestionDTOMini.add(question);
-                }
-            }
-
-            // Cập nhật thông tin câu hỏi lớn với danh sách câu hỏi con
-            questionBig.setListQuestionChild(listQuestionDTOMini);
-            listQuestionDTO.add(questionBig);
-
-            // Đặt danh sách câu hỏi vào Request kết quả
-            resultDTO.setQuestions(listQuestionDTO);
-            return resultDTO;
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new CustomException(part == 1 ? ErrorEnum.CAN_NOT_CREATE_PART_1_BY_EXCEL : ErrorEnum.CAN_NOT_CREATE_PART_2_BY_EXCEL);
-        }
-    }
-
-
-    @Transactional
-    @Override
-    public ExcelQuestionListResponse parseReadingPart5DTO(UUID topicId, MultipartFile file) throws IOException {
-
-        if(file == null || file.isEmpty())
-            throw new BadRequestException("Please select a file_storage to upload");
+            throw new BadRequestException("Invalid Part value. It must be either 1 or 2");
 
         if(ExcelHelper.isExcelFile(file))
             throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
 
+        UserEntity currentUser = userService.currentUser();
+
+        TopicEntity topicEntity = topicService.getTopicById(topicId);
+
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
-            Sheet sheet = workbook.getSheetAt(5);
-            ExcelQuestionListResponse resultDTO = new ExcelQuestionListResponse();
-            List<ExcelQuestionResponse> listQuestionDTO = new ArrayList<>();
-            ExcelQuestionResponse questionBig = new ExcelQuestionResponse();
-            List<ExcelQuestionResponse> listQuestionDTOMini = new ArrayList<>();
-            int scoreBig = (int) getNumericCellValue(sheet.getRow(1).getCell(1));
-            questionBig.setQuestionScore(scoreBig);
-            questionBig.setPartId(partRepository.findByPartName(PartEnum.PART_5.getContent()).orElseThrow(() -> new CustomException(ErrorEnum.PART_NOT_FOUND)).getPartId());
-            for (int i = 3; i <= sheet.getLastRowNum(); i++) {
-                Row row = sheet.getRow(i);
-                if (row != null) {
-                    ExcelQuestionResponse question = new ExcelQuestionResponse();
-                    question.setPartId(questionBig.getPartId());
-                    question.setQuestionContent(row.getCell(1).getStringCellValue());
-                    int score = (int) getNumericCellValue(row.getCell(7));
-                    question.setQuestionScore(score);
-                    List<AnswerBasicRequest> listAnswerDTO = processAnswers(
-                            getStringCellValue(row, 2),
-                            getStringCellValue(row, 3),
-                            getStringCellValue(row, 4),
-                            getStringCellValue(row, 5),
-                            getStringCellValue(row, 6)
+
+            Sheet sheet = workbook.getSheetAt(part);
+
+            if (sheet == null)
+                throw new BadRequestException(String.format("Sheet %s does not exist", part));
+
+            int iRowPartName = 0;
+
+            Row firstRow = sheet.getRow(iRowPartName);
+
+            if(firstRow == null)
+                throw new BadRequestException("First row for part name is required in sheet with name is PART 1 or PART 2 !");
+
+            String partNameAtFirstRow = ExcelHelper.getStringCellValue(firstRow, 0);
+
+            if(
+                    !partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_1.getName()) && part == 1
+                            || !partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_2.getName()) && part == 2
+            ) throw new BadRequestException("Part name at first row must defined with PART 1 or PART 2.");
+
+            PartEntity partEntity;
+
+            if(partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_1.getName()))
+                partEntity = partService.getPartToName(PartEnum.PART_1.getName());
+            else partEntity = partService.getPartToName(PartEnum.PART_2.getName());
+
+            // bỏ qua dòng đầu tiên vì đã được đọc
+            int countRowWillFetch = sheet.getLastRowNum() - 1;
+
+            int iRowAudioPath = iRowPartName + 1;
+
+            int iRowTotalScore = iRowAudioPath + 1;
+
+            ExcelQuestionContentResponse excelQuestionContentResponse = ExcelHelper.collectContentPart1234567With(sheet, iRowAudioPath, null, iRowTotalScore, part);
+
+            QuestionEntity questionParent = QuestionEntity.builder()
+                    .questionId(UUID.randomUUID())
+                    .part(partEntity)
+                    .topics(List.of(topicEntity))
+                    .userCreate(currentUser)
+                    .userUpdate(currentUser)
+                    .isQuestionParent(Boolean.TRUE)
+                    .questionType(QuestionTypeEnum.Question_Parent)
+                    .questionScore(excelQuestionContentResponse.getTotalScore())
+                    .build();
+
+            questionParent = questionRepository.save(questionParent);
+
+            if(questionParent.getQuestionGroupChildren() == null)
+                questionParent.setQuestionGroupChildren(new ArrayList<>());
+
+            if(questionParent.getContentCollection() == null)
+                questionParent.setContentCollection(new ArrayList<>());
+
+            ContentEntity contentAudio = contentUtil.makeQuestionContentEntity(
+                    currentUser,
+                    questionParent,
+                    excelQuestionContentResponse.getAudioPath()
+            );
+
+            contentAudio = contentRepository.save(contentAudio);
+            questionParent.getContentCollection().add(contentAudio);
+
+            int iRowHeaderTable = iRowTotalScore + 1;
+
+            ExcelHelper.checkHeaderTabQuestionPart1234567With(sheet, iRowHeaderTable, part);
+
+            // bỏ qua 3 dòng vì đã đọc được audio path, total score và check structure header table
+            countRowWillFetch -= 3;
+
+            int totalRowInSheet = sheet.getLastRowNum();
+
+            while (countRowWillFetch >= 0){
+
+                int iRowBodyTable = totalRowInSheet - countRowWillFetch;
+
+                Row rowBodyTable = sheet.getRow(iRowBodyTable);
+
+                int jColQuestionResult = 1;
+                int jColQuestionScore = 2;
+
+                String resultTrueQuestion = ExcelHelper.getStringCellValue(rowBodyTable, jColQuestionResult);
+                int scoreTrueQuestion = (int) rowBodyTable.getCell(jColQuestionScore).getNumericCellValue();
+
+                QuestionEntity questionChildren = QuestionEntity.builder()
+                        .questionId(UUID.randomUUID())
+                        .questionScore(scoreTrueQuestion)
+                        .questionGroupParent(questionParent)
+                        .isQuestionParent(Boolean.FALSE)
+                        .questionResult(resultTrueQuestion)
+                        .questionType(QuestionTypeEnum.Multiple_Choice)
+                        .userCreate(currentUser)
+                        .userUpdate(currentUser)
+                        .build();
+
+                questionChildren = questionRepository.save(questionChildren);
+
+                if(part == 1){
+
+                    int jColQuestionImage = 3;
+
+                    String imageQuestion = ExcelHelper.getStringCellValue(rowBodyTable, jColQuestionImage);
+
+                    ContentEntity contentImage = contentUtil.makeQuestionContentEntity(
+                            currentUser,
+                            questionChildren,
+                            imageQuestion
                     );
-                    question.setListAnswer(listAnswerDTO);
-                    listQuestionDTOMini.add(question);
+
+                    contentImage = contentRepository.save(contentImage);
+
+                    if (questionChildren.getContentCollection() == null)
+                        questionChildren.setContentCollection(new ArrayList<>());
+
+                    questionChildren.getContentCollection().add(contentImage);
                 }
+
+                questionParent.getQuestionGroupChildren().add(questionChildren);
+
+                countRowWillFetch--;
+
             }
-            questionBig.setListQuestionChild(listQuestionDTOMini);
-            listQuestionDTO.add(questionBig);
-            resultDTO.setQuestions(listQuestionDTO);
-            return resultDTO;
-        } catch (Exception e) {
-            throw new CustomException(ErrorEnum.CAN_NOT_CREATE_TOPIC_BY_EXCEL);
+
+            ExcelQuestionResponse excelQuestionResponse = QuestionMapper.INSTANCE.toExcelQuestionResponse(questionParent);
+
+            excelQuestionResponse.setTopicId(topicId);
+
+            List<ExcelQuestionResponse> excelQuestionResponseList = List.of(excelQuestionResponse);
+
+            return ExcelQuestionListResponse.builder()
+                    .questions(excelQuestionResponseList)
+                    .build();
+
         }
+//        catch (Exception e) {
+//            e.printStackTrace();
+//            throw new CustomException(part == 1 ? ErrorEnum.CAN_NOT_CREATE_PART_1_BY_EXCEL : ErrorEnum.CAN_NOT_CREATE_PART_2_BY_EXCEL);
+//        }
+    }
+
+
+    @Transactional
+    @Override
+    @SneakyThrows
+    public ExcelQuestionListResponse importQuestionReadingPart5Excel(UUID topicId, MultipartFile file) {
+
+        if(file == null || file.isEmpty())
+            throw new BadRequestException("Please select a file excel to upload");
+
+        if(ExcelHelper.isExcelFile(file))
+            throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
+
+        UserEntity currentUser = userService.currentUser();
+
+        TopicEntity topicEntity = topicService.getTopicById(topicId);
+
+        int part = 5;
+
+        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+
+            Sheet sheet = workbook.getSheetAt(part);
+
+            if (sheet == null)
+                throw new BadRequestException(String.format("Sheet %s does not exist", part));
+
+            int iRowPartName = 0;
+
+            Row firstRow = sheet.getRow(iRowPartName);
+
+            if(firstRow == null)
+                throw new BadRequestException("First row for part name is required in sheet with name is PART 5!");
+
+            String partNameAtFirstRow = ExcelHelper.getStringCellValue(firstRow, 0);
+
+            if(
+                    !partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_5.getName())
+            ) throw new BadRequestException("Part name at first row must defined with PART 5.");
+
+            PartEntity partEntity = partService.getPartToName(PartEnum.PART_5.getName());
+
+            // bỏ qua dòng đầu tiên vì đã được đọc
+            int countRowWillFetch = sheet.getLastRowNum() - 1;
+
+            int iRowTotalScore = iRowPartName + 1;
+
+            ExcelQuestionContentResponse excelQuestionContentResponse = ExcelHelper.collectContentPart1234567With(sheet, null, null, iRowTotalScore, part);
+
+            QuestionEntity questionParent = QuestionEntity.builder()
+                    .questionId(UUID.randomUUID())
+                    .part(partEntity)
+                    .topics(List.of(topicEntity))
+                    .userCreate(currentUser)
+                    .userUpdate(currentUser)
+                    .isQuestionParent(Boolean.TRUE)
+                    .questionType(QuestionTypeEnum.Question_Parent)
+                    .questionScore(excelQuestionContentResponse.getTotalScore())
+                    .build();
+
+            questionParent = questionRepository.save(questionParent);
+
+            if(questionParent.getQuestionGroupChildren() == null)
+                questionParent.setQuestionGroupChildren(new ArrayList<>());
+
+            int iRowHeaderTable = iRowTotalScore + 1;
+
+            ExcelHelper.checkHeaderTabQuestionPart1234567With(sheet, iRowHeaderTable, part);
+
+            // bỏ qua 2 dòng vì đã đọc được total score và check structure header table
+            countRowWillFetch -= 2;
+
+            int totalRowInSheet = sheet.getLastRowNum();
+
+            while (countRowWillFetch >= 0){
+
+                int iRowBodyTable = totalRowInSheet - countRowWillFetch;
+
+                Row rowBodyTable = sheet.getRow(iRowBodyTable);
+
+                int jColQuestionContent = 1;
+                int jColResultTrueAnswer = 6;
+                int jColQuestionScore = 7;
+
+                String questionContent = ExcelHelper.getStringCellValue(rowBodyTable, jColQuestionContent);
+                String resultTrueQuestion = ExcelHelper.getStringCellValue(rowBodyTable, jColResultTrueAnswer);
+                int scoreTrueQuestion = (int) rowBodyTable.getCell(jColQuestionScore).getNumericCellValue();
+
+                QuestionEntity questionChildren = QuestionEntity.builder()
+                        .questionId(UUID.randomUUID())
+                        .questionContent(questionContent)
+                        .questionScore(scoreTrueQuestion)
+                        .questionGroupParent(questionParent)
+                        .isQuestionParent(Boolean.FALSE)
+                        .questionResult(resultTrueQuestion)
+                        .questionType(QuestionTypeEnum.Multiple_Choice_To_Fill_In_Blank)
+                        .userCreate(currentUser)
+                        .userUpdate(currentUser)
+                        .build();
+
+                questionChildren = questionRepository.save(questionChildren);
+
+                if(questionChildren.getAnswers() == null)
+                    questionChildren.setAnswers(new ArrayList<>());
+
+                int jA_Begin = 2;
+                int jD_Last = 5;
+
+                for(int j = jA_Begin; j <= jD_Last; j++) {
+
+                    String answerContent = ExcelHelper.getStringCellValue(rowBodyTable, j);
+
+                    AnswerEntity answerEntity = AnswerEntity.builder()
+                            .answerId(UUID.randomUUID())
+                            .answerContent(answerContent)
+                            .correctAnswer(answerContent.equalsIgnoreCase(resultTrueQuestion))
+                            .question(questionChildren)
+                            .userCreate(currentUser)
+                            .userUpdate(currentUser)
+                            .build();
+
+                    answerEntity = answerRepository.save(answerEntity);
+
+                    questionChildren.getAnswers().add(answerEntity);
+                }
+
+                questionParent.getQuestionGroupChildren().add(questionChildren);
+
+                countRowWillFetch--;
+
+            }
+
+            ExcelQuestionResponse excelQuestionResponse = QuestionMapper.INSTANCE.toExcelQuestionResponse(questionParent);
+
+            excelQuestionResponse.setTopicId(topicId);
+
+            List<ExcelQuestionResponse> excelQuestionResponseList = List.of(excelQuestionResponse);
+
+            return ExcelQuestionListResponse.builder()
+                    .questions(excelQuestionResponseList)
+                    .build();
+        }
+//        catch (Exception e) {
+//            throw new CustomException(ErrorEnum.CAN_NOT_CREATE_TOPIC_BY_EXCEL);
+//        }
     }
 
     @Transactional
     @Override
-    public ExcelQuestionListResponse parseListeningPart34DTO(UUID topicId, MultipartFile file, int part) {
+    @SneakyThrows
+    public ExcelQuestionListResponse importQuestionListeningPart34Excel(UUID topicId, MultipartFile file, int part) {
 
         if(file == null || file.isEmpty())
-            throw new BadRequestException("Please select a file_storage to upload");
+            throw new BadRequestException("Please select a file excel to upload");
 
         if (part != 3 && part != 4)
-            throw new BadRequestException("Invalid PartEntity Value. It must be either 3 or 4");
+            throw new BadRequestException("Invalid Part value. It must be either 3 or 4");
 
         if(ExcelHelper.isExcelFile(file))
             throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
 
+        TopicEntity topicEntity = topicService.getTopicById(topicId);
+
+        UserEntity currentUser = userService.currentUser();
+
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
 
             Sheet sheet = workbook.getSheetAt(part);
-            List<ExcelQuestionResponse> listeningParts = new ArrayList<>();
-            ExcelQuestionResponse currentListeningPart = null;
-            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-                Row row = sheet.getRow(i);
-                if (row == null) continue;
-                String firstCellValue = getStringCellValue(row, 0);
-                if (firstCellValue.equalsIgnoreCase("Audio")) {
-                    if (currentListeningPart != null) {
-                        listeningParts.add(currentListeningPart);
-                    }
-                    currentListeningPart = new ExcelQuestionResponse();
-                    currentListeningPart.setPartId(part == 3 ? partService.getPartToName(PartEnum.PART_3.getContent()).getPartId() : partService.getPartToName(PartEnum.PART_4.getContent()).getPartId());
-                    String contentAudio = getStringCellValue(row, 1) == null ? null : getStringCellValue(row, 1);
-                    if (contentAudio != null) {
-                        String contentAudioLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentAudio);
-                        currentListeningPart.setContentAudio(contentAudioLink);
-                    }
-                } else if (firstCellValue.equalsIgnoreCase("Score")) {
-                    if (currentListeningPart != null) {
-                        currentListeningPart.setQuestionScore(getNumericCellValue(row, 1));
-                    }
-                } else if (firstCellValue.equalsIgnoreCase("STT")) {
-                    continue;
-                } else if (firstCellValue.equalsIgnoreCase("Image")) {
-                    if (currentListeningPart != null) {
-                        String contentImage = getStringCellValue(row, 1);
-                        String contentImageLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentImage);
-                        currentListeningPart.setContentImage(contentImageLink);
-                    }
-                } else if (currentListeningPart != null) {
-                    ExcelQuestionResponse question = new ExcelQuestionResponse();
-                    question.setQuestionContent(getStringCellValue(row, 1));
-                    question.setQuestionScore(getNumericCellValue(row, 7));
-                    question.setPartId(currentListeningPart.getPartId());
-                    List<AnswerBasicRequest> listAnswerDTO = processAnswers(
-                            getStringCellValue(row, 2),
-                            getStringCellValue(row, 3),
-                            getStringCellValue(row, 4),
-                            getStringCellValue(row, 5),
-                            getStringCellValue(row, 6)
-                    );
-                    question.setListAnswer(listAnswerDTO);
-                    if (currentListeningPart.getListQuestionChild() == null) {
-                        currentListeningPart.setListQuestionChild(new ArrayList<>());
-                    }
-                    currentListeningPart.getListQuestionChild().add(question);
-                }
-            }
-            if (currentListeningPart != null) {
-                listeningParts.add(currentListeningPart);
-            }
-            ExcelQuestionListResponse result = new ExcelQuestionListResponse();
-            result.setQuestions(listeningParts);
-            return result;
-        } catch (Exception e) {
 
-            throw new CustomException(part == 3 ? ErrorEnum.CAN_NOT_CREATE_PART_3_BY_EXCEL : ErrorEnum.CAN_NOT_CREATE_PART_4_BY_EXCEL);
+            if (sheet == null)
+                throw new BadRequestException(String.format("Sheet %s does not exist", part));
+
+            int iRowPartName = 0;
+
+            Row firstRow = sheet.getRow(iRowPartName);
+
+            if(firstRow == null)
+                throw new BadRequestException("First row for part name is required in sheet with name is PART 3 or PART 4!");
+
+            String partNameAtFirstRow = ExcelHelper.getStringCellValue(firstRow, 0);
+
+            if(
+                    !partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_3.getName()) && part == 3
+                || !partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_4.getName()) && part == 4
+            ) throw new BadRequestException("Part name at first row must defined with PART 3 or PART 4.");
+
+            PartEntity partEntity;
+
+            if(partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_3.getName()))
+                partEntity = partService.getPartToName(PartEnum.PART_3.getName());
+            else partEntity = partService.getPartToName(PartEnum.PART_4.getName());
+
+            List<ExcelQuestionResponse> excelQuestionResponseList = new ArrayList<>();
+
+            // bỏ qua dòng đầu tiên vì đã được đọc
+            int countRowWillFetch = sheet.getLastRowNum() - 1;
+
+            int iRowAudioPath = iRowPartName + 1;
+
+            while(countRowWillFetch >= 0) {
+
+                int iRowImage = iRowAudioPath + 1;
+                int iRowTotalScore = iRowImage + 1;
+
+                ExcelQuestionContentResponse excelQuestionContentResponse = ExcelHelper.collectContentPart1234567With(sheet, iRowAudioPath, iRowImage, iRowTotalScore, part);
+
+                QuestionEntity questionParent = QuestionEntity.builder()
+                        .questionId(UUID.randomUUID())
+                        .part(partEntity)
+                        .topics(List.of(topicEntity))
+                        .userCreate(currentUser)
+                        .userUpdate(currentUser)
+                        .isQuestionParent(Boolean.TRUE)
+                        .questionType(QuestionTypeEnum.Question_Parent)
+                        .questionScore(excelQuestionContentResponse.getTotalScore())
+                        .build();
+
+                questionParent = questionRepository.save(questionParent);
+
+                if(questionParent.getQuestionGroupChildren() == null)
+                    questionParent.setQuestionGroupChildren(new ArrayList<>());
+
+                if(questionParent.getContentCollection() == null)
+                    questionParent.setContentCollection(new ArrayList<>());
+
+                ContentEntity contentAudio = contentUtil.makeQuestionContentEntity(
+                        currentUser,
+                        questionParent,
+                        excelQuestionContentResponse.getAudioPath()
+                );
+
+                contentAudio = contentRepository.save(contentAudio);
+                questionParent.getContentCollection().add(contentAudio);
+
+                ContentEntity contentImage = contentUtil.makeQuestionContentEntity(
+                        currentUser,
+                        questionParent,
+                        excelQuestionContentResponse.getImagePath()
+                );
+
+                contentImage = contentRepository.save(contentImage);
+                questionParent.getContentCollection().add(contentImage);
+
+                int iRowHeaderTable = iRowTotalScore + 1;
+
+                ExcelHelper.checkHeaderTabQuestionPart1234567With(sheet, iRowHeaderTable, part);
+
+                int iRowBodyTable = iRowHeaderTable + 1;
+
+                //bỏ qua 4 dòng vị đã dọc audio, image, score, và check structure header table
+                countRowWillFetch -= 4;
+
+                while(true){
+
+                    Row rowBodyTable = sheet.getRow(iRowBodyTable);
+
+                    if(rowBodyTable == null || countRowWillFetch < 0){
+                        countRowWillFetch = -1;
+                        break;
+                    }
+
+                    Cell cellQuestionContent = rowBodyTable.getCell(0);
+
+                    if(
+                            cellQuestionContent.getCellType().equals(CellType.STRING)
+                            && cellQuestionContent.getStringCellValue().equalsIgnoreCase(ExcelHeaderContentConstant.Audio.getHeaderName())
+                    ) {
+
+                        iRowAudioPath = iRowBodyTable;
+                        break;
+                    }
+
+                    int jColQuestionContent = 1;
+                    int jColResultTrueAnswer = 6;
+                    int jColQuestionScore = 7;
+
+                    String questionContent = ExcelHelper.getStringCellValue(rowBodyTable, jColQuestionContent);
+                    String resultTrueQuestion = ExcelHelper.getStringCellValue(rowBodyTable, jColResultTrueAnswer);
+                    int scoreTrueQuestion = (int) rowBodyTable.getCell(jColQuestionScore).getNumericCellValue();
+
+                    QuestionEntity questionChildren = QuestionEntity.builder()
+                            .questionId(UUID.randomUUID())
+                            .questionContent(questionContent)
+                            .questionScore(scoreTrueQuestion)
+                            .questionGroupParent(questionParent)
+                            .isQuestionParent(Boolean.FALSE)
+                            .questionResult(resultTrueQuestion)
+                            .questionType(QuestionTypeEnum.Multiple_Choice)
+                            .userCreate(currentUser)
+                            .userUpdate(currentUser)
+                            .build();
+
+                    questionChildren = questionRepository.save(questionChildren);
+
+                    if(questionChildren.getAnswers() == null)
+                        questionChildren.setAnswers(new ArrayList<>());
+
+                    int jA_Begin = 2;
+                    int jD_Last = 5;
+
+                    for(int j = jA_Begin; j <= jD_Last; j++) {
+
+                        String answerContent = ExcelHelper.getStringCellValue(rowBodyTable, j);
+
+                        AnswerEntity answerEntity = AnswerEntity.builder()
+                                .answerId(UUID.randomUUID())
+                                .answerContent(answerContent)
+                                .correctAnswer(answerContent.equalsIgnoreCase(resultTrueQuestion))
+                                .question(questionChildren)
+                                .userCreate(currentUser)
+                                .userUpdate(currentUser)
+                                .build();
+
+                        answerEntity = answerRepository.save(answerEntity);
+
+                        questionChildren.getAnswers().add(answerEntity);
+                    }
+
+                    questionParent.getQuestionGroupChildren().add(questionChildren);
+
+                    countRowWillFetch--;
+
+                    iRowBodyTable++;
+                }
+
+                ExcelQuestionResponse excelQuestionResponse = QuestionMapper.INSTANCE.toExcelQuestionResponse(questionParent);
+
+                excelQuestionResponse.setTopicId(topicId);
+
+                excelQuestionResponseList.add(excelQuestionResponse);
+            }
+
+            return ExcelQuestionListResponse.builder()
+                    .questions(excelQuestionResponseList)
+                    .build();
+
         }
+//        catch (Exception e) {
+//
+//            throw new CustomException(part == 3 ? ErrorEnum.CAN_NOT_CREATE_PART_3_BY_EXCEL : ErrorEnum.CAN_NOT_CREATE_PART_4_BY_EXCEL);
+//        }
     }
 
     @Transactional
     @Override
-    public ExcelQuestionListResponse parseReadingPart67DTO(UUID topicId, MultipartFile file, int part) {
+    @SneakyThrows
+    public ExcelQuestionListResponse importQuestionReadingPart67Excel(UUID topicId, MultipartFile file, int part) {
 
         if(file == null || file.isEmpty())
-            throw new BadRequestException("Please select a file_storage to upload");
-
-        if (ExcelHelper.isExcelFile(file))
-            throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
+            throw new BadRequestException("Please select a file excel to upload");
 
         if (part != 6 && part != 7)
-            throw new BadRequestException("Invalid PartEntity Value. It must be either 6 or 7");
+            throw new BadRequestException("Invalid Part value. It must be either 6 or 7");
+
+        if(ExcelHelper.isExcelFile(file))
+            throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
+
+        TopicEntity topicEntity = topicService.getTopicById(topicId);
+
+        UserEntity currentUser = userService.currentUser();
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
 
             Sheet sheet = workbook.getSheetAt(part);
-            List<ExcelQuestionResponse> readingParts = new ArrayList<>();
-            ExcelQuestionResponse currentReadingPart = null;
-            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
-                Row row = sheet.getRow(i);
-                if (row == null) continue;
-                String firstCellValue = getStringCellValue(row, 0);
-                if (firstCellValue.equalsIgnoreCase("QuestionEntity ContentEntity")) {
-                    if (currentReadingPart != null) {
-                        readingParts.add(currentReadingPart);
-                    }
-                    currentReadingPart = new ExcelQuestionResponse();
-                    currentReadingPart.setPartId(part == 6 ? partService.getPartToName(PartEnum.PART_6.getContent()).getPartId() : partService.getPartToName(PartEnum.PART_5.getContent()).getPartId());
-                    currentReadingPart.setQuestionContent(getStringCellValue(row, 1));
-                } else if (firstCellValue.equalsIgnoreCase("Score")) {
-                    // Nếu là "Score", set điểm cho phần reading hiện tại
-                    if (currentReadingPart != null) {
-                        currentReadingPart.setQuestionScore(getNumericCellValue(row, 1));
-                    }
-                } else if (firstCellValue.equalsIgnoreCase("STT")) {
-                    continue;
-                } else if (firstCellValue.equalsIgnoreCase("Image")) {
-                    if (currentReadingPart != null) {
-                        String contentImage = getStringCellValue(row, 1);
-                        String contentImageLink = contentRepository.findContentDataByTopicIdAndCode(topicId, contentImage);
-                        currentReadingPart.setContentImage(contentImageLink);
-                    }
-                } else if (currentReadingPart != null) {
-                    ExcelQuestionResponse question = new ExcelQuestionResponse();
-                    question.setQuestionContent(getStringCellValue(row, 1));
-                    question.setQuestionScore(getNumericCellValue(row, 7));
-                    question.setPartId(currentReadingPart.getPartId());
-                    List<AnswerBasicRequest> listAnswerDTO = processAnswers(
-                            getStringCellValue(row, 2),
-                            getStringCellValue(row, 3),
-                            getStringCellValue(row, 4),
-                            getStringCellValue(row, 5),
-                            getStringCellValue(row, 6)
-                    );
-                    question.setListAnswer(listAnswerDTO);
-                    if (currentReadingPart.getListQuestionChild() == null) {
-                        currentReadingPart.setListQuestionChild(new ArrayList<>());
-                    }
-                    currentReadingPart.getListQuestionChild().add(question);
-                }
-            }
-            if (currentReadingPart != null) {
-                readingParts.add(currentReadingPart);
-            }
-            ExcelQuestionListResponse result = new ExcelQuestionListResponse();
-            result.setQuestions(readingParts);
-            return result;
-        } catch (Exception e) {
 
-            throw new CustomException(part == 6 ? ErrorEnum.CAN_NOT_CREATE_PART_6_BY_EXCEL : ErrorEnum.CAN_NOT_CREATE_PART_7_BY_EXCEL);
+            if (sheet == null)
+                throw new BadRequestException(String.format("Sheet %s does not exist", part));
+
+            int iRowPartName = 0;
+
+            Row firstRow = sheet.getRow(iRowPartName);
+
+            if(firstRow == null)
+                throw new BadRequestException("First row for part name is required in sheet with name is PART 6 or PART 7!");
+
+            String partNameAtFirstRow = ExcelHelper.getStringCellValue(firstRow, 0);
+
+            if(
+                    !partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_6.getName()) && part == 6
+                            || !partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_7.getName()) && part == 7
+            ) throw new BadRequestException("Part name at first row must defined with PART 6 or PART 7.");
+
+            PartEntity partEntity;
+
+            if(partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_6.getName()))
+                partEntity = partService.getPartToName(PartEnum.PART_6.getName());
+            else partEntity = partService.getPartToName(PartEnum.PART_7.getName());
+
+            List<ExcelQuestionResponse> excelQuestionResponseList = new ArrayList<>();
+
+            // bỏ qua dòng đầu tiên vì đã được đọc
+            int countRowWillFetch = sheet.getLastRowNum() - 1;
+
+            int iRowQuestionContent = iRowPartName + 1;
+
+            while(countRowWillFetch >= 0) {
+
+                Integer iRowImage = part == 7 ? iRowQuestionContent + 1 : null;
+                int iRowTotalScore = part == 7 ? iRowImage + 1 : iRowQuestionContent + 1;
+
+                ExcelQuestionContentResponse excelQuestionContentResponse = ExcelHelper.collectContentPart1234567With(sheet, iRowQuestionContent, iRowImage, iRowTotalScore, part);
+
+                QuestionEntity questionParent = QuestionEntity.builder()
+                        .questionId(UUID.randomUUID())
+                        .part(partEntity)
+                        .topics(List.of(topicEntity))
+                        .userCreate(currentUser)
+                        .userUpdate(currentUser)
+                        .isQuestionParent(Boolean.TRUE)
+                        .questionType(QuestionTypeEnum.Question_Parent)
+                        .questionScore(excelQuestionContentResponse.getTotalScore())
+                        .questionContent(excelQuestionContentResponse.getQuestionContent())
+                        .build();
+
+                questionParent = questionRepository.save(questionParent);
+
+                if(questionParent.getQuestionGroupChildren() == null)
+                    questionParent.setQuestionGroupChildren(new ArrayList<>());
+
+                if(part == 7){
+
+                    if(questionParent.getContentCollection() == null)
+                        questionParent.setContentCollection(new ArrayList<>());
+
+                    ContentEntity contentImage = contentUtil.makeQuestionContentEntity(
+                            currentUser,
+                            questionParent,
+                            excelQuestionContentResponse.getImagePath()
+                    );
+
+                    contentImage = contentRepository.save(contentImage);
+                    questionParent.getContentCollection().add(contentImage);
+                }
+
+                int iRowHeaderTable = iRowTotalScore + 1;
+
+                ExcelHelper.checkHeaderTabQuestionPart1234567With(sheet, iRowHeaderTable, part);
+
+                int iRowBodyTable = iRowHeaderTable + 1;
+
+                //bỏ qua 2 dòng nếu là part 6 hay 3 dòng nếu là part 7 vị đã dọc question content, image, score, và check structure header table
+                countRowWillFetch -= part == 7 ? 3 : 2;
+
+                while(true){
+
+                    Row rowBodyTable = sheet.getRow(iRowBodyTable);
+
+                    if(rowBodyTable == null || countRowWillFetch < 0){
+                        countRowWillFetch = -1;
+                        break;
+                    }
+
+                    Cell cellQuestionContent = rowBodyTable.getCell(0);
+
+                    if(
+                            cellQuestionContent.getCellType().equals(CellType.STRING)
+                                    && cellQuestionContent.getStringCellValue().equalsIgnoreCase(ExcelHeaderContentConstant.Question_Content.getHeaderName())
+                    ) {
+
+                        iRowQuestionContent = iRowBodyTable;
+                        break;
+                    }
+
+                    int jColQuestionContentChild = 1;
+                    int jColResultTrueAnswer = 6;
+                    int jColQuestionScore = 7;
+
+                    String questionContentChild = ExcelHelper.getStringCellValue(rowBodyTable, jColQuestionContentChild);
+                    String resultTrueQuestion = ExcelHelper.getStringCellValue(rowBodyTable, jColResultTrueAnswer);
+                    int scoreTrueQuestion = (int) rowBodyTable.getCell(jColQuestionScore).getNumericCellValue();
+
+                    QuestionEntity questionChildren = QuestionEntity.builder()
+                            .questionId(UUID.randomUUID())
+                            .questionContent(questionContentChild)
+                            .questionScore(scoreTrueQuestion)
+                            .questionGroupParent(questionParent)
+                            .isQuestionParent(Boolean.FALSE)
+                            .questionResult(resultTrueQuestion)
+                            .questionType(QuestionTypeEnum.Multiple_Choice)
+                            .userCreate(currentUser)
+                            .userUpdate(currentUser)
+                            .build();
+
+                    questionChildren = questionRepository.save(questionChildren);
+
+                    if(questionChildren.getAnswers() == null)
+                        questionChildren.setAnswers(new ArrayList<>());
+
+                    int jA_Begin = 2;
+                    int jD_Last = 5;
+
+                    for(int j = jA_Begin; j <= jD_Last; j++) {
+
+                        String answerContent = ExcelHelper.getStringCellValue(rowBodyTable, j);
+
+                        AnswerEntity answerEntity = AnswerEntity.builder()
+                                .answerId(UUID.randomUUID())
+                                .answerContent(answerContent)
+                                .correctAnswer(answerContent.equalsIgnoreCase(resultTrueQuestion))
+                                .question(questionChildren)
+                                .userCreate(currentUser)
+                                .userUpdate(currentUser)
+                                .build();
+
+                        answerEntity = answerRepository.save(answerEntity);
+
+                        questionChildren.getAnswers().add(answerEntity);
+                    }
+
+                    questionParent.getQuestionGroupChildren().add(questionChildren);
+
+                    countRowWillFetch--;
+
+                    iRowBodyTable++;
+                }
+
+                ExcelQuestionResponse excelQuestionResponse = QuestionMapper.INSTANCE.toExcelQuestionResponse(questionParent);
+
+                excelQuestionResponse.setTopicId(topicId);
+
+                excelQuestionResponseList.add(excelQuestionResponse);
+            }
+
+            return ExcelQuestionListResponse.builder()
+                    .questions(excelQuestionResponseList)
+                    .build();
         }
+//        catch (Exception e) {
+//
+//            throw new CustomException(part == 6 ? ErrorEnum.CAN_NOT_CREATE_PART_6_BY_EXCEL : ErrorEnum.CAN_NOT_CREATE_PART_7_BY_EXCEL);
+//        }
     }
 
     @Transactional
     @Override
-    public ExcelQuestionListResponse parseAllPartsDTO(UUID topicId, MultipartFile file) throws IOException {
+    @SneakyThrows
+    public ExcelQuestionListResponse importQuestionAllPartsExcel(UUID topicId, MultipartFile file) {
 
-        if(file == null || file.isEmpty())
-            throw new BadRequestException("Please select a file_storage to upload");
+        List<ExcelQuestionResponse> excelQuestionResponseList = new ArrayList<>();
 
-        if (ExcelHelper.isExcelFile(file))
-            throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
+        List.of(1, 2).forEach(
+                part ->{
 
-        ExcelQuestionListResponse result = new ExcelQuestionListResponse();
-        List<ExcelQuestionResponse> allQuestions = new ArrayList<>();
-        for (int part : new int[]{1, 2}) {
-            ExcelQuestionListResponse part12DTO = parseListeningPart12DTO(topicId, file, part);
-            allQuestions.addAll(part12DTO.getQuestions());
-        }
-        for (int part : new int[]{3, 4}) {
-            ExcelQuestionListResponse part34DTO = parseListeningPart34DTO(topicId, file, part);
-            allQuestions.addAll(part34DTO.getQuestions());
-        }
-        ExcelQuestionListResponse part5DTO = parseReadingPart5DTO(topicId, file);
-        allQuestions.addAll(part5DTO.getQuestions());
-        for (int part : new int[]{6, 7}) {
-            ExcelQuestionListResponse part67DTO = parseReadingPart67DTO(topicId, file, part);
-            allQuestions.addAll(part67DTO.getQuestions());
-        }
+                    ExcelQuestionListResponse excelQuestionListResponse = importQuestionListeningPart12Excel(topicId, file, part);
 
-        result.setQuestions(allQuestions);
+                    excelQuestionResponseList.addAll(excelQuestionListResponse.getQuestions());
+                });
 
-        return result;
+        List.of(3, 4).forEach(
+                part ->{
+
+                    ExcelQuestionListResponse excelQuestionListResponse = importQuestionListeningPart34Excel(topicId, file, part);
+
+                    excelQuestionResponseList.addAll(excelQuestionListResponse.getQuestions());
+                });
+
+
+        ExcelQuestionListResponse excelQuestionP5ListResponse = importQuestionReadingPart5Excel(topicId, file);
+
+        excelQuestionResponseList.addAll(excelQuestionP5ListResponse.getQuestions());
+
+        List.of(6, 7).forEach(
+                part ->{
+
+                    ExcelQuestionListResponse excelQuestionListResponse = importQuestionReadingPart67Excel(topicId, file, part);
+
+                    excelQuestionResponseList.addAll(excelQuestionListResponse.getQuestions());
+                });
+
+        return ExcelQuestionListResponse.builder()
+                .questions(excelQuestionResponseList)
+                .build();
     }
 
 
-    private String getStringCellValue(Cell cell) {
-
-        if (cell == null) return "";
-
-        return switch (cell.getCellType()) {
-            case STRING -> cell.getStringCellValue();
-            case NUMERIC -> String.valueOf(cell.getNumericCellValue());
-            default -> "";
-        };
-    }
-
-    private double getNumericCellValue(Cell cell) {
-
-        if (cell == null) return 0;
-
-        switch (cell.getCellType()) {
-            case NUMERIC:
-                return cell.getNumericCellValue();
-            case STRING:
-                try {
-                    return Double.parseDouble(cell.getStringCellValue());
-                } catch (NumberFormatException e) {
-                    return 0;
-                }
-            default:
-                return 0;
-        }
-    }
-
-    private String getCellValueAsString(Sheet sheet, int rowIndex, int cellIndex) {
-
-        Row row = sheet.getRow(rowIndex);
-
-        if (row == null) return "";
-
-        Cell cell = row.getCell(cellIndex);
-
-        if (cell == null) return "";
-
-        return switch (cell.getCellType()) {
-            case STRING -> cell.getStringCellValue();
-            case NUMERIC -> {
-                if (DateUtil.isCellDateFormatted(cell)) {
-                    yield cell.getLocalDateTimeCellValue().toString();
-                }
-                yield String.valueOf(cell.getNumericCellValue());
-            }
-            case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
-            case FORMULA -> cell.getCellFormula();
-            default -> "";
-        };
-    }
-
-    private int getIntCellValue(Sheet sheet, int rowIndex, int cellIndex) {
-
-        String value = getCellValueAsString(sheet, rowIndex, cellIndex);
-
-        try {
-            return (int) Double.parseDouble(value);
-        } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("Invalid number format at row " + (rowIndex + 1) + ", column " + (cellIndex + 1));
-        }
-    }
 
     private List<UUID> parseParts(String partsString) {
 
@@ -473,50 +862,5 @@ public class ExcelFillService implements IExcelFillService {
         return uuidList;
     }
 
-    private String getStringCellValue(Row row, int cellIndex) {
-
-        Cell cell = row.getCell(cellIndex);
-
-        if (cell == null) return "";
-
-        return switch (cell.getCellType()) {
-            case STRING -> cell.getStringCellValue();
-            case NUMERIC -> {
-                if (DateUtil.isCellDateFormatted(cell))
-                    yield cell.getDateCellValue().toString();
-                else yield String.valueOf(cell.getNumericCellValue());
-            }
-            case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
-            case FORMULA -> {
-                try {
-                    yield cell.getStringCellValue();
-                } catch (IllegalStateException e) {
-                    yield String.valueOf(cell.getNumericCellValue());
-                }
-            }
-            default -> "";
-        };
-    }
-
-    private int getNumericCellValue(Row row, int cellIndex) {
-        Cell cell = row.getCell(cellIndex);
-        return (cell != null) ? (int) cell.getNumericCellValue() : 0;
-    }
-
-    private List<AnswerBasicRequest> processAnswers(String optionA, String optionB, String optionC, String optionD, String result) {
-        List<AnswerBasicRequest> listAnswerDTO = new ArrayList<>();
-        listAnswerDTO.add(createAnswerDTO(optionA, result));
-        listAnswerDTO.add(createAnswerDTO(optionB, result));
-        listAnswerDTO.add(createAnswerDTO(optionC, result));
-        listAnswerDTO.add(createAnswerDTO(optionD, result));
-        return listAnswerDTO;
-    }
-
-    private AnswerBasicRequest createAnswerDTO(String option, String result) {
-        AnswerBasicRequest answerDTO = new AnswerBasicRequest();
-        answerDTO.setAnswerContent(option);
-        answerDTO.setCorrectAnswer(option != null && option.equalsIgnoreCase(result));
-        return answerDTO;
-    }
 
 }

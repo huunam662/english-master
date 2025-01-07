@@ -1,6 +1,10 @@
 package com.example.englishmaster_be.domain.excel_fill.dto.response;
 
+import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
+import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
+import com.example.englishmaster_be.domain.content.dto.response.ContentBasicResponse;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -19,11 +23,11 @@ public class ExcelQuestionResponse {
 
     UUID partId;
 
+    UUID topicId;
+
     String questionContent;
 
-    String contentImage;
-
-    String contentAudio;
+    String questionResult;
 
     String questionExplainEn;
 
@@ -31,24 +35,13 @@ public class ExcelQuestionResponse {
 
     Integer questionScore;
 
-    List<AnswerBasicRequest> listAnswer;
+    Boolean isQuestionParent;
 
-    List<ExcelQuestionResponse> listQuestionChild;
+    QuestionTypeEnum questionType;
 
+    List<ContentBasicResponse> contents;
 
-    @Override
-    public String toString() {
-        return "CreateQuestionByExcelFileDTO{" +
-                "questionId=" + questionId +
-                ", questionContent='" + questionContent + '\'' +
-                ", questionScore=" + questionScore +
-                ", contentImage='" + contentImage + '\'' +
-                ", contentAudio='" + contentAudio + '\'' +
-                ", partId=" + partId +
-                ", listAnswer=" + listAnswer +
-                ", listQuestionChild=" + listQuestionChild +
-                ", questionExplainEn='" + questionExplainEn + '\'' +
-                ", questionExplainVn='" + questionExplainVn + '\'' +
-                '}';
-    }
+    List<AnswerResponse> answers;
+
+    List<ExcelQuestionResponse> questionsChildren;
 }

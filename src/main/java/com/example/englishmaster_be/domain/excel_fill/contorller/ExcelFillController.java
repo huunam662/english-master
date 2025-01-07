@@ -28,7 +28,7 @@ public class ExcelFillController {
     @PostMapping(value = "/importExcel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @DefaultMessage("File processed successfully")
     @SneakyThrows
-    public ExcelTopicResponse getCreateTopicByExcelFileDTO(@RequestParam("file") MultipartFile file) {
+    public ExcelTopicResponse getCreateTopicByExcelFileDTO(@RequestPart("file") MultipartFile file) {
 
         return excelService.parseCreateTopicDTO(file);
     }
@@ -38,11 +38,11 @@ public class ExcelFillController {
     @SneakyThrows
     public ExcelQuestionListResponse getCreateQuestionPart67ByExcelFileDTO(
             @RequestParam("topicId") UUID topicId,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("part") int part
+            @RequestParam("part") int part,
+            @RequestPart("file") MultipartFile file
     ) {
 
-        return excelService.parseReadingPart67DTO(topicId, file, part);
+        return excelService.importQuestionReadingPart67Excel(topicId, file, part);
     }
 
     @PostMapping(value = "/importQuestionPart5", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -50,10 +50,10 @@ public class ExcelFillController {
     @SneakyThrows
     public ExcelQuestionListResponse getCreateQuestionByExcelFileDTO(
             @RequestParam("topicId") UUID topicId,
-            @RequestParam("file") MultipartFile file
+            @RequestPart("file") MultipartFile file
     ) {
 
-        return excelService.parseReadingPart5DTO(topicId, file);
+        return excelService.importQuestionReadingPart5Excel(topicId, file);
     }
 
     @PostMapping(value = "/importQuestionPart12", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -61,11 +61,11 @@ public class ExcelFillController {
     @SneakyThrows
     public ExcelQuestionListResponse getCreateQuestionPart12ByExcelFileDTO(
             @RequestParam("topicId") UUID topicId,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("part") int part
+            @RequestParam("part") int part,
+            @RequestPart("file") MultipartFile file
     ) {
 
-        return excelService.parseListeningPart12DTO(topicId, file, part);
+        return excelService.importQuestionListeningPart12Excel(topicId, file, part);
     }
 
 
@@ -74,11 +74,11 @@ public class ExcelFillController {
     @SneakyThrows
     public ExcelQuestionListResponse getCreateQuestionPart34ByExcelFileDTO(
             @RequestParam("topicId") UUID topicId,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("part") int part
+            @RequestParam("part") int part,
+            @RequestPart("file") MultipartFile file
     ) {
 
-        return excelService.parseListeningPart34DTO(topicId, file, part);
+        return excelService.importQuestionListeningPart34Excel(topicId, file, part);
     }
 
     @PostMapping(value = "/importAllParts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -86,9 +86,9 @@ public class ExcelFillController {
     @SneakyThrows
     public ExcelQuestionListResponse getCreateQuestionAllPartByExcelFileDTO(
             @RequestParam("topicId") UUID topicId,
-            @RequestParam("file") MultipartFile file
+            @RequestPart("file") MultipartFile file
     ) {
 
-        return excelService.parseAllPartsDTO(topicId, file);
+        return excelService.importQuestionAllPartsExcel(topicId, file);
     }
 }

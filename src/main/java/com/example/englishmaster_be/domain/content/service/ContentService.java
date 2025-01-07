@@ -115,7 +115,7 @@ public class ContentService implements IContentService {
                 );
 
             content.setContentData(contentRequest.getImage());
-            content.setContentType(fileUtil.typeFile(contentRequest.getImage()));
+            content.setContentType(fileUtil.mimeTypeFile(contentRequest.getImage()));
         }
 
         content.setQuestion(question);
