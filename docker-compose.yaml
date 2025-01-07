@@ -1,25 +1,15 @@
 #version: '3.5'
 
 services:
-#  app:
-#    container_name: ENVIRONMENT-NAME-PROJECT-NAME
-#    image: IMAGE-NAME:IMAGE-TAG
-#    volumes:
-#      - MOUNT-DATA-FOLDER/PROJECT-NAME:/media
-#    ports:
-#      - P-MAPPING:8080
-#    restart: unless-stopped
-#    pull_policy: always
-
-  db:
-    image: postgres:12
-    environment:
-      - POSTGRES_DB=english_master
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=123456
-    ports:
-      - "5433:5432"
+  app:
+    container_name: ENVIRONMENT-NAME-PROJECT-NAME
+    image: IMAGE-NAME:IMAGE-TAG
     volumes:
-      - data:/var/lib/postgresql/data
+      - MOUNT-DATA-FOLDER/PROJECT-NAME:/media
+    ports:
+      - P-MAPPING:8080
+    restart: unless-stopped
+    pull_policy: always
+
 volumes:
   data:
