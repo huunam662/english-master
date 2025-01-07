@@ -119,11 +119,11 @@ public class AuthService implements IAuthService {
         userRegister.setEnabled(Boolean.FALSE);
 
         if(user != null && user.getConfirmTokens() != null)
-            userRegister.setConfirmTokens(new ArrayList<>());
+            sessionActiveRepository.deleteByUserAndType(user, SessionActiveTypeEnum.CONFIRM);
 
         userRegister = userRepository.save(userRegister);
 
-        UserConfirmTokenResponse confirmationTokenResponse = this.createConfirmationToken(userRegister.getUserId());
+        UserConfirmTokenResponse confirmationTokenResponse = this.createConfirmationToken(userRegister);
 
         try {
             mailerUtil.sendConfirmationEmail(userRegister.getEmail(), confirmationTokenResponse.getCode());
@@ -135,9 +135,7 @@ public class AuthService implements IAuthService {
 
     @Transactional
     @Override
-    public UserConfirmTokenResponse createConfirmationToken(UUID userId) {
-
-        UserEntity user = userService.getUserById(userId);
+    public UserConfirmTokenResponse createConfirmationToken(UserEntity user) {
 
         SessionActiveEntity sessionActive = SessionActiveEntity.builder()
                 .type(SessionActiveTypeEnum.CONFIRM)

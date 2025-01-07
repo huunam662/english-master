@@ -1,9 +1,11 @@
 package com.example.englishmaster_be.domain.user_answer.service;
 
+import com.example.englishmaster_be.domain.answer_matching.dto.request.AnswerMatchingRequest;
+import com.example.englishmaster_be.domain.user_answer.dto.request.UserAnswerRequest;
 import com.example.englishmaster_be.mapper.AnswerMatchingMapper;
 import com.example.englishmaster_be.domain.answer_blank.dto.request.AnswerBlankRequest;
 import com.example.englishmaster_be.domain.answer_matching.dto.request.AnswerMatchingQuestionRequest;
-import com.example.englishmaster_be.domain.user_answer.dto.request.UserAnswerRequest;
+import com.example.englishmaster_be.domain.user_answer.dto.request.UserAnswerRequest1;
 import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.domain.answer_matching.dto.response.AnswerMatchingBasicResponse;
@@ -63,13 +65,78 @@ public class UserAnswerService implements IUserAnswerService {
 
     @Transactional
     @Override
-    public UserAnswerEntity saveUserAnswer(UserAnswerRequest userAnswerRequest){
+    public void createUserAnswer(List<UserAnswerRequest> userAnswerRequests) {
+        UserEntity user = userService.currentUser();
+
+
+
+        for(UserAnswerRequest request : userAnswerRequests) {
+            QuestionEntity question = questionService.getQuestionById(request.getQuestionId());
+
+            if( request.getType()==QuestionTypeEnum.Multiple_Choice || request.getType()==QuestionTypeEnum.T_F_Not_Given){
+                if( request.getAnswer().size() > question.getNumberChoice() ) {
+                    throw new BadRequestException("The number of choices must be less than or equal to " + question.getNumberChoice());
+                }
+                else{
+                    UserAnswerEntity userAns = UserAnswerEntity.builder()
+                            .user(user)
+                            .question(question)
+                            .answers(new ArrayList<>())
+                            .build();
+
+                    for(int i = 0; i< request.getAnswer().size(); i++){
+                        AnswerEntity answerEntity = answerRepository.findByQuestionAndAnswerContent(question, request.getAnswer().get(i));
+
+                        if(Objects.isNull(answerEntity)){
+                            throw new BadRequestException("The answer is not exist");
+                        }
+                        userAns.getAnswers().add(answerEntity);
+
+                    }
+                    userAnswerRepository.save(userAns);
+                }
+            }
+            else if( request.getType()==QuestionTypeEnum.Fill_In_Blank || request.getType()==QuestionTypeEnum.Label){
+
+                for(AnswerBlankRequest answerBlankRequest: request.getAnswersBlank()){
+                    UserBlankAnswerEntity answer = new UserBlankAnswerEntity();
+                    answer.setUser(user);
+                    answer.setQuestion(question);
+                    answer.setAnswer(answerBlankRequest.getContent());
+                    answer.setPosition(answerBlankRequest.getPosition());
+                    userBlankAnswerRepository.save(answer);
+                }
+
+
+            } else if ( request.getType()==QuestionTypeEnum.Matching) {
+
+                for(AnswerMatchingRequest answerMatchingRequest: request.getAnswersMatching()){
+                    UserAnswerMatchingEntity userAnswerMatching = UserAnswerMatchingEntity.builder()
+                            .question(question)
+                            .user(user)
+                            .contentLeft(answerMatchingRequest.getContentLeft())
+                            .contentRight(answerMatchingRequest.getContentRight())
+                            .build();
+
+                    userAnswerMatchingRepository.save(userAnswerMatching);
+                }
+
+            }
+        }
+
+
+    }
+
+
+    @Transactional
+    @Override
+    public UserAnswerEntity saveUserAnswer(UserAnswerRequest1 userAnswerRequest1){
 
         UserEntity user = userService.currentUser();
 
-        QuestionEntity question = questionService.getQuestionById(userAnswerRequest.getQuestionId());
+        QuestionEntity question = questionService.getQuestionById(userAnswerRequest1.getQuestionId());
 
-        if(userAnswerRequest.getAnswer().size() > question.getNumberChoice()){
+        if(userAnswerRequest1.getAnswer().size() > question.getNumberChoice()){
             throw new BadRequestException("The number of choices must be less than or equal to " + question.getNumberChoice());
         }
 
@@ -80,8 +147,8 @@ public class UserAnswerService implements IUserAnswerService {
                 .answers(new ArrayList<>())
                 .build();
 
-        for(int i=0;i<userAnswerRequest.getAnswer().size();i++){
-            AnswerEntity answerEntity = answerRepository.findByQuestionAndAnswerContent(question, userAnswerRequest.getAnswer().get(i));
+        for(int i = 0; i< userAnswerRequest1.getAnswer().size(); i++){
+            AnswerEntity answerEntity = answerRepository.findByQuestionAndAnswerContent(question, userAnswerRequest1.getAnswer().get(i));
 
             if(Objects.isNull(answerEntity)){
                 throw new BadRequestException("The answer is not exist");
