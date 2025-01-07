@@ -1,6 +1,8 @@
 package com.example.englishmaster_be.domain.user_answer.dto.request;
 
 import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
+import com.example.englishmaster_be.domain.answer_blank.dto.request.AnswerBlankRequest;
+import com.example.englishmaster_be.domain.answer_matching.dto.request.AnswerMatchingRequest;
 import com.example.englishmaster_be.domain.answer_matching.dto.response.AnswerMatchingBasicResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -21,8 +23,8 @@ public class UserAnswerRequest {
 
     List<String> answer;
 
-    List<Object> answersBlank;
+    List<AnswerBlankRequest> answersBlank;
 
-    List<AnswerMatchingBasicResponse> answersMatching;
+    List<AnswerMatchingRequest> answersMatching;
 
 }

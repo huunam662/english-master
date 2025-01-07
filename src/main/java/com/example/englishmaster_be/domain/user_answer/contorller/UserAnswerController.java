@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.domain.user_answer.contorller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.domain.user_answer.dto.request.UserAnswerRequest;
 import com.example.englishmaster_be.domain.user_answer.dto.response.UserAnswerBlankResponse;
 import com.example.englishmaster_be.domain.user_answer.service.IUserAnswerService;
 import com.example.englishmaster_be.mapper.AnswerMatchingMapper;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -62,6 +64,14 @@ public class UserAnswerController {
     ) {
 
         return userAnswerService.scoreAnswer(questionId);
+    }
+
+    @PostMapping("/create-list-user-answer")
+    @DefaultMessage("Create list user answer successfully")
+    public void createUserAnswer(@RequestBody List<UserAnswerRequest> requests) {
+
+        userAnswerService.createUserAnswer(requests);
+
     }
 
 

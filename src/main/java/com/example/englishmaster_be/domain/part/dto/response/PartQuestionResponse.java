@@ -17,6 +17,8 @@ public class PartQuestionResponse {
 
     UUID partId;
 
+    String partName;
+
     String contentType;
 
     String contentData;
