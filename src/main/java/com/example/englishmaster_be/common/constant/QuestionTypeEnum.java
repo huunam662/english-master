@@ -8,11 +8,10 @@ public enum QuestionTypeEnum {
     Short_Answer,
     T_F_Not_Given,
     Matching,
-    Label;
+    text,
+    audio,
+    image,
+    Label
 
 
-    @Override
-    public String toString() {
-        return super.toString();
-    }
 }

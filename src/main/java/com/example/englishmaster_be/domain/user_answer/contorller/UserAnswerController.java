@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.domain.user_answer.contorller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.domain.user_answer.dto.request.UserAnswerRequest;
 import com.example.englishmaster_be.domain.user_answer.dto.response.UserAnswerBlankResponse;
 import com.example.englishmaster_be.domain.user_answer.service.IUserAnswerService;
 import com.example.englishmaster_be.mapper.AnswerMatchingMapper;
@@ -8,7 +9,7 @@ import com.example.englishmaster_be.mapper.UserAnswerMapper;
 import com.example.englishmaster_be.mapper.UserBlankAnswerMapper;
 import com.example.englishmaster_be.domain.answer_blank.dto.request.AnswerBlankRequest;
 import com.example.englishmaster_be.domain.answer_matching.dto.request.AnswerMatchingQuestionRequest;
-import com.example.englishmaster_be.domain.user_answer.dto.request.UserAnswerRequest;
+import com.example.englishmaster_be.domain.user_answer.dto.request.UserAnswerRequest1;
 import com.example.englishmaster_be.domain.answer_matching.dto.response.AnswerMatchingBasicResponse;
 import com.example.englishmaster_be.domain.user_answer.dto.response.UserAnswerScoreResponse;
 import com.example.englishmaster_be.domain.user_answer.dto.response.UserAnswerResponse;
@@ -21,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 
@@ -64,12 +66,20 @@ public class UserAnswerController {
         return userAnswerService.scoreAnswer(questionId);
     }
 
+    @PostMapping("/create-list-user-answer")
+    @DefaultMessage("Create list user answer successfully")
+    public void createUserAnswer(@RequestBody List<UserAnswerRequest> requests) {
+
+        userAnswerService.createUserAnswer(requests);
+
+    }
+
 
     @PostMapping("/create-user-answer")
     @DefaultMessage("Create user answer successfully")
-    public UserAnswerResponse createUserAnswer(@RequestBody UserAnswerRequest userAnswerRequest) {
+    public UserAnswerResponse createUserAnswer(@RequestBody UserAnswerRequest1 userAnswerRequest1) {
 
-        UserAnswerEntity answer = userAnswerService.saveUserAnswer(userAnswerRequest);
+        UserAnswerEntity answer = userAnswerService.saveUserAnswer(userAnswerRequest1);
 
         return UserAnswerMapper.INSTANCE.toUserAnswerResponse(answer);
     }

@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.domain.answer_matching.service;
 
 import com.example.englishmaster_be.domain.answer_matching.dto.request.AnswerMatchingQuestionRequest;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionMatchingDto;
 import com.example.englishmaster_be.model.answer_matching.AnswerMatchingEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.domain.answer_matching.dto.response.AnswerMatchingBasicResponse;
@@ -62,6 +63,30 @@ public class AnswerMatchingService implements IAnswerMatchingService {
             );
 
         return answerMatchingShuffleResponseList;
+
+    }
+
+    @Override
+    public QuestionMatchingDto getListAnswerMatchingWithShuffle1(UUID questionId) {
+
+        QuestionEntity question = questionService.getQuestionById(questionId);
+
+        List<AnswerMatchingEntity> answerMatchingList = answerMatchingRepository.findAllByQuestion(question);
+
+        List<String> contentLeft = answerMatchingList.stream().map(AnswerMatchingEntity::getContentLeft).collect(Collectors.toList());
+        List<String> contentRight = answerMatchingList.stream().map(AnswerMatchingEntity::getContentRight).collect(Collectors.toList());
+
+        Collections.shuffle(contentLeft);
+        Collections.shuffle(contentRight);
+
+        contentRight=contentRight.stream().filter(s-> !Objects.isNull(s)).toList();
+        QuestionMatchingDto questionMatchingDto = new QuestionMatchingDto();
+        questionMatchingDto.setQuestionId(questionId);
+        questionMatchingDto.setContentLeft(contentLeft);
+        questionMatchingDto.setContentRight(contentRight);
+        questionMatchingDto.setType(question.getQuestionType());
+
+        return questionMatchingDto;
 
     }
 }
