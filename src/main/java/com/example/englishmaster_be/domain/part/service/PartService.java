@@ -79,7 +79,7 @@ public class PartService implements IPartService {
                 );
 
             partEntity.setContentData(partRequest.getFile());
-            partEntity.setContentType(fileUtil.typeFile(partRequest.getFile()));
+            partEntity.setContentType(fileUtil.mimeTypeFile(partRequest.getFile()));
         }
 
         PartMapper.INSTANCE.flowToPartEntity(partRequest, partEntity);
@@ -108,11 +108,7 @@ public class PartService implements IPartService {
     @Override
     public PartEntity getPartToName(String partName) {
 
-        List<PartEntity> listPart = partRepository.findAll();
-
-        return listPart.stream().filter(
-                part -> part.getPartName().equalsIgnoreCase(partName)
-        ).findFirst().orElseThrow(
+        return partRepository.findByPartName(partName).orElseThrow(
                 () -> new CustomException(ErrorEnum.PART_NOT_FOUND)
         );
     }

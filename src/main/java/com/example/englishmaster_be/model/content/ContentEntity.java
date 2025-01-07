@@ -62,12 +62,8 @@ public class ContentEntity {
     TopicEntity topic;
 
     @ManyToOne
-    @JoinTable(name = "question_content",
-            joinColumns = @JoinColumn(name = "content_id"),
-            inverseJoinColumns = @JoinColumn(name = "question_id")
-    )
+    @JoinColumn(name = "question_id", referencedColumnName = "id")
     QuestionEntity question;
-
 
     @PrePersist
     void onCreate() {

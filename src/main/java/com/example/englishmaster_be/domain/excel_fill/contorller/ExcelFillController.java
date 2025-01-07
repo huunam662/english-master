@@ -42,7 +42,7 @@ public class ExcelFillController {
             @RequestPart("file") MultipartFile file
     ) {
 
-        return excelService.parseReadingPart67DTO(topicId, file, part);
+        return excelService.importQuestionReadingPart67Excel(topicId, file, part);
     }
 
     @PostMapping(value = "/importQuestionPart5", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -53,7 +53,7 @@ public class ExcelFillController {
             @RequestPart("file") MultipartFile file
     ) {
 
-        return excelService.parseReadingPart5DTO(topicId, file);
+        return excelService.importQuestionReadingPart5Excel(topicId, file);
     }
 
     @PostMapping(value = "/importQuestionPart12", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -65,7 +65,7 @@ public class ExcelFillController {
             @RequestPart("file") MultipartFile file
     ) {
 
-        return excelService.parseListeningPart12DTO(topicId, file, part);
+        return excelService.importQuestionListeningPart12Excel(topicId, file, part);
     }
 
 
@@ -78,7 +78,7 @@ public class ExcelFillController {
             @RequestPart("file") MultipartFile file
     ) {
 
-        return excelService.parseListeningPart34DTO(topicId, file, part);
+        return excelService.importQuestionListeningPart34Excel(topicId, file, part);
     }
 
     @PostMapping(value = "/importAllParts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -89,6 +89,6 @@ public class ExcelFillController {
             @RequestPart("file") MultipartFile file
     ) {
 
-        return excelService.parseAllPartsDTO(topicId, file);
+        return excelService.importQuestionAllPartsExcel(topicId, file);
     }
 }

@@ -23,6 +23,10 @@ public interface AnswerMapper {
 
     List<AnswerResponse> toAnswerResponseList(List<AnswerEntity> answerList);
 
+    AnswerBasicRequest toAnswerBasicRequest(AnswerResponse answerResponse);
+
+    List<AnswerBasicRequest> toAnswerRequestList(List<AnswerResponse> answerResponseList);
+
     @Mapping(target = "answerId", ignore = true)
     void flowToAnswerEntity(AnswerRequest answerRequest, @MappingTarget AnswerEntity answer);
 

@@ -41,6 +41,9 @@ public class QuestionEntity {
     @Column(name = "question_score")
     Integer questionScore;
 
+    @Column(name = "question_result")
+    String questionResult;
+
     @Column(name = "question_explain_en")
     String questionExplainEn;
 
@@ -54,7 +57,7 @@ public class QuestionEntity {
     @Enumerated(EnumType.STRING)
     QuestionTypeEnum questionType;
 
-    @Column(name = "number_choice",columnDefinition = "int default 1")
+    @Column(name = "number_choice", columnDefinition = "int default 1")
     Integer numberChoice;
 
     String title;
@@ -88,7 +91,11 @@ public class QuestionEntity {
     @JoinColumn(name = "question_group", referencedColumnName = "id")
     QuestionEntity questionGroupParent;
 
-    @ManyToMany(mappedBy = "questions")
+    @ManyToMany
+    @JoinTable(name = "topic_question",
+            joinColumns = @JoinColumn(name = "question_id"),
+            inverseJoinColumns = @JoinColumn(name = "topic_id")
+    )
     List<TopicEntity> topics;
 
     @OneToMany(mappedBy = "questionGroupParent")
@@ -105,6 +112,9 @@ public class QuestionEntity {
 
     @Column(name = "has_hints")
     Boolean hasHints;
+
+    @Column(name = "is_question_parent")
+    Boolean isQuestionParent;
 
     @PreRemove
     void preRemove(){

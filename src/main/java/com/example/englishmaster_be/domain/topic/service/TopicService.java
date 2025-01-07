@@ -537,7 +537,7 @@ public class TopicService implements ITopicService {
 
         UserEntity user = userService.currentUser();
 
-        ExcelQuestionListResponse excelFileDTO = excelService.parseAllPartsDTO(topicId, file);
+        ExcelQuestionListResponse excelFileDTO = excelService.importQuestionAllPartsExcel(topicId, file);
 
         processQuestions(excelFileDTO, topicId, user);
     }
@@ -561,11 +561,11 @@ public class TopicService implements ITopicService {
         ExcelQuestionListResponse excelFileDTO;
 
         if(partName == 1 || partName == 2)
-            excelFileDTO = excelService.parseListeningPart12DTO(topicId, file, partName);
+            excelFileDTO = excelService.importQuestionListeningPart12Excel(topicId, file, partName);
         else if(partName == 3 || partName == 4)
-            excelFileDTO = excelService.parseListeningPart34DTO(topicId, file, partName);
+            excelFileDTO = excelService.importQuestionListeningPart34Excel(topicId, file, partName);
         else
-            excelFileDTO = excelService.parseReadingPart67DTO(topicId, file, partName);
+            excelFileDTO = excelService.importQuestionReadingPart67Excel(topicId, file, partName);
 
         processQuestions(excelFileDTO, topicId, user);
 
@@ -578,7 +578,7 @@ public class TopicService implements ITopicService {
 
         UserEntity user = userService.currentUser();
 
-        ExcelQuestionListResponse excelFileDTO = excelService.parseReadingPart5DTO(topicId, file);
+        ExcelQuestionListResponse excelFileDTO = excelService.importQuestionReadingPart5Excel(topicId, file);
 
         processQuestions(excelFileDTO, topicId, user);
 
@@ -666,11 +666,11 @@ public class TopicService implements ITopicService {
             QuestionEntity question = saveQuestionFromExcelTemplate(questionByExcelFileResponse, user);
 
             // Xử lý câu trả lời
-            processAnswers(questionByExcelFileResponse.getListAnswer(), question, user);
+            processAnswers(AnswerMapper.INSTANCE.toAnswerRequestList(questionByExcelFileResponse.getAnswers()), question, user);
 
             // Tương tự cho questionChild
-            if (questionByExcelFileResponse.getListQuestionChild() != null && !questionByExcelFileResponse.getListQuestionChild().isEmpty()) {
-                for (ExcelQuestionResponse createQuestionChildDTO : questionByExcelFileResponse.getListQuestionChild()) {
+            if (questionByExcelFileResponse.getQuestionsChildren() != null && !questionByExcelFileResponse.getQuestionsChildren().isEmpty()) {
+                for (ExcelQuestionResponse createQuestionChildDTO : questionByExcelFileResponse.getQuestionsChildren()) {
 
                     QuestionEntity questionChild = saveQuestionFromExcelTemplate(createQuestionChildDTO, user);
 
@@ -678,13 +678,19 @@ public class TopicService implements ITopicService {
 
                     questionChild = questionRepository.save(questionChild); // Lưu câu hỏi con trước
 
-                    processAnswers(createQuestionChildDTO.getListAnswer(), questionChild, user);
-                    processContent(createQuestionChildDTO.getContentImage(), createQuestionChildDTO.getContentAudio(), questionChild, user);
+                    processAnswers(AnswerMapper.INSTANCE.toAnswerRequestList(createQuestionChildDTO.getAnswers()), questionChild, user);
+
+                    processContent(
+                            null,
+                            null,
+                            questionChild,
+                            user
+                    );
                 }
             }
 
             // Xử lý ContentEntity
-            processContent(questionByExcelFileResponse.getContentImage(), questionByExcelFileResponse.getContentAudio(), question, user);
+            processContent(null, null, question, user);
 
             // Lưu câu hỏi đã cập nhật với ContentEntity
             questionRepository.save(question);
@@ -787,7 +793,7 @@ public class TopicService implements ITopicService {
 
                 ContentEntity content = ContentEntity.builder()
                         .contentData(questionRequest.getContentImage())
-                        .contentType(fileUtil.typeFile(questionRequest.getContentImage()))
+                        .contentType(fileUtil.mimeTypeFile(questionRequest.getContentImage()))
                         .question(question)
                         .userCreate(user)
                         .userUpdate(user)
@@ -804,7 +810,7 @@ public class TopicService implements ITopicService {
 
                 ContentEntity content = ContentEntity.builder()
                         .contentData(questionRequest.getContentAudio())
-                        .contentType(fileUtil.typeFile(questionRequest.getContentAudio()))
+                        .contentType(fileUtil.mimeTypeFile(questionRequest.getContentAudio()))
                         .question(question)
                         .userCreate(user)
                         .userUpdate(user)
@@ -917,7 +923,7 @@ public class TopicService implements ITopicService {
 
             ContentEntity content = ContentEntity.builder()
                     .contentData(questionRequest.getContentImage())
-                    .contentType(fileUtil.typeFile(questionRequest.getContentImage()))
+                    .contentType(fileUtil.mimeTypeFile(questionRequest.getContentImage()))
                     .question(question)
                     .userCreate(user)
                     .userUpdate(user)
@@ -933,7 +939,7 @@ public class TopicService implements ITopicService {
 
             ContentEntity content = ContentEntity.builder()
                     .contentData(questionRequest.getContentImage())
-                    .contentType(fileUtil.typeFile(questionRequest.getContentAudio()))
+                    .contentType(fileUtil.mimeTypeFile(questionRequest.getContentAudio()))
                     .question(question)
                     .userCreate(user)
                     .userUpdate(user)

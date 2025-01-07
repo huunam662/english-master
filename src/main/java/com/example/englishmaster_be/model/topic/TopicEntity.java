@@ -103,13 +103,15 @@ public class TopicEntity {
     @ManyToMany
     @JoinTable(name = "topic_question",
             joinColumns = @JoinColumn(name = "topic_id"),
-            inverseJoinColumns = @JoinColumn(name = "question_id"))
+            inverseJoinColumns = @JoinColumn(name = "question_id")
+    )
     List<QuestionEntity> questions;
 
     @ManyToMany
     @JoinTable(name = "topic_part",
             joinColumns = @JoinColumn(name = "topic_id"),
-            inverseJoinColumns = @JoinColumn(name = "part_id"))
+            inverseJoinColumns = @JoinColumn(name = "part_id")
+    )
     List<PartEntity> parts;
 
     @PrePersist
