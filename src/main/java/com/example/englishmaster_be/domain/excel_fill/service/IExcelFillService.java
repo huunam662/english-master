@@ -11,14 +11,14 @@ public interface IExcelFillService {
 
     ExcelTopicResponse parseCreateTopicDTO(MultipartFile file) throws IOException;
 
-    ExcelQuestionListResponse parseReadingPart67DTO(UUID topicId, MultipartFile file, int part) throws IOException;
+    ExcelQuestionListResponse importQuestionReadingPart67Excel(UUID topicId, MultipartFile file, int part) throws IOException;
 
-    ExcelQuestionListResponse parseReadingPart5DTO(UUID topicId, MultipartFile file) throws IOException;
+    ExcelQuestionListResponse importQuestionReadingPart5Excel(UUID topicId, MultipartFile file) throws IOException;
 
-    ExcelQuestionListResponse parseListeningPart12DTO(UUID topicId, MultipartFile file, int part) throws IOException;
+    ExcelQuestionListResponse importQuestionListeningPart12Excel(UUID topicId, MultipartFile file, int part) throws IOException;
 
-    ExcelQuestionListResponse parseListeningPart34DTO(UUID topicId, MultipartFile file, int part) throws IOException;
+    ExcelQuestionListResponse importQuestionListeningPart34Excel(UUID topicId, MultipartFile file, int part) throws IOException;
 
-    ExcelQuestionListResponse parseAllPartsDTO(UUID topicId, MultipartFile file) throws IOException;
+    ExcelQuestionListResponse importQuestionAllPartsExcel(UUID topicId, MultipartFile file) throws IOException;
 
 }

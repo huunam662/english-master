@@ -4,6 +4,7 @@ package com.example.englishmaster_be.mapper;
 import com.example.englishmaster_be.domain.result_mock_test.dto.request.ResultMockTestRequest;
 import com.example.englishmaster_be.domain.result_mock_test.dto.response.ResultMockTestResponse;
 import com.example.englishmaster_be.model.result_mock_test.ResultMockTestEntity;
+import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -11,7 +12,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper
+@Mapper(builder = @Builder(disableBuilder = true))
 public interface ResultMockTestMapper {
 
     ResultMockTestMapper INSTANCE = Mappers.getMapper(ResultMockTestMapper.class);

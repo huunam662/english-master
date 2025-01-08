@@ -1,6 +1,9 @@
 package com.example.englishmaster_be.domain.user.dto.response;
 
 
+import com.example.englishmaster_be.common.constant.RoleEnum;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -12,7 +15,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserProfileResponse {
 
-    String role;
+    @Enumerated(EnumType.STRING)
+    RoleEnum role;
 
     UserResponse user;
 }

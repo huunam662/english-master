@@ -17,7 +17,11 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
@@ -27,7 +31,10 @@ import java.util.List;
 
 
 @Slf4j
+@EnableScheduling
 @Component
+@RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TaskScheduled {
 
     JwtValue jwtValue;
@@ -43,9 +50,19 @@ public class TaskScheduled {
     SessionActiveRepository sessionActiveRepository;
 
 
+    @Transactional
+    @Scheduled(cron = "0 0 3 * * ?") // Run at 3 AM every day
+    public void scheduledRunTask(){
+
+        deleteExpiredUsers();
+        deleteExpiredToken();
+        deleteInvalidToken();
+        deleteAllSessionConfirm();
+        invalidTokenExpired();
+
+    }
 
     @Transactional
-    @Scheduled(cron = "0 0 1 * * ?") // Run at 1 AM every day
     public void deleteExpiredUsers() {
         log.info("Starting deleteExpiredUsers task");
         try {
@@ -69,7 +86,6 @@ public class TaskScheduled {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0 2 * * ?") // Run at 2 AM every day
     public void deleteExpiredToken() {
         log.info("Starting deleteExpiredToken task");
         try {
@@ -87,9 +103,7 @@ public class TaskScheduled {
         }
     }
 
-
     @Transactional
-    @Scheduled(cron = "0 0 3 * * ?") // Run at 3 AM every day
     public void deleteInvalidToken(){
 
         log.info("Starting deleteInvalidToken task");
@@ -117,7 +131,6 @@ public class TaskScheduled {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0 3 * * ?") // Run at 3 AM every day
     public void deleteAllSessionConfirm(){
 
         log.info("Starting deleteAllSessionActiveConfirm task");
@@ -127,7 +140,9 @@ public class TaskScheduled {
             JPAQuery<SessionActiveEntity> query = queryFactory
                     .selectFrom(QSessionActiveEntity.sessionActiveEntity)
                     .where(
-                            QSessionActiveEntity.sessionActiveEntity.type.eq(SessionActiveTypeEnum.CONFIRM)
+                            QSessionActiveEntity.sessionActiveEntity.type.eq(SessionActiveTypeEnum.CONFIRM).or(
+                                    QSessionActiveEntity.sessionActiveEntity.token.isNull()
+                            )
                     );
 
             List<SessionActiveEntity> sessionActiveEntityList = query.fetch();
@@ -142,7 +157,6 @@ public class TaskScheduled {
 
 
     @Transactional
-    @Scheduled(cron = "0 0 3 * * ?")
     public void invalidTokenExpired(){
 
         log.info("Starting invalidTokenExpired task");
@@ -154,11 +168,15 @@ public class TaskScheduled {
                     .where(
                         Expressions.booleanTemplate(
                                 "{0} <= {1}",
-                                QInvalidTokenEntity.invalidTokenEntity.createAt,
+                                QSessionActiveEntity.sessionActiveEntity.createAt,
                                 new Date(System.currentTimeMillis() - jwtValue.getJwtExpiration())
                                         .toInstant()
                                         .atZone(ZoneId.systemDefault())
                                         .toLocalDateTime()
+                        ).and(
+                                QSessionActiveEntity.sessionActiveEntity.type.eq(SessionActiveTypeEnum.CONFIRM).not()
+                        ).and(
+                                QSessionActiveEntity.sessionActiveEntity.token.isNotNull()
                         )
                     );
 
@@ -166,9 +184,11 @@ public class TaskScheduled {
 
             invalidTokenService.insertInvalidTokenList(sessionActiveEntityList, InvalidTokenTypeEnum.EXPIRED);
 
+            sessionActiveRepository.deleteAll(sessionActiveEntityList);
         }
         catch (Exception e){
             log.error("Error in invalidTokenExpired task", e);
         }
     }
+
 }

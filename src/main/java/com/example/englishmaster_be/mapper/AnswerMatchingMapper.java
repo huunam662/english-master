@@ -5,13 +5,14 @@ import com.example.englishmaster_be.domain.answer_matching.dto.response.AnswerMa
 import com.example.englishmaster_be.model.answer_matching.AnswerMatchingEntity;
 import com.example.englishmaster_be.domain.answer_matching.dto.response.AnswerMatchingResponse;
 import com.example.englishmaster_be.model.user_answer_matching.UserAnswerMatchingEntity;
+import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper
+@Mapper(builder = @Builder(disableBuilder = true))
 public interface AnswerMatchingMapper {
 
     AnswerMatchingMapper INSTANCE = Mappers.getMapper(AnswerMatchingMapper.class);

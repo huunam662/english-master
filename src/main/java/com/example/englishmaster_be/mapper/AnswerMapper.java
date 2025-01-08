@@ -5,6 +5,7 @@ import com.example.englishmaster_be.domain.answer.dto.request.AnswerRequest;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerCorrectResponse;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
+import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -12,7 +13,7 @@ import org.mapstruct.factory.Mappers;
 import java.util.List;
 
 
-@Mapper
+@Mapper(builder = @Builder(disableBuilder = true))
 public interface AnswerMapper {
 
     AnswerMapper INSTANCE = Mappers.getMapper(AnswerMapper.class);
@@ -21,6 +22,10 @@ public interface AnswerMapper {
     AnswerResponse toAnswerResponse(AnswerEntity answer);
 
     List<AnswerResponse> toAnswerResponseList(List<AnswerEntity> answerList);
+
+    AnswerBasicRequest toAnswerBasicRequest(AnswerResponse answerResponse);
+
+    List<AnswerBasicRequest> toAnswerRequestList(List<AnswerResponse> answerResponseList);
 
     @Mapping(target = "answerId", ignore = true)
     void flowToAnswerEntity(AnswerRequest answerRequest, @MappingTarget AnswerEntity answer);

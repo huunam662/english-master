@@ -4,6 +4,7 @@ import com.example.englishmaster_be.domain.flash_card.dto.request.FlashCardReque
 import com.example.englishmaster_be.model.flash_card.FlashCardEntity;
 import com.example.englishmaster_be.domain.flash_card_word.dto.response.FlashCardWordListResponse;
 import com.example.englishmaster_be.domain.flash_card.dto.response.FlashCardResponse;
+import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -11,7 +12,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 
-@Mapper
+@Mapper(builder = @Builder(disableBuilder = true))
 public interface FlashCardMapper {
 
     FlashCardMapper INSTANCE = Mappers.getMapper(FlashCardMapper.class);

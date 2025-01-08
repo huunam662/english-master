@@ -31,13 +31,14 @@ public class FileUtil {
         };
     }
 
-    public String typeFile(String filename){
+    public String mimeTypeFile(String filename){
 
         String extension = this.getExtension(filename);
 
         return switch (extension) {
             case ".jpg", ".JPG", ".jpeg", ".JPEG", ".png", ".PNG", ".gif", ".GIF" -> String.format("image/%s", extension.replaceFirst(".", "").trim().toLowerCase());
             case ".mp3" -> "audio/mpeg";
+            case ".mp4" -> "video/mp4";
             default -> "TEXT";
         };
     }

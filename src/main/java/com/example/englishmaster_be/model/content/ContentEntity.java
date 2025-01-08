@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.model.content;
 
 import com.example.englishmaster_be.model.question.QuestionEntity;
+import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -28,9 +29,6 @@ public class ContentEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
     UUID contentId;
-
-    @Column(name = "topic_id")
-    UUID topicId;
 
     @Column(name = "code")
     String code;
@@ -60,13 +58,12 @@ public class ContentEntity {
     UserEntity userUpdate;
 
     @ManyToOne
-    @JoinTable(name = "question_content",
-            joinColumns = @JoinColumn(name = "content_id"),
-            inverseJoinColumns = @JoinColumn(name = "question_id")
-    )
+    @JoinColumn(name = "topic_id", referencedColumnName = "id")
+    TopicEntity topic;
+
+    @ManyToOne
+    @JoinColumn(name = "question_id", referencedColumnName = "id")
     QuestionEntity question;
-
-
 
     @PrePersist
     void onCreate() {

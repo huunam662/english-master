@@ -1,10 +1,12 @@
 package com.example.englishmaster_be.domain.upload.service;
 
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
+import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
 import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.value.UploadValue;
 import com.example.englishmaster_be.model.content.ContentEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
@@ -43,6 +45,8 @@ public class UploadService implements IUploadService {
     UploadValue uploadValue;
 
     IUserService userService;
+
+    ITopicService topicService;
 
 
     private ResponseEntity<String> sendHttpRequest(String url, HttpMethod method, HttpHeaders headers, Object body) {
@@ -140,14 +144,17 @@ public class UploadService implements IUploadService {
         if(existsContent != null)
             throw new CustomException(ErrorEnum.CODE_EXISTED_IN_TOPIC);
 
+        TopicEntity topicEntity = topicService.getTopicById(topicId);
+
         ContentEntity content = ContentEntity.builder()
-                .topicId(topicId)
+                .topic(topicEntity)
                 .code(code)
                 .contentType(fileResponse.getType())
                 .contentData(fileResponse.getUrl())
                 .userCreate(currentUser)
                 .userUpdate(currentUser)
                 .build();
+
         contentRepository.save(content);
 
         return fileResponse;

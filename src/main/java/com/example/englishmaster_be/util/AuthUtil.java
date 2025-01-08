@@ -32,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Component
-@Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 public class AuthUtil {
@@ -40,8 +39,6 @@ public class AuthUtil {
     JwtUtil jwtUtil;
 
     PasswordEncoder passwordEncoder;
-
-    IAuthService authService;
 
     IUserService userService;
 
