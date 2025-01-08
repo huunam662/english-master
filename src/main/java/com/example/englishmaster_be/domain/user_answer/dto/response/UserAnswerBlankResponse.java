@@ -1,10 +1,13 @@
 package com.example.englishmaster_be.domain.user_answer.dto.response;
 
+import com.example.englishmaster_be.domain.answer_blank.dto.response.AnswerBlankResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionBasicResponse;
 import com.example.englishmaster_be.domain.user.dto.response.UserBasicResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Getter
@@ -15,14 +18,9 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class UserAnswerBlankResponse {
 
-    UUID id;
 
-    String answer;
+    List<AnswerBlankResponse> values;
 
-    Integer position;
-
-    QuestionBasicResponse question;
-
-    UserBasicResponse user;
+    List<AnswerBlankResponse> expected;
 
 }
