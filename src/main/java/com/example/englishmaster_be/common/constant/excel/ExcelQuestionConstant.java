@@ -6,7 +6,7 @@ import lombok.experimental.FieldDefaults;
 
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public enum ExcelHeaderContentConstant {
+public enum ExcelQuestionConstant {
 
     Audio("Audio"),
     Image("Image"),
@@ -19,7 +19,7 @@ public enum ExcelHeaderContentConstant {
 
     String headerName;
 
-    ExcelHeaderContentConstant(String headerName){
+    ExcelQuestionConstant(String headerName){
         this.headerName = headerName;
     }
 

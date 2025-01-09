@@ -33,6 +33,10 @@ public class ExcelQuestionResponse {
 
     String questionExplainVn;
 
+    String contentAudio;
+
+    String contentImage;
+
     Integer questionScore;
 
     Boolean isQuestionParent;

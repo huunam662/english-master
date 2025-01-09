@@ -170,38 +170,39 @@ public class TopicService implements ITopicService {
     @Override
     public TopicEntity updateTopicByExcelFile(UUID topicId, MultipartFile file, String url) {
 
-        // Parse dữ liệu từ file_storage
-        ExcelTopicResponse topicByExcelFileResponse = excelService.parseCreateTopicDTO(file);
-
-        UserEntity user = userService.currentUser();
-
-        // Tìm pack dựa trên ID từ Request
-        PackEntity pack = packService.getPackById(topicByExcelFileResponse.getPackId());
-
-        // Tạo đối tượng TopicEntity
-        TopicEntity topic = getTopicById(topicId);
-        topic.setUserUpdate(user);
-        topic.setUpdateAt(LocalDateTime.now());
-
-        TopicMapper.INSTANCE.flowToTopicEntity(topicByExcelFileResponse, topic);
-
-        // Cập nhật các thông tin liên quan đến số lượng câu hỏi, người tạo và trạng thái
-        topic.setPack(pack);
-        topic.setStatus(statusService.getStatusByName(StatusEnum.ACTIVE));
-
-        // Xử lý ảnh chủ đề
-        if (topicByExcelFileResponse.getTopicImageName() == null || topicByExcelFileResponse.getTopicImageName().isEmpty())
-            topic.setTopicImage(url);
-
-        // Lưu topic vào cơ sở dữ liệu
-        topic = topicRepository.save(topic);
-
-        // Thêm các phần vào topic
-        topicByExcelFileResponse.getListPart().forEach(partId -> addPartToTopic(topicId, partId));
-
-        // Tạo response với thông tin của topic
-
-        return topic;
+        return null;
+//        // Parse dữ liệu từ file_storage
+//        ExcelTopicResponse topicByExcelFileResponse = excelService.parseCreateTopicDTO(file);
+//
+//        UserEntity user = userService.currentUser();
+//
+//        // Tìm pack dựa trên ID từ Request
+//        PackEntity pack = packService.getPackById(topicByExcelFileResponse.getPackId());
+//
+//        // Tạo đối tượng TopicEntity
+//        TopicEntity topic = getTopicById(topicId);
+//        topic.setUserUpdate(user);
+//        topic.setUpdateAt(LocalDateTime.now());
+//
+//        TopicMapper.INSTANCE.flowToTopicEntity(topicByExcelFileResponse, topic);
+//
+//        // Cập nhật các thông tin liên quan đến số lượng câu hỏi, người tạo và trạng thái
+//        topic.setPack(pack);
+//        topic.setStatus(statusService.getStatusByName(StatusEnum.ACTIVE));
+//
+//        // Xử lý ảnh chủ đề
+//        if (topicByExcelFileResponse.getTopicImageName() == null || topicByExcelFileResponse.getTopicImageName().isEmpty())
+//            topic.setTopicImage(url);
+//
+//        // Lưu topic vào cơ sở dữ liệu
+//        topic = topicRepository.save(topic);
+//
+//        // Thêm các phần vào topic
+//        topicByExcelFileResponse.getListPart().forEach(partId -> addPartToTopic(topicId, partId));
+//
+//        // Tạo response với thông tin của topic
+//
+//        return topic;
 
     }
 
@@ -210,22 +211,23 @@ public class TopicService implements ITopicService {
     @Override
     public TopicEntity saveTopicByExcelFile(MultipartFile file, String url) {
 
-        ExcelTopicResponse topicByExcelFileResponse = excelService.parseCreateTopicDTO(file);
-
-        TopicRequest topicRequest = TopicMapper.INSTANCE.toTopicRequest(topicByExcelFileResponse);
-
-        log.warn(topicByExcelFileResponse.getTopicImageName());
-
-        TopicEntity topicEntity = saveTopic(topicRequest);
-
-        if (topicByExcelFileResponse.getTopicImageName() == null || topicByExcelFileResponse.getTopicImageName().isEmpty()) {
-
-            topicEntity.setTopicImage(url);
-
-            topicEntity = topicRepository.save(topicEntity);
-        }
-
-        return topicEntity;
+        return null;
+//        ExcelTopicResponse topicByExcelFileResponse = excelService.parseCreateTopicDTO(file);
+//
+//        TopicRequest topicRequest = TopicMapper.INSTANCE.toTopicRequest(topicByExcelFileResponse);
+//
+//        log.warn(topicByExcelFileResponse.getTopicImageName());
+//
+//        TopicEntity topicEntity = saveTopic(topicRequest);
+//
+//        if (topicByExcelFileResponse.getTopicImageName() == null || topicByExcelFileResponse.getTopicImageName().isEmpty()) {
+//
+//            topicEntity.setTopicImage(url);
+//
+//            topicEntity = topicRepository.save(topicEntity);
+//        }
+//
+//        return topicEntity;
     }
 
     @Transactional
@@ -253,8 +255,16 @@ public class TopicService implements ITopicService {
 
         return topicRepository.findByTopicId(topicId)
                 .orElseThrow(
-                        () -> new IllegalArgumentException("TopicEntity not found with ID: " + topicId)
+                        () -> new IllegalArgumentException("Topic not found with ID: " + topicId)
                 );
+    }
+
+    @Override
+    public TopicEntity getTopicByName(String topicName) {
+
+        return topicRepository.findByTopicName(topicName).orElseThrow(
+                () -> new IllegalArgumentException("Topic not found with name: " + topicName)
+        );
     }
 
     @Override

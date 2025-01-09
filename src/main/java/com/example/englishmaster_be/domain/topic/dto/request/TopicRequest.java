@@ -8,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.Parameter;
 
+import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +32,7 @@ public class TopicRequest {
 
 	String topicType;
 
-	String workTime;
+	Time workTime;
 
 	Integer numberQuestion;
 

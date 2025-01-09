@@ -25,6 +25,10 @@ public class QuestionBasicResponse {
 
     String questionContent;
 
+    String contentAudio;
+
+    String contentImage;
+
     Integer questionScore;
 
     QuestionTypeEnum questionType;

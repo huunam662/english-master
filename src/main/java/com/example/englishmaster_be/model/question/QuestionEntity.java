@@ -35,11 +35,17 @@ public class QuestionEntity {
     @Column(name = "id")
     UUID questionId;
 
-    @Column(name = "question_content")
+    @Column(name = "question_content", columnDefinition = "TEXT")
     String questionContent;
 
     @Column(name = "question_score")
     Integer questionScore;
+
+    @Column(name = "content_audio")
+    String contentAudio;
+
+    @Column(name = "content_image")
+    String contentImage;
 
     @Column(name = "question_result")
     String questionResult;
@@ -129,6 +135,7 @@ public class QuestionEntity {
     void onCreate() {
         createAt = LocalDateTime.now();
         updateAt = LocalDateTime.now();
+        numberChoice = 1;
 
         if(questionScore == null) questionScore = 0;
     }
