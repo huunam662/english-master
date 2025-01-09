@@ -1,15 +1,15 @@
 package com.example.englishmaster_be.domain.user_answer.service;
 
+import com.example.englishmaster_be.domain.answer_blank.dto.response.AnswerBlankResponse;
 import com.example.englishmaster_be.domain.answer_matching.dto.request.AnswerMatchingRequest;
+import com.example.englishmaster_be.domain.answer_matching.dto.response.AnswerMatchingResponse;
 import com.example.englishmaster_be.domain.user_answer.dto.request.UserAnswerRequest;
+import com.example.englishmaster_be.domain.user_answer.dto.response.*;
 import com.example.englishmaster_be.mapper.AnswerMatchingMapper;
 import com.example.englishmaster_be.domain.answer_blank.dto.request.AnswerBlankRequest;
-import com.example.englishmaster_be.domain.answer_matching.dto.request.AnswerMatchingQuestionRequest;
-import com.example.englishmaster_be.domain.user_answer.dto.request.UserAnswerRequest1;
 import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.domain.answer_matching.dto.response.AnswerMatchingBasicResponse;
-import com.example.englishmaster_be.domain.user_answer.dto.response.UserAnswerScoreResponse;
 import com.example.englishmaster_be.model.answer_blank.AnswerBlankEntity;
 import com.example.englishmaster_be.model.answer.AnswerRepository;
 import com.example.englishmaster_be.model.answer_blank.AnswerBlankRepository;
@@ -65,13 +65,24 @@ public class UserAnswerService implements IUserAnswerService {
 
     @Transactional
     @Override
-    public void createUserAnswer(List<UserAnswerRequest> userAnswerRequests) {
+    public UserAnswerResponse createUserAnswer(List<UserAnswerRequest> userAnswerRequests) {
         UserEntity user = userService.currentUser();
 
+        UserAnswerResponse userAnswerResponse = new UserAnswerResponse();
+        int score = 0;
 
+        List<AnswerDetailsResponse> answerDetailsRespons =new ArrayList<>();
 
         for(UserAnswerRequest request : userAnswerRequests) {
+
+            AnswerDetailsResponse answerDetailsResponse =new AnswerDetailsResponse();
+
+
             QuestionEntity question = questionService.getQuestionById(request.getQuestionId());
+
+            answerDetailsResponse.setId(question.getQuestionId());
+            answerDetailsResponse.setQuestionContent(question.getQuestionContent());
+            answerDetailsResponse.setType(question.getQuestionType().toString());
 
             if( request.getType()==QuestionTypeEnum.Multiple_Choice || request.getType()==QuestionTypeEnum.T_F_Not_Given){
                 if( request.getAnswer().size() > question.getNumberChoice() ) {
@@ -94,9 +105,36 @@ public class UserAnswerService implements IUserAnswerService {
 
                     }
                     userAnswerRepository.save(userAns);
+
+
+                    UserAnswerMultipleChoiceResponse userAnswerMultipleChoiceResponse = new UserAnswerMultipleChoiceResponse();
+
+                    boolean isCorrect = checkCorrectAnswerMultipleChoice(question.getQuestionId(),user.getUserId());
+                    userAnswerMultipleChoiceResponse.setCorrect(isCorrect);
+                    userAnswerMultipleChoiceResponse.setValues(
+                            userAns.getAnswers().stream().map(AnswerEntity::getAnswerContent).collect(Collectors.toList())
+                    );
+
+                    if(isCorrect){
+                        score += question.getQuestionScore();
+                        userAnswerMultipleChoiceResponse.setExpected(userAns.getAnswers().stream().map(AnswerEntity::getAnswerContent).collect(Collectors.toList()));
+                    }
+                    else{
+                        userAnswerMultipleChoiceResponse.setExpected(
+                                answerRepository.findByQuestion(question)
+                                .stream().map(AnswerEntity::getAnswerContent).collect(Collectors.toList())
+                        );
+                    }
+                    answerDetailsResponse.setAnswers(userAnswerMultipleChoiceResponse);
+
+                    answerDetailsRespons.add(answerDetailsResponse);
+
                 }
             }
             else if( request.getType()==QuestionTypeEnum.Fill_In_Blank || request.getType()==QuestionTypeEnum.Label){
+                UserAnswerBlankResponse userAnswerBlankResponse= new UserAnswerBlankResponse();
+                List<AnswerBlankResponse> values=new ArrayList<>();
+                List<AnswerBlankResponse> expected=new ArrayList<>();
 
                 for(AnswerBlankRequest answerBlankRequest: request.getAnswersBlank()){
                     UserBlankAnswerEntity answer = new UserBlankAnswerEntity();
@@ -105,11 +143,38 @@ public class UserAnswerService implements IUserAnswerService {
                     answer.setAnswer(answerBlankRequest.getContent());
                     answer.setPosition(answerBlankRequest.getPosition());
                     userBlankAnswerRepository.save(answer);
+
+                    AnswerBlankResponse answerBlankResponse = new AnswerBlankResponse();
+                    answerBlankResponse.setAnswer(answerBlankRequest.getContent());
+                    answerBlankResponse.setPosition(answerBlankRequest.getPosition());
+
+                    values.add(answerBlankResponse);
+
                 }
+                List<AnswerBlankEntity> answerBlankEntities=answerBlankRepository.findByQuestion(question);
+
+                answerBlankEntities.forEach(answerEntity -> {
+                    AnswerBlankResponse answerBlankResponse1 = new AnswerBlankResponse();
+                    answerBlankResponse1.setAnswer(answerEntity.getAnswer());
+                    answerBlankResponse1.setPosition(answerEntity.getPosition());
+                    expected.add(answerBlankResponse1);
+                });
+
+                userAnswerBlankResponse.setValues(values);
+                userAnswerBlankResponse.setExpected(expected);
+
+                answerDetailsResponse.setAnswers(userAnswerBlankResponse);
+                answerDetailsRespons.add(answerDetailsResponse);
+
+                score += scoreAnswerBlank(question.getQuestionId());
+
+
 
 
             } else if ( request.getType()==QuestionTypeEnum.Matching) {
-
+                UserAnswerMatchingResponse userAnswerMatchingResponse = new UserAnswerMatchingResponse();
+                List<AnswerMatchingResponse> values = new ArrayList<>();
+                List<AnswerMatchingResponse> expected = new ArrayList<>();
                 for(AnswerMatchingRequest answerMatchingRequest: request.getAnswersMatching()){
                     UserAnswerMatchingEntity userAnswerMatching = UserAnswerMatchingEntity.builder()
                             .question(question)
@@ -119,64 +184,44 @@ public class UserAnswerService implements IUserAnswerService {
                             .build();
 
                     userAnswerMatchingRepository.save(userAnswerMatching);
+
+                    AnswerMatchingResponse answerMatchingResponse = new AnswerMatchingResponse();
+                    answerMatchingResponse.setContentLeft(answerMatchingRequest.getContentLeft());
+                    answerMatchingResponse.setContentRight(answerMatchingRequest.getContentRight());
+                    values.add(answerMatchingResponse);
+
                 }
 
+                List<AnswerMatchingEntity> answerMatchingEntities=answerMatchingRepository.findAllByQuestion(question);
+                answerMatchingEntities.forEach(matching -> {
+                    AnswerMatchingResponse answerMatchingResponse1 = new AnswerMatchingResponse();
+                    if(matching.getContentLeft().isEmpty() || matching.getContentRight().isEmpty()){
+                        answerMatchingResponse1.setContentLeft(matching.getContentLeft());
+                        answerMatchingResponse1.setContentRight(matching.getContentRight());
+
+                        expected.add(answerMatchingResponse1);
+                    }
+                });
+                userAnswerMatchingResponse.setValues(values);
+                userAnswerMatchingResponse.setExpected(expected);
+
+                answerDetailsResponse.setAnswers(userAnswerMatchingResponse);
+
+                answerDetailsRespons.add(answerDetailsResponse);
+
+                score+= scoreAnswerMatching(question.getQuestionId());
+
+
             }
         }
 
+        userAnswerResponse.setResult(answerDetailsRespons);
+
+        userAnswerResponse.setScore(score);
+        return userAnswerResponse;
 
     }
 
-
-    @Transactional
-    @Override
-    public UserAnswerEntity saveUserAnswer(UserAnswerRequest1 userAnswerRequest1){
-
-        UserEntity user = userService.currentUser();
-
-        QuestionEntity question = questionService.getQuestionById(userAnswerRequest1.getQuestionId());
-
-        if(userAnswerRequest1.getAnswer().size() > question.getNumberChoice()){
-            throw new BadRequestException("The number of choices must be less than or equal to " + question.getNumberChoice());
-        }
-
-
-        UserAnswerEntity userAns = UserAnswerEntity.builder()
-                .user(user)
-                .question(question)
-                .answers(new ArrayList<>())
-                .build();
-
-        for(int i = 0; i< userAnswerRequest1.getAnswer().size(); i++){
-            AnswerEntity answerEntity = answerRepository.findByQuestionAndAnswerContent(question, userAnswerRequest1.getAnswer().get(i));
-
-            if(Objects.isNull(answerEntity)){
-                throw new BadRequestException("The answer is not exist");
-            }
-            userAns.getAnswers().add(answerEntity);
-
-        }
-
-        return userAnswerRepository.save(userAns);
-    }
-
-
-    @Transactional
-    @Override
-    public UserBlankAnswerEntity createUserBlankAnswer(AnswerBlankRequest request) {
-
-        UserEntity user = userService.currentUser();
-
-        QuestionEntity question = questionService.getQuestionById(request.getQuestionId());
-
-        UserBlankAnswerEntity answer = new UserBlankAnswerEntity();
-        answer.setUser(user);
-        answer.setQuestion(question);
-        answer.setAnswer(request.getContent());
-        answer.setPosition(request.getPosition());
-
-        return userBlankAnswerRepository.save(answer);
-    }
 
     @Transactional
     @Override
@@ -259,10 +304,15 @@ public class UserAnswerService implements IUserAnswerService {
         QuestionEntity question = questionService.getQuestionById(questionId);
 
         UserAnswerEntity userAnswer=userAnswerRepository.findByUserAndQuestion(user,question);
+
+        List<AnswerEntity> answerEntities=answerRepository.findByQuestion(question);
+        if(userAnswer.getAnswers().size()<answerEntities.size()){
+            return false;
+        }
+
         for (AnswerEntity answer : userAnswer.getAnswers())
             if(!answer.getCorrectAnswer())
                 return false;
-
 
         return true;
     }
@@ -302,7 +352,12 @@ public class UserAnswerService implements IUserAnswerService {
 
         List<UserAnswerMatchingEntity> userAnswerMatchings = userAnswerMatchingRepository.findAllByUserAndQuestion(user, question);
 
-        List<AnswerMatchingEntity> answerMatchings = answerMatchingRepository.findAllByQuestion(question);
+        List<AnswerMatchingEntity> answerMatchings = answerMatchingRepository.findAllByQuestion(question)
+                .stream()
+                .filter(matching->
+                        !matching.getContentLeft().isEmpty() || !matching.getContentRight().isEmpty()
+                )
+                .collect(Collectors.toList());
 
         UserAnswerScoreResponse scoreAnswerResponse = UserAnswerScoreResponse.builder()
                 .answers(AnswerMatchingMapper.INSTANCE.toAnswerMatchingBasicResponseList(answerMatchings))
@@ -383,22 +438,6 @@ public class UserAnswerService implements IUserAnswerService {
         return scoreAnswerResponse;
     }
 
-    @Override
-    public UserAnswerMatchingEntity createUserMatchingAnswer(AnswerMatchingQuestionRequest request) {
-
-        UserEntity user=userService.currentUser();
-
-        QuestionEntity question = questionService.getQuestionById(request.getQuestionId());
-
-        UserAnswerMatchingEntity userAnswerMatching = UserAnswerMatchingEntity.builder()
-                .question(question)
-                .user(user)
-                .contentLeft(request.getContentLeft())
-                .contentRight(request.getContentRight())
-                .build();
-
-        return userAnswerMatchingRepository.save(userAnswerMatching);
-    }
 
 
 }
