@@ -1,14 +1,22 @@
 package com.example.englishmaster_be.helper;
 
-import com.example.englishmaster_be.common.constant.excel.ExcelHeaderContentConstant;
+import com.example.englishmaster_be.common.constant.excel.ExcelQuestionConstant;
+import com.example.englishmaster_be.common.constant.excel.ExcelTopicConstant;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionContentResponse;
+import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicContentResponse;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ExcelHelper {
 
@@ -25,7 +33,7 @@ public class ExcelHelper {
     }
 
 
-    public static ExcelQuestionContentResponse collectContentPart1234567With(Sheet sheet, Integer iRowAudioOrQuestionContentPath, Integer iRowImagePath, Integer iRowTotalScore, int part) {
+    public static ExcelQuestionContentResponse collectQuestionContentPart1234567With(Sheet sheet, Integer iRowAudioOrQuestionContentPath, Integer iRowImagePath, Integer iRowTotalScore, int part) {
 
         if(!List.of(1, 2, 3, 4, 5, 6, 7).contains(part))
             throw new BadRequestException("Part must be in numbers 1, 2, 3, 4, 5, 6, 7 !");
@@ -39,11 +47,11 @@ public class ExcelHelper {
             Row audioOrQuestionContentRow = sheet.getRow(iRowAudioOrQuestionContentPath);
 
             if(List.of(1, 2, 3, 4).contains(part)){
-                if(audioOrQuestionContentRow == null || !getStringCellValue(audioOrQuestionContentRow, 0).equalsIgnoreCase(ExcelHeaderContentConstant.Audio.getHeaderName()))
+                if(audioOrQuestionContentRow == null || !getStringCellValue(audioOrQuestionContentRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Audio.getHeaderName()))
                     throw new BadRequestException("'Audio' tag is required in Sheet " + part + ", You can fill is blank content audio !");
             }
             else{
-                if(audioOrQuestionContentRow == null || !getStringCellValue(audioOrQuestionContentRow, 0).equalsIgnoreCase(ExcelHeaderContentConstant.Question_Content.getHeaderName()))
+                if(audioOrQuestionContentRow == null || !getStringCellValue(audioOrQuestionContentRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Question_Content.getHeaderName()))
                     throw new BadRequestException("'Question Content' tag is required in Sheet " + part + ", You can fill is blank question content !");
             }
 
@@ -54,7 +62,7 @@ public class ExcelHelper {
 
             Row imageRow = sheet.getRow(iRowImagePath);
 
-            if(imageRow == null || !getStringCellValue(imageRow, 0).equalsIgnoreCase(ExcelHeaderContentConstant.Image.getHeaderName()))
+            if(imageRow == null || !getStringCellValue(imageRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Image.getHeaderName()))
                 throw new BadRequestException("'Image' tag is required in Sheet " + part + ", You can fill is blank content image !");
 
             imagePath = getStringCellValue(imageRow, 1);
@@ -64,7 +72,7 @@ public class ExcelHelper {
 
             Row scoreRow = sheet.getRow(iRowTotalScore);
 
-            if(scoreRow == null || !getStringCellValue(scoreRow, 0).equalsIgnoreCase(ExcelHeaderContentConstant.Score.getHeaderName()))
+            if(scoreRow == null || !getStringCellValue(scoreRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Score.getHeaderName()))
                 throw new BadRequestException("'Score' tag is required in Sheet " + part + ", You can fill is blank content score !");
 
             Cell cellTotalScore = scoreRow.getCell(1);
@@ -86,41 +94,145 @@ public class ExcelHelper {
         return excelQuestionContentResponse;
     }
 
-    public static void checkHeaderTabQuestionPart1234567With(Sheet sheet, int iRowHeaderTable, int part){
+    public static ExcelTopicContentResponse collectTopicContentWith(Sheet sheet){
+
+        int jColHeader = 0;
+
+        int jColBody = 1;
+
+        int iRowExamName = 0;
+        checkCellTopicHeader(sheet, iRowExamName, jColHeader, ExcelTopicConstant.Name);
+
+        String topicName = getCellValueAsString(sheet, iRowExamName, jColBody);
+
+        int iRowImagePath = 1;
+        checkCellTopicHeader(sheet, iRowImagePath, jColHeader, ExcelTopicConstant.Image_Path);
+
+        String imagePath = getCellValueAsString(sheet, iRowImagePath, jColBody);
+
+        int iRowDescription = 2;
+        checkCellTopicHeader(sheet, iRowDescription, jColHeader, ExcelTopicConstant.Description);
+
+        String description = getCellValueAsString(sheet, iRowDescription, jColBody);
+
+        int iRowExamType = 3;
+        checkCellTopicHeader(sheet, iRowExamType, jColHeader, ExcelTopicConstant.Type);
+
+        String topicType = getCellValueAsString(sheet, iRowExamType, jColBody);
+
+        int iRowWorkTime = 4;
+        checkCellTopicHeader(sheet, iRowWorkTime, jColHeader, ExcelTopicConstant.Work_Time);
+
+        String workTimeString = getCellValueAsString(sheet, iRowWorkTime, jColBody);
+
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm[:ss]");
+
+        LocalDateTime localDateTime = LocalDateTime.parse(workTimeString, dateTimeFormatter);
+
+        Time workTime = Time.valueOf(localDateTime.toLocalTime());
+
+        int iRowNumberQuestion = 5;
+        checkCellTopicHeader(sheet, iRowNumberQuestion, jColHeader, ExcelTopicConstant.Number_Question);
+
+        int numberQuestion = (int) sheet.getRow(iRowNumberQuestion).getCell(jColBody).getNumericCellValue();
+
+        int iRowPackName = 6;
+        checkCellTopicHeader(sheet, iRowPackName, jColHeader, ExcelTopicConstant.Exam_Set);
+
+        String packName = getCellValueAsString(sheet, iRowPackName, jColBody);
+
+        int iRowPart = 7;
+        checkCellTopicHeader(sheet, iRowPart, jColHeader, ExcelTopicConstant.Part);
+
+        String part = getCellValueAsString(sheet, iRowPart, jColBody).replaceAll("\n", "");
+
+        List<String> partsList = Arrays.stream(part.split(",")).map(String::trim).toList();
+
+        List<String> partNamesList = new ArrayList<>();
+        List<String> partDescriptionsList = new ArrayList<>();
+
+        partsList.forEach(partItem -> {
+            String[] partItemSplit = partItem.split(":");
+
+            partNamesList.add(partItemSplit[0].trim());
+            partDescriptionsList.add(partItemSplit[1].trim());
+        });
+
+
+        return ExcelTopicContentResponse.builder()
+                .topicName(topicName)
+                .topicImage(imagePath)
+                .topicDescription(description)
+                .topicType(topicType)
+                .workTime(workTime)
+                .numberQuestion(numberQuestion)
+                .packName(packName)
+                .listPartName(partNamesList)
+                .listPartDescription(partDescriptionsList)
+                .build();
+
+    }
+
+    public static void checkCellTopicHeader(Sheet sheet, int iRowHeader, int jColOfRow, ExcelTopicConstant excelTopicConstant){
+
+        Row rowInSheet = sheet.getRow(iRowHeader);
+
+        if(rowInSheet == null)
+            throw new BadRequestException(String.format("Row %d at Sheet %s does not exist", iRowHeader, sheet.getSheetName()));
+
+        Cell cellAtCol = rowInSheet.getCell(jColOfRow);
+
+        if(cellAtCol == null || !getStringCellValue(rowInSheet, jColOfRow).equalsIgnoreCase(excelTopicConstant.getHeaderName()))
+            throw new BadRequestException(
+                    String.format(
+                            "'%s' of cell %d header at row %d is required in Sheet %s",
+                            excelTopicConstant.getHeaderName(),
+                            jColOfRow,
+                            iRowHeader,
+                            sheet.getSheetName()
+                    )
+            );
+
+    }
+
+    public static void checkHeaderTableQuestionPart1234567With(Sheet sheet, int iRowHeaderTable, int part){
 
         if(!List.of(1, 2, 3, 4, 5, 6, 7).contains(part))
             throw new BadRequestException("Part must be in numbers 1, 2, 3, 4, 5, 6, 7 !");
 
         Row rowHeaderTable = sheet.getRow(iRowHeaderTable);
 
+        if(rowHeaderTable == null)
+            throw new BadRequestException(String.format("Row %d at Sheet %s does not exist", iRowHeaderTable, sheet.getSheetName()));
+
         int jColSTT_CellOnHeader = 0;
 
-        checkCellHeaderTable(rowHeaderTable, iRowHeaderTable, jColSTT_CellOnHeader, part, ExcelHeaderContentConstant.STT);
+        checkCellQuestionHeaderTable(sheet, rowHeaderTable, iRowHeaderTable, jColSTT_CellOnHeader, ExcelQuestionConstant.STT);
 
         if(List.of(3, 4, 5, 6, 7).contains(part)){
 
             int jColQuestionContent_CellOnHeader = 1;
 
             if(List.of(3, 4, 5).contains(part))
-                checkCellHeaderTable(rowHeaderTable, iRowHeaderTable, jColQuestionContent_CellOnHeader, part, ExcelHeaderContentConstant.Question_Content);
+                checkCellQuestionHeaderTable(sheet, rowHeaderTable, iRowHeaderTable, jColQuestionContent_CellOnHeader, ExcelQuestionConstant.Question_Content);
             else
-                checkCellHeaderTable(rowHeaderTable, iRowHeaderTable, jColQuestionContent_CellOnHeader, part, ExcelHeaderContentConstant.Question_Content_Child);
+                checkCellQuestionHeaderTable(sheet, rowHeaderTable, iRowHeaderTable, jColQuestionContent_CellOnHeader, ExcelQuestionConstant.Question_Content_Child);
 
             int jColA_CellOnHeader = 2;
 
-            checkCellHeaderTable(rowHeaderTable, iRowHeaderTable, jColA_CellOnHeader, part, ExcelHeaderContentConstant.A);
+            checkCellQuestionHeaderTable(sheet, rowHeaderTable, iRowHeaderTable, jColA_CellOnHeader, ExcelQuestionConstant.A);
 
             int jColB_CellOnHeader = 3;
 
-            checkCellHeaderTable(rowHeaderTable, iRowHeaderTable, jColB_CellOnHeader, part, ExcelHeaderContentConstant.B);
+            checkCellQuestionHeaderTable(sheet, rowHeaderTable, iRowHeaderTable, jColB_CellOnHeader, ExcelQuestionConstant.B);
 
             int jColC_CellOnHeader = 4;
 
-            checkCellHeaderTable(rowHeaderTable, iRowHeaderTable, jColC_CellOnHeader, part, ExcelHeaderContentConstant.C);
+            checkCellQuestionHeaderTable(sheet, rowHeaderTable, iRowHeaderTable, jColC_CellOnHeader, ExcelQuestionConstant.C);
 
             int jColD_CellOnHeader = 5;
 
-            checkCellHeaderTable(rowHeaderTable, iRowHeaderTable, jColD_CellOnHeader, part, ExcelHeaderContentConstant.D);
+            checkCellQuestionHeaderTable(sheet, rowHeaderTable, iRowHeaderTable, jColD_CellOnHeader, ExcelQuestionConstant.D);
 
         }
 
@@ -129,35 +241,35 @@ public class ExcelHelper {
         if(List.of(1, 2).contains(part))
             jColResultHeaderTable = 1;
 
-        checkCellHeaderTable(rowHeaderTable, iRowHeaderTable, jColResultHeaderTable, part, ExcelHeaderContentConstant.Result);
+        checkCellQuestionHeaderTable(sheet, rowHeaderTable, iRowHeaderTable, jColResultHeaderTable, ExcelQuestionConstant.Result);
 
         int jColScoreHeaderTable = 7;
 
         if(List.of(1, 2).contains(part))
             jColScoreHeaderTable = 2;
 
-        checkCellHeaderTable(rowHeaderTable, iRowHeaderTable, jColScoreHeaderTable, part, ExcelHeaderContentConstant.Score);
+        checkCellQuestionHeaderTable(sheet, rowHeaderTable, iRowHeaderTable, jColScoreHeaderTable, ExcelQuestionConstant.Score);
 
         if(part == 1){
 
             int jColImageHeaderTable = 3;
 
-            checkCellHeaderTable(rowHeaderTable, iRowHeaderTable, jColImageHeaderTable, part, ExcelHeaderContentConstant.Image);
+            checkCellQuestionHeaderTable(sheet, rowHeaderTable, iRowHeaderTable, jColImageHeaderTable, ExcelQuestionConstant.Image);
         }
     }
 
-    private static void checkCellHeaderTable(Row rowHeaderTable, int iRowHeaderTable, int jColHeaderTable, int part, ExcelHeaderContentConstant cellHeaderValue){
+    private static void checkCellQuestionHeaderTable(Sheet sheet, Row rowHeaderTable, int iRowHeaderTable, int jColHeaderTable, ExcelQuestionConstant cellHeaderValue){
 
         Cell cellOnHeaderTable = rowHeaderTable.getCell(jColHeaderTable);
 
-        if(cellOnHeaderTable == null || !cellOnHeaderTable.getStringCellValue().equalsIgnoreCase(cellHeaderValue.getHeaderName()))
+        if(cellOnHeaderTable == null || !getStringCellValue(rowHeaderTable, jColHeaderTable).equalsIgnoreCase(cellHeaderValue.getHeaderName()))
             throw new BadRequestException(
                     String.format(
-                            "'%s' cell %d in header table row at row %d is required in Sheet %d",
+                            "'%s' of cell %d in header table row %d is required in Sheet %s",
                             cellHeaderValue.getHeaderName(),
                             jColHeaderTable,
                             iRowHeaderTable,
-                            part
+                            sheet.getSheetName()
                     )
             );
     }

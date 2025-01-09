@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.mapper;
 
+import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicContentResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicRequest;
 import com.example.englishmaster_be.model.part.PartEntity;
@@ -35,6 +36,10 @@ public interface TopicMapper {
 
     List<TopicResponse> toTopicResponseList(List<TopicEntity> topicEntityList);
 
+    @Mapping(target = "pack", expression = "java(PackMapper.INSTANCE.toPackResponse(topicEntity.getPack()))")
+    @Mapping(target = "parts", expression = "java(PartMapper.INSTANCE.toPartResponseList(topicEntity.getParts()))")
+    ExcelTopicResponse toExcelTopicResponse(TopicEntity topicEntity);
+
     @Mapping(target = "topicId", ignore = true)
     @Mapping(target = "numberQuestion", defaultValue = "0")
     @Mapping(target = "topicImage", ignore = true)
@@ -42,4 +47,5 @@ public interface TopicMapper {
 
     void flowToTopicEntity(ExcelTopicResponse topicByExcelFileResponse, @MappingTarget TopicEntity topicEntity);
 
+    void flowToTopicEntity(ExcelTopicContentResponse excelTopicContentResponse, @MappingTarget TopicEntity topicEntity);
 }

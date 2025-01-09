@@ -3,35 +3,42 @@ package com.example.englishmaster_be.domain.excel_fill.service;
 import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
 import com.example.englishmaster_be.common.constant.PartEnum;
-import com.example.englishmaster_be.common.constant.excel.ExcelHeaderContentConstant;
-import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionContentResponse;
-import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
-import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
-import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionListResponse;
+import com.example.englishmaster_be.common.constant.excel.ExcelQuestionConstant;
+import com.example.englishmaster_be.domain.excel_fill.dto.response.*;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.QuestionMapper;
+import com.example.englishmaster_be.mapper.TopicMapper;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.answer.AnswerRepository;
 import com.example.englishmaster_be.model.content.ContentEntity;
 import com.example.englishmaster_be.model.content.ContentRepository;
+import com.example.englishmaster_be.model.pack.PackEntity;
+import com.example.englishmaster_be.model.pack.PackRepository;
+import com.example.englishmaster_be.model.pack.QPackEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.part.PartRepository;
 import com.example.englishmaster_be.domain.pack.service.IPackService;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.helper.ExcelHelper;
+import com.example.englishmaster_be.model.part.QPartEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.question.QuestionRepository;
+import com.example.englishmaster_be.model.topic.QTopicEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
+import com.example.englishmaster_be.model.topic.TopicRepository;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.util.ContentUtil;
+import com.example.englishmaster_be.util.FileUtil;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.openxml4j.opc.internal.FileHelper;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,17 +47,21 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ExcelFillService implements IExcelFillService {
+
+    JPAQueryFactory jpaQueryFactory;
+
+    FileUtil fileUtil;
 
     ContentUtil contentUtil;
 
@@ -62,7 +73,9 @@ public class ExcelFillService implements IExcelFillService {
 
     AnswerRepository answerRepository;
 
-    IPackService packService;
+    TopicRepository topicRepository;
+
+    PackRepository packRepository;
 
     IPartService partService;
 
@@ -73,43 +86,103 @@ public class ExcelFillService implements IExcelFillService {
 
     @Transactional
     @Override
-    public ExcelTopicResponse parseCreateTopicDTO(MultipartFile file) {
+    @SneakyThrows
+    public ExcelTopicResponse importTopicExcel(MultipartFile file) {
 
         if(file == null || file.isEmpty())
-            throw new BadRequestException("Please select a file storage to upload");
+            throw new BadRequestException("Please select a file excel to upload");
 
         if(ExcelHelper.isExcelFile(file))
             throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
 
+        UserEntity currentUser = userService.currentUser();
+
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
 
-            Sheet sheet = workbook.getSheetAt(0);
+            int sheetNumber = 0;
 
-            if (sheet == null)
-                throw new BadRequestException(String.format("Sheet %s does not exist", 0));
+            Sheet sheet = workbook.getSheetAt(sheetNumber);
 
-            String topicName = ExcelHelper.getCellValueAsString(sheet, 0, 1);
-            String topicImageName = ExcelHelper.getCellValueAsString(sheet, 1, 1);
-            String topicDescription = ExcelHelper.getCellValueAsString(sheet, 2, 1);
-            String topicType = ExcelHelper.getCellValueAsString(sheet, 3, 1);
-            String workTime = ExcelHelper.getCellValueAsString(sheet, 4, 1).replace(".0", "");
-            int numberQuestion = ExcelHelper.getIntCellValue(sheet, 5, 1);
-            String topicPackName = ExcelHelper.getCellValueAsString(sheet, 6, 1);
-            List<UUID> parts = parseParts(ExcelHelper.getCellValueAsString(sheet, 7, 1));
-            return ExcelTopicResponse.builder()
-                    .topicName(topicName)
-                    .topicImageName(topicImageName)
-                    .topicDescription(topicDescription)
-                    .topicType(topicType)
-                    .workTime(workTime)
-                    .numberQuestion(numberQuestion)
-                    .packId(packService.getPackByName(topicName).getPackId())
-                    .listPart(parts)
-                    .build();
+            if(sheet == null)
+                throw new BadRequestException(String.format("Sheet %d does not exist", sheetNumber));
 
-        } catch (Exception e) {
-            throw new CustomException(ErrorEnum.CAN_NOT_CREATE_TOPIC_BY_EXCEL);
+            ExcelTopicContentResponse excelTopicContentResponse = ExcelHelper.collectTopicContentWith(sheet);
+
+            PackEntity packEntity = jpaQueryFactory.selectFrom(QPackEntity.packEntity).where(
+                    QPackEntity.packEntity.packName.equalsIgnoreCase(excelTopicContentResponse.getPackName())
+            ).fetchOne();
+
+            if(packEntity == null) {
+
+                packEntity = PackEntity.builder()
+                        .packId(UUID.randomUUID())
+                        .userCreate(currentUser)
+                        .userUpdate(currentUser)
+                        .packName(excelTopicContentResponse.getPackName())
+                        .build();
+
+                packEntity = packRepository.save(packEntity);
+            }
+
+            TopicEntity topicEntity = jpaQueryFactory.selectFrom(QTopicEntity.topicEntity).where(
+                    QTopicEntity.topicEntity.topicName.equalsIgnoreCase(excelTopicContentResponse.getTopicName())
+            ).fetchOne();
+
+            if(topicEntity == null)
+                topicEntity = TopicEntity.builder()
+                        .topicId(UUID.randomUUID())
+                        .userCreate(currentUser)
+                        .userUpdate(currentUser)
+                        .build();
+
+            topicEntity.setPack(packEntity);
+
+            TopicMapper.INSTANCE.flowToTopicEntity(excelTopicContentResponse, topicEntity);
+
+            if(topicEntity.getParts() == null)
+                topicEntity.setParts(new ArrayList<>());
+
+            int partNamesSize = excelTopicContentResponse.getListPartName().size();
+
+            for(int i = 0; i < partNamesSize; i++) {
+
+                String partNameAtI = excelTopicContentResponse.getListPartName().get(i);
+
+                String partDescriptionAtI = excelTopicContentResponse.getListPartDescription().get(i);
+
+                PartEntity partEntity = jpaQueryFactory.selectFrom(QPartEntity.partEntity).where(
+                        QPartEntity.partEntity.partName.equalsIgnoreCase(partNameAtI)
+                ).fetchOne();
+
+                if (partEntity == null) {
+
+                    partEntity = PartEntity.builder()
+                            .partId(UUID.randomUUID())
+                            .partName(partNameAtI)
+                            .partDescription(partDescriptionAtI)
+                            .partType(String.join(": ", List.of(partNameAtI, partDescriptionAtI)))
+                            .contentData("")
+                            .contentType(fileUtil.mimeTypeFile(""))
+                            .userCreate(currentUser)
+                            .userUpdate(currentUser)
+                            .build();
+
+                    partEntity = partRepository.save(partEntity);
+                }
+
+                if (!topicEntity.getParts().contains(partEntity))
+                    topicEntity.getParts().add(partEntity);
+
+                topicEntity = topicRepository.save(topicEntity);
+            }
+
+
+            return TopicMapper.INSTANCE.toExcelTopicResponse(topicEntity);
+
         }
+//        catch (Exception e) {
+//            throw new CustomException(ErrorEnum.CAN_NOT_CREATE_TOPIC_BY_EXCEL);
+//        }
 
     }
 
@@ -136,7 +209,7 @@ public class ExcelFillService implements IExcelFillService {
             Sheet sheet = workbook.getSheetAt(part);
 
             if (sheet == null)
-                throw new BadRequestException(String.format("Sheet %s does not exist", part));
+                throw new BadRequestException(String.format("Sheet %d does not exist", part));
 
             int iRowPartName = 0;
 
@@ -165,7 +238,7 @@ public class ExcelFillService implements IExcelFillService {
 
             int iRowTotalScore = iRowAudioPath + 1;
 
-            ExcelQuestionContentResponse excelQuestionContentResponse = ExcelHelper.collectContentPart1234567With(sheet, iRowAudioPath, null, iRowTotalScore, part);
+            ExcelQuestionContentResponse excelQuestionContentResponse = ExcelHelper.collectQuestionContentPart1234567With(sheet, iRowAudioPath, null, iRowTotalScore, part);
 
             QuestionEntity questionParent = QuestionEntity.builder()
                     .questionId(UUID.randomUUID())
@@ -193,11 +266,15 @@ public class ExcelFillService implements IExcelFillService {
             );
 
             contentAudio = contentRepository.save(contentAudio);
+
+            questionParent.setContentAudio(contentAudio.getContentData());
             questionParent.getContentCollection().add(contentAudio);
+
+            questionParent = questionRepository.save(questionParent);
 
             int iRowHeaderTable = iRowTotalScore + 1;
 
-            ExcelHelper.checkHeaderTabQuestionPart1234567With(sheet, iRowHeaderTable, part);
+            ExcelHelper.checkHeaderTableQuestionPart1234567With(sheet, iRowHeaderTable, part);
 
             // bỏ qua 3 dòng vì đã đọc được audio path, total score và check structure header table
             countRowWillFetch -= 3;
@@ -295,7 +372,7 @@ public class ExcelFillService implements IExcelFillService {
             Sheet sheet = workbook.getSheetAt(part);
 
             if (sheet == null)
-                throw new BadRequestException(String.format("Sheet %s does not exist", part));
+                throw new BadRequestException(String.format("Sheet %d does not exist", part));
 
             int iRowPartName = 0;
 
@@ -317,7 +394,7 @@ public class ExcelFillService implements IExcelFillService {
 
             int iRowTotalScore = iRowPartName + 1;
 
-            ExcelQuestionContentResponse excelQuestionContentResponse = ExcelHelper.collectContentPart1234567With(sheet, null, null, iRowTotalScore, part);
+            ExcelQuestionContentResponse excelQuestionContentResponse = ExcelHelper.collectQuestionContentPart1234567With(sheet, null, null, iRowTotalScore, part);
 
             QuestionEntity questionParent = QuestionEntity.builder()
                     .questionId(UUID.randomUUID())
@@ -337,7 +414,7 @@ public class ExcelFillService implements IExcelFillService {
 
             int iRowHeaderTable = iRowTotalScore + 1;
 
-            ExcelHelper.checkHeaderTabQuestionPart1234567With(sheet, iRowHeaderTable, part);
+            ExcelHelper.checkHeaderTableQuestionPart1234567With(sheet, iRowHeaderTable, part);
 
             // bỏ qua 2 dòng vì đã đọc được total score và check structure header table
             countRowWillFetch -= 2;
@@ -440,7 +517,7 @@ public class ExcelFillService implements IExcelFillService {
             Sheet sheet = workbook.getSheetAt(part);
 
             if (sheet == null)
-                throw new BadRequestException(String.format("Sheet %s does not exist", part));
+                throw new BadRequestException(String.format("Sheet %d does not exist", part));
 
             int iRowPartName = 0;
 
@@ -474,7 +551,7 @@ public class ExcelFillService implements IExcelFillService {
                 int iRowImage = iRowAudioPath + 1;
                 int iRowTotalScore = iRowImage + 1;
 
-                ExcelQuestionContentResponse excelQuestionContentResponse = ExcelHelper.collectContentPart1234567With(sheet, iRowAudioPath, iRowImage, iRowTotalScore, part);
+                ExcelQuestionContentResponse excelQuestionContentResponse = ExcelHelper.collectQuestionContentPart1234567With(sheet, iRowAudioPath, iRowImage, iRowTotalScore, part);
 
                 QuestionEntity questionParent = QuestionEntity.builder()
                         .questionId(UUID.randomUUID())
@@ -502,6 +579,8 @@ public class ExcelFillService implements IExcelFillService {
                 );
 
                 contentAudio = contentRepository.save(contentAudio);
+
+                questionParent.setContentAudio(contentAudio.getContentData());
                 questionParent.getContentCollection().add(contentAudio);
 
                 ContentEntity contentImage = contentUtil.makeQuestionContentEntity(
@@ -511,11 +590,15 @@ public class ExcelFillService implements IExcelFillService {
                 );
 
                 contentImage = contentRepository.save(contentImage);
+
+                questionParent.setContentImage(contentImage.getContentData());
                 questionParent.getContentCollection().add(contentImage);
+
+                questionParent = questionRepository.save(questionParent);
 
                 int iRowHeaderTable = iRowTotalScore + 1;
 
-                ExcelHelper.checkHeaderTabQuestionPart1234567With(sheet, iRowHeaderTable, part);
+                ExcelHelper.checkHeaderTableQuestionPart1234567With(sheet, iRowHeaderTable, part);
 
                 int iRowBodyTable = iRowHeaderTable + 1;
 
@@ -535,7 +618,7 @@ public class ExcelFillService implements IExcelFillService {
 
                     if(
                             cellQuestionContent.getCellType().equals(CellType.STRING)
-                            && cellQuestionContent.getStringCellValue().equalsIgnoreCase(ExcelHeaderContentConstant.Audio.getHeaderName())
+                            && cellQuestionContent.getStringCellValue().equalsIgnoreCase(ExcelQuestionConstant.Audio.getHeaderName())
                     ) {
 
                         iRowAudioPath = iRowBodyTable;
@@ -636,7 +719,7 @@ public class ExcelFillService implements IExcelFillService {
             Sheet sheet = workbook.getSheetAt(part);
 
             if (sheet == null)
-                throw new BadRequestException(String.format("Sheet %s does not exist", part));
+                throw new BadRequestException(String.format("Sheet %d does not exist", part));
 
             int iRowPartName = 0;
 
@@ -670,7 +753,7 @@ public class ExcelFillService implements IExcelFillService {
                 Integer iRowImage = part == 7 ? iRowQuestionContent + 1 : null;
                 int iRowTotalScore = part == 7 ? iRowImage + 1 : iRowQuestionContent + 1;
 
-                ExcelQuestionContentResponse excelQuestionContentResponse = ExcelHelper.collectContentPart1234567With(sheet, iRowQuestionContent, iRowImage, iRowTotalScore, part);
+                ExcelQuestionContentResponse excelQuestionContentResponse = ExcelHelper.collectQuestionContentPart1234567With(sheet, iRowQuestionContent, iRowImage, iRowTotalScore, part);
 
                 QuestionEntity questionParent = QuestionEntity.builder()
                         .questionId(UUID.randomUUID())
@@ -701,12 +784,16 @@ public class ExcelFillService implements IExcelFillService {
                     );
 
                     contentImage = contentRepository.save(contentImage);
+
+                    questionParent.setContentImage(contentImage.getContentData());
                     questionParent.getContentCollection().add(contentImage);
+
+                    questionParent = questionRepository.save(questionParent);
                 }
 
                 int iRowHeaderTable = iRowTotalScore + 1;
 
-                ExcelHelper.checkHeaderTabQuestionPart1234567With(sheet, iRowHeaderTable, part);
+                ExcelHelper.checkHeaderTableQuestionPart1234567With(sheet, iRowHeaderTable, part);
 
                 int iRowBodyTable = iRowHeaderTable + 1;
 
@@ -726,7 +813,7 @@ public class ExcelFillService implements IExcelFillService {
 
                     if(
                             cellQuestionContent.getCellType().equals(CellType.STRING)
-                                    && cellQuestionContent.getStringCellValue().equalsIgnoreCase(ExcelHeaderContentConstant.Question_Content.getHeaderName())
+                                    && cellQuestionContent.getStringCellValue().equalsIgnoreCase(ExcelQuestionConstant.Question_Content.getHeaderName())
                     ) {
 
                         iRowQuestionContent = iRowBodyTable;
