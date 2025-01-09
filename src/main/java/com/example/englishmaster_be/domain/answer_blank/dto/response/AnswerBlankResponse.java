@@ -15,7 +15,6 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class AnswerBlankResponse {
 
-    UUID id;
 
     Integer position;
 

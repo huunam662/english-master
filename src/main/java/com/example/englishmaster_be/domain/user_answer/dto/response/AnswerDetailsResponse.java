@@ -3,18 +3,20 @@ package com.example.englishmaster_be.domain.user_answer.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.List;
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class UserAnswerResponse {
+public class AnswerDetailsResponse {
 
+    UUID id;
 
-    List<AnswerDetailsResponse> result;
+    String questionContent;
+    String type;
 
-    Integer score=0;
-
+    Object answers;
 }

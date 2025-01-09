@@ -12,7 +12,5 @@ public interface UserBlankAnswerMapper {
 
     UserBlankAnswerMapper INSTANCE = Mappers.getMapper(UserBlankAnswerMapper.class);
 
-    @Mapping(target = "question", expression = "java(QuestionMapper.INSTANCE.toQuestionBasicResponse(userBlankAnswerEntity.getQuestion()))")
-    UserAnswerBlankResponse toUserBlankAnswerResponse(UserBlankAnswerEntity userBlankAnswerEntity);
 
 }
