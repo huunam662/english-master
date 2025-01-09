@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.domain.excel_fill.service;
 
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionListResponse;
+import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicContentResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -9,7 +10,7 @@ import java.util.UUID;
 
 public interface IExcelFillService {
 
-    ExcelTopicResponse parseCreateTopicDTO(MultipartFile file) throws IOException;
+    ExcelTopicResponse importTopicExcel(MultipartFile file) throws IOException;
 
     ExcelQuestionListResponse importQuestionReadingPart67Excel(UUID topicId, MultipartFile file, int part) throws IOException;
 

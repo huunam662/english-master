@@ -15,6 +15,7 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -49,7 +50,7 @@ public class TopicEntity {
     String topicType;
 
     @Column(name = "work_time")
-    String workTime;
+    Time workTime;
 
     @Column(name = "number_question")
     Integer numberQuestion;
@@ -72,8 +73,8 @@ public class TopicEntity {
     LocalDateTime startTime;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "end_time")
-    LocalDateTime endTime;
+    @Column(name = "update_time")
+    LocalDateTime updateTime;
 
     @ManyToOne
     @JoinColumn(name = "create_by", referencedColumnName = "id")
@@ -118,10 +119,13 @@ public class TopicEntity {
     void onCreate() {
         createAt = LocalDateTime.now();
         updateAt = LocalDateTime.now();
+
+        enable = Boolean.TRUE;
     }
 
     @PreUpdate
     void onUpdate() {
         updateAt = LocalDateTime.now();
+
     }
 }

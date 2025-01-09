@@ -3,6 +3,7 @@ package com.example.englishmaster_be.domain.excel_fill.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionListResponse;
+import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicContentResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
 import com.example.englishmaster_be.domain.excel_fill.service.IExcelFillService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,7 +31,7 @@ public class ExcelFillController {
     @SneakyThrows
     public ExcelTopicResponse getCreateTopicByExcelFileDTO(@RequestPart("file") MultipartFile file) {
 
-        return excelService.parseCreateTopicDTO(file);
+        return excelService.importTopicExcel(file);
     }
 
     @PostMapping(value = "/importQuestionPart67", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

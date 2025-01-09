@@ -33,6 +33,8 @@ public interface ITopicService {
 
     TopicEntity getTopicById(UUID topicId);
 
+    TopicEntity getTopicByName(String topicName);
+
     List<TopicEntity> get5TopicName(String query);
 
     List<TopicEntity> getAllTopicToPack(PackEntity pack);

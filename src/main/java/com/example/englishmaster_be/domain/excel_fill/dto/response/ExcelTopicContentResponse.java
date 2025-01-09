@@ -1,10 +1,6 @@
 package com.example.englishmaster_be.domain.excel_fill.dto.response;
 
-import com.example.englishmaster_be.domain.pack.dto.response.PackResponse;
-import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -19,9 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ExcelTopicResponse {
-
-    UUID topicId;
+public class ExcelTopicContentResponse {
 
     String topicName;
 
@@ -31,13 +25,15 @@ public class ExcelTopicResponse {
 
     String topicType;
 
-    PackResponse pack;
+    String packName;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     Time workTime;
 
     Integer numberQuestion;
 
-    List<PartResponse> parts;
+    List<String> listPartName;
+
+    List<String> listPartDescription;
 
 }
