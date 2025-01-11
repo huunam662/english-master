@@ -11,7 +11,9 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(builder = @Builder(disableBuilder = true))
 public interface PartMapper {
@@ -25,10 +27,23 @@ public interface PartMapper {
 
     List<PartResponse> toPartResponseList(List<PartEntity> partList);
 
-    @Mapping(target = "totalQuestion", expression = "java(partEntity != null && partEntity.getQuestions() != null ? partEntity.getQuestions().size() : 0)")
     PartBasicResponse toPartBasicResponse(PartEntity partEntity);
 
     List<PartBasicResponse> toPartBasicResponseList(List<PartEntity> partList);
+
+    default List<String> toPartNameResponseList(List<PartEntity> partEntities) {
+
+        partEntities = new ArrayList<>(
+                partEntities.stream().collect(
+                        Collectors.toMap(
+                                PartEntity::getPartName,
+                                part -> part,
+                                (part1, part2) -> part1
+                        )
+                ).values());
+
+        return partEntities.stream().map(PartEntity::getPartName).sorted(String::compareTo).toList();
+    }
 
     @Mapping(target = "partId", ignore = true)
     void flowToPartEntity(PartRequest partRequest, @MappingTarget PartEntity partEntity);

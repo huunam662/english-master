@@ -169,11 +169,11 @@ public class QuestionController {
     @GetMapping("/list-question")
     @DefaultMessage("All question from part successfully")
     public List<QuestionPartResponse> getAllQuestionFromPart(
-            @RequestParam("partId") UUID partId,
+            @RequestParam("partName") String partName,
             @RequestParam("topicId") UUID topicId
     ) {
 
-        return questionService.getAllPartQuestions(partId, topicId);
+        return questionService.getAllPartQuestions(partName, topicId);
     }
 
 }

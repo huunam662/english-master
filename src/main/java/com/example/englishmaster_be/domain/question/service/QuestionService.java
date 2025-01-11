@@ -23,6 +23,7 @@ import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.content.ContentEntity;
 import com.example.englishmaster_be.model.matching_pair.MatchingPairEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
+import com.example.englishmaster_be.model.part.QPartEntity;
 import com.example.englishmaster_be.model.question.QQuestionEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.question_label.QuestionLabelEntity;
@@ -36,6 +37,7 @@ import com.example.englishmaster_be.model.part.PartRepository;
 import com.example.englishmaster_be.model.question.QuestionRepository;
 import com.example.englishmaster_be.util.FileUtil;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.mail.Part;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -384,20 +386,26 @@ public class QuestionService implements IQuestionService {
     }
 
     @Override
-    public List<QuestionPartResponse> getAllPartQuestions(UUID partId, UUID topicId) {
+    public List<QuestionPartResponse> getAllPartQuestions(String partName, UUID topicId) {
 
         TopicEntity topicEntity = topicService.getTopicById(topicId);
 
-        PartEntity partEntity = partService.getPartToId(partId);
-
-        List<QuestionEntity> questionEntityList = jpaQueryFactory.selectFrom(QQuestionEntity.questionEntity)
+        List<PartEntity> partEntityList = jpaQueryFactory.selectFrom(QPartEntity.partEntity)
                 .where(
-                        QQuestionEntity.questionEntity.part.eq(partEntity)
-                                .and(QQuestionEntity.questionEntity.topics.contains(topicEntity))
-                                .and(QQuestionEntity.questionEntity.isQuestionParent.eq(Boolean.TRUE))
+                        QPartEntity.partEntity.partName.equalsIgnoreCase(partName)
+                                .and(QPartEntity.partEntity.topics.contains(topicEntity))
                 ).fetch();
 
-        return QuestionMapper.INSTANCE.toQuestionPartResponseList(questionEntityList);
+        return partEntityList.stream().map(
+                partEntity -> {
+
+                    List<QuestionEntity> questionParents = topicEntity.getQuestions().stream().filter(
+                            questionEntity -> questionEntity.getPart().equals(partEntity)
+                    ).toList();
+
+                    return QuestionMapper.INSTANCE.toQuestionPartResponse(questionParents, partEntity, topicEntity);
+                }
+        ).toList();
     }
 
 

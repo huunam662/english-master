@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.mapper;
 
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
+import com.example.englishmaster_be.domain.part.dto.response.PartBasicResponse;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionBasicResponse;
@@ -63,16 +64,41 @@ public interface QuestionMapper {
 
     List<ExcelQuestionResponse> toExcelQuestionResponseList(List<QuestionEntity> questionEntityList);
 
+    @Mapping(target = "topic", expression = "java(TopicMapper.INSTANCE.toTopicBasicResponse(topicEntity))")
+    @Mapping(target = "part", expression = "java(PartMapper.INSTANCE.toPartBasicResponse(partEntity))")
+    @Mapping(target = "questionParents", expression = "java(toExcelQuestionResponseList(questionParents))")
+    QuestionPartResponse toQuestionPartResponse(List<QuestionEntity> questionParents, PartEntity partEntity, TopicEntity topicEntity);
+
+    @AfterMapping
+    default void setTotalQuestion(@MappingTarget QuestionPartResponse response, List<QuestionEntity> questionParents) {
+        if (response.getPart() == null) {
+            response.setPart(new PartBasicResponse());
+        }
+        response.getPart().setTotalQuestion(calculateTotalQuestionOf(questionParents));
+    }
+
+    default int calculateTotalQuestionOf(List<QuestionEntity> questionParents) {
+
+        if(questionParents == null) return 0;
+
+        int totalQuestion = questionParents.size();
+
+        int totalQuestionChild = questionParents.stream().map(
+                questionEntity -> {
+                    if(questionEntity.getQuestionGroupChildren() == null) return 0;
+
+                    return questionEntity.getQuestionGroupChildren().size();
+                }
+        ).reduce(0, Integer::sum);
+
+        return totalQuestion + totalQuestionChild;
+    }
+
     @Mapping(target = "questionId", ignore = true)
     void flowToQuestionEntity(ExcelQuestionResponse questionByExcelFileResponse, @MappingTarget QuestionEntity questionEntity);
 
     @Mapping(target = "questionId", ignore = true)
     void flowToQuestionEntity(QuestionRequest questionRequest, @MappingTarget QuestionEntity questionEntity);
-
-    @Mapping(target = "partId", source = "part.partId")
-    @Mapping(target = "partName", source = "part.partName")
-    @Mapping(target = "questionParent", expression = "java(toExcelQuestionResponse(questionEntity))")
-    QuestionPartResponse toQuestionPartResponse(QuestionEntity questionEntity);
 
     List<QuestionPartResponse> toQuestionPartResponseList(List<QuestionEntity> questionEntityList);
 }

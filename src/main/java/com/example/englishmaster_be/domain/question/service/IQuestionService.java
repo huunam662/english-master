@@ -36,5 +36,5 @@ public interface IQuestionService {
 
     List<QuestionEntity> getQuestionGroupListByQuestionId(UUID questionId);
 
-    List<QuestionPartResponse> getAllPartQuestions(UUID partId, UUID topicId);
+    List<QuestionPartResponse> getAllPartQuestions(String partName, UUID topicId);
 }

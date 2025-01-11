@@ -1,8 +1,5 @@
 package com.example.englishmaster_be.domain.topic.dto.response;
 
-import com.example.englishmaster_be.domain.part.dto.response.PartBasicResponse;
-import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
-import com.example.englishmaster_be.domain.user.dto.response.UserBasicResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -49,11 +46,7 @@ public class TopicResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
     LocalDateTime updateAt;
 
-    UserBasicResponse userCreate;
-
-    UserBasicResponse userUpdate;
-
-    List<PartBasicResponse> parts;
+    List<String> partNames;
 
     Integer numberQuestion;
 
