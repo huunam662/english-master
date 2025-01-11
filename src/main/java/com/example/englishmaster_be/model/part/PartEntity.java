@@ -64,7 +64,12 @@ public class PartEntity {
     @JoinColumn(name = "update_by", referencedColumnName = "id")
     UserEntity userUpdate;
 
-    @ManyToMany(mappedBy = "parts")
+    @ManyToMany
+    @JoinTable(
+            name = "topic_part",
+            joinColumns = @JoinColumn(name = "part_id"),
+            inverseJoinColumns = @JoinColumn(name = "topic_id")
+    )
 	List<TopicEntity> topics;
 
     @OneToMany(mappedBy = "part")

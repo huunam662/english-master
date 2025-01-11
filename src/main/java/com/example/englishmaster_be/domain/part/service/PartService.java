@@ -11,9 +11,13 @@ import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.PartMapper;
 import com.example.englishmaster_be.model.part.PartEntity;
+import com.example.englishmaster_be.model.part.QPartEntity;
+import com.example.englishmaster_be.model.question.QQuestionEntity;
+import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.util.FileUtil;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -25,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -33,6 +38,8 @@ import java.util.UUID;
 public class PartService implements IPartService {
 
     FileUtil fileUtil;
+
+    JPAQueryFactory jpaQueryFactory;
 
     PartRepository partRepository;
 
@@ -106,9 +113,16 @@ public class PartService implements IPartService {
     }
 
     @Override
-    public PartEntity getPartToName(String partName) {
+    public PartEntity getPartToName(String partName, String partType, TopicEntity topicEntity){
 
-        return partRepository.findByPartName(partName).orElseThrow(
+        PartEntity partEntity = jpaQueryFactory.selectFrom(QPartEntity.partEntity)
+                .where(
+                        QPartEntity.partEntity.partName.equalsIgnoreCase(partName)
+                                .and(QPartEntity.partEntity.partType.equalsIgnoreCase(partType))
+                                .and(QPartEntity.partEntity.topics.contains(topicEntity))
+                ).fetchOne();
+
+        return Optional.ofNullable(partEntity).orElseThrow(
                 () -> new CustomException(ErrorEnum.PART_NOT_FOUND)
         );
     }

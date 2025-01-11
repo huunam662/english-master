@@ -109,7 +109,7 @@ public class TopicController {
 
     @PutMapping(value = "/{topicId:.+}/uploadImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Upload TopicEntity file_storage successfully")
+    @DefaultMessage("Upload TopicEntity file storage successfully")
     public TopicResponse uploadFileImage(
             @PathVariable UUID topicId,
             @RequestPart("contentData") MultipartFile contentData
@@ -173,7 +173,7 @@ public class TopicController {
 
     @PostMapping(value = "/{topicId:.+}/addPart")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Add PartEntity to TopicEntity successfully")
+    @DefaultMessage("Add Part to TopicEntity successfully")
     public void addPartToTopic(@PathVariable UUID topicId, @RequestParam UUID partId) {
 
         topicService.addPartToTopic(topicId, partId);
@@ -181,7 +181,7 @@ public class TopicController {
 
     @DeleteMapping(value = "/{topicId:.+}/deletePart")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Delete PartEntity to TopicEntity successfully")
+    @DefaultMessage("Delete Part to TopicEntity successfully")
     public void deletePartToTopic(@PathVariable UUID topicId, @RequestParam UUID partId) {
 
         topicService.deletePartToTopic(topicId, partId);
@@ -273,7 +273,7 @@ public class TopicController {
 
     @GetMapping(value = "/{topicId:.+}/listPart")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show PartEntity to TopicEntity successfully")
+    @DefaultMessage("Show Part to TopicEntity successfully")
     public List<PartResponse> getPartToTopic(@PathVariable UUID topicId) {
 
         return topicService.getPartToTopic(topicId);
@@ -281,7 +281,7 @@ public class TopicController {
 
     @GetMapping(value = "/{topicId:.+}/listQuestionToPart")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show QuestionEntity of PartEntity to TopicEntity successfully")
+    @DefaultMessage("Show QuestionEntity of Part to TopicEntity successfully")
     public List<QuestionResponse> getQuestionOfToTopic(@PathVariable UUID topicId, @RequestParam UUID partId) {
 
         return topicService.getQuestionOfToTopic(topicId, partId);

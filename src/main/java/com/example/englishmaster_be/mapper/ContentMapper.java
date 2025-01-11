@@ -11,13 +11,14 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
+import java.util.UUID;
 
 @Mapper(builder = @Builder(disableBuilder = true))
 public interface ContentMapper {
 
     ContentMapper INSTANCE = Mappers.getMapper(ContentMapper.class);
 
-    @Mapping(target = "questionId", source = "question.questionId")
+    @Mapping(target = "questions", expression = "java(QuestionMapper.INSTANCE.toQuestionBasicResponseList(content.getQuestions()))")
     ContentResponse toContentResponse(ContentEntity content);
 
     List<ContentResponse> toContentResponseList(List<ContentEntity> content);

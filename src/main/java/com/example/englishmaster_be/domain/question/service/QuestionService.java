@@ -8,6 +8,7 @@ import com.example.englishmaster_be.domain.content.service.IContentService;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.part.dto.response.PartQuestionResponse;
 import com.example.englishmaster_be.domain.part.service.IPartService;
+import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.question.dto.response.*;
@@ -22,8 +23,11 @@ import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.content.ContentEntity;
 import com.example.englishmaster_be.model.matching_pair.MatchingPairEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
+import com.example.englishmaster_be.model.part.QPartEntity;
+import com.example.englishmaster_be.model.question.QQuestionEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.question_label.QuestionLabelEntity;
+import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.QuestionMapper;
@@ -32,6 +36,8 @@ import com.example.englishmaster_be.model.content.ContentRepository;
 import com.example.englishmaster_be.model.part.PartRepository;
 import com.example.englishmaster_be.model.question.QuestionRepository;
 import com.example.englishmaster_be.util.FileUtil;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.mail.Part;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -57,6 +63,8 @@ public class QuestionService implements IQuestionService {
 
     FileUtil fileUtil;
 
+    JPAQueryFactory jpaQueryFactory;
+
     QuestionRepository questionRepository;
 
     ContentRepository contentRepository;
@@ -68,6 +76,8 @@ public class QuestionService implements IQuestionService {
     IUserService userService;
 
     IPartService partService;
+
+    ITopicService topicService;
 
     IContentService contentService;
 
@@ -149,7 +159,6 @@ public class QuestionService implements IQuestionService {
                 }
 
                 ContentEntity content = ContentEntity.builder()
-                        .question(question)
                         .contentData(questionRequest.getContentImage())
                         .contentType(fileUtil.mimeTypeFile(questionRequest.getContentImage()))
                         .userCreate(user)
@@ -178,7 +187,6 @@ public class QuestionService implements IQuestionService {
                 }
 
                 ContentEntity content = ContentEntity.builder()
-                        .question(question)
                         .contentData(questionRequest.getContentAudio())
                         .contentType(fileUtil.mimeTypeFile(questionRequest.getContentAudio()))
                         .userCreate(user)
@@ -210,7 +218,6 @@ public class QuestionService implements IQuestionService {
 
             if (questionRequest.getContentImage() != null && !questionRequest.getContentImage().isEmpty()) {
                 ContentEntity content = ContentEntity.builder()
-                        .question(createQuestion)
                         .contentType(questionRequest.getContentImage())
                         .contentData(fileUtil.mimeTypeFile(questionRequest.getContentImage()))
                         .userCreate(user)
@@ -309,7 +316,6 @@ public class QuestionService implements IQuestionService {
                     .contentType(fileResponse.getType())
                     .userCreate(user)
                     .userUpdate(user)
-                    .question(question)
                     .build();
 
             question.getContentCollection().add(content);
@@ -380,107 +386,26 @@ public class QuestionService implements IQuestionService {
     }
 
     @Override
-    public List<PartQuestionResponse> getAllPartQuestions(UUID partId) {
-        PartEntity part = partRepository.findByPartId(partId)
-                .orElseThrow(
-                        () -> new IllegalArgumentException("PartEntity not found with ID: " + partId)
-                );
+    public List<QuestionPartResponse> getAllPartQuestions(String partName, UUID topicId) {
 
-        List<QuestionEntity> questionEntities = questionRepository.findByPart(part);
+        TopicEntity topicEntity = topicService.getTopicById(topicId);
 
-        if (questionEntities == null)
-            return null;
+        List<PartEntity> partEntityList = jpaQueryFactory.selectFrom(QPartEntity.partEntity)
+                .where(
+                        QPartEntity.partEntity.partName.equalsIgnoreCase(partName)
+                                .and(QPartEntity.partEntity.topics.contains(topicEntity))
+                ).fetch();
 
-        List<PartQuestionResponse> partQuestionResponses = new ArrayList<>();
-        for (QuestionEntity questionEntity : questionEntities) {
-            PartQuestionResponse partQuestionResponse = new PartQuestionResponse();
+        return partEntityList.stream().map(
+                partEntity -> {
 
-            partQuestionResponse.setContentData(questionEntity.getQuestionContent());
-            partQuestionResponse.setContentType(questionEntity.getQuestionType().toString());
-            partQuestionResponse.setPartId(partId);
-            partQuestionResponse.setPartName(questionEntity.getPart().getPartName());
+                    List<QuestionEntity> questionParents = topicEntity.getQuestions().stream().filter(
+                            questionEntity -> questionEntity.getPart().equals(partEntity)
+                    ).toList();
 
-
-            QuestionDto questionDto=new QuestionDto();
-            List<QuestionEntity> questionEntityList = listQuestionGroup(questionEntity);
-            if (questionEntityList.get(0).getQuestionType() == QuestionTypeEnum.Multiple_Choice || questionEntityList.get(0).getQuestionType() == QuestionTypeEnum.T_F_Not_Given) {
-                List<Object> questions = new ArrayList<>();
-                for (QuestionEntity question : questionEntityList) {
-                    QuestionMultipleChoiceDto questionMultipleChoiceDto = new QuestionMultipleChoiceDto();
-
-                    questionMultipleChoiceDto.setQuestionId(question.getQuestionId());
-                    questionMultipleChoiceDto.setContent(question.getQuestionContent());
-                    questionMultipleChoiceDto.setAnswers(
-                            question.getAnswers().stream().map(AnswerEntity::getAnswerContent).collect(Collectors.toList())
-                    );
-
-                    questionMultipleChoiceDto.setType(question.getQuestionType());
-                    questionMultipleChoiceDto.setNumberOfChoices(question.getNumberChoice());
-
-                    questions.add(questionMultipleChoiceDto);
-
+                    return QuestionMapper.INSTANCE.toQuestionPartResponse(questionParents, partEntity, topicEntity);
                 }
-                questionDto.setTitle(questionEntity.getTitle());
-                questionDto.setQuestion(questions);
-                partQuestionResponse.setQuestions(questionDto);
-
-            }
-            else if(questionEntityList.get(0).getQuestionType() == QuestionTypeEnum.Fill_In_Blank){
-                List<Object> questions = new ArrayList<>();
-                for (QuestionEntity question: questionEntityList){
-                    QuestionFillInBlankDto questionFillInBlankDto = new QuestionFillInBlankDto();
-
-                    questionFillInBlankDto.setContent(question.getQuestionContent());
-                    questionFillInBlankDto.setQuestionId(question.getQuestionId());
-                    questionFillInBlankDto.setType(question.getQuestionType());
-                    questionFillInBlankDto.setCountBlank(question.getCountBlank());
-                    questions.add(questionFillInBlankDto);
-                }
-                questionDto.setTitle(questionEntity.getTitle());
-                questionDto.setQuestion(questions);
-                partQuestionResponse.setQuestions(questionDto);
-            }
-            else if(questionEntityList.get(0).getQuestionType() == QuestionTypeEnum.Matching){
-                List<Object> questions = new ArrayList<>();
-                for (QuestionEntity question: questionEntityList){
-                    QuestionMatchingDto questionMatchingDto = answerMatchingService.getListAnswerMatchingWithShuffle1(question.getQuestionId());
-
-                    questions.add(questionMatchingDto);
-                }
-                questionDto.setTitle(questionEntity.getTitle());
-                questionDto.setQuestion(questions);
-                partQuestionResponse.setQuestions(questionDto);
-            } else if (questionEntityList.get(0).getQuestionType() == QuestionTypeEnum.Label) {
-                List<Object> questions = new ArrayList<>();
-                for (QuestionEntity question: questionEntityList){
-                    QuestionLabelDto questionLabelDto = new QuestionLabelDto();
-                    questionLabelDto.setQuestionId(question.getQuestionId());
-
-                    ContentEntity content= question.getContentCollection().get(0);
-
-                    questionLabelDto.setImage(content.getContentData());
-                    questionLabelDto.setHasHints(question.getHasHints());
-
-                    questionLabelDto.setType(question.getQuestionType());
-
-                    if(question.getHasHints()){
-                        List<String> labelHints = new ArrayList<>();
-                        labelHints= labelService.getLabelByIdQuestion(question.getQuestionId())
-                                .stream().map(QuestionLabelEntity::getLabel).toList();
-                        questionLabelDto.setLabels(labelHints);
-                    }
-                    questions.add(questionLabelDto);
-
-                }
-                questionDto.setTitle(questionEntity.getTitle());
-                questionDto.setQuestion(questions);
-                partQuestionResponse.setQuestions(questionDto);
-            }
-            partQuestionResponses.add(partQuestionResponse);
-
-
-        }
-        return partQuestionResponses;
+        ).toList();
     }
 
 
