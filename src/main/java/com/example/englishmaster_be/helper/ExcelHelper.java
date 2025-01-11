@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -129,7 +130,7 @@ public class ExcelHelper {
 
         LocalDateTime localDateTime = LocalDateTime.parse(workTimeString, dateTimeFormatter);
 
-        Time workTime = Time.valueOf(localDateTime.toLocalTime());
+        LocalTime workTime = localDateTime.toLocalTime();
 
         int iRowNumberQuestion = 5;
         checkCellTopicHeader(sheet, iRowNumberQuestion, jColHeader, ExcelTopicConstant.Number_Question);

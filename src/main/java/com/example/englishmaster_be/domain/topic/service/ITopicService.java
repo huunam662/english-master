@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.domain.topic.service;
 
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicQuestionListRequest;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicRequest;
@@ -25,9 +26,9 @@ public interface ITopicService {
 
     TopicEntity saveTopic(TopicRequest topicRequest);
 
-    TopicEntity saveTopicByExcelFile(MultipartFile file, String url);
+    ExcelTopicResponse saveTopicByExcelFile(MultipartFile file);
 
-    TopicEntity updateTopicByExcelFile(@PathVariable UUID topicId, MultipartFile file, String url);
+    ExcelTopicResponse updateTopicByExcelFile(@PathVariable UUID topicId, MultipartFile file);
 
     TopicEntity uploadFileImage(UUID topicId, MultipartFile contentData);
 

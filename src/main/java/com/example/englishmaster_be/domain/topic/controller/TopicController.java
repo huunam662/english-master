@@ -3,6 +3,7 @@ package com.example.englishmaster_be.domain.topic.controller;
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
 
+import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.mapper.CommentMapper;
 import com.example.englishmaster_be.mapper.TopicMapper;
@@ -66,30 +67,23 @@ public class TopicController {
     @PostMapping(value = "/createTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Create topic successfully")
-    public TopicResponse createTopicByExcelFile(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "url", required = false) String url
+    public ExcelTopicResponse createTopicByExcelFile(
+            @RequestParam("file") MultipartFile file
     ) {
 
-        TopicEntity topic = topicService.saveTopicByExcelFile(file, url);
-
-        return TopicMapper.INSTANCE.toTopicResponse(topic);
+        return topicService.saveTopicByExcelFile(file);
     }
 
 
     @PutMapping(value = "/{topicId:.+}/updateTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @DefaultMessage("Update topic successfully")
-    public TopicResponse updateTopicByExcelFile(
+    public ExcelTopicResponse updateTopicByExcelFile(
             @PathVariable UUID topicId,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("url") String url
+            @RequestParam("file") MultipartFile file
     ) {
 
-        TopicEntity topic = topicService.updateTopicByExcelFile(topicId, file, url);
-
-        return TopicMapper.INSTANCE.toTopicResponse(topic);
+        return topicService.updateTopicByExcelFile(topicId, file);
     }
-
 
 
     @PutMapping(value = "/{topicId:.+}/updateTopic")

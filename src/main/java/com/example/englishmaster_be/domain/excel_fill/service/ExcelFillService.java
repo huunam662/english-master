@@ -93,6 +93,23 @@ public class ExcelFillService implements IExcelFillService {
     IStatusService statusService;
 
 
+    @Override
+    @SneakyThrows
+    public ExcelTopicContentResponse readTopicContentFromExcel(MultipartFile file) {
+
+        try(Workbook workbook = new XSSFWorkbook(file.getInputStream())){
+
+            int sheetNumber = 0;
+
+            Sheet sheet = workbook.getSheetAt(sheetNumber);
+
+            if(sheet == null)
+                throw new BadRequestException(String.format("Sheet %d does not exist", sheetNumber));
+
+            return ExcelHelper.collectTopicContentWith(sheet);
+        }
+    }
+
     @Transactional
     @Override
     @SneakyThrows
