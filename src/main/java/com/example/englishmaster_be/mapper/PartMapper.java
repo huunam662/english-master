@@ -2,6 +2,7 @@ package com.example.englishmaster_be.mapper;
 
 
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
+import com.example.englishmaster_be.domain.part.dto.response.PartBasicResponse;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
 import org.mapstruct.Builder;
@@ -23,6 +24,11 @@ public interface PartMapper {
     PartResponse toPartResponse(PartEntity part);
 
     List<PartResponse> toPartResponseList(List<PartEntity> partList);
+
+    @Mapping(target = "totalQuestion", expression = "java(partEntity != null && partEntity.getQuestions() != null ? partEntity.getQuestions().size() : 0)")
+    PartBasicResponse toPartBasicResponse(PartEntity partEntity);
+
+    List<PartBasicResponse> toPartBasicResponseList(List<PartEntity> partList);
 
     @Mapping(target = "partId", ignore = true)
     void flowToPartEntity(PartRequest partRequest, @MappingTarget PartEntity partEntity);

@@ -32,8 +32,8 @@ public class ExcelTopicContentResponse {
 
     Integer numberQuestion;
 
-    List<String> listPartName;
+    List<String> partNamesList;
 
-    List<String> listPartDescription;
+    List<String> partTypesList;
 
 }

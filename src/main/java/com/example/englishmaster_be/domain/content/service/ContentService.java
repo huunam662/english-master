@@ -105,7 +105,7 @@ public class ContentService implements IContentService {
 
         ContentMapper.INSTANCE.flowToContentEntity(contentRequest, content);
 
-        if(contentRequest.getImage() != null && !contentRequest.getImage().isEmpty()){
+        if(contentRequest.getImage() != null){
 
             if(content.getContentData() != null && !content.getContentData().isEmpty())
                 uploadService.delete(
@@ -118,7 +118,9 @@ public class ContentService implements IContentService {
             content.setContentType(fileUtil.mimeTypeFile(contentRequest.getImage()));
         }
 
-        content.setQuestion(question);
+        if(!content.getQuestions().contains(question))
+            content.getQuestions().add(question);
+
         content.setUserUpdate(user);
 
         return contentRepository.save(content);

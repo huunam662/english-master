@@ -4,6 +4,8 @@ import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestion
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionBasicResponse;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
+import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
 import com.example.englishmaster_be.model.topic.TopicEntity;
@@ -66,4 +68,11 @@ public interface QuestionMapper {
 
     @Mapping(target = "questionId", ignore = true)
     void flowToQuestionEntity(QuestionRequest questionRequest, @MappingTarget QuestionEntity questionEntity);
+
+    @Mapping(target = "partId", source = "part.partId")
+    @Mapping(target = "partName", source = "part.partName")
+    @Mapping(target = "questionParent", expression = "java(toExcelQuestionResponse(questionEntity))")
+    QuestionPartResponse toQuestionPartResponse(QuestionEntity questionEntity);
+
+    List<QuestionPartResponse> toQuestionPartResponseList(List<QuestionEntity> questionEntityList);
 }

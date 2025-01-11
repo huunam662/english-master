@@ -4,6 +4,7 @@ package com.example.englishmaster_be.domain.question.controller;
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.part.dto.response.PartQuestionResponse;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.mapper.AnswerMapper;
 import com.example.englishmaster_be.mapper.QuestionMapper;
@@ -165,11 +166,14 @@ public class QuestionController {
         return QuestionMapper.INSTANCE.toQuestionResponse(question);
     }
 
-    @GetMapping("/{partId}/list-question")
+    @GetMapping("/list-question")
     @DefaultMessage("All question from part successfully")
-    public List<PartQuestionResponse> getAllQuestionFromPart(@PathVariable UUID partId) {
+    public List<QuestionPartResponse> getAllQuestionFromPart(
+            @RequestParam("partId") UUID partId,
+            @RequestParam("topicId") UUID topicId
+    ) {
 
-        return questionService.getAllPartQuestions(partId);
+        return questionService.getAllPartQuestions(partId, topicId);
     }
 
 }

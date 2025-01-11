@@ -1,5 +1,7 @@
 package com.example.englishmaster_be.domain.topic.dto.response;
 
+import com.example.englishmaster_be.domain.part.dto.response.PartBasicResponse;
+import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
 import com.example.englishmaster_be.domain.user.dto.response.UserBasicResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
@@ -19,11 +21,11 @@ public class TopicResponse {
 
     UUID topicId;
 
+    String packName;
+
     UUID packId;
 
     UUID statusId;
-
-    String packName;
 
     String topicName;
 
@@ -51,7 +53,7 @@ public class TopicResponse {
 
     UserBasicResponse userUpdate;
 
-    List<UUID> parts;
+    List<PartBasicResponse> parts;
 
     Integer numberQuestion;
 
