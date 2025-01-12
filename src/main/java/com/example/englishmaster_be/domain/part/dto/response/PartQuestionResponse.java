@@ -1,6 +1,5 @@
 package com.example.englishmaster_be.domain.part.dto.response;
 
-import com.example.englishmaster_be.domain.question.dto.response.QuestionDto;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -20,5 +19,5 @@ public class PartQuestionResponse {
 
     String partName;
 
-    QuestionResponse questions;
+    List<QuestionResponse> questions;
 }

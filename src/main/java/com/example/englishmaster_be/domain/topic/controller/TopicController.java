@@ -2,8 +2,9 @@ package com.example.englishmaster_be.domain.topic.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
-
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.mapper.CommentMapper;
 import com.example.englishmaster_be.mapper.TopicMapper;
@@ -13,10 +14,10 @@ import com.example.englishmaster_be.domain.topic.dto.request.TopicRequest;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicFilterRequest;
 import com.example.englishmaster_be.domain.comment.dto.response.CommentResponse;
 import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
-import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicResponse;
 import com.example.englishmaster_be.model.comment.CommentEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.*;
 import lombok.AccessLevel;
@@ -28,7 +29,7 @@ import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.*;
 
 
@@ -103,7 +104,7 @@ public class TopicController {
 
     @PutMapping(value = "/{topicId:.+}/uploadImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Upload TopicEntity file storage successfully")
+    @DefaultMessage("Upload Topic file storage successfully")
     public TopicResponse uploadFileImage(
             @PathVariable UUID topicId,
             @RequestPart("contentData") MultipartFile contentData
@@ -116,14 +117,14 @@ public class TopicController {
 
     @DeleteMapping(value = "/{topicId:.+}/delete")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Delete TopicEntity successfully")
+    @DefaultMessage("Delete Topic successfully")
     public void deleteTopic(@PathVariable UUID topicId) {
 
         topicService.deleteTopic(topicId);
     }
 
     @GetMapping(value = "/listTopic")
-    @DefaultMessage("Show list TopicEntity successfully")
+    @DefaultMessage("Show list Topic successfully")
     public FilterResponse<?> getAllTopic(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) int page,
             @RequestParam(value = "size", defaultValue = "12") @Min(1) @Max(100) int size,
@@ -148,7 +149,7 @@ public class TopicController {
     }
 
     @GetMapping("/getTopic")
-    @DefaultMessage("Get TopicEntity successfully")
+    @DefaultMessage("Get Topic successfully")
     public TopicResponse getTopic(@RequestParam("id") UUID id) {
 
         TopicEntity topic = topicService.getTopicById(id);
@@ -158,7 +159,7 @@ public class TopicController {
 
 
     @GetMapping(value = "/suggestTopic")
-    @DefaultMessage("Show list 5 TopicEntity name successfully")
+    @DefaultMessage("Show list 5 Topic name successfully")
     public List<String> get5SuggestTopic(@RequestParam(value = "query") String query) {
 
         return topicService.get5SuggestTopic(query);
@@ -167,7 +168,7 @@ public class TopicController {
 
     @PostMapping(value = "/{topicId:.+}/addPart")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Add Part to TopicEntity successfully")
+    @DefaultMessage("Add Part to Topic successfully")
     public void addPartToTopic(@PathVariable UUID topicId, @RequestParam UUID partId) {
 
         topicService.addPartToTopic(topicId, partId);
@@ -175,7 +176,7 @@ public class TopicController {
 
     @DeleteMapping(value = "/{topicId:.+}/deletePart")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Delete Part to TopicEntity successfully")
+    @DefaultMessage("Delete Part to Topic successfully")
     public void deletePartToTopic(@PathVariable UUID topicId, @RequestParam UUID partId) {
 
         topicService.deletePartToTopic(topicId, partId);
@@ -255,7 +256,7 @@ public class TopicController {
 
     @DeleteMapping(value = "/{topicId:.+}/deleteQuestion")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Delete QuestionEntity to TopicEntity successfully")
+    @DefaultMessage("Delete Question to Topic successfully")
     public void deleteQuestionToTopic(
             @PathVariable UUID topicId,
             @RequestParam UUID questionId
@@ -267,7 +268,7 @@ public class TopicController {
 
     @GetMapping(value = "/{topicId:.+}/listPart")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show Part to TopicEntity successfully")
+    @DefaultMessage("Show Part to Topic successfully")
     public List<PartResponse> getPartToTopic(@PathVariable UUID topicId) {
 
         return topicService.getPartToTopic(topicId);
@@ -275,10 +276,13 @@ public class TopicController {
 
     @GetMapping(value = "/{topicId:.+}/listQuestionToPart")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show QuestionEntity of Part to TopicEntity successfully")
-    public List<QuestionResponse> getQuestionOfToTopic(@PathVariable UUID topicId, @RequestParam UUID partId) {
+    @DefaultMessage("Show Question of Part to Topic successfully")
+    public List<QuestionPartResponse> getQuestionOfToTopicPart(
+            @PathVariable UUID topicId,
+            @RequestParam String partName
+    ) {
 
-        return topicService.getQuestionOfToTopic(topicId, partId);
+        return topicService.getQuestionOfToTopicPart(topicId, partName);
     }
 
 
@@ -292,7 +296,7 @@ public class TopicController {
 
     @GetMapping(value = "/{topicId:.+}/listComment")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show list CommentEntity successfully")
+    @DefaultMessage("Show list Comment successfully")
     public List<CommentResponse> listComment(@PathVariable UUID topicId) {
 
         List<CommentEntity> commentEntityList = topicService.listComment(topicId);
@@ -303,9 +307,12 @@ public class TopicController {
 
     @GetMapping("/searchByStartTime")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("TopicEntity retrieved successfully")
+    @DefaultMessage("Topic retrieved successfully")
     public List<TopicResponse> getTopicByStartTime(
-            @RequestParam @DateTimeFormat(pattern ="yyyy-MM-dd") LocalDateTime startDate
+            @RequestParam
+            @Parameter(description = "format startDate is 'yyyy-MM-dd'", example = "2025-01-12")
+            @DateTimeFormat(pattern ="yyyy-MM-dd")
+            LocalDate startDate
     ){
 
         List<TopicEntity> topicEntityList = topicService.getTopicsByStartTime(startDate);

@@ -1,8 +1,10 @@
 package com.example.englishmaster_be.domain.topic.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.time.LocalTime;
 import java.util.UUID;
 
 @Getter
@@ -16,5 +18,8 @@ public class TopicBasicResponse {
     UUID topicId;
 
     String topicName;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
+    LocalTime workTime;
 
 }
