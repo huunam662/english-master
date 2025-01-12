@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.domain.question.service;
 
 import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
+import com.example.englishmaster_be.common.constant.RoleEnum;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.answer_matching.dto.response.AnswerMatchingBasicResponse;
 import com.example.englishmaster_be.domain.answer_matching.service.IAnswerMatchingService;
@@ -382,11 +383,13 @@ public class QuestionService implements IQuestionService {
 
         QuestionEntity question = getQuestionById(questionId);
 
-        return listQuestionGroup(question);
+        return question.getQuestionGroupChildren();
     }
 
     @Override
     public List<QuestionPartResponse> getAllPartQuestions(String partName, UUID topicId) {
+
+        UserEntity currentUser = userService.currentUser();
 
         TopicEntity topicEntity = topicService.getTopicById(topicId);
 
@@ -396,16 +399,9 @@ public class QuestionService implements IQuestionService {
                                 .and(QPartEntity.partEntity.topics.contains(topicEntity))
                 ).fetch();
 
-        return partEntityList.stream().map(
-                partEntity -> {
+        Boolean isAdmin = currentUser.getRole().getRoleName().equals(RoleEnum.ADMIN);
 
-                    List<QuestionEntity> questionParents = topicEntity.getQuestions().stream().filter(
-                            questionEntity -> questionEntity.getPart().equals(partEntity)
-                    ).toList();
-
-                    return QuestionMapper.INSTANCE.toQuestionPartResponse(questionParents, partEntity, topicEntity);
-                }
-        ).toList();
+        return QuestionMapper.INSTANCE.toQuestionPartResponseList(partEntityList, topicEntity, isAdmin);
     }
 
 

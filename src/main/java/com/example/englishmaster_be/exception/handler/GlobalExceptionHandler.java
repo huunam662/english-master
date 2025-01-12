@@ -142,7 +142,8 @@ public class  GlobalExceptionHandler {
             MessagingException.class,
             BadRequestException.class,
             IllegalArgumentException.class,
-            FileAlreadyExistsException.class
+            FileAlreadyExistsException.class,
+            UnsupportedOperationException.class
     })
     public ExceptionResponseModel handleIllegalArgumentException(Exception exception) {
 

@@ -38,9 +38,9 @@ public class TypeController {
     @GetMapping("/getAllTypes")
     @DefaultMessage("List Type List successfully")
     public FilterResponse<?> getAllTypes(
-            @Schema(description = "Trang")
+            @Schema(description = "Trang", example = "1")
             @RequestParam(value = "page", defaultValue = "1") @Min(1) int page,
-            @Schema(description = "Kích thước của trang")
+            @Schema(description = "Kích thước của trang", example = "8")
             @RequestParam(value = "pageSize", defaultValue = "8") @Min(1) @Max(100) int pageSize,
             @Schema(description = "Tìm kiếm")
             @RequestParam(value = "search", defaultValue = "") String search,

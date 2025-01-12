@@ -93,6 +93,23 @@ public class ExcelFillService implements IExcelFillService {
     IStatusService statusService;
 
 
+    @Override
+    @SneakyThrows
+    public ExcelTopicContentResponse readTopicContentFromExcel(MultipartFile file) {
+
+        try(Workbook workbook = new XSSFWorkbook(file.getInputStream())){
+
+            int sheetNumber = 0;
+
+            Sheet sheet = workbook.getSheetAt(sheetNumber);
+
+            if(sheet == null)
+                throw new BadRequestException(String.format("Sheet %d does not exist", sheetNumber));
+
+            return ExcelHelper.collectTopicContentWith(sheet);
+        }
+    }
+
     @Transactional
     @Override
     @SneakyThrows
@@ -321,6 +338,7 @@ public class ExcelFillService implements IExcelFillService {
                 QuestionEntity questionChildren = QuestionEntity.builder()
                         .questionId(UUID.randomUUID())
                         .questionGroupParent(questionParent)
+                        .part(partEntity)
                         .isQuestionParent(Boolean.FALSE)
                         .questionResult(resultTrueQuestion)
                         .questionType(QuestionTypeEnum.Multiple_Choice)
@@ -475,6 +493,7 @@ public class ExcelFillService implements IExcelFillService {
                 QuestionEntity questionChildren = QuestionEntity.builder()
                         .questionId(UUID.randomUUID())
                         .questionContent(questionContent)
+                        .part(partEntity)
                         .questionGroupParent(questionParent)
                         .isQuestionParent(Boolean.FALSE)
                         .questionType(QuestionTypeEnum.Multiple_Choice_To_Fill_In_Blank)
@@ -685,6 +704,7 @@ public class ExcelFillService implements IExcelFillService {
                     QuestionEntity questionChildren = QuestionEntity.builder()
                             .questionId(UUID.randomUUID())
                             .questionContent(questionContent)
+                            .part(partEntity)
                             .questionGroupParent(questionParent)
                             .isQuestionParent(Boolean.FALSE)
                             .questionType(QuestionTypeEnum.Multiple_Choice)
@@ -890,6 +910,7 @@ public class ExcelFillService implements IExcelFillService {
                     QuestionEntity questionChildren = QuestionEntity.builder()
                             .questionId(UUID.randomUUID())
                             .questionContent(questionContentChild)
+                            .part(partEntity)
                             .questionGroupParent(questionParent)
                             .isQuestionParent(Boolean.FALSE)
                             .questionType(QuestionTypeEnum.Multiple_Choice)
@@ -989,24 +1010,5 @@ public class ExcelFillService implements IExcelFillService {
                 .questions(excelQuestionResponseList)
                 .build();
     }
-
-
-
-    private List<UUID> parseParts(String partsString) {
-
-        List<String> listPart = Arrays.stream(partsString.split(", "))
-                .map(String::trim)
-                .toList();
-
-        List<UUID> uuidList = new ArrayList<>();
-
-        for (String part : listPart) {
-            UUID uuid = partRepository.findByPartName(part).orElseThrow(() -> new CustomException(ErrorEnum.PART_NOT_FOUND)).getPartId();
-            uuidList.add(uuid);
-        }
-
-        return uuidList;
-    }
-
 
 }

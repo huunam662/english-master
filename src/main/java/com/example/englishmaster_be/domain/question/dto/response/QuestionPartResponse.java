@@ -22,6 +22,6 @@ public class QuestionPartResponse {
 
     PartBasicResponse part;
 
-    List<ExcelQuestionResponse> questionParents;
+    List<QuestionResponse> questionParents;
 
 }

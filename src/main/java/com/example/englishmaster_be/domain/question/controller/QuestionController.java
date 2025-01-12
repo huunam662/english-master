@@ -3,7 +3,6 @@ package com.example.englishmaster_be.domain.question.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
-import com.example.englishmaster_be.domain.part.dto.response.PartQuestionResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.mapper.AnswerMapper;
@@ -11,7 +10,6 @@ import com.example.englishmaster_be.mapper.QuestionMapper;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
-import com.example.englishmaster_be.domain.question.dto.response.QuestionBasicResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
@@ -69,20 +67,20 @@ public class QuestionController {
     @PutMapping(value = "/{questionId:.+}/uploadfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Upload question successfully")
-    public QuestionBasicResponse uploadFileQuestion(
+    public QuestionResponse uploadFileQuestion(
             @PathVariable UUID questionId,
             @RequestPart List<MultipartFile> uploadMultiFileRequest
     ) {
 
         QuestionEntity question = questionService.uploadFileQuestion(questionId, uploadMultiFileRequest);
 
-        return QuestionMapper.INSTANCE.toQuestionBasicResponse(question);
+        return QuestionMapper.INSTANCE.toQuestionResponse(question);
     }
 
     @PutMapping(value = "/{questionId:.+}/updatefile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Update file question successfully")
-    public QuestionBasicResponse updateFileQuestion(
+    public QuestionResponse updateFileQuestion(
             @PathVariable UUID questionId,
             @RequestParam("oldFileName") String oldFileName,
             @RequestPart MultipartFile newFile
@@ -90,7 +88,7 @@ public class QuestionController {
 
         QuestionEntity question = questionService.updateFileQuestion(questionId, oldFileName, newFile);
 
-        return QuestionMapper.INSTANCE.toQuestionBasicResponse(question);
+        return QuestionMapper.INSTANCE.toQuestionResponse(question);
     }
 
     @PostMapping(value = "/create/groupQuestion")
@@ -109,14 +107,14 @@ public class QuestionController {
     @GetMapping(value = "/{partId:.+}/listTop10Question")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("List top 10 question successfully")
-    public List<QuestionBasicResponse> getTop10Question(
+    public List<QuestionResponse> getTop10Question(
             @PathVariable UUID partId,
             @RequestParam int indexp
     ) {
 
         List<QuestionEntity> questionList = questionService.getTop10Question(indexp, partId);
 
-        return QuestionMapper.INSTANCE.toQuestionBasicResponseList(questionList);
+        return QuestionMapper.INSTANCE.toQuestionResponseList(questionList);
     }
 
     @GetMapping(value = "/{questionId:.+}/checkQuestionGroup")
@@ -134,7 +132,7 @@ public class QuestionController {
 
         List<QuestionEntity> questionEntityList = questionService.getQuestionGroupListByQuestionId(questionId);
 
-        return QuestionMapper.INSTANCE.toQuestionGroupChildrenResponseList(questionEntityList);
+        return QuestionMapper.INSTANCE.toQuestionResponseList(questionEntityList);
     }
 
     @GetMapping(value = "/{questionId:.+}/listAnswer")

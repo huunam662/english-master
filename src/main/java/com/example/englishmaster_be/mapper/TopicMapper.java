@@ -10,10 +10,11 @@ import com.example.englishmaster_be.model.topic.TopicEntity;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Mapper(builder = @Builder(disableBuilder = true))
+@Mapper(builder = @Builder(disableBuilder = true), imports = {LocalTime.class})
 public interface TopicMapper {
 
     TopicMapper INSTANCE = Mappers.getMapper(TopicMapper.class);
@@ -38,6 +39,7 @@ public interface TopicMapper {
     @Mapping(target = "topicId", ignore = true)
     @Mapping(target = "numberQuestion", defaultValue = "0")
     @Mapping(target = "topicImage", ignore = true)
+    @Mapping(target = "workTime", expression = "java(LocalTime.parse(topicRequest.getWorkTime()))")
     void flowToTopicEntity(TopicRequest topicRequest, @MappingTarget TopicEntity topicEntity);
 
     void flowToTopicEntity(ExcelTopicResponse topicByExcelFileResponse, @MappingTarget TopicEntity topicEntity);

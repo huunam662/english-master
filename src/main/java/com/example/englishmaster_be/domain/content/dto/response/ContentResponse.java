@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.content.dto.response;
 
-import com.example.englishmaster_be.domain.question.dto.response.QuestionBasicResponse;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
 import com.example.englishmaster_be.domain.user.dto.response.UserBasicResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
@@ -39,5 +39,5 @@ public class ContentResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
     LocalDateTime updatedAt;
 
-    List<QuestionBasicResponse> questions;
+    List<QuestionResponse> questions;
 }

@@ -18,7 +18,7 @@ public interface ContentMapper {
 
     ContentMapper INSTANCE = Mappers.getMapper(ContentMapper.class);
 
-    @Mapping(target = "questions", expression = "java(QuestionMapper.INSTANCE.toQuestionBasicResponseList(content.getQuestions()))")
+    @Mapping(target = "questions", expression = "java(QuestionMapper.INSTANCE.toQuestionResponseList(content.getQuestions()))")
     ContentResponse toContentResponse(ContentEntity content);
 
     List<ContentResponse> toContentResponseList(List<ContentEntity> content);
