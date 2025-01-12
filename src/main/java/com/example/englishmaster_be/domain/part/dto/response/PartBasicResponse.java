@@ -18,6 +18,10 @@ public class PartBasicResponse {
 
     String partName;
 
+    String partType;;
+
+    String partDescription;
+
     Integer totalQuestion;
 
 }

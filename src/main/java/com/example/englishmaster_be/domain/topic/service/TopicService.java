@@ -962,7 +962,7 @@ public class TopicService implements ITopicService {
             topicRepository.save(topic);
 
             QuestionEntity question1 = questionService.getQuestionById(question.getQuestionId());
-            QuestionResponse questionResponse = QuestionMapper.INSTANCE.toQuestionResponse(question1, topic, isAdmin);
+            QuestionResponse questionResponse = QuestionMapper.INSTANCE.toQuestionResponse(question1, topic, part, isAdmin);
 
             if (questionService.checkQuestionGroup(question1.getQuestionId())) {
                 List<QuestionEntity> questionGroupList = questionService.listQuestionGroup(question1);
@@ -971,7 +971,7 @@ public class TopicService implements ITopicService {
                 for (QuestionEntity questionGroup : questionGroupList) {
 
                     AnswerEntity answerCorrect = answerService.correctAnswer(questionGroup);
-                    QuestionResponse questionGroupResponse = QuestionMapper.INSTANCE.toQuestionResponse(questionGroup, topic, isAdmin);
+                    QuestionResponse questionGroupResponse = QuestionMapper.INSTANCE.toQuestionResponse(questionGroup, topic, part, isAdmin);
                     questionGroupResponse.setAnswerCorrectId(answerCorrect.getAnswerId());
                     questionGroupResponseList.add(questionGroupResponse);
                 }

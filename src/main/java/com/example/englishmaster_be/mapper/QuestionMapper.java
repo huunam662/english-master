@@ -13,7 +13,11 @@ import com.example.englishmaster_be.model.topic.TopicEntity;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(builder = @Builder(disableBuilder = true))
 public interface QuestionMapper {
@@ -31,58 +35,63 @@ public interface QuestionMapper {
 
     List<QuestionResponse> toQuestionResponseList(List<QuestionEntity> questionEntityList);
 
+    default List<QuestionResponse> toQuestionResponseList(List<QuestionEntity> questionEntityList, PartEntity partEntity) {
+
+        List<QuestionEntity> questionsList4Shuffle = new ArrayList<>(questionEntityList);
+
+        if(!partEntity.getPartType().equalsIgnoreCase("Text Completion"))
+            Collections.shuffle(questionsList4Shuffle);
+
+        return questionsList4Shuffle.stream()
+                .map(
+                        this::toQuestionResponse
+                )
+                .toList();
+    }
+
     @Mapping(target = "partId", expression = "java(questionEntity.getPart() != null ? questionEntity.getPart().getPartId() : null)")
     @Mapping(target = "contents", expression = "java(ContentMapper.INSTANCE.toContentBasicResponseList(questionEntity.getContentCollection()))")
     @Mapping(target = "answers", expression = "java(AnswerMapper.INSTANCE.toAnswerResponseList(questionEntity.getAnswers()))")
     @Mapping(target = "questionsChildren",
             expression = "java(" +
                                 "isAdmin " +
-                                "? toQuestionResponseIncludeAnswerCorrectList(questionEntity.getQuestionGroupChildren(), topicEntity, isAdmin)" +
-                                ": toQuestionResponseList(questionEntity.getQuestionGroupChildren(), topicEntity, isAdmin)" +
+                                "? toQuestionResponseIncludeAnswerCorrectList(questionEntity.getQuestionGroupChildren(), topicEntity, partEntity, isAdmin)" +
+                                ": toQuestionResponseList(questionEntity.getQuestionGroupChildren(), topicEntity, partEntity, isAdmin)" +
                         ")"
     )
-    QuestionResponse toQuestionResponse(QuestionEntity questionEntity, TopicEntity topicEntity, Boolean isAdmin);
+    QuestionResponse toQuestionResponse(QuestionEntity questionEntity, TopicEntity topicEntity, PartEntity partEntity, Boolean isAdmin);
 
-    default List<QuestionResponse> toQuestionResponseList(List<QuestionEntity> questionEntityList, TopicEntity topicEntity, Boolean isAdmin) {
+    default List<QuestionResponse> toQuestionResponseList(List<QuestionEntity> questionEntityList, TopicEntity topicEntity, PartEntity partEntity, Boolean isAdmin) {
 
         if(questionEntityList == null) return null;
+
+        if(!partEntity.getPartType().equalsIgnoreCase("Text Completion")){
+
+            questionEntityList = new ArrayList<>(questionEntityList);
+
+            Collections.shuffle(questionEntityList);
+        }
 
         return questionEntityList.stream().map(
                 questionEntity -> {
 
-                    if(questionEntity.getQuestionGroupChildren() != null)
-                        questionEntity.getQuestionGroupChildren().forEach(
-                                questionGroupChildEntity -> {
-                                    if(questionGroupChildEntity.getQuestionGroupChildren() != null)
-                                        questionGroupChildEntity.getQuestionGroupChildren().forEach(
-                                                questionGroupChild -> questionGroupChild.setQuestionGroupChildren(null)
-                                        );
-                                }
-                        );
+                    shuffleQuestionsAndAnswers(questionEntity, partEntity);
 
-                    return toQuestionResponse(questionEntity, topicEntity, isAdmin);
+                    return toQuestionResponse(questionEntity, topicEntity, partEntity, isAdmin);
                 }
         ).toList();
     }
 
-    default List<QuestionResponse> toQuestionResponseIncludeAnswerCorrectList(List<QuestionEntity> questionEntityList, TopicEntity topicEntity, Boolean isAdmin) {
+    default List<QuestionResponse> toQuestionResponseIncludeAnswerCorrectList(List<QuestionEntity> questionEntityList, TopicEntity topicEntity, PartEntity partEntity, Boolean isAdmin) {
 
         if(questionEntityList == null) return null;
 
         return questionEntityList.stream().map(
                 questionEntity -> {
 
-                    if(questionEntity.getQuestionGroupChildren() != null)
-                        questionEntity.getQuestionGroupChildren().forEach(
-                                questionGroupChildEntity -> {
-                                    if(questionGroupChildEntity.getQuestionGroupChildren() != null)
-                                        questionGroupChildEntity.getQuestionGroupChildren().forEach(
-                                                questionGroupChild -> questionGroupChild.setQuestionGroupChildren(null)
-                                        );
-                                }
-                        );
+                    shuffleQuestionsAndAnswers(questionEntity, partEntity);
 
-                    QuestionResponse questionResponse = toQuestionResponse(questionEntity, topicEntity, isAdmin);
+                    QuestionResponse questionResponse = toQuestionResponse(questionEntity, topicEntity, partEntity, isAdmin);
 
                     if(questionEntity.getAnswers() == null) return questionResponse;
 
@@ -95,6 +104,39 @@ public interface QuestionMapper {
                     return questionResponse;
                 }
         ).toList();
+    }
+
+    default void shuffleQuestionsAndAnswers(QuestionEntity questionEntity, PartEntity partEntity) {
+
+        if(questionEntity.getQuestionGroupChildren() != null) {
+
+            List<QuestionEntity> questionsList4Shuffle = new ArrayList<>(questionEntity.getQuestionGroupChildren());
+
+            if(!partEntity.getPartType().equalsIgnoreCase("Text Completion")){
+
+                Collections.shuffle(questionsList4Shuffle);
+
+                questionEntity.setQuestionGroupChildren(questionsList4Shuffle);
+            }
+
+            questionEntity.getQuestionGroupChildren().forEach(
+                    questionGroupChildEntity -> {
+
+                        if (questionGroupChildEntity.getQuestionGroupChildren() != null)
+                            questionGroupChildEntity.setQuestionGroupChildren(null);
+
+                        if(questionGroupChildEntity.getAnswers() != null){
+
+                            List<AnswerEntity> answersList4Shuffle = new ArrayList<>(questionGroupChildEntity.getAnswers());
+
+                            Collections.shuffle(answersList4Shuffle);
+
+                            questionGroupChildEntity.setAnswers(answersList4Shuffle);
+                        }
+
+                    }
+            );
+        }
     }
 
     @Mapping(target = "partId", source = "part.partId")
@@ -125,7 +167,7 @@ public interface QuestionMapper {
 
     @Mapping(target = "topic", expression = "java(TopicMapper.INSTANCE.toTopicBasicResponse(topicEntity))")
     @Mapping(target = "part", expression = "java(PartMapper.INSTANCE.toPartBasicResponse(partEntity))")
-    @Mapping(target = "questionParents", expression = "java(toQuestionResponseList(questionParents, topicEntity, isAdmin))")
+    @Mapping(target = "questionParents", expression = "java(toQuestionResponseList(questionParents, topicEntity, partEntity, isAdmin))")
     QuestionPartResponse toQuestionPartResponse(List<QuestionEntity> questionParents, PartEntity partEntity, TopicEntity topicEntity, Boolean isAdmin);
 
     default List<QuestionPartResponse> toQuestionPartResponseList(List<PartEntity> partEntityList, TopicEntity topicEntity, Boolean isAdmin) {
@@ -139,7 +181,7 @@ public interface QuestionMapper {
                             questionEntity -> questionEntity.getPart().equals(partEntity)
                     ).toList();
 
-                    return QuestionMapper.INSTANCE.toQuestionPartResponse(questionParents, partEntity, topicEntity, isAdmin);
+                    return toQuestionPartResponse(questionParents, partEntity, topicEntity, isAdmin);
                 }
         ).toList();
 
