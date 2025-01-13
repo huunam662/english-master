@@ -179,7 +179,7 @@ public class  GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ExceptionResponseModel handleAccessDeniedException(AccessDeniedException exception) {
+    public ExceptionResponseModel handleAccessDeniedException(AccessDeniedException ignored) {
 
         ErrorEnum error = ErrorEnum.UNAUTHORIZED;
 

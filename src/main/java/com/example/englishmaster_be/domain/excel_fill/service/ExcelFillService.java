@@ -977,34 +977,49 @@ public class ExcelFillService implements IExcelFillService {
 
         List<ExcelQuestionResponse> excelQuestionResponseList = new ArrayList<>();
 
-        List.of(1, 2).forEach(
-                part ->{
+        importTopicExcel(file);
 
-                    ExcelQuestionListResponse excelQuestionListResponse = importQuestionListeningPart12Excel(topicId, file, part);
+        ExcelTopicContentResponse excelTopicContentResponse;
 
-                    excelQuestionResponseList.addAll(excelQuestionListResponse.getQuestions());
-                });
+        try(Workbook workbook = new XSSFWorkbook(file.getInputStream())){
 
-        List.of(3, 4).forEach(
-                part ->{
+            Sheet sheet = workbook.getSheetAt(0);
 
-                    ExcelQuestionListResponse excelQuestionListResponse = importQuestionListeningPart34Excel(topicId, file, part);
+            excelTopicContentResponse = ExcelHelper.collectTopicContentWith(sheet);
+        }
 
-                    excelQuestionResponseList.addAll(excelQuestionListResponse.getQuestions());
-                });
+        excelTopicContentResponse.getPartNamesList().stream()
+        .map(
+                partName -> Integer.valueOf(partName.split(" ")[1])
+        ).forEach(
+            partNumber -> {
 
+                if(List.of(1, 2).contains(partNumber)){
 
-        ExcelQuestionListResponse excelQuestionP5ListResponse = importQuestionReadingPart5Excel(topicId, file);
-
-        excelQuestionResponseList.addAll(excelQuestionP5ListResponse.getQuestions());
-
-        List.of(6, 7).forEach(
-                part ->{
-
-                    ExcelQuestionListResponse excelQuestionListResponse = importQuestionReadingPart67Excel(topicId, file, part);
+                    ExcelQuestionListResponse excelQuestionListResponse = importQuestionListeningPart12Excel(topicId, file, partNumber);
 
                     excelQuestionResponseList.addAll(excelQuestionListResponse.getQuestions());
-                });
+                }
+                else if(List.of(3, 4).contains(partNumber)){
+
+                    ExcelQuestionListResponse excelQuestionListResponse = importQuestionListeningPart34Excel(topicId, file, partNumber);
+
+                    excelQuestionResponseList.addAll(excelQuestionListResponse.getQuestions());
+                }
+                else if(partNumber == 5){
+
+                    ExcelQuestionListResponse excelQuestionP5ListResponse = importQuestionReadingPart5Excel(topicId, file);
+
+                    excelQuestionResponseList.addAll(excelQuestionP5ListResponse.getQuestions());
+                }
+                else if(List.of(6, 7).contains(partNumber)){
+
+                    ExcelQuestionListResponse excelQuestionListResponse = importQuestionReadingPart67Excel(topicId, file, partNumber);
+
+                    excelQuestionResponseList.addAll(excelQuestionListResponse.getQuestions());
+                }
+            }
+        );
 
         return ExcelQuestionListResponse.builder()
                 .questions(excelQuestionResponseList)
