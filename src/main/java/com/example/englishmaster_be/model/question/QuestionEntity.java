@@ -35,7 +35,7 @@ public class QuestionEntity {
     @Column(name = "id")
     UUID questionId;
 
-    @Column(name = "question_content", columnDefinition = "TEXT")
+    @Column(name = "question_content", columnDefinition = "text")
     String questionContent;
 
     @Column(name = "question_score")
@@ -98,7 +98,8 @@ public class QuestionEntity {
     QuestionEntity questionGroupParent;
 
     @ManyToMany
-    @JoinTable(name = "topic_question",
+    @JoinTable(
+            name = "topic_question",
             joinColumns = @JoinColumn(name = "question_id"),
             inverseJoinColumns = @JoinColumn(name = "topic_id")
     )
@@ -110,7 +111,12 @@ public class QuestionEntity {
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     List<AnswerEntity> answers;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
+    @ManyToMany
+    @JoinTable(
+            name = "question_content",
+            joinColumns = @JoinColumn(name = "question_id"),
+            inverseJoinColumns = @JoinColumn(name = "content_id")
+    )
     List<ContentEntity> contentCollection;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)

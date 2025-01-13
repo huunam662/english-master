@@ -22,7 +22,7 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, Query
     @Query("SELECT t FROM TopicEntity t WHERE t.topicName = :topicName")
     Optional<TopicEntity> findByTopicName(@Param("topicName") String topicName);
 
-    @Query("SELECT t FROM TopicEntity t WHERE t.startTime = :startTime")
+    @Query("SELECT t FROM TopicEntity t WHERE FUNCTION('DATE', t.startTime) = FUNCTION('DATE', :startTime)")
     List<TopicEntity> findByStartTime(@Param("startTime") LocalDateTime startTime);
 
     Optional<TopicEntity> findByTopicId(UUID topicId);

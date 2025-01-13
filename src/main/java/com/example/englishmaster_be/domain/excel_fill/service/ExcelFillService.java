@@ -1,10 +1,12 @@
 package com.example.englishmaster_be.domain.excel_fill.service;
 
 import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
+import com.example.englishmaster_be.common.constant.StatusEnum;
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
 import com.example.englishmaster_be.common.constant.PartEnum;
 import com.example.englishmaster_be.common.constant.excel.ExcelQuestionConstant;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.*;
+import com.example.englishmaster_be.domain.status.service.IStatusService;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.exception.template.CustomException;
@@ -24,14 +26,19 @@ import com.example.englishmaster_be.domain.pack.service.IPackService;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.helper.ExcelHelper;
 import com.example.englishmaster_be.model.part.QPartEntity;
+import com.example.englishmaster_be.model.question.QQuestionEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.question.QuestionRepository;
+import com.example.englishmaster_be.model.status.StatusEntity;
 import com.example.englishmaster_be.model.topic.QTopicEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.topic.TopicRepository;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.util.ContentUtil;
 import com.example.englishmaster_be.util.FileUtil;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -83,6 +90,25 @@ public class ExcelFillService implements IExcelFillService {
 
     IUserService userService;
 
+    IStatusService statusService;
+
+
+    @Override
+    @SneakyThrows
+    public ExcelTopicContentResponse readTopicContentFromExcel(MultipartFile file) {
+
+        try(Workbook workbook = new XSSFWorkbook(file.getInputStream())){
+
+            int sheetNumber = 0;
+
+            Sheet sheet = workbook.getSheetAt(sheetNumber);
+
+            if(sheet == null)
+                throw new BadRequestException(String.format("Sheet %d does not exist", sheetNumber));
+
+            return ExcelHelper.collectTopicContentWith(sheet);
+        }
+    }
 
     @Transactional
     @Override
@@ -96,6 +122,8 @@ public class ExcelFillService implements IExcelFillService {
             throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
 
         UserEntity currentUser = userService.currentUser();
+
+        StatusEntity statusEntity = statusService.getStatusByName(StatusEnum.ACTIVE);
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
 
@@ -126,56 +154,60 @@ public class ExcelFillService implements IExcelFillService {
 
             TopicEntity topicEntity = jpaQueryFactory.selectFrom(QTopicEntity.topicEntity).where(
                     QTopicEntity.topicEntity.topicName.equalsIgnoreCase(excelTopicContentResponse.getTopicName())
+                            .and(QTopicEntity.topicEntity.pack.eq(packEntity))
             ).fetchOne();
 
             if(topicEntity == null)
                 topicEntity = TopicEntity.builder()
                         .topicId(UUID.randomUUID())
+                        .status(statusEntity)
+                        .pack(packEntity)
                         .userCreate(currentUser)
                         .userUpdate(currentUser)
                         .build();
 
-            topicEntity.setPack(packEntity);
-
             TopicMapper.INSTANCE.flowToTopicEntity(excelTopicContentResponse, topicEntity);
+
+            topicEntity = topicRepository.save(topicEntity);
 
             if(topicEntity.getParts() == null)
                 topicEntity.setParts(new ArrayList<>());
 
-            int partNamesSize = excelTopicContentResponse.getListPartName().size();
+            int partNamesSize = excelTopicContentResponse.getPartNamesList().size();
 
             for(int i = 0; i < partNamesSize; i++) {
 
-                String partNameAtI = excelTopicContentResponse.getListPartName().get(i);
+                String partNameAtI = excelTopicContentResponse.getPartNamesList().get(i);
 
-                String partDescriptionAtI = excelTopicContentResponse.getListPartDescription().get(i);
+                String partTypeAtI = excelTopicContentResponse.getPartTypesList().get(i);
 
                 PartEntity partEntity = jpaQueryFactory.selectFrom(QPartEntity.partEntity).where(
                         QPartEntity.partEntity.partName.equalsIgnoreCase(partNameAtI)
+                                .and(QPartEntity.partEntity.partType.equalsIgnoreCase(partTypeAtI))
                 ).fetchOne();
 
-                if (partEntity == null) {
-
+                if (partEntity == null)
                     partEntity = PartEntity.builder()
                             .partId(UUID.randomUUID())
-                            .partName(partNameAtI)
-                            .partDescription(partDescriptionAtI)
-                            .partType(String.join(": ", List.of(partNameAtI, partDescriptionAtI)))
                             .contentData("")
                             .contentType(fileUtil.mimeTypeFile(""))
+                            .partName(partNameAtI)
+                            .partType(partTypeAtI)
+                            .partDescription(String.join(": ", List.of(partNameAtI, partTypeAtI)))
                             .userCreate(currentUser)
                             .userUpdate(currentUser)
                             .build();
 
-                    partEntity = partRepository.save(partEntity);
-                }
+                if(partEntity.getTopics() == null)
+                    partEntity.setTopics(List.of(topicEntity));
+                else if(!partEntity.getTopics().contains(topicEntity))
+                    partEntity.getTopics().add(topicEntity);
 
-                if (!topicEntity.getParts().contains(partEntity))
+                partEntity = partRepository.save(partEntity);
+
+                if(!topicEntity.getParts().contains(partEntity))
                     topicEntity.getParts().add(partEntity);
-
-                topicEntity = topicRepository.save(topicEntity);
             }
-
 
             return TopicMapper.INSTANCE.toExcelTopicResponse(topicEntity);
 
@@ -206,7 +238,13 @@ public class ExcelFillService implements IExcelFillService {
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
 
-            Sheet sheet = workbook.getSheetAt(part);
+            int numberOfSheetTopicInformation = 0;
+
+            Sheet sheet = workbook.getSheetAt(numberOfSheetTopicInformation);
+
+            ExcelTopicContentResponse excelTopicContentResponse = ExcelHelper.collectTopicContentWith(sheet);
+
+            sheet = workbook.getSheetAt(part);
 
             if (sheet == null)
                 throw new BadRequestException(String.format("Sheet %d does not exist", part));
@@ -225,11 +263,13 @@ public class ExcelFillService implements IExcelFillService {
                             || !partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_2.getName()) && part == 2
             ) throw new BadRequestException("Part name at first row must defined with PART 1 or PART 2.");
 
+            String partType = excelTopicContentResponse.getPartTypesList().get(part - 1);
+
             PartEntity partEntity;
 
             if(partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_1.getName()))
-                partEntity = partService.getPartToName(PartEnum.PART_1.getName());
-            else partEntity = partService.getPartToName(PartEnum.PART_2.getName());
+                partEntity = partService.getPartToName(PartEnum.PART_1.getName(), partType, topicEntity);
+            else partEntity = partService.getPartToName(PartEnum.PART_2.getName(), partType, topicEntity);
 
             // bỏ qua dòng đầu tiên vì đã được đọc
             int countRowWillFetch = sheet.getLastRowNum() - 1;
@@ -246,31 +286,33 @@ public class ExcelFillService implements IExcelFillService {
                     .topics(List.of(topicEntity))
                     .userCreate(currentUser)
                     .userUpdate(currentUser)
+                    .questionScore(excelQuestionContentResponse.getTotalScore())
                     .isQuestionParent(Boolean.TRUE)
                     .questionType(QuestionTypeEnum.Question_Parent)
-                    .questionScore(excelQuestionContentResponse.getTotalScore())
                     .build();
 
             questionParent = questionRepository.save(questionParent);
-
-            if(questionParent.getQuestionGroupChildren() == null)
-                questionParent.setQuestionGroupChildren(new ArrayList<>());
 
             if(questionParent.getContentCollection() == null)
                 questionParent.setContentCollection(new ArrayList<>());
 
             ContentEntity contentAudio = contentUtil.makeQuestionContentEntity(
                     currentUser,
-                    questionParent,
+                    topicEntity,
                     excelQuestionContentResponse.getAudioPath()
             );
 
             contentAudio = contentRepository.save(contentAudio);
 
             questionParent.setContentAudio(contentAudio.getContentData());
-            questionParent.getContentCollection().add(contentAudio);
+
+            if(!questionParent.getContentCollection().contains(contentAudio))
+                questionParent.getContentCollection().add(contentAudio);
 
             questionParent = questionRepository.save(questionParent);
+
+            if(questionParent.getQuestionGroupChildren() == null)
+                questionParent.setQuestionGroupChildren(new ArrayList<>());
 
             int iRowHeaderTable = iRowTotalScore + 1;
 
@@ -295,18 +337,20 @@ public class ExcelFillService implements IExcelFillService {
 
                 QuestionEntity questionChildren = QuestionEntity.builder()
                         .questionId(UUID.randomUUID())
-                        .questionScore(scoreTrueQuestion)
                         .questionGroupParent(questionParent)
+                        .part(partEntity)
                         .isQuestionParent(Boolean.FALSE)
                         .questionResult(resultTrueQuestion)
                         .questionType(QuestionTypeEnum.Multiple_Choice)
+                        .questionScore(scoreTrueQuestion)
                         .userCreate(currentUser)
                         .userUpdate(currentUser)
                         .build();
 
-                questionChildren = questionRepository.save(questionChildren);
-
                 if(part == 1){
+
+                    if (questionChildren.getContentCollection() == null)
+                        questionChildren.setContentCollection(new ArrayList<>());
 
                     int jColQuestionImage = 3;
 
@@ -314,17 +358,20 @@ public class ExcelFillService implements IExcelFillService {
 
                     ContentEntity contentImage = contentUtil.makeQuestionContentEntity(
                             currentUser,
-                            questionChildren,
+                            topicEntity,
                             imageQuestion
                     );
 
                     contentImage = contentRepository.save(contentImage);
 
-                    if (questionChildren.getContentCollection() == null)
-                        questionChildren.setContentCollection(new ArrayList<>());
+                    questionChildren.setContentImage(contentImage.getContentData());
 
-                    questionChildren.getContentCollection().add(contentImage);
+                    if(!questionChildren.getContentCollection().contains(contentImage))
+                        questionChildren.getContentCollection().add(contentImage);
+
                 }
+
+                questionChildren = questionRepository.save(questionChildren);
 
                 questionParent.getQuestionGroupChildren().add(questionChildren);
 
@@ -369,7 +416,13 @@ public class ExcelFillService implements IExcelFillService {
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
 
-            Sheet sheet = workbook.getSheetAt(part);
+            int numberOfSheetTopicInformation = 0;
+
+            Sheet sheet = workbook.getSheetAt(numberOfSheetTopicInformation);
+
+            ExcelTopicContentResponse excelTopicContentResponse = ExcelHelper.collectTopicContentWith(sheet);
+
+            sheet = workbook.getSheetAt(part);
 
             if (sheet == null)
                 throw new BadRequestException(String.format("Sheet %d does not exist", part));
@@ -387,7 +440,9 @@ public class ExcelFillService implements IExcelFillService {
                     !partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_5.getName())
             ) throw new BadRequestException("Part name at first row must defined with PART 5.");
 
-            PartEntity partEntity = partService.getPartToName(PartEnum.PART_5.getName());
+            String partType = excelTopicContentResponse.getPartTypesList().get(part - 1);
+
+            PartEntity partEntity = partService.getPartToName(PartEnum.PART_5.getName(), partType, topicEntity);
 
             // bỏ qua dòng đầu tiên vì đã được đọc
             int countRowWillFetch = sheet.getLastRowNum() - 1;
@@ -402,9 +457,9 @@ public class ExcelFillService implements IExcelFillService {
                     .topics(List.of(topicEntity))
                     .userCreate(currentUser)
                     .userUpdate(currentUser)
+                    .questionScore(excelQuestionContentResponse.getTotalScore())
                     .isQuestionParent(Boolean.TRUE)
                     .questionType(QuestionTypeEnum.Question_Parent)
-                    .questionScore(excelQuestionContentResponse.getTotalScore())
                     .build();
 
             questionParent = questionRepository.save(questionParent);
@@ -438,13 +493,14 @@ public class ExcelFillService implements IExcelFillService {
                 QuestionEntity questionChildren = QuestionEntity.builder()
                         .questionId(UUID.randomUUID())
                         .questionContent(questionContent)
-                        .questionScore(scoreTrueQuestion)
+                        .part(partEntity)
                         .questionGroupParent(questionParent)
                         .isQuestionParent(Boolean.FALSE)
-                        .questionResult(resultTrueQuestion)
                         .questionType(QuestionTypeEnum.Multiple_Choice_To_Fill_In_Blank)
                         .userCreate(currentUser)
                         .userUpdate(currentUser)
+                        .questionScore(scoreTrueQuestion)
+                        .questionResult(resultTrueQuestion)
                         .build();
 
                 questionChildren = questionRepository.save(questionChildren);
@@ -514,7 +570,13 @@ public class ExcelFillService implements IExcelFillService {
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
 
-            Sheet sheet = workbook.getSheetAt(part);
+            int numberOfSheetTopicInformation = 0;
+
+            Sheet sheet = workbook.getSheetAt(numberOfSheetTopicInformation);
+
+            ExcelTopicContentResponse excelTopicContentResponse = ExcelHelper.collectTopicContentWith(sheet);
+
+            sheet = workbook.getSheetAt(part);
 
             if (sheet == null)
                 throw new BadRequestException(String.format("Sheet %d does not exist", part));
@@ -533,11 +595,13 @@ public class ExcelFillService implements IExcelFillService {
                 || !partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_4.getName()) && part == 4
             ) throw new BadRequestException("Part name at first row must defined with PART 3 or PART 4.");
 
+            String partType = excelTopicContentResponse.getPartTypesList().get(part - 1);
+
             PartEntity partEntity;
 
             if(partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_3.getName()))
-                partEntity = partService.getPartToName(PartEnum.PART_3.getName());
-            else partEntity = partService.getPartToName(PartEnum.PART_4.getName());
+                partEntity = partService.getPartToName(PartEnum.PART_3.getName(), partType, topicEntity);
+            else partEntity = partService.getPartToName(PartEnum.PART_4.getName(), partType, topicEntity);
 
             List<ExcelQuestionResponse> excelQuestionResponseList = new ArrayList<>();
 
@@ -559,42 +623,46 @@ public class ExcelFillService implements IExcelFillService {
                         .topics(List.of(topicEntity))
                         .userCreate(currentUser)
                         .userUpdate(currentUser)
+                        .questionScore(excelQuestionContentResponse.getTotalScore())
                         .isQuestionParent(Boolean.TRUE)
                         .questionType(QuestionTypeEnum.Question_Parent)
-                        .questionScore(excelQuestionContentResponse.getTotalScore())
                         .build();
 
                 questionParent = questionRepository.save(questionParent);
-
-                if(questionParent.getQuestionGroupChildren() == null)
-                    questionParent.setQuestionGroupChildren(new ArrayList<>());
 
                 if(questionParent.getContentCollection() == null)
                     questionParent.setContentCollection(new ArrayList<>());
 
                 ContentEntity contentAudio = contentUtil.makeQuestionContentEntity(
                         currentUser,
-                        questionParent,
+                        topicEntity,
                         excelQuestionContentResponse.getAudioPath()
                 );
 
                 contentAudio = contentRepository.save(contentAudio);
 
                 questionParent.setContentAudio(contentAudio.getContentData());
-                questionParent.getContentCollection().add(contentAudio);
+
+                if(!questionParent.getContentCollection().contains(contentAudio))
+                    questionParent.getContentCollection().add(contentAudio);
 
                 ContentEntity contentImage = contentUtil.makeQuestionContentEntity(
                         currentUser,
-                        questionParent,
+                        topicEntity,
                         excelQuestionContentResponse.getImagePath()
                 );
 
                 contentImage = contentRepository.save(contentImage);
 
                 questionParent.setContentImage(contentImage.getContentData());
-                questionParent.getContentCollection().add(contentImage);
+
+                if(!questionParent.getContentCollection().contains(contentImage))
+                    questionParent.getContentCollection().add(contentImage);
 
                 questionParent = questionRepository.save(questionParent);
+
+                if(questionParent.getQuestionGroupChildren() == null)
+                    questionParent.setQuestionGroupChildren(new ArrayList<>());
 
                 int iRowHeaderTable = iRowTotalScore + 1;
 
@@ -636,13 +704,14 @@ public class ExcelFillService implements IExcelFillService {
                     QuestionEntity questionChildren = QuestionEntity.builder()
                             .questionId(UUID.randomUUID())
                             .questionContent(questionContent)
-                            .questionScore(scoreTrueQuestion)
+                            .part(partEntity)
                             .questionGroupParent(questionParent)
                             .isQuestionParent(Boolean.FALSE)
-                            .questionResult(resultTrueQuestion)
                             .questionType(QuestionTypeEnum.Multiple_Choice)
                             .userCreate(currentUser)
                             .userUpdate(currentUser)
+                            .questionScore(scoreTrueQuestion)
+                            .questionResult(resultTrueQuestion)
                             .build();
 
                     questionChildren = questionRepository.save(questionChildren);
@@ -716,7 +785,13 @@ public class ExcelFillService implements IExcelFillService {
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
 
-            Sheet sheet = workbook.getSheetAt(part);
+            int numberOfSheetTopicInformation = 0;
+
+            Sheet sheet = workbook.getSheetAt(numberOfSheetTopicInformation);
+
+            ExcelTopicContentResponse excelTopicContentResponse = ExcelHelper.collectTopicContentWith(sheet);
+
+            sheet = workbook.getSheetAt(part);
 
             if (sheet == null)
                 throw new BadRequestException(String.format("Sheet %d does not exist", part));
@@ -735,11 +810,13 @@ public class ExcelFillService implements IExcelFillService {
                             || !partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_7.getName()) && part == 7
             ) throw new BadRequestException("Part name at first row must defined with PART 6 or PART 7.");
 
+            String partType = excelTopicContentResponse.getPartTypesList().get(part - 1);
+
             PartEntity partEntity;
 
             if(partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_6.getName()))
-                partEntity = partService.getPartToName(PartEnum.PART_6.getName());
-            else partEntity = partService.getPartToName(PartEnum.PART_7.getName());
+                partEntity = partService.getPartToName(PartEnum.PART_6.getName(), partType, topicEntity);
+            else partEntity = partService.getPartToName(PartEnum.PART_7.getName(), partType, topicEntity);
 
             List<ExcelQuestionResponse> excelQuestionResponseList = new ArrayList<>();
 
@@ -761,16 +838,13 @@ public class ExcelFillService implements IExcelFillService {
                         .topics(List.of(topicEntity))
                         .userCreate(currentUser)
                         .userUpdate(currentUser)
+                        .questionScore(excelQuestionContentResponse.getTotalScore())
                         .isQuestionParent(Boolean.TRUE)
                         .questionType(QuestionTypeEnum.Question_Parent)
-                        .questionScore(excelQuestionContentResponse.getTotalScore())
                         .questionContent(excelQuestionContentResponse.getQuestionContent())
                         .build();
 
                 questionParent = questionRepository.save(questionParent);
-
-                if(questionParent.getQuestionGroupChildren() == null)
-                    questionParent.setQuestionGroupChildren(new ArrayList<>());
 
                 if(part == 7){
 
@@ -779,17 +853,22 @@ public class ExcelFillService implements IExcelFillService {
 
                     ContentEntity contentImage = contentUtil.makeQuestionContentEntity(
                             currentUser,
-                            questionParent,
+                            topicEntity,
                             excelQuestionContentResponse.getImagePath()
                     );
 
                     contentImage = contentRepository.save(contentImage);
 
                     questionParent.setContentImage(contentImage.getContentData());
-                    questionParent.getContentCollection().add(contentImage);
+
+                    if(!questionParent.getContentCollection().contains(contentImage))
+                        questionParent.getContentCollection().add(contentImage);
 
                     questionParent = questionRepository.save(questionParent);
                 }
+
+                if(questionParent.getQuestionGroupChildren() == null)
+                    questionParent.setQuestionGroupChildren(new ArrayList<>());
 
                 int iRowHeaderTable = iRowTotalScore + 1;
 
@@ -831,13 +910,14 @@ public class ExcelFillService implements IExcelFillService {
                     QuestionEntity questionChildren = QuestionEntity.builder()
                             .questionId(UUID.randomUUID())
                             .questionContent(questionContentChild)
-                            .questionScore(scoreTrueQuestion)
+                            .part(partEntity)
                             .questionGroupParent(questionParent)
                             .isQuestionParent(Boolean.FALSE)
-                            .questionResult(resultTrueQuestion)
                             .questionType(QuestionTypeEnum.Multiple_Choice)
                             .userCreate(currentUser)
                             .userUpdate(currentUser)
+                            .questionScore(scoreTrueQuestion)
+                            .questionResult(resultTrueQuestion)
                             .build();
 
                     questionChildren = questionRepository.save(questionChildren);
@@ -930,24 +1010,5 @@ public class ExcelFillService implements IExcelFillService {
                 .questions(excelQuestionResponseList)
                 .build();
     }
-
-
-
-    private List<UUID> parseParts(String partsString) {
-
-        List<String> listPart = Arrays.stream(partsString.split(", "))
-                .map(String::trim)
-                .toList();
-
-        List<UUID> uuidList = new ArrayList<>();
-
-        for (String part : listPart) {
-            UUID uuid = partRepository.findByPartName(part).orElseThrow(() -> new CustomException(ErrorEnum.PART_NOT_FOUND)).getPartId();
-            uuidList.add(uuid);
-        }
-
-        return uuidList;
-    }
-
 
 }

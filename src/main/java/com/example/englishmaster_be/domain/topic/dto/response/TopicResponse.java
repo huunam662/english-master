@@ -1,11 +1,11 @@
 package com.example.englishmaster_be.domain.topic.dto.response;
 
-import com.example.englishmaster_be.domain.user.dto.response.UserBasicResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,11 +19,11 @@ public class TopicResponse {
 
     UUID topicId;
 
+    String packName;
+
     UUID packId;
 
     UUID statusId;
-
-    String packName;
 
     String topicName;
 
@@ -33,7 +33,8 @@ public class TopicResponse {
 
     String topicType;
 
-    String workTime;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
+    LocalTime workTime;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
     LocalDateTime startTime;
@@ -47,11 +48,7 @@ public class TopicResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
     LocalDateTime updateAt;
 
-    UserBasicResponse userCreate;
-
-    UserBasicResponse userUpdate;
-
-    List<UUID> parts;
+    List<String> partNames;
 
     Integer numberQuestion;
 

@@ -4,6 +4,7 @@ import com.example.englishmaster_be.domain.part.dto.response.PartQuestionRespons
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionDto;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,5 +36,5 @@ public interface IQuestionService {
 
     List<QuestionEntity> getQuestionGroupListByQuestionId(UUID questionId);
 
-    List<PartQuestionResponse> getAllPartQuestions(UUID partId);
+    List<QuestionPartResponse> getAllPartQuestions(String partName, UUID topicId);
 }

@@ -10,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,7 +35,7 @@ public class ExcelTopicResponse {
     PackResponse pack;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
-    Time workTime;
+    LocalTime workTime;
 
     Integer numberQuestion;
 

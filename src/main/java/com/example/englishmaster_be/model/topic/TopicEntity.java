@@ -17,6 +17,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Time;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,7 +51,7 @@ public class TopicEntity {
     String topicType;
 
     @Column(name = "work_time")
-    Time workTime;
+    LocalTime workTime;
 
     @Column(name = "number_question")
     Integer numberQuestion;
@@ -71,6 +72,10 @@ public class TopicEntity {
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "start_time")
     LocalDateTime startTime;
+
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "end_time")
+    LocalDateTime endTime;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "update_time")

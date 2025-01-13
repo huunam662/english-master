@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,11 +49,11 @@ public class ExcelHelper {
 
             if(List.of(1, 2, 3, 4).contains(part)){
                 if(audioOrQuestionContentRow == null || !getStringCellValue(audioOrQuestionContentRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Audio.getHeaderName()))
-                    throw new BadRequestException("'Audio' tag is required in Sheet " + part + ", You can fill is blank content audio !");
+                    throw new BadRequestException(String.format("'%s' tag is required in Sheet %s, You can fill is blank content audio !", ExcelQuestionConstant.Audio.getHeaderName(), sheet.getSheetName()));
             }
             else{
                 if(audioOrQuestionContentRow == null || !getStringCellValue(audioOrQuestionContentRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Question_Content.getHeaderName()))
-                    throw new BadRequestException("'Question Content' tag is required in Sheet " + part + ", You can fill is blank question content !");
+                    throw new BadRequestException(String.format("'%s' tag is required in Sheet %s, You can fill is blank question content !", ExcelQuestionConstant.Question_Content.getHeaderName(), sheet.getSheetName()));
             }
 
             audioPathOrQuestionContent = getStringCellValue(audioOrQuestionContentRow, 1);
@@ -63,7 +64,7 @@ public class ExcelHelper {
             Row imageRow = sheet.getRow(iRowImagePath);
 
             if(imageRow == null || !getStringCellValue(imageRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Image.getHeaderName()))
-                throw new BadRequestException("'Image' tag is required in Sheet " + part + ", You can fill is blank content image !");
+                throw new BadRequestException(String.format("'%s' tag is required in Sheet %s, You can fill is blank content image !", ExcelQuestionConstant.Image.getHeaderName(), sheet.getSheetName()));
 
             imagePath = getStringCellValue(imageRow, 1);
         }
@@ -73,7 +74,7 @@ public class ExcelHelper {
             Row scoreRow = sheet.getRow(iRowTotalScore);
 
             if(scoreRow == null || !getStringCellValue(scoreRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Score.getHeaderName()))
-                throw new BadRequestException("'Score' tag is required in Sheet " + part + ", You can fill is blank content score !");
+                throw new BadRequestException(String.format("'%s' tag is required in Sheet %s, You can fill is blank content score !", ExcelQuestionConstant.Score.getHeaderName(), sheet.getSheetName()));
 
             Cell cellTotalScore = scoreRow.getCell(1);
 
@@ -129,7 +130,7 @@ public class ExcelHelper {
 
         LocalDateTime localDateTime = LocalDateTime.parse(workTimeString, dateTimeFormatter);
 
-        Time workTime = Time.valueOf(localDateTime.toLocalTime());
+        LocalTime workTime = localDateTime.toLocalTime();
 
         int iRowNumberQuestion = 5;
         checkCellTopicHeader(sheet, iRowNumberQuestion, jColHeader, ExcelTopicConstant.Number_Question);
@@ -149,13 +150,13 @@ public class ExcelHelper {
         List<String> partsList = Arrays.stream(part.split(",")).map(String::trim).toList();
 
         List<String> partNamesList = new ArrayList<>();
-        List<String> partDescriptionsList = new ArrayList<>();
+        List<String> partTypesList = new ArrayList<>();
 
         partsList.forEach(partItem -> {
             String[] partItemSplit = partItem.split(":");
 
             partNamesList.add(partItemSplit[0].trim());
-            partDescriptionsList.add(partItemSplit[1].trim());
+            partTypesList.add(partItemSplit[1].trim());
         });
 
 
@@ -167,8 +168,8 @@ public class ExcelHelper {
                 .workTime(workTime)
                 .numberQuestion(numberQuestion)
                 .packName(packName)
-                .listPartName(partNamesList)
-                .listPartDescription(partDescriptionsList)
+                .partNamesList(partNamesList)
+                .partTypesList(partTypesList)
                 .build();
 
     }
