@@ -128,11 +128,11 @@ public class TopicService implements ITopicService {
     @SneakyThrows
     public TopicEntity saveTopic(TopicRequest topicRequest) {
 
-        TopicEntity topic;
-
         UserEntity user = userService.currentUser();
 
         PackEntity pack = packService.getPackById(topicRequest.getPackId());
+
+        TopicEntity topic;
 
         if(topicRequest.getTopicId() != null)
             topic = getTopicById(topicRequest.getTopicId());
@@ -529,55 +529,43 @@ public class TopicService implements ITopicService {
     @Transactional
     @Override
     @SneakyThrows
-    public void addAllPartsToTopicByExcelFile(UUID topicId, MultipartFile file) {
+    public ExcelQuestionListResponse addAllPartsToTopicByExcelFile(UUID topicId, MultipartFile file) {
 
-        UserEntity user = userService.currentUser();
-
-        ExcelQuestionListResponse excelFileDTO = excelService.importQuestionAllPartsExcel(topicId, file);
-
-        processQuestions(excelFileDTO, topicId, user);
+        return excelService.importQuestionAllPartsExcel(topicId, file);
     }
 
     @Transactional
     @Override
     @SneakyThrows
-    public void addListQuestionPart123467ToTopicByExcelFile(UUID topicId, MultipartFile file, int partName) {
+    public ExcelQuestionListResponse addListQuestionPart12ToTopicByExcelFile(UUID topicId, MultipartFile file, int partNumber) {
 
-        List<Integer> partNameTemplate = List.of(1, 2, 3, 4, 6, 7);
+        return excelService.importQuestionListeningPart12Excel(topicId, file, partNumber);
+    }
 
-        if(!partNameTemplate.contains(partName))
-            throw new BadRequestException(
-                    "part name must be existed in ["
-                            + partNameTemplate.stream().map(String::valueOf).collect(Collectors.joining(", "))
-                            + "]"
-            );
 
-        UserEntity user = userService.currentUser();
+    @Transactional
+    @Override
+    @SneakyThrows
+    public ExcelQuestionListResponse addListQuestionPart34ToTopicByExcelFile(UUID topicId, MultipartFile file, int partNumber) {
 
-        ExcelQuestionListResponse excelFileDTO;
+        return excelService.importQuestionListeningPart34Excel(topicId, file, partNumber);
+    }
 
-        if(partName == 1 || partName == 2)
-            excelFileDTO = excelService.importQuestionListeningPart12Excel(topicId, file, partName);
-        else if(partName == 3 || partName == 4)
-            excelFileDTO = excelService.importQuestionListeningPart34Excel(topicId, file, partName);
-        else
-            excelFileDTO = excelService.importQuestionReadingPart67Excel(topicId, file, partName);
+    @Transactional
+    @Override
+    @SneakyThrows
+    public ExcelQuestionListResponse addListQuestionPart5ToTopicByExcelFile(UUID topicId, MultipartFile file) {
 
-        processQuestions(excelFileDTO, topicId, user);
+        return excelService.importQuestionReadingPart5Excel(topicId, file);
 
     }
 
     @Transactional
     @Override
     @SneakyThrows
-    public void addListQuestionPart5ToTopicByExcelFile(UUID topicId, MultipartFile file) {
+    public ExcelQuestionListResponse addListQuestionPart67ToTopicByExcelFile(UUID topicId, MultipartFile file, int partNumber) {
 
-        UserEntity user = userService.currentUser();
-
-        ExcelQuestionListResponse excelFileDTO = excelService.importQuestionReadingPart5Excel(topicId, file);
-
-        processQuestions(excelFileDTO, topicId, user);
-
+        return excelService.importQuestionReadingPart67Excel(topicId, file, partNumber);
     }
 
     @Transactional

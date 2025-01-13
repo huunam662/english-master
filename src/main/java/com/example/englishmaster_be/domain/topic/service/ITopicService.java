@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.domain.topic.service;
 
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionListResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
@@ -72,11 +73,15 @@ public interface ITopicService {
 
     void deleteQuestionToTopic(UUID topicId, UUID questionId);
 
-    void addAllPartsToTopicByExcelFile(UUID topicId, MultipartFile file);
+    ExcelQuestionListResponse addAllPartsToTopicByExcelFile(UUID topicId, MultipartFile file);
 
-    void addListQuestionPart123467ToTopicByExcelFile(UUID topicId, MultipartFile file, int partName);
+    ExcelQuestionListResponse addListQuestionPart12ToTopicByExcelFile(UUID topicId, MultipartFile file, int partNumber);
 
-    void addListQuestionPart5ToTopicByExcelFile(UUID topicId, MultipartFile file);
+    ExcelQuestionListResponse addListQuestionPart34ToTopicByExcelFile(UUID topicId, MultipartFile file, int partNumber);
+
+    ExcelQuestionListResponse addListQuestionPart67ToTopicByExcelFile(UUID topicId, MultipartFile file, int partNumber);
+
+    ExcelQuestionListResponse addListQuestionPart5ToTopicByExcelFile(UUID topicId, MultipartFile file);
 
     void addListQuestionToTopic(UUID topicId, TopicQuestionListRequest createQuestionDTOList);
 

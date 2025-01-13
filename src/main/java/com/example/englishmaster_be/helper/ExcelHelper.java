@@ -147,12 +147,21 @@ public class ExcelHelper {
 
         String part = getCellValueAsString(sheet, iRowPart, jColBody).replaceAll("\n", "");
 
-        List<String> partsList = Arrays.stream(part.split(",")).map(String::trim).toList();
+        List<String> partsList = Arrays.stream(part.split(","))
+                .map(partItem -> {
+
+                    if(!partItem.split(":")[0].trim().equalsIgnoreCase("part"))
+                        throw new BadRequestException("Part name of questions must be start with key 'PART'");
+
+                    return partItem.trim();
+                })
+                .toList();
 
         List<String> partNamesList = new ArrayList<>();
         List<String> partTypesList = new ArrayList<>();
 
         partsList.forEach(partItem -> {
+
             String[] partItemSplit = partItem.split(":");
 
             partNamesList.add(partItemSplit[0].trim());
