@@ -15,14 +15,13 @@ public class EnglishmasterBeApplication {
 
     private static final String local = "local";
 
+    private static final String staging = "staging";
+
     public static void main(String[] args) {
 
         SpringApplication application = new SpringApplication(EnglishmasterBeApplication.class);
 
-        boolean isLocalhost = InetAddress.getLoopbackAddress()
-                .getHostName().equalsIgnoreCase("localhost");
-
-        if(isLocalhost) application.setAdditionalProfiles(local);
+        application.setAdditionalProfiles(staging);
 
         application.run(args);
 
