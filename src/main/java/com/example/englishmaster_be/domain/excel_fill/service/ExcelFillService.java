@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.domain.excel_fill.service;
 
 import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
-import com.example.englishmaster_be.common.constant.StatusEnum;
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
 import com.example.englishmaster_be.common.constant.PartEnum;
 import com.example.englishmaster_be.common.constant.excel.ExcelQuestionConstant;
@@ -22,11 +21,9 @@ import com.example.englishmaster_be.model.pack.PackRepository;
 import com.example.englishmaster_be.model.pack.QPackEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.part.PartRepository;
-import com.example.englishmaster_be.domain.pack.service.IPackService;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.helper.ExcelHelper;
 import com.example.englishmaster_be.model.part.QPartEntity;
-import com.example.englishmaster_be.model.question.QQuestionEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.question.QuestionRepository;
 import com.example.englishmaster_be.model.status.StatusEntity;
@@ -36,16 +33,12 @@ import com.example.englishmaster_be.model.topic.TopicRepository;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.util.ContentUtil;
 import com.example.englishmaster_be.util.FileUtil;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.openxml4j.opc.internal.FileHelper;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,10 +48,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -123,7 +114,7 @@ public class ExcelFillService implements IExcelFillService {
 
         UserEntity currentUser = userService.currentUser();
 
-        StatusEntity statusEntity = statusService.getStatusByName(StatusEnum.ACTIVE);
+        StatusEntity statusEntity = statusService.getStatusByName("ACTIVE");
 
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
 

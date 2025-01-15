@@ -34,10 +34,9 @@ public class ContentResponse {
     UserBasicResponse userUpdate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
-    LocalDateTime createdAt;
+    LocalDateTime createAt;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
-    LocalDateTime updatedAt;
+    LocalDateTime updateAt;
 
-    List<QuestionResponse> questions;
 }

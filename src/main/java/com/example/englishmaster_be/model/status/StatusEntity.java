@@ -1,6 +1,5 @@
 package com.example.englishmaster_be.model.status;
 
-import com.example.englishmaster_be.common.constant.StatusEnum;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.type.TypeEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,8 +29,7 @@ public class StatusEntity {
     UUID statusId;
 
     @Column(name = "status_name")
-    @Enumerated(EnumType.STRING)
-    StatusEnum statusName;
+    String statusName;
 
     @Column(name = "flag")
     Boolean flag;

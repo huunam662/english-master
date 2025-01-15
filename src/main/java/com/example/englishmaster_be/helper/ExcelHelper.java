@@ -150,7 +150,7 @@ public class ExcelHelper {
         List<String> partsList = Arrays.stream(part.split(","))
                 .map(partItem -> {
 
-                    if(!partItem.split(":")[0].trim().equalsIgnoreCase("part"))
+                    if(!partItem.split(":")[0].trim().toLowerCase().startsWith("part"))
                         throw new BadRequestException("Part name of questions must be start with key 'PART'");
 
                     return partItem.trim();
