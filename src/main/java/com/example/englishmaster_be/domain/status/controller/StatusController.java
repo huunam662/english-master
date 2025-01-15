@@ -8,7 +8,9 @@ import com.example.englishmaster_be.domain.status.dto.request.StatusRequest;
 import com.example.englishmaster_be.domain.status.dto.response.StatusResponse;
 import com.example.englishmaster_be.domain.status.service.IStatusService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +22,7 @@ import java.util.UUID;
 @RequestMapping("/status")
 @PreAuthorize("hasRole('ADMIN')")
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class StatusController {
 
     IStatusService statusService;
@@ -33,9 +36,11 @@ public class StatusController {
         return StatusMapper.INSTANCE.toStatusResponse(statusEntity);
     }
 
-    @PutMapping("/updateStatus")
+    @PutMapping("/updateStatus/{statusId}")
     @DefaultMessage("Update status successfully")
-    public StatusResponse updateStatus(@RequestBody StatusRequest statusRequest) {
+    public StatusResponse updateStatus(@PathVariable("statusId") UUID statusId, @RequestBody StatusRequest statusRequest) {
+
+        statusRequest.setStatusId(statusId);
 
         StatusEntity status = statusService.saveStatus(statusRequest);
 

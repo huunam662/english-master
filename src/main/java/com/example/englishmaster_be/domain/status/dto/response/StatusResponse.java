@@ -1,6 +1,5 @@
 package com.example.englishmaster_be.domain.status.dto.response;
 
-import com.example.englishmaster_be.common.constant.StatusEnum;
 import com.example.englishmaster_be.domain.type.dto.response.TypeResponse;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -19,8 +18,7 @@ public class StatusResponse {
 
     UUID statusId;
 
-    @Enumerated(EnumType.STRING)
-    StatusEnum statusName;
+    String statusName;
 
     Boolean flag;
 

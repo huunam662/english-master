@@ -1,6 +1,5 @@
 package com.example.englishmaster_be.domain.status.service;
 
-import com.example.englishmaster_be.common.constant.StatusEnum;
 import com.example.englishmaster_be.mapper.StatusMapper;
 import com.example.englishmaster_be.domain.status.dto.request.StatusRequest;
 import com.example.englishmaster_be.exception.template.CustomException;
@@ -44,39 +43,25 @@ public class StatusService implements IStatusService {
 
         TypeEntity type = typeService.getTypeById(statusRequest.getTypeId());
 
-        String messageException = "StatusEntity is already exist";
-
-        if(statusRequest.getStatusId() != null) {
-
+        if(statusRequest.getStatusId() != null)
             status = getStatusById(statusRequest.getStatusId());
-
-            if(isExistedByStatusNameWithDiff(status, statusRequest.getStatusName()))
-                throw new BadRequestException(messageException);
-        }
-        else{
-
-            if(isExistedByStatusName(statusRequest.getStatusName()))
-                throw new BadRequestException(messageException);
-
+        else
             status = StatusEntity.builder().build();
-        }
+
+        if(isExistedByStatusNameOfType(statusRequest.getStatusName(), type))
+            throw new BadRequestException(String.format("Status name of type %s already exist", type.getTypeName()));
 
         StatusMapper.INSTANCE.flowToStatusEntity(statusRequest, status);
+
         status.setType(type);
 
         return statusRepository.save(status);
     }
 
     @Override
-    public boolean isExistedByStatusNameWithDiff(StatusEntity status, StatusEnum statusName) {
+    public boolean isExistedByStatusNameOfType(String statusName, TypeEntity type) {
 
-        return statusRepository.isExistedByStatusNameWithDiff(status, statusName);
-    }
-
-    @Override
-    public boolean isExistedByStatusName(StatusEnum statusName) {
-
-        return statusRepository.findByStatusName(statusName).isPresent();
+        return statusRepository.isExistedByStatusNameOfType(statusName, type);
     }
 
     @Override
@@ -107,7 +92,7 @@ public class StatusService implements IStatusService {
     }
 
     @Override
-    public StatusEntity getStatusByName(StatusEnum statusName) {
+    public StatusEntity getStatusByName(String statusName) {
 
         return statusRepository.findByStatusName(statusName).orElseThrow(
                 () -> new CustomException(ErrorEnum.STATUS_NOT_FOUND)
