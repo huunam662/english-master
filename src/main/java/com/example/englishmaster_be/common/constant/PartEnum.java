@@ -15,13 +15,15 @@ public enum PartEnum {
     PART_4("PART 4", "Short Talks"),
     PART_5("PART 5", "Incomplete Sentences"),
     PART_6("PART 6", "Text Completion"),
-    PART_7("PART 7", "Reading Comprehension");
+    PART_7("PART 7", "Reading Comprehension"),
+    PART_8("PART 8", "Words Fill Completion"),
+    PART_9("PART 9", "Matching Words");
 
     String name;
-    String description;
+    String type;
 
-    PartEnum(String name, String description) {
+    PartEnum(String name, String type) {
         this.name = name;
-        this.description = description;
+        this.type = type;
     }
 }
