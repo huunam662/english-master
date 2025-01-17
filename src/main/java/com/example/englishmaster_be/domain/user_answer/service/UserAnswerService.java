@@ -171,7 +171,7 @@ public class UserAnswerService implements IUserAnswerService {
 
 
 
-            } else if ( request.getType()==QuestionTypeEnum.Matching) {
+            } else if ( request.getType()==QuestionTypeEnum.Words_Matching) {
                 UserAnswerMatchingResponse userAnswerMatchingResponse = new UserAnswerMatchingResponse();
                 List<AnswerMatchingResponse> values = new ArrayList<>();
                 List<AnswerMatchingResponse> expected = new ArrayList<>();
@@ -432,7 +432,7 @@ public class UserAnswerService implements IUserAnswerService {
                 scoreAnswerResponse.setScoreAnswer(userAnswer.getQuestion().getQuestionScore());
 
         }
-        else if(Objects.equals(question.getQuestionType(), QuestionTypeEnum.Matching))
+        else if(Objects.equals(question.getQuestionType(), QuestionTypeEnum.Words_Matching))
             scoreAnswerResponse.setScoreAnswer(scoreAnswerMatching(questionId));
 
         return scoreAnswerResponse;

@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.domain.topic.service;
 
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
-import com.example.englishmaster_be.common.constant.StatusEnum;
 import com.example.englishmaster_be.common.thread.MessageResponseHolder;
 import com.example.englishmaster_be.common.constant.RoleEnum;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
@@ -18,7 +17,6 @@ import com.example.englishmaster_be.domain.status.service.IStatusService;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.helper.ExcelHelper;
 import com.example.englishmaster_be.mapper.AnswerMapper;
 import com.example.englishmaster_be.mapper.QuestionMapper;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
@@ -63,9 +61,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
@@ -75,7 +70,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -128,11 +122,11 @@ public class TopicService implements ITopicService {
     @SneakyThrows
     public TopicEntity saveTopic(TopicRequest topicRequest) {
 
-        TopicEntity topic;
-
         UserEntity user = userService.currentUser();
 
         PackEntity pack = packService.getPackById(topicRequest.getPackId());
+
+        TopicEntity topic;
 
         if(topicRequest.getTopicId() != null)
             topic = getTopicById(topicRequest.getTopicId());
@@ -166,7 +160,7 @@ public class TopicService implements ITopicService {
             topic.setParts(partList);
         }
 
-        topic.setStatus(statusService.getStatusByName(StatusEnum.ACTIVE));
+        topic.setStatus(statusService.getStatusByName("ACTIVE"));
         topic.setUserUpdate(user);
         topic.setPack(pack);
         topic.setEnable(Boolean.TRUE);
@@ -484,7 +478,7 @@ public class TopicService implements ITopicService {
 
         topic.setUpdateAt(LocalDateTime.now());
 
-        StatusEnum statusName = enable ? StatusEnum.ACTIVE : StatusEnum.DEACTIVATE;
+        String statusName = enable ? "ACTIVE" : "DEACTIVATE";
 
         StatusEntity statusUpdate = statusService.getStatusByName(statusName);
 
@@ -529,55 +523,43 @@ public class TopicService implements ITopicService {
     @Transactional
     @Override
     @SneakyThrows
-    public void addAllPartsToTopicByExcelFile(UUID topicId, MultipartFile file) {
+    public ExcelQuestionListResponse addAllPartsToTopicByExcelFile(UUID topicId, MultipartFile file) {
 
-        UserEntity user = userService.currentUser();
-
-        ExcelQuestionListResponse excelFileDTO = excelService.importQuestionAllPartsExcel(topicId, file);
-
-        processQuestions(excelFileDTO, topicId, user);
+        return excelService.importQuestionAllPartsExcel(topicId, file);
     }
 
     @Transactional
     @Override
     @SneakyThrows
-    public void addListQuestionPart123467ToTopicByExcelFile(UUID topicId, MultipartFile file, int partName) {
+    public ExcelQuestionListResponse addListQuestionPart12ToTopicByExcelFile(UUID topicId, MultipartFile file, int partNumber) {
 
-        List<Integer> partNameTemplate = List.of(1, 2, 3, 4, 6, 7);
+        return excelService.importQuestionListeningPart12Excel(topicId, file, partNumber);
+    }
 
-        if(!partNameTemplate.contains(partName))
-            throw new BadRequestException(
-                    "part name must be existed in ["
-                            + partNameTemplate.stream().map(String::valueOf).collect(Collectors.joining(", "))
-                            + "]"
-            );
 
-        UserEntity user = userService.currentUser();
+    @Transactional
+    @Override
+    @SneakyThrows
+    public ExcelQuestionListResponse addListQuestionPart34ToTopicByExcelFile(UUID topicId, MultipartFile file, int partNumber) {
 
-        ExcelQuestionListResponse excelFileDTO;
+        return excelService.importQuestionListeningPart34Excel(topicId, file, partNumber);
+    }
 
-        if(partName == 1 || partName == 2)
-            excelFileDTO = excelService.importQuestionListeningPart12Excel(topicId, file, partName);
-        else if(partName == 3 || partName == 4)
-            excelFileDTO = excelService.importQuestionListeningPart34Excel(topicId, file, partName);
-        else
-            excelFileDTO = excelService.importQuestionReadingPart67Excel(topicId, file, partName);
+    @Transactional
+    @Override
+    @SneakyThrows
+    public ExcelQuestionListResponse addListQuestionPart5ToTopicByExcelFile(UUID topicId, MultipartFile file) {
 
-        processQuestions(excelFileDTO, topicId, user);
+        return excelService.importQuestionReadingPart5Excel(topicId, file);
 
     }
 
     @Transactional
     @Override
     @SneakyThrows
-    public void addListQuestionPart5ToTopicByExcelFile(UUID topicId, MultipartFile file) {
+    public ExcelQuestionListResponse addListQuestionPart67ToTopicByExcelFile(UUID topicId, MultipartFile file, int partNumber) {
 
-        UserEntity user = userService.currentUser();
-
-        ExcelQuestionListResponse excelFileDTO = excelService.importQuestionReadingPart5Excel(topicId, file);
-
-        processQuestions(excelFileDTO, topicId, user);
-
+        return excelService.importQuestionReadingPart67Excel(topicId, file, partNumber);
     }
 
     @Transactional

@@ -55,7 +55,6 @@ public class TaskScheduled {
     public void scheduledRunTask(){
 
         deleteExpiredUsers();
-        deleteExpiredToken();
         deleteInvalidToken();
         deleteAllSessionConfirm();
         invalidTokenExpired();
@@ -82,24 +81,6 @@ public class TaskScheduled {
             log.info("Deleted {} expired users", usersToDelete.size());
         } catch (Exception e) {
             log.error("Error in deleteExpiredUsers task", e);
-        }
-    }
-
-    @Transactional
-    public void deleteExpiredToken() {
-        log.info("Starting deleteExpiredToken task");
-        try {
-            QInvalidTokenEntity qInvalidToken = QInvalidTokenEntity.invalidTokenEntity;
-            LocalDateTime expirationTime = LocalDateTime.now();
-
-            List<InvalidTokenEntity> tokensToDelete = queryFactory.selectFrom(qInvalidToken)
-                    .where(qInvalidToken.expireTime.before(expirationTime)).fetch();
-
-            invalidTokenRepository.deleteAll(tokensToDelete);
-
-            log.info("Deleted {} expired tokens", tokensToDelete.size());
-        } catch (Exception e) {
-            log.error("Error in deleteExpiredToken task", e);
         }
     }
 

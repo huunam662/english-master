@@ -28,7 +28,7 @@ public class ContentUtil {
 
     FileUtil fileUtil;
 
-    public ContentEntity makeQuestionContentEntity(UserEntity byUser, TopicEntity refTopic, String contentData) {
+    public ContentEntity makeContentEntity(UserEntity byUser, TopicEntity refTopic, String contentData) {
 
         ContentEntity contentEntity = jpaQueryFactory.selectFrom(QContentEntity.contentEntity)
                 .where(
@@ -37,23 +37,7 @@ public class ContentUtil {
                 )
                 .fetchOne();
 
-        if(contentEntity != null) {
-
-            contentEntity.setUserUpdate(byUser);
-            return contentEntity;
-        }
-
-        return ContentEntity.builder()
-                .contentId(UUID.randomUUID())
-                .contentData(contentData)
-                .contentType(fileUtil.mimeTypeFile(contentData))
-                .userCreate(byUser)
-                .userUpdate(byUser)
-                .topic(refTopic)
-                .build();
-    }
-
-    public ContentEntity makeTopicContentEntity(UserEntity byUser, TopicEntity refTopic, String contentData) {
+        if(contentEntity != null) return contentEntity;
 
         return ContentEntity.builder()
                 .contentId(UUID.randomUUID())

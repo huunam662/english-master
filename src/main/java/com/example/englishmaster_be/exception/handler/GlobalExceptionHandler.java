@@ -6,9 +6,11 @@ import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.exception.template.RefreshTokenException;
 import com.example.englishmaster_be.exception.template.ResourceNotFoundException;
 import com.example.englishmaster_be.common.dto.response.ExceptionResponseModel;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import jakarta.mail.MessagingException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -56,6 +58,36 @@ public class  GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND)
                 .code(HttpStatus.NOT_FOUND.value())
                 .message(message)
+                .build();
+    }
+
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ExceptionResponseModel handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+
+        Throwable cause = e.getCause();
+
+        Map<String, Object> errors = null;
+
+        if(cause instanceof InvalidFormatException invalidFormatException){
+
+            String fieldName = invalidFormatException.getPath().get(0).getFieldName();
+
+            String invalidValue = invalidFormatException.getValue().toString();
+
+//            String expectedType = invalidFormatException.getTargetType().getSimpleName();
+
+            errors = new HashMap<>();
+
+            errors.put("fieldName", fieldName);
+            errors.put("invalidValue", invalidValue);
+        }
+
+        return ExceptionResponseModel.builder()
+                .status(HttpStatus.BAD_REQUEST)
+                .code(HttpStatus.BAD_REQUEST.value())
+                .message("Invalid request")
+                .errors(errors)
                 .build();
     }
 
@@ -179,7 +211,7 @@ public class  GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ExceptionResponseModel handleAccessDeniedException(AccessDeniedException exception) {
+    public ExceptionResponseModel handleAccessDeniedException(AccessDeniedException ignored) {
 
         ErrorEnum error = ErrorEnum.UNAUTHORIZED;
 

@@ -73,7 +73,7 @@ public class TypeController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{typeId}/updateType")
-    @DefaultMessage("Create Type successfully")
+    @DefaultMessage("Update Type successfully")
     public TypeResponse updateType(@PathVariable("typeId") UUID typeId, @RequestBody TypeRequest typeRequest) {
 
         typeRequest.setTypeId(typeId);

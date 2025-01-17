@@ -92,11 +92,7 @@ public class QuestionEntity {
     @ManyToOne
     @JoinColumn(name = "part_id", referencedColumnName = "id")
     PartEntity part;
-
-    @ManyToOne
-    @JoinColumn(name = "question_group", referencedColumnName = "id")
-    QuestionEntity questionGroupParent;
-
+    
     @ManyToMany
     @JoinTable(
             name = "topic_question",
@@ -104,6 +100,10 @@ public class QuestionEntity {
             inverseJoinColumns = @JoinColumn(name = "topic_id")
     )
     List<TopicEntity> topics;
+
+    @ManyToOne
+    @JoinColumn(name = "question_group", referencedColumnName = "id")
+    QuestionEntity questionGroupParent;
 
     @OneToMany(mappedBy = "questionGroupParent")
     List<QuestionEntity> questionGroupChildren;
@@ -141,7 +141,6 @@ public class QuestionEntity {
     void onCreate() {
         createAt = LocalDateTime.now();
         updateAt = LocalDateTime.now();
-        numberChoice = 1;
 
         if(questionScore == null) questionScore = 0;
     }
