@@ -6,6 +6,8 @@ import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestion
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicContentResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
 import com.example.englishmaster_be.domain.excel_fill.service.IExcelFillService;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -26,66 +28,41 @@ public class ExcelFillController {
 
     IExcelFillService excelService;
 
-    @PostMapping(value = "/importExcel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/importTopicInformation", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @DefaultMessage("File processed successfully")
     @SneakyThrows
-    public ExcelTopicResponse getCreateTopicByExcelFileDTO(@RequestPart("file") MultipartFile file) {
+    public ExcelTopicResponse importTopicInformation(@RequestPart("file") MultipartFile file) {
 
         return excelService.importTopicExcel(file);
     }
 
-    @PostMapping(value = "/importQuestionPart67", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/importQuestionForTopicAndPart", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @DefaultMessage("File processed successfully")
-    @SneakyThrows
-    public ExcelQuestionListResponse getCreateQuestionPart67ByExcelFileDTO(
+    public ExcelQuestionListResponse importQuestionForTopicAndPart(
             @RequestParam("topicId") UUID topicId,
-            @RequestParam("part") int part,
+            @Parameter(description = "Part number must one value in scope [1, 2, 3, 4, 5, 6, 7, 8, 9]")
+            @RequestParam(value = "partNumber") int partNumber,
             @RequestPart("file") MultipartFile file
-    ) {
+    ){
 
-        return excelService.importQuestionReadingPart67Excel(topicId, file, part);
+        return excelService.importQuestionForTopicAndPart(topicId, partNumber, file);
     }
 
-    @PostMapping(value = "/importQuestionPart5", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/importAllPartsForTopic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @DefaultMessage("File processed successfully")
-    @SneakyThrows
-    public ExcelQuestionListResponse getCreateQuestionByExcelFileDTO(
+    public ExcelTopicResponse importAllPartsForTopic(
             @RequestParam("topicId") UUID topicId,
             @RequestPart("file") MultipartFile file
-    ) {
+    ){
 
-        return excelService.importQuestionReadingPart5Excel(topicId, file);
-    }
-
-    @PostMapping(value = "/importQuestionPart12", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @DefaultMessage("File processed successfully")
-    @SneakyThrows
-    public ExcelQuestionListResponse getCreateQuestionPart12ByExcelFileDTO(
-            @RequestParam("topicId") UUID topicId,
-            @RequestParam("part") int part,
-            @RequestPart("file") MultipartFile file
-    ) {
-
-        return excelService.importQuestionListeningPart12Excel(topicId, file, part);
+        return excelService.importAllPartsForTopicExcel(topicId, file);
     }
 
 
-    @PostMapping(value = "/importQuestionPart34", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/importQuestionAllPartsForTopic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @DefaultMessage("File processed successfully")
     @SneakyThrows
-    public ExcelQuestionListResponse getCreateQuestionPart34ByExcelFileDTO(
-            @RequestParam("topicId") UUID topicId,
-            @RequestParam("part") int part,
-            @RequestPart("file") MultipartFile file
-    ) {
-
-        return excelService.importQuestionListeningPart34Excel(topicId, file, part);
-    }
-
-    @PostMapping(value = "/importAllParts", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @DefaultMessage("File processed successfully")
-    @SneakyThrows
-    public ExcelQuestionListResponse getCreateQuestionAllPartByExcelFileDTO(
+    public ExcelQuestionListResponse importQuestionAllPartsForTopic(
             @RequestParam("topicId") UUID topicId,
             @RequestPart("file") MultipartFile file
     ) {

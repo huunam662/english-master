@@ -73,15 +73,11 @@ public interface ITopicService {
 
     void deleteQuestionToTopic(UUID topicId, UUID questionId);
 
-    ExcelQuestionListResponse addAllPartsToTopicByExcelFile(UUID topicId, MultipartFile file);
+    ExcelTopicResponse addAllPartsForTopicByExcelFile(UUID topicId, MultipartFile file);
 
-    ExcelQuestionListResponse addListQuestionPart12ToTopicByExcelFile(UUID topicId, MultipartFile file, int partNumber);
+    ExcelQuestionListResponse addQuestionAllPartsToTopicByExcelFile(UUID topicId, MultipartFile file);
 
-    ExcelQuestionListResponse addListQuestionPart34ToTopicByExcelFile(UUID topicId, MultipartFile file, int partNumber);
-
-    ExcelQuestionListResponse addListQuestionPart67ToTopicByExcelFile(UUID topicId, MultipartFile file, int partNumber);
-
-    ExcelQuestionListResponse addListQuestionPart5ToTopicByExcelFile(UUID topicId, MultipartFile file);
+    ExcelQuestionListResponse addQuestionForTopicAndPartByExcelFile(UUID topicId, int partNumber, MultipartFile file);
 
     void addListQuestionToTopic(UUID topicId, TopicQuestionListRequest createQuestionDTOList);
 

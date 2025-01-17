@@ -33,13 +33,17 @@ public class ExcelHelper {
                 (fileName == null || (!fileName.endsWith(".xls") && !fileName.endsWith(".xlsx")));
     }
 
-
-    public static ExcelQuestionContentResponse collectQuestionContentPart1234567With(Sheet sheet, Integer iRowAudioOrQuestionContentPath, Integer iRowImagePath, Integer iRowTotalScore, int part) {
+    public static void checkPartInScope(int partNumber){
 
         List<Integer> partsScope = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
 
-        if(!partsScope.contains(part))
-            throw new BadRequestException(String.format("Part must be in numbers %s !", String.join(", ", partsScope.stream().map(String::valueOf).toList())));
+        if(!partsScope.contains(partNumber))
+            throw new BadRequestException(String.format("Part number must one value in scope [%s]", String.join(", ", partsScope.stream().map(String::valueOf).toList())));
+    }
+
+    public static ExcelQuestionContentResponse collectQuestionContentPart1234567With(Sheet sheet, Integer iRowAudioOrQuestionContentPath, Integer iRowImagePath, Integer iRowTotalScore, int partNumber) {
+
+        checkPartInScope(partNumber);
 
         String audioPathOrQuestionContent = null;
         String imagePath = null;
@@ -49,7 +53,7 @@ public class ExcelHelper {
 
             Row audioOrQuestionContentRow = sheet.getRow(iRowAudioOrQuestionContentPath);
 
-            if(List.of(1, 2, 3, 4, 8).contains(part)){
+            if(List.of(1, 2, 3, 4, 8).contains(partNumber)){
                 if(audioOrQuestionContentRow == null || !getStringCellValue(audioOrQuestionContentRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Audio.getHeaderName()))
                     throw new BadRequestException(String.format("'%s' tag is required in Sheet %s, You can fill is blank content audio !", ExcelQuestionConstant.Audio.getHeaderName(), sheet.getSheetName()));
             }
@@ -89,9 +93,9 @@ public class ExcelHelper {
                 .totalScore(totalScore)
                 .build();
 
-        if(List.of(1, 2, 3, 4, 8).contains(part))
+        if(List.of(1, 2, 3, 4, 8).contains(partNumber))
             excelQuestionContentResponse.setAudioPath(audioPathOrQuestionContent);
-        else if(List.of(6, 7).contains(part))
+        else if(List.of(6, 7).contains(partNumber))
             excelQuestionContentResponse.setQuestionContent(audioPathOrQuestionContent);
 
         return excelQuestionContentResponse;
@@ -207,12 +211,9 @@ public class ExcelHelper {
 
     }
 
-    public static void checkHeaderTableQuestionPart1234567With(Sheet sheet, int iRowHeaderTable, int part){
+    public static void checkHeaderTableQuestionPart1234567With(Sheet sheet, int iRowHeaderTable, int partNumber){
 
-        List<Integer> partsScope = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
-
-        if(!partsScope.contains(part))
-            throw new BadRequestException(String.format("Part must be in numbers %s !", String.join(", ", partsScope.stream().map(String::valueOf).toList())));
+        checkPartInScope(partNumber);
 
         Row rowHeaderTable = sheet.getRow(iRowHeaderTable);
 
@@ -223,16 +224,16 @@ public class ExcelHelper {
 
         checkCellQuestionHeaderTable(sheet, rowHeaderTable, iRowHeaderTable, jColSTT_CellOnHeader, ExcelQuestionConstant.STT);
 
-        if(List.of(3, 4, 5, 6, 7, 9).contains(part)){
+        if(List.of(3, 4, 5, 6, 7, 9).contains(partNumber)){
 
             int jColQuestionContent_CellOnHeader = 1;
 
-            if(List.of(3, 4, 5).contains(part))
+            if(List.of(3, 4, 5).contains(partNumber))
                 checkCellQuestionHeaderTable(sheet, rowHeaderTable, iRowHeaderTable, jColQuestionContent_CellOnHeader, ExcelQuestionConstant.Question_Content);
             else
                 checkCellQuestionHeaderTable(sheet, rowHeaderTable, iRowHeaderTable, jColQuestionContent_CellOnHeader, ExcelQuestionConstant.Question_Content_Child);
 
-            if(part != 9){
+            if(partNumber != 9){
 
                 int jColA_CellOnHeader = 2;
 
@@ -255,23 +256,23 @@ public class ExcelHelper {
 
         int jColResultHeaderTable = 6;
 
-        if(List.of(1, 2, 8).contains(part))
+        if(List.of(1, 2, 8).contains(partNumber))
             jColResultHeaderTable = 1;
-        else if(part == 9)
+        else if(partNumber == 9)
             jColResultHeaderTable = 2;
 
         checkCellQuestionHeaderTable(sheet, rowHeaderTable, iRowHeaderTable, jColResultHeaderTable, ExcelQuestionConstant.Result);
 
         int jColScoreHeaderTable = 7;
 
-        if(List.of(1, 2, 8).contains(part))
+        if(List.of(1, 2, 8).contains(partNumber))
             jColScoreHeaderTable = 2;
-        else if(part == 9)
+        else if(partNumber == 9)
             jColScoreHeaderTable = 3;
 
         checkCellQuestionHeaderTable(sheet, rowHeaderTable, iRowHeaderTable, jColScoreHeaderTable, ExcelQuestionConstant.Score);
 
-        if(part == 1){
+        if(partNumber == 1){
 
             int jColImageHeaderTable = 3;
 
