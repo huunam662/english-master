@@ -203,55 +203,39 @@ public class TopicController {
         topicService.addListQuestionToTopic(topicId, createQuestionDTOList);
     }
 
-    @PostMapping(value = "/{topicId:.+}/addListQuestionPart12ToTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{topicId:.+}/addQuestionForTopicAndPartByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public ExcelQuestionListResponse addListQuestionPart12ToTopicByExcelFile(
-            @PathVariable UUID topicId,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("part") int partNumber
-    ) {
+    @DefaultMessage("Add Questions to Topic successfully")
+    public ExcelQuestionListResponse addQuestionForTopicAndPartByExcelFile(
+            @PathVariable("topicId") UUID topicId,
+            @RequestParam("partNumber") int partNumber,
+            @RequestPart("file") MultipartFile file
+    ){
 
-        return topicService.addListQuestionPart12ToTopicByExcelFile(topicId, file, partNumber);
-    }
-
-    @PostMapping(value = "/{topicId:.+}/addListQuestionPart34ToTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
-    public ExcelQuestionListResponse addListQuestionPart34ToTopicByExcelFile(
-            @PathVariable UUID topicId,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("part") int partNumber
-    ) {
-
-        return topicService.addListQuestionPart34ToTopicByExcelFile(topicId, file, partNumber);
-    }
-
-    @PostMapping(value = "/{topicId:.+}/addListQuestionPart5ToTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
-    public ExcelQuestionListResponse addListQuestionPart5ToTopicByExcelFile(@PathVariable UUID topicId, @RequestParam("file") MultipartFile file) {
-
-        return topicService.addListQuestionPart5ToTopicByExcelFile(topicId, file);
+        return topicService.addQuestionForTopicAndPartByExcelFile(topicId, partNumber, file);
     }
 
 
-    @PostMapping(value = "/{topicId:.+}/addListQuestionPart67ToTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/{topicId:.+}/addQuestionAllPartsToTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public ExcelQuestionListResponse addListQuestionPart67ToTopicByExcelFile(
-            @PathVariable UUID topicId,
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("part") int partName
-    ) {
-
-        return topicService.addListQuestionPart67ToTopicByExcelFile(topicId, file, partName);
-    }
-
-    @PostMapping(value = "/{topicId:.+}/addAllPartsToTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
-    public ExcelQuestionListResponse addAllPartsToTopicByExcelFile(
+    @DefaultMessage("Add Questions to Topic successfully")
+    public ExcelQuestionListResponse addQuestionAllPartsToTopicByExcelFile(
             @PathVariable UUID topicId,
             @RequestParam("file") MultipartFile file
     ) {
 
-        return topicService.addAllPartsToTopicByExcelFile(topicId, file);
+        return topicService.addQuestionAllPartsToTopicByExcelFile(topicId, file);
+    }
+
+    @PostMapping(value = "/{topicId:.+}/addAllPartsToTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ADMIN')")
+    @DefaultMessage("Add Parts to Topic successfully")
+    public ExcelTopicResponse addAllPartsToTopicByExcelFile(
+            @PathVariable("topicId") UUID topicId,
+            @RequestPart("file") MultipartFile file
+    ){
+
+        return topicService.addAllPartsForTopicByExcelFile(topicId, file);
     }
 
 

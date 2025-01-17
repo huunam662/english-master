@@ -523,43 +523,15 @@ public class TopicService implements ITopicService {
     @Transactional
     @Override
     @SneakyThrows
-    public ExcelQuestionListResponse addAllPartsToTopicByExcelFile(UUID topicId, MultipartFile file) {
+    public ExcelQuestionListResponse addQuestionAllPartsToTopicByExcelFile(UUID topicId, MultipartFile file) {
 
         return excelService.importQuestionAllPartsExcel(topicId, file);
     }
 
-    @Transactional
     @Override
-    @SneakyThrows
-    public ExcelQuestionListResponse addListQuestionPart12ToTopicByExcelFile(UUID topicId, MultipartFile file, int partNumber) {
+    public ExcelTopicResponse addAllPartsForTopicByExcelFile(UUID topicId, MultipartFile file) {
 
-        return excelService.importQuestionListeningPart12Excel(topicId, file, partNumber);
-    }
-
-
-    @Transactional
-    @Override
-    @SneakyThrows
-    public ExcelQuestionListResponse addListQuestionPart34ToTopicByExcelFile(UUID topicId, MultipartFile file, int partNumber) {
-
-        return excelService.importQuestionListeningPart34Excel(topicId, file, partNumber);
-    }
-
-    @Transactional
-    @Override
-    @SneakyThrows
-    public ExcelQuestionListResponse addListQuestionPart5ToTopicByExcelFile(UUID topicId, MultipartFile file) {
-
-        return excelService.importQuestionReadingPart5Excel(topicId, file);
-
-    }
-
-    @Transactional
-    @Override
-    @SneakyThrows
-    public ExcelQuestionListResponse addListQuestionPart67ToTopicByExcelFile(UUID topicId, MultipartFile file, int partNumber) {
-
-        return excelService.importQuestionReadingPart67Excel(topicId, file, partNumber);
+        return excelService.importAllPartsForTopicExcel(topicId, file);
     }
 
     @Transactional
@@ -689,6 +661,13 @@ public class TopicService implements ITopicService {
                 MessageResponseHolder.setMessage("Add QuestionEntity to TopicEntity successfully");
             }
         }
+    }
+
+    @Transactional
+    @Override
+    public ExcelQuestionListResponse addQuestionForTopicAndPartByExcelFile(UUID topicId, int partNumber, MultipartFile file) {
+
+        return excelService.importQuestionForTopicAndPart(topicId, partNumber, file);
     }
 
     @Transactional
