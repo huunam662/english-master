@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.user.service;
 
+import com.example.englishmaster_be.common.constant.RoleEnum;
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.exam.dto.response.ExamResultResponse;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
@@ -162,6 +163,16 @@ public class UserService implements IUserService {
             return getUserByEmail(userDetails.getUsername());
 
         throw new AuthenticationServiceException("Vui lòng xác thực người dùng");
+    }
+
+    @Override
+    public Boolean currentUserIsAdmin() {
+
+        UserEntity currentUser = currentUser();
+
+        return currentUser.getRole()
+                .getRoleName()
+                .equals(RoleEnum.ADMIN);
     }
 
     @Override

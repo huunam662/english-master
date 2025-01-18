@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.model.part;
 
+import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -36,5 +38,13 @@ public class PartQueryFactory {
         return Optional.ofNullable(partResult);
     }
 
+    public List<PartEntity> findAllPartsByNameAndTopic(String partName, TopicEntity topic){
+
+        BooleanExpression conditionQueryPattern = QPartEntity.partEntity.partName.equalsIgnoreCase(partName)
+                .and(QPartEntity.partEntity.topics.contains(topic));
+
+        return selectFromPartEntity().where(conditionQueryPattern).fetch();
+
+    }
 
 }
