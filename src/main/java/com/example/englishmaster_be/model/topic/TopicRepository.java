@@ -10,7 +10,7 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, QuerydslPredicateExecutor<TopicEntity> {
+public interface TopicRepository extends JpaRepository<TopicEntity, UUID> {
 
     Page<TopicEntity> findAll(Pageable pageable);
 

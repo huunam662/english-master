@@ -13,6 +13,8 @@ public interface IExcelFillService {
 
     ExcelTopicResponse importTopicExcel(MultipartFile file);
 
+    ExcelTopicResponse importAllPartsForTopicExcel(UUID topicId, MultipartFile file);
+
     ExcelTopicContentResponse readTopicContentFromExcel(MultipartFile file);
 
     ExcelQuestionListResponse importQuestionReadingPart67Excel(UUID topicId, MultipartFile file, int part);
@@ -26,6 +28,8 @@ public interface IExcelFillService {
     ExcelQuestionListResponse importQuestionFillInBlankPart8Excel(UUID topicId, MultipartFile file);
 
     ExcelQuestionListResponse importQuestionMatchingWordsPart9Excel(UUID topicId, MultipartFile file);
+
+    ExcelQuestionListResponse importQuestionForTopicAndPart(UUID topicId, int partNumber, MultipartFile file);
 
     ExcelQuestionListResponse importQuestionAllPartsExcel(UUID topicId, MultipartFile file);
 
