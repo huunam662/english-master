@@ -24,9 +24,11 @@ import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.content.ContentEntity;
 import com.example.englishmaster_be.model.matching_pair.MatchingPairEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
+import com.example.englishmaster_be.model.part.PartQueryFactory;
 import com.example.englishmaster_be.model.part.QPartEntity;
 import com.example.englishmaster_be.model.question.QQuestionEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
+import com.example.englishmaster_be.model.question.QuestionQueryFactory;
 import com.example.englishmaster_be.model.question_label.QuestionLabelEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
@@ -64,7 +66,9 @@ public class QuestionService implements IQuestionService {
 
     FileUtil fileUtil;
 
-    JPAQueryFactory jpaQueryFactory;
+    PartQueryFactory partQueryFactory;
+
+    QuestionQueryFactory questionQueryFactory;
 
     QuestionRepository questionRepository;
 
@@ -389,19 +393,15 @@ public class QuestionService implements IQuestionService {
     @Override
     public List<QuestionPartResponse> getAllPartQuestions(String partName, UUID topicId) {
 
-        UserEntity currentUser = userService.currentUser();
+        Boolean isAdmin = userService.currentUserIsAdmin();
 
         TopicEntity topicEntity = topicService.getTopicById(topicId);
 
-        List<PartEntity> partEntityList = jpaQueryFactory.selectFrom(QPartEntity.partEntity)
-                .where(
-                        QPartEntity.partEntity.partName.equalsIgnoreCase(partName)
-                                .and(QPartEntity.partEntity.topics.contains(topicEntity))
-                ).fetch();
+        List<PartEntity> partEntityList = partQueryFactory.findAllPartsByNameAndTopic(partName, topicEntity);
 
-        Boolean isAdmin = currentUser.getRole().getRoleName().equals(RoleEnum.ADMIN);
+        List<QuestionEntity> questionEntityList = questionQueryFactory.findAllQuestionsByTopicAndParts(topicEntity, partEntityList);
 
-        return QuestionMapper.INSTANCE.toQuestionPartResponseList(partEntityList, topicEntity, isAdmin);
+        return QuestionMapper.INSTANCE.toQuestionPartResponseList(questionEntityList, partEntityList, topicEntity, isAdmin);
     }
 
 

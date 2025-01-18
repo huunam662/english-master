@@ -82,4 +82,7 @@ public interface ITopicService {
     void addListQuestionToTopic(UUID topicId, TopicQuestionListRequest createQuestionDTOList);
 
     QuestionResponse addQuestionToTopic(UUID topicId, QuestionRequest createQuestionDTO);
+
+    List<QuestionPartResponse> getQuestionPartListOfTopic(UUID topicId);
+
 }

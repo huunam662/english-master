@@ -17,16 +17,13 @@ import com.example.englishmaster_be.domain.status.service.IStatusService;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.mapper.AnswerMapper;
-import com.example.englishmaster_be.mapper.QuestionMapper;
+import com.example.englishmaster_be.mapper.*;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicQuestionListRequest;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicRequest;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicFilterRequest;
 import com.example.englishmaster_be.exception.template.BadRequestException;
-import com.example.englishmaster_be.mapper.PartMapper;
-import com.example.englishmaster_be.mapper.TopicMapper;
 import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicResponse;
@@ -44,6 +41,7 @@ import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.part.PartRepository;
 import com.example.englishmaster_be.model.part.QPartEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
+import com.example.englishmaster_be.model.question.QuestionQueryFactory;
 import com.example.englishmaster_be.model.question.QuestionRepository;
 import com.example.englishmaster_be.model.status.StatusEntity;
 import com.example.englishmaster_be.model.topic.QTopicEntity;
@@ -83,6 +81,8 @@ public class TopicService implements ITopicService {
     FileUtil fileUtil;
 
     JPAQueryFactory jpaQueryFactory;
+
+    QuestionQueryFactory questionQueryFactory;
 
     TopicRepository topicRepository;
 
@@ -545,7 +545,7 @@ public class TopicService implements ITopicService {
                 .part(part)
                 .build();
 
-        QuestionMapper.INSTANCE.flowToQuestionEntity(questionByExcelFileResponse, question);
+        ExcelContentMapper.INSTANCE.flowToQuestionEntity(questionByExcelFileResponse, question);
 
         return questionRepository.save(question);
     }
@@ -1017,5 +1017,19 @@ public class TopicService implements ITopicService {
         );
 
         return filterResponse;
+    }
+
+    @Override
+    public List<QuestionPartResponse> getQuestionPartListOfTopic(UUID topicId) {
+
+        Boolean isAdmin = userService.currentUserIsAdmin();
+
+        TopicEntity topicEntity = getTopicById(topicId);
+
+        List<PartEntity> partEntityList = topicEntity.getParts();
+
+        List<QuestionEntity> questionEntityList = questionQueryFactory.findAllQuestionsByTopicAndParts(topicEntity, partEntityList);
+
+        return QuestionMapper.INSTANCE.toQuestionPartResponseList(questionEntityList, partEntityList, topicEntity, isAdmin);
     }
 }

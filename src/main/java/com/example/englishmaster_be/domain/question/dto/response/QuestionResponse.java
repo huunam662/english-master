@@ -43,6 +43,10 @@ public class QuestionResponse {
 
     Integer questionScore;
 
+    Integer numberChoice;
+
+    Integer numberOfQuestionsChild;
+
     Boolean isQuestionParent;
 
     QuestionTypeEnum questionType;

@@ -16,6 +16,8 @@ public interface IUserService {
 
     UserEntity currentUser();
 
+    Boolean currentUserIsAdmin();
+
     UserEntity getUserById(UUID userId);
 
     UserEntity getUserByEmail(String email);
