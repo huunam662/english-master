@@ -22,7 +22,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@SuppressWarnings("unchecked")
 public class QuestionMockTestResponse {
 
     UUID questionId;

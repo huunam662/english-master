@@ -11,6 +11,7 @@ import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.mapper.ExcelContentMapper;
 import com.example.englishmaster_be.mapper.QuestionMapper;
 import com.example.englishmaster_be.mapper.TopicMapper;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
@@ -480,7 +481,7 @@ public class ExcelFillService implements IExcelFillService {
 
             }
 
-            ExcelQuestionResponse excelQuestionResponse = QuestionMapper.INSTANCE.toExcelQuestionResponse(questionParent);
+            ExcelQuestionResponse excelQuestionResponse = ExcelContentMapper.INSTANCE.toExcelQuestionResponse(questionParent);
 
             excelQuestionResponse.setTopicId(topicId);
 
@@ -637,7 +638,7 @@ public class ExcelFillService implements IExcelFillService {
 
             }
 
-            ExcelQuestionResponse excelQuestionResponse = QuestionMapper.INSTANCE.toExcelQuestionResponse(questionParent);
+            ExcelQuestionResponse excelQuestionResponse = ExcelContentMapper.INSTANCE.toExcelQuestionResponse(questionParent);
 
             excelQuestionResponse.setTopicId(topicId);
 
@@ -850,7 +851,7 @@ public class ExcelFillService implements IExcelFillService {
                     iRowBodyTable++;
                 }
 
-                ExcelQuestionResponse excelQuestionResponse = QuestionMapper.INSTANCE.toExcelQuestionResponse(questionParent);
+                ExcelQuestionResponse excelQuestionResponse = ExcelContentMapper.INSTANCE.toExcelQuestionResponse(questionParent);
 
                 excelQuestionResponse.setTopicId(topicId);
 
@@ -1057,7 +1058,7 @@ public class ExcelFillService implements IExcelFillService {
                     iRowBodyTable++;
                 }
 
-                ExcelQuestionResponse excelQuestionResponse = QuestionMapper.INSTANCE.toExcelQuestionResponse(questionParent);
+                ExcelQuestionResponse excelQuestionResponse = ExcelContentMapper.INSTANCE.toExcelQuestionResponse(questionParent);
 
                 excelQuestionResponse.setTopicId(topicId);
 
@@ -1273,7 +1274,7 @@ public class ExcelFillService implements IExcelFillService {
                 if(!questionParent.getQuestionGroupChildren().contains(questionChildren))
                     questionParent.getQuestionGroupChildren().add(questionChildren);
 
-                ExcelQuestionResponse excelQuestionResponse = QuestionMapper.INSTANCE.toExcelQuestionResponse(questionParent);
+                ExcelQuestionResponse excelQuestionResponse = ExcelContentMapper.INSTANCE.toExcelQuestionResponse(questionParent);
 
                 excelQuestionResponse.setTopicId(topicId);
 
@@ -1442,7 +1443,7 @@ public class ExcelFillService implements IExcelFillService {
                     iRowBodyTable++;
                 }
 
-                ExcelQuestionResponse excelQuestionResponse = QuestionMapper.INSTANCE.toExcelQuestionResponse(questionParent);
+                ExcelQuestionResponse excelQuestionResponse = ExcelContentMapper.INSTANCE.toExcelQuestionResponse(questionParent);
 
                 excelQuestionResponse.setTopicId(topicId);
 

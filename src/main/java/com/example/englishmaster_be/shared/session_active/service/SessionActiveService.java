@@ -2,6 +2,7 @@ package com.example.englishmaster_be.shared.session_active.service;
 
 import com.example.englishmaster_be.common.constant.SessionActiveTypeEnum;
 import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.model.session_active.SessionActiveQueryFactory;
 import com.example.englishmaster_be.model.session_active.SessionActiveRepository;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
@@ -21,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -33,6 +35,8 @@ public class SessionActiveService implements ISessionActiveService {
     JwtUtil jwtUtil;
 
     IUserService userService;
+
+    SessionActiveQueryFactory sessionActiveQueryFactory;
 
     SessionActiveRepository sessionActiveRepository;
 
@@ -49,6 +53,12 @@ public class SessionActiveService implements ISessionActiveService {
     public SessionActiveEntity getByCodeAndType(UUID code, SessionActiveTypeEnum type) {
 
         return sessionActiveRepository.findByCodeAndType(code, type);
+    }
+
+    @Override
+    public SessionActiveEntity getByToken(String token) {
+
+        return sessionActiveQueryFactory.findByToken(token).orElse(null);
     }
 
     @Transactional
@@ -107,6 +117,14 @@ public class SessionActiveService implements ISessionActiveService {
             throw new RuntimeException("Don't delete token!");
         }
 
+    }
+
+    @Override
+    public void deleteBySessionEntity(SessionActiveEntity sessionActiveEntity) {
+
+        if(sessionActiveEntity == null) return;
+
+        sessionActiveRepository.delete(sessionActiveEntity);
     }
 
     public List<SessionActiveEntity> getSessionActiveList(UUID userId, SessionActiveTypeEnum sessionActiveType){

@@ -304,4 +304,15 @@ public class TopicController {
 
         return TopicMapper.INSTANCE.toTopicResponseList(topicEntityList);
     }
+
+    @GetMapping("/{topicId}/list-question-from-all-part")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @DefaultMessage("Topic questions all part successfully")
+    public List<QuestionPartResponse> getQuestionFromAllPart(
+            @PathVariable UUID topicId
+    ) {
+
+        return topicService.getQuestionPartListOfTopic(topicId);
+    }
+
 }

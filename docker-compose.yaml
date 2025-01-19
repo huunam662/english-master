@@ -10,4 +10,3 @@ services:
       - P-MAPPING:8080
     restart: unless-stopped
     pull_policy: always
-
