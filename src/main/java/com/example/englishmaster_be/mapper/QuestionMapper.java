@@ -77,29 +77,25 @@ public interface QuestionMapper {
 
         if(questionEntityList == null) return null;
 
-        QuestionHelper.shuffleQuestionsAndAnswers(questionEntityList, partEntity);
+        questionEntityList = QuestionHelper.shuffleQuestionsAndAnswers(questionEntityList, partEntity);
 
         return questionEntityList.stream().map(
                 questionEntity -> {
 
-                    QuestionResponse questionResponse;
+                    QuestionResponse questionResponse = toQuestionResponse(questionEntity, topicEntity, partEntity, isAdmin);
 
-                    if(!partEntity.getPartType().equalsIgnoreCase("Words Matching")) {
+                    if(isAdmin && !partEntity.getPartType().equalsIgnoreCase("Words Matching"))
+                        questionResponse.setAnswerCorrectId(AnswerHelper.getIdCorrectAnswer(questionEntity.getAnswers()));
 
-                        questionResponse = toQuestionResponse(questionEntity, topicEntity, partEntity, isAdmin);
-
-                        if(isAdmin) questionResponse.setAnswerCorrectId(AnswerHelper.getIdCorrectAnswer(questionEntity.getAnswers()));
-
-                    }
                     else{
 
-                        QuestionMatchingResponse questionMatchingResponse = toQuestionMatchingResponse(questionEntity, topicEntity, partEntity);
+                        QuestionMatchingResponse questionMatchingResponse = null;
 
                         if(questionEntity.getQuestionGroupChildren() != null){
 
-                            questionMatchingResponse.setContentLeft(toQuestionMatchingResponseList(questionEntity.getQuestionGroupChildren(), topicEntity, partEntity));
+                            List<QuestionResponse> contentLeft = toQuestionResponseList(questionEntity.getQuestionGroupChildren(), topicEntity, partEntity, isAdmin);
 
-                            List<QuestionMatchingResponse> contentRight = questionEntity.getQuestionGroupChildren().stream().map(
+                            List<QuestionResponse> contentRight = questionEntity.getQuestionGroupChildren().stream().map(
                                     questionContentRight -> {
 
                                         String questionContent = questionContentRight.getQuestionContent();
@@ -108,14 +104,18 @@ public interface QuestionMapper {
                                         questionContentRight.setQuestionResult(questionContent);
                                         questionContentRight.setQuestionContent(questionResult);
 
-                                        return toQuestionMatchingResponse(questionContentRight, topicEntity, partEntity);
+                                        return toQuestionResponse(questionContentRight, topicEntity, partEntity, isAdmin);
                                     }
                             ).toList();
 
-                            questionMatchingResponse.setContentRight(contentRight);
+                            questionMatchingResponse = QuestionMatchingResponse.builder()
+                                    .contentLeft(contentLeft)
+                                    .contentRight(contentRight)
+                                    .build();
                         }
 
-                        questionResponse = questionMatchingResponse;
+                        if(questionMatchingResponse != null)
+                            questionResponse.setQuestionsChildren(List.of(questionMatchingResponse));
                     }
 
                     questionResponse.setNumberOfQuestionsChild(questionEntity.getQuestionGroupChildren() != null ? questionEntity.getQuestionGroupChildren().size() : 0);
@@ -131,7 +131,6 @@ public interface QuestionMapper {
     @Mapping(target = "questionParents", expression = "java(toQuestionResponseList(questionParents, topicEntity, partEntity, isAdmin))")
     QuestionPartResponse toQuestionPartResponse(List<QuestionEntity> questionParents, PartEntity partEntity, TopicEntity topicEntity, Boolean isAdmin);
 
-
     default List<QuestionPartResponse> toQuestionPartResponseList(List<QuestionEntity> questionEntityList, List<PartEntity> partEntityList, TopicEntity topicEntity, Boolean isAdmin) {
 
         if(questionEntityList == null) return null;
@@ -141,6 +140,7 @@ public interface QuestionMapper {
 
                     List<QuestionEntity> questionEntityListFilter = questionEntityList.stream().filter(
                             questionEntity -> questionEntity.getPart().equals(partEntity)
+                                                            && questionEntity.getTopics().contains(topicEntity)
                     ).toList();
 
                     QuestionPartResponse questionPartResponse = toQuestionPartResponse(questionEntityListFilter, partEntity, topicEntity, isAdmin);

@@ -15,6 +15,8 @@ public interface ISessionActiveService {
 
     SessionActiveEntity getByCodeAndType(UUID code, SessionActiveTypeEnum type);
 
+    SessionActiveEntity getByToken(String token);
+
     void deleteSessionCode(UUID sessionCode);
 
     SessionActiveEntity saveSessionActive(UserEntity user, String jwtToken);
@@ -22,6 +24,8 @@ public interface ISessionActiveService {
     void verifyExpiration(SessionActiveEntity token);
 
     void deleteAllTokenExpired(UserEntity user);
+
+    void deleteBySessionEntity(SessionActiveEntity sessionActiveEntity);
 
     List<SessionActiveEntity> getSessionActiveList(UUID userId, SessionActiveTypeEnum sessionActiveType);
 
