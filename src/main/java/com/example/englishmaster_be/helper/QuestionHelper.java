@@ -10,9 +10,9 @@ import java.util.List;
 
 public class QuestionHelper {
 
-    public static void  shuffleQuestionsAndAnswers(List<QuestionEntity> questionParentsList, PartEntity partEntity) {
+    public static List<QuestionEntity> shuffleQuestionsAndAnswers(List<QuestionEntity> questionParentsList, PartEntity partEntity) {
 
-        if(questionParentsList == null || partEntity == null) return;
+        if(questionParentsList == null || partEntity == null) return null;
 
         questionParentsList = new ArrayList<>(questionParentsList);
 
@@ -33,7 +33,8 @@ public class QuestionHelper {
                             if (questionGroupChildEntity.getQuestionGroupChildren() != null)
                                 questionGroupChildEntity.setQuestionGroupChildren(null);
 
-                            if(!partEntity.getPartType().equalsIgnoreCase("Words Fill Completion")){
+                            if(!partEntity.getPartType().equalsIgnoreCase("Words Fill Completion")
+                                && !partEntity.getPartType().equalsIgnoreCase("Words Matching")){
 
                                 if(questionGroupChildEntity.getAnswers() != null){
 
@@ -53,6 +54,7 @@ public class QuestionHelper {
 
         });
 
+        return questionParentsList;
     }
 
     public static int calculateTotalQuestionOf(List<QuestionEntity> questionParents) {

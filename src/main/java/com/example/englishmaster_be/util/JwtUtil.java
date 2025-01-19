@@ -1,5 +1,9 @@
 package com.example.englishmaster_be.util;
 
+import com.example.englishmaster_be.common.constant.InvalidTokenTypeEnum;
+import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
+import com.example.englishmaster_be.shared.invalid_token.service.InvalidTokenService;
+import com.example.englishmaster_be.shared.session_active.service.SessionActiveService;
 import com.example.englishmaster_be.value.JwtValue;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -35,12 +39,28 @@ public class JwtUtil {
 
     JwtValue jwtValue;
 
+    SessionActiveService sessionActiveService;
+
+    InvalidTokenService invalidTokenService;
 
     Boolean isTokenExpired(String token) {
 
         Date now = new Date(System.currentTimeMillis());
 
-        return !now.before(extractExpiration(token));
+        Boolean isExpired = !now.before(extractExpiration(token));
+
+        if(isExpired) {
+
+            SessionActiveEntity sessionActive = sessionActiveService.getByToken(token);
+
+            if(sessionActive != null) {
+
+                invalidTokenService.insertInvalidToken(sessionActive, InvalidTokenTypeEnum.EXPIRED);
+                sessionActiveService.deleteBySessionEntity(sessionActive);
+            }
+        }
+
+        return isExpired;
     }
 
     Date extractExpiration(String token) {
