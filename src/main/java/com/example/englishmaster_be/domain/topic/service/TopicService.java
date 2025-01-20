@@ -239,7 +239,7 @@ public class TopicService implements ITopicService {
                 topicEntity.getParts().add(partEntity);
         }
 
-        return TopicMapper.INSTANCE.toExcelTopicResponse(topicEntity);
+        return ExcelContentMapper.INSTANCE.toExcelTopicResponse(topicEntity);
 
     }
 
@@ -545,7 +545,7 @@ public class TopicService implements ITopicService {
                 .part(part)
                 .build();
 
-        ExcelContentMapper.INSTANCE.flowToQuestionEntity(questionByExcelFileResponse, question);
+        QuestionMapper.INSTANCE.flowToQuestionEntity(questionByExcelFileResponse, question);
 
         return questionRepository.save(question);
     }
@@ -667,7 +667,11 @@ public class TopicService implements ITopicService {
     @Override
     public ExcelQuestionListResponse addQuestionForTopicAndPartByExcelFile(UUID topicId, int partNumber, MultipartFile file) {
 
-        return excelService.importQuestionForTopicAndPart(topicId, partNumber, file);
+        List<ExcelQuestionResponse> excelQuestionResponses = excelService.importQuestionForTopicAndPart(topicId, partNumber, file);
+
+        return ExcelQuestionListResponse.builder()
+                .questions(excelQuestionResponses)
+                .build();
     }
 
     @Transactional

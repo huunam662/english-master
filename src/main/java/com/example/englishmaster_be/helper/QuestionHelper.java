@@ -18,13 +18,21 @@ public class QuestionHelper {
 
         Collections.shuffle(questionParentsList);
 
+        List<String> partTypesNotShuffle = List.of("Picture Description", "Question - Response", "Words Fill Completion", "Words Matching");
+
+        boolean notShuffleAnswer = partTypesNotShuffle.stream().anyMatch(
+                partType -> partType.equalsIgnoreCase(partEntity.getPartType())
+        );
+
+        boolean partTypeIsTextCompletion = partEntity.getPartType().equalsIgnoreCase("Text Completion");
+
         questionParentsList.forEach(questionEntity -> {
 
             if(questionEntity.getQuestionGroupChildren() != null) {
 
                 List<QuestionEntity> questionsList4Shuffle = new ArrayList<>(questionEntity.getQuestionGroupChildren());
 
-                if(!partEntity.getPartType().equalsIgnoreCase("Text Completion"))
+                if(!partTypeIsTextCompletion)
                     Collections.shuffle(questionsList4Shuffle);
 
                 questionsList4Shuffle.forEach(
@@ -33,8 +41,7 @@ public class QuestionHelper {
                             if (questionGroupChildEntity.getQuestionGroupChildren() != null)
                                 questionGroupChildEntity.setQuestionGroupChildren(null);
 
-                            if(!partEntity.getPartType().equalsIgnoreCase("Words Fill Completion")
-                                && !partEntity.getPartType().equalsIgnoreCase("Words Matching")){
+                            if(!notShuffleAnswer){
 
                                 if(questionGroupChildEntity.getAnswers() != null){
 

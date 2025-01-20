@@ -55,6 +55,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Slf4j
@@ -217,7 +218,7 @@ public class ExcelFillService implements IExcelFillService {
 
             topicEntity = topicRepository.save(topicEntity);
 
-            return TopicMapper.INSTANCE.toExcelTopicResponse(topicEntity);
+            return ExcelContentMapper.INSTANCE.toExcelTopicResponse(topicEntity);
 
         }
 //        catch (Exception e) {
@@ -290,7 +291,7 @@ public class ExcelFillService implements IExcelFillService {
             topicEntity = topicRepository.save(topicEntity);
         }
 
-        return TopicMapper.INSTANCE.toExcelTopicResponse(topicEntity);
+        return ExcelContentMapper.INSTANCE.toExcelTopicResponse(topicEntity);
     }
 
     @Transactional
@@ -1459,7 +1460,8 @@ public class ExcelFillService implements IExcelFillService {
 
     @Transactional
     @Override
-    public ExcelQuestionListResponse importQuestionForTopicAndPart(UUID topicId, int partNumber, MultipartFile file) {
+    @SneakyThrows
+    public List<ExcelQuestionResponse> importQuestionForTopicAndPart(UUID topicId, int partNumber, MultipartFile file) {
 
         ExcelHelper.checkPartInScope(partNumber);
 
@@ -1469,50 +1471,46 @@ public class ExcelFillService implements IExcelFillService {
 
             ExcelQuestionListResponse excelQuestionListResponse = importQuestionListeningPart12Excel(topicId, file, partNumber);
 
-            excelQuestionResponseList.addAll(excelQuestionListResponse.getQuestions());
+            excelQuestionResponseList = excelQuestionListResponse.getQuestions();
         }
         else if(List.of(3, 4).contains(partNumber)){
 
             ExcelQuestionListResponse excelQuestionListResponse = importQuestionListeningPart34Excel(topicId, file, partNumber);
 
-            excelQuestionResponseList.addAll(excelQuestionListResponse.getQuestions());
+            excelQuestionResponseList = excelQuestionListResponse.getQuestions();
         }
         else if(partNumber == 5){
 
             ExcelQuestionListResponse excelQuestionP5ListResponse = importQuestionReadingPart5Excel(topicId, file);
 
-            excelQuestionResponseList.addAll(excelQuestionP5ListResponse.getQuestions());
+            excelQuestionResponseList = excelQuestionP5ListResponse.getQuestions();
         }
         else if(List.of(6, 7).contains(partNumber)){
 
             ExcelQuestionListResponse excelQuestionListResponse = importQuestionReadingPart67Excel(topicId, file, partNumber);
 
-            excelQuestionResponseList.addAll(excelQuestionListResponse.getQuestions());
+            excelQuestionResponseList = excelQuestionListResponse.getQuestions();
         }
         else if(partNumber == 8){
 
             ExcelQuestionListResponse excelQuestionListResponse = importQuestionFillInBlankPart8Excel(topicId, file);
 
-            excelQuestionResponseList.addAll(excelQuestionListResponse.getQuestions());
+            excelQuestionResponseList = excelQuestionListResponse.getQuestions();
         }
         else if(partNumber == 9){
 
             ExcelQuestionListResponse excelQuestionListResponse = importQuestionMatchingWordsPart9Excel(topicId, file);
 
-            excelQuestionResponseList.addAll(excelQuestionListResponse.getQuestions());
+            excelQuestionResponseList = excelQuestionListResponse.getQuestions();
         }
 
-        return ExcelQuestionListResponse.builder()
-                .questions(excelQuestionResponseList)
-                .build();
+        return excelQuestionResponseList;
     }
 
     @Transactional
     @Override
     @SneakyThrows
     public ExcelQuestionListResponse importQuestionAllPartsExcel(UUID topicId, MultipartFile file) {
-
-        List<ExcelQuestionResponse> excelQuestionResponseList = new ArrayList<>();
 
         ExcelTopicContentResponse excelTopicContentResponse;
 
@@ -1523,17 +1521,13 @@ public class ExcelFillService implements IExcelFillService {
             excelTopicContentResponse = ExcelHelper.collectTopicContentWith(sheet);
         }
 
-        excelTopicContentResponse.getPartNamesList().stream()
-        .map(
+        List<ExcelQuestionResponse> excelQuestionResponseList = excelTopicContentResponse.getPartNamesList().stream()
+                .map(
                 partName -> Integer.valueOf(partName.split(" ")[1])
-        ).forEach(
-            partNumber -> {
-
-                ExcelQuestionListResponse excelQuestionListResponse = this.importQuestionForTopicAndPart(topicId, partNumber, file);
-
-                excelQuestionResponseList.addAll(excelQuestionListResponse.getQuestions());
-            }
-        );
+                )
+                .flatMap(
+                        partNumber -> importQuestionForTopicAndPart(topicId, partNumber, file).stream()
+                ).toList();
 
         return ExcelQuestionListResponse.builder()
                 .questions(excelQuestionResponseList)

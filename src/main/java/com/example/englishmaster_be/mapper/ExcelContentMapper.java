@@ -1,7 +1,10 @@
 package com.example.englishmaster_be.mapper;
 
+import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionListResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
+import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
 import com.example.englishmaster_be.model.question.QuestionEntity;
+import com.example.englishmaster_be.model.topic.TopicEntity;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -41,7 +44,17 @@ public interface ExcelContentMapper {
 
     List<ExcelQuestionResponse> toExcelQuestionResponseList(List<QuestionEntity> questionEntityList);
 
-    @Mapping(target = "questionId", ignore = true)
-    void flowToQuestionEntity(ExcelQuestionResponse questionByExcelFileResponse, @MappingTarget QuestionEntity questionEntity);
+    default ExcelQuestionListResponse toExcelQuestionListResponse(List<ExcelQuestionResponse> excelQuestionResponseList){
+
+        if(excelQuestionResponseList == null) return null;
+
+        return ExcelQuestionListResponse.builder()
+                .questions(excelQuestionResponseList)
+                .build();
+    }
+
+    @Mapping(target = "pack", expression = "java(PackMapper.INSTANCE.toPackResponse(topicEntity.getPack()))")
+    @Mapping(target = "parts", expression = "java(PartMapper.INSTANCE.toPartResponseList(topicEntity.getParts()))")
+    ExcelTopicResponse toExcelTopicResponse(TopicEntity topicEntity);
 
 }
