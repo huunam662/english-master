@@ -79,15 +79,25 @@ public interface QuestionMapper {
 
         questionEntityList = QuestionHelper.shuffleQuestionsAndAnswers(questionEntityList, partEntity);
 
+        List<String> partTypesWithoutAnswerCorrectId = List.of("Words Fill Completion", "Words Matching");
+
+        boolean withAnswerCorrectId = isAdmin && partTypesWithoutAnswerCorrectId.stream().anyMatch(
+                partType -> partType.equalsIgnoreCase(partEntity.getPartType())
+        );
+
+        boolean partTypeIsWordsMatching = partEntity.getPartType().equalsIgnoreCase("Words Matching");
+
         return questionEntityList.stream().map(
                 questionEntity -> {
 
                     QuestionResponse questionResponse = toQuestionResponse(questionEntity, topicEntity, partEntity, isAdmin);
 
-                    if(isAdmin && !partEntity.getPartType().equalsIgnoreCase("Words Matching"))
+                    if(questionResponse == null) return null;
+
+                    if(withAnswerCorrectId)
                         questionResponse.setAnswerCorrectId(AnswerHelper.getIdCorrectAnswer(questionEntity.getAnswers()));
 
-                    else{
+                    if(partTypeIsWordsMatching){
 
                         QuestionMatchingResponse questionMatchingResponse = null;
 
@@ -165,7 +175,11 @@ public interface QuestionMapper {
                         : 0
         );
     }
+
     @Mapping(target = "questionId", ignore = true)
     void flowToQuestionEntity(QuestionRequest questionRequest, @MappingTarget QuestionEntity questionEntity);
+
+    @Mapping(target = "questionId", ignore = true)
+    void flowToQuestionEntity(ExcelQuestionResponse questionByExcelFileResponse, @MappingTarget QuestionEntity questionEntity);
 
 }

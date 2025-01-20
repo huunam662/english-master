@@ -4,10 +4,9 @@ import com.example.englishmaster_be.common.constant.InvalidTokenTypeEnum;
 import com.example.englishmaster_be.common.constant.OtpStatusEnum;
 import com.example.englishmaster_be.common.constant.SessionActiveTypeEnum;
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;
-import com.example.englishmaster_be.domain.auth.service.IAuthService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.exception.template.BadRequestException;
-import com.example.englishmaster_be.mapper.AuthMapper;
+import com.example.englishmaster_be.mapper.UserMapper;
 import com.example.englishmaster_be.model.otp.OtpEntity;
 import com.example.englishmaster_be.model.otp.OtpRepository;
 import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
@@ -18,7 +17,6 @@ import com.example.englishmaster_be.shared.invalid_token.service.IInvalidTokenSe
 import com.example.englishmaster_be.shared.otp.service.IOtpService;
 import com.example.englishmaster_be.shared.session_active.service.ISessionActiveService;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +73,7 @@ public class AuthUtil {
 
         logoutUser();
 
-        return AuthMapper.INSTANCE.toUserAuthResponse(sessionActive, jwtToken);
+        return UserMapper.INSTANCE.toUserAuthResponse(sessionActive, jwtToken);
     }
 
 

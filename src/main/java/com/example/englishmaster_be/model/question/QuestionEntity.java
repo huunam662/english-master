@@ -4,14 +4,12 @@ import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.content.ContentEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
-import com.example.englishmaster_be.model.question_label.QuestionLabelEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
@@ -118,9 +116,6 @@ public class QuestionEntity {
             inverseJoinColumns = @JoinColumn(name = "content_id")
     )
     List<ContentEntity> contentCollection;
-
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-    List<QuestionLabelEntity> labels;
 
     @Column(name = "has_hints")
     Boolean hasHints;

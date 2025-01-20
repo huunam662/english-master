@@ -1,19 +1,14 @@
 package com.example.englishmaster_be.domain.question.service;
 
 import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
-import com.example.englishmaster_be.common.constant.RoleEnum;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
-import com.example.englishmaster_be.domain.answer_matching.dto.response.AnswerMatchingBasicResponse;
-import com.example.englishmaster_be.domain.answer_matching.service.IAnswerMatchingService;
 import com.example.englishmaster_be.domain.content.service.IContentService;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
-import com.example.englishmaster_be.domain.part.dto.response.PartQuestionResponse;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.question.dto.response.*;
-import com.example.englishmaster_be.domain.question_label.service.IQuestionLabelService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
@@ -22,14 +17,10 @@ import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupReq
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.content.ContentEntity;
-import com.example.englishmaster_be.model.matching_pair.MatchingPairEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.part.PartQueryFactory;
-import com.example.englishmaster_be.model.part.QPartEntity;
-import com.example.englishmaster_be.model.question.QQuestionEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.question.QuestionQueryFactory;
-import com.example.englishmaster_be.model.question_label.QuestionLabelEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.exception.template.BadRequestException;
@@ -39,8 +30,6 @@ import com.example.englishmaster_be.model.content.ContentRepository;
 import com.example.englishmaster_be.model.part.PartRepository;
 import com.example.englishmaster_be.model.question.QuestionRepository;
 import com.example.englishmaster_be.util.FileUtil;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.mail.Part;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -56,8 +45,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
-
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
@@ -88,11 +75,7 @@ public class QuestionService implements IQuestionService {
 
     IAnswerService answerService;
 
-    IAnswerMatchingService answerMatchingService;
-
     IUploadService uploadService;
-
-    IQuestionLabelService labelService;
 
 
     @Transactional

@@ -29,11 +29,6 @@ public interface TopicMapper {
     TopicResponse toTopicResponse(TopicEntity topicEntity);
 
     List<TopicResponse> toTopicResponseList(List<TopicEntity> topicEntityList);
-
-    @Mapping(target = "pack", expression = "java(PackMapper.INSTANCE.toPackResponse(topicEntity.getPack()))")
-    @Mapping(target = "parts", expression = "java(PartMapper.INSTANCE.toPartResponseList(topicEntity.getParts()))")
-    ExcelTopicResponse toExcelTopicResponse(TopicEntity topicEntity);
-
     TopicBasicResponse toTopicBasicResponse(TopicEntity topicEntity);
 
     @Mapping(target = "topicId", ignore = true)
