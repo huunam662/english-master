@@ -5,7 +5,9 @@ import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupReq
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionDto;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
+import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
+import com.example.englishmaster_be.model.topic.TopicEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -29,6 +31,8 @@ public interface IQuestionService {
     int countQuestionToQuestionGroup(QuestionEntity question);
 
     boolean checkQuestionGroup(UUID questionId);
+
+    List<QuestionEntity> getQuestionsParentBy(List<PartEntity> partEntityList, TopicEntity topicEntity);
 
     List<QuestionEntity> listQuestionGroup(QuestionEntity question);
 

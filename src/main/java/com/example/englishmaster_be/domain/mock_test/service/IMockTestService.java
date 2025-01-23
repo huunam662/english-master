@@ -5,7 +5,7 @@ import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestFilterR
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestRequest;
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestPartResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionMockTestResponse;
-import com.example.englishmaster_be.model.detail_mock_test.DetailMockTestEntity;
+import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailEntity;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
@@ -26,7 +26,7 @@ public interface IMockTestService {
 
     MockTestEntity findMockTestById(UUID mockTestId);
 
-    List<DetailMockTestEntity> getTop10DetailToCorrect(int index, boolean isCorrect , MockTestEntity mockTest);
+    List<MockTestDetailEntity> getTop10DetailToCorrect(int index, boolean isCorrect , MockTestEntity mockTest);
 
     int countCorrectAnswer(UUID mockTestId);
 
@@ -38,9 +38,9 @@ public interface IMockTestService {
 
     List<MockTestEntity> getListMockTestToUser(int index, UUID userId);
 
-    List<DetailMockTestEntity> addAnswerToMockTest(UUID mockTestId, List<UUID> listAnswerId);
+    List<MockTestDetailEntity> addAnswerToMockTest(UUID mockTestId, List<UUID> listAnswerId);
 
-    List<DetailMockTestEntity> getListCorrectAnswer(int index, boolean isCorrect, UUID mockTestId);
+    List<MockTestDetailEntity> getListCorrectAnswer(int index, boolean isCorrect, UUID mockTestId);
 
     void sendEmailToMock(@PathVariable UUID mockTestId);
 

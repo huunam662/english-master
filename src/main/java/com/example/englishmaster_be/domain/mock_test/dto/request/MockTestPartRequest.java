@@ -1,8 +1,9 @@
-package com.example.englishmaster_be.domain.result_mock_test.dto.request;
+package com.example.englishmaster_be.domain.mock_test.dto.request;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -11,16 +12,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ResultMockTestRequest {
-
-    UUID resultMockTestId;
+public class MockTestPartRequest {
 
     UUID partId;
 
-    UUID mockTestId;
+    String partType;
 
-    Integer correctAnswer;
-
-    Integer score;
+    List<MockTestQuestionParentRequest> questionParentAnswers;
 
 }

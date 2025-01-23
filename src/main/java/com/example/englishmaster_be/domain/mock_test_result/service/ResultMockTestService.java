@@ -1,15 +1,15 @@
-package com.example.englishmaster_be.domain.result_mock_test.service;
+package com.example.englishmaster_be.domain.mock_test_result.service;
 
-import com.example.englishmaster_be.mapper.ResultMockTestMapper;
-import com.example.englishmaster_be.domain.result_mock_test.dto.request.ResultMockTestRequest;
-import com.example.englishmaster_be.model.result_mock_test.QResultMockTestEntity;
-import com.example.englishmaster_be.model.result_mock_test.ResultMockTestRepository;
+import com.example.englishmaster_be.mapper.MockTestResultMapper;
+import com.example.englishmaster_be.domain.mock_test_result.dto.request.ResultMockTestRequest;
+import com.example.englishmaster_be.model.mock_test_result.MockTestResultRepository;
 import com.example.englishmaster_be.domain.mock_test.service.IMockTestService;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;
+import com.example.englishmaster_be.model.mock_test_result.QMockTestResultEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
-import com.example.englishmaster_be.model.result_mock_test.ResultMockTestEntity;
+import com.example.englishmaster_be.model.mock_test_result.MockTestResultEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
@@ -31,7 +31,7 @@ import java.util.stream.StreamSupport;
 public class ResultMockTestService implements IResultMockTestService {
 
 
-    ResultMockTestRepository resultMockTestRepository;
+    MockTestResultRepository resultMockTestRepository;
 
     IUserService userService;
 
@@ -42,7 +42,7 @@ public class ResultMockTestService implements IResultMockTestService {
 
     @Transactional
     @Override
-    public ResultMockTestEntity saveResultMockTest(ResultMockTestRequest resultMockTest) {
+    public MockTestResultEntity saveResultMockTest(ResultMockTestRequest resultMockTest) {
 
         UserEntity user = userService.currentUser();
 
@@ -50,12 +50,12 @@ public class ResultMockTestService implements IResultMockTestService {
 
         MockTestEntity mockTest = mockTestService.findMockTestToId(resultMockTest.getMockTestId());
 
-        ResultMockTestEntity resultMockTestEntity;
+        MockTestResultEntity resultMockTestEntity;
 
         if(resultMockTest.getResultMockTestId() != null)
             resultMockTestEntity = getResultMockTestById(resultMockTest.getResultMockTestId());
 
-        else resultMockTestEntity = ResultMockTestEntity.builder()
+        else resultMockTestEntity = MockTestResultEntity.builder()
                 .createAt(LocalDateTime.now())
                 .userCreate(user)
                 .build();
@@ -65,37 +65,37 @@ public class ResultMockTestService implements IResultMockTestService {
         resultMockTestEntity.setPart(part);
         resultMockTestEntity.setMockTest(mockTest);
 
-        ResultMockTestMapper.INSTANCE.flowToResultMockTest(resultMockTest, resultMockTestEntity);
+        MockTestResultMapper.INSTANCE.flowToResultMockTest(resultMockTest, resultMockTestEntity);
 
         return resultMockTestRepository.save(resultMockTestEntity);
     }
 
     @Override
-    public List<ResultMockTestEntity> getAllResultMockTests() {
+    public List<MockTestResultEntity> getAllResultMockTests() {
 
         return resultMockTestRepository.findAll();
     }
 
     @Override
-    public List<ResultMockTestEntity> getResultMockTestsByPartIdAndMockTestId(UUID partId, UUID mockTestId) {
+    public List<MockTestResultEntity> getResultMockTestsByPartIdAndMockTestId(UUID partId, UUID mockTestId) {
 
-        BooleanBuilder builder = new BooleanBuilder().and(QResultMockTestEntity.resultMockTestEntity.part.isNotNull());
+        BooleanBuilder builder = new BooleanBuilder().and(QMockTestResultEntity.mockTestResultEntity.part.isNotNull());
 
         if (partId != null)
-            builder.and(QResultMockTestEntity.resultMockTestEntity.part.partId.eq(partId));
+            builder.and(QMockTestResultEntity.mockTestResultEntity.part.partId.eq(partId));
 
         if (mockTestId != null)
-            builder.and(QResultMockTestEntity.resultMockTestEntity.mockTest.mockTestId.eq(mockTestId));
+            builder.and(QMockTestResultEntity.mockTestResultEntity.mockTest.mockTestId.eq(mockTestId));
 
         Predicate predicate = builder.getValue();
 
-        Iterable<ResultMockTestEntity> resultMockTestIterable = resultMockTestRepository.findAll(predicate);
+        Iterable<MockTestResultEntity> resultMockTestIterable = resultMockTestRepository.findAll(predicate);
 
         return StreamSupport.stream(resultMockTestIterable.spliterator(), false).toList();
     }
 
     @Override
-    public ResultMockTestEntity getResultMockTestById(UUID id) {
+    public MockTestResultEntity getResultMockTestById(UUID id) {
         return resultMockTestRepository.findById(id).orElseThrow(
                 () -> new RuntimeException("Result mock test not found")
         );
@@ -104,7 +104,7 @@ public class ResultMockTestService implements IResultMockTestService {
     @Override
     public void deleteResultMockTestById(UUID id) {
 
-        ResultMockTestEntity resultMockTest = getResultMockTestById(id);
+        MockTestResultEntity resultMockTest = getResultMockTestById(id);
 
         resultMockTestRepository.delete(resultMockTest);
     }

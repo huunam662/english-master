@@ -1,7 +1,9 @@
-package com.example.englishmaster_be.model.detail_mock_test;
+package com.example.englishmaster_be.model.mock_test_result;
 
-import com.example.englishmaster_be.model.answer.AnswerEntity;
+
+import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailEntity;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;
+import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -9,13 +11,13 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 
 @Entity
-@Table(name = "detail_mocktest")
+@Table(name = "mock_test_result")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,30 +25,22 @@ import java.util.UUID;
 @Builder
 @Schema(hidden = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class DetailMockTestEntity {
+public class MockTestResultEntity {
 
     @Id
-	@GeneratedValue(strategy = GenerationType.UUID)
-	@Column(name = "id")
-    UUID detailMockTestId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
+    UUID mockTestResultId;
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
     @Column(name = "create_at")
     LocalDateTime createAt;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@UpdateTimestamp
-	@Column(name = "update_at")
-	LocalDateTime updateAt;
-
-    @ManyToOne
-    @JoinColumn(name = "mock_test_id", referencedColumnName = "id")
-    MockTestEntity mockTest;
-
-    @ManyToOne
-    @JoinColumn(name = "answer_choose", referencedColumnName = "id")
-    AnswerEntity answer;
+    @Temporal(TemporalType.TIMESTAMP)
+    @UpdateTimestamp
+    @Column(name = "update_at")
+    LocalDateTime updateAt;
 
     @ManyToOne
     @JoinColumn(name = "create_by", referencedColumnName = "id")
@@ -56,7 +50,16 @@ public class DetailMockTestEntity {
     @JoinColumn(name = "update_by", referencedColumnName = "id")
     UserEntity userUpdate;
 
+    @ManyToOne
+    @JoinColumn(name = "part_id", referencedColumnName = "id")
+    PartEntity part;
 
+    @ManyToOne
+    @JoinColumn(name = "mock_test_id", referencedColumnName = "id")
+    MockTestEntity mockTest;
+
+    @OneToMany(mappedBy = "resultMockTest")
+    List<MockTestDetailEntity> mockTestDetails;
 
     @PrePersist
     void onCreate() {

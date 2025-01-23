@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.model.mock_test;
 
-import com.example.englishmaster_be.model.detail_mock_test.DetailMockTestEntity;
-import com.example.englishmaster_be.model.result_mock_test.ResultMockTestEntity;
+import com.example.englishmaster_be.model.mock_test_result.MockTestResultEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import jakarta.persistence.*;
@@ -9,8 +8,9 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import java.sql.Time;
+
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,12 +30,35 @@ public class MockTestEntity {
     @Column(name = "id")
     UUID mockTestId;
 
-    Integer score;
+    @Column(name = "total_score_parts")
+    Integer totalScoreParts;
 
-    @JoinColumn(name = "correct_answers")
-    Integer correctAnswers;
+    @Column(name = "total_score_finish")
+    Integer totalScoreFinish;
 
-    Time time;
+    @Column(name = "total_questions_work")
+    Integer totalQuestionsWork;
+
+    @Column(name = "total_questions_choose")
+    Integer totalQuestionsChoose;
+
+    @Column(name = "total_questions_skip")
+    Integer totalQuestionsSkip;
+
+    @Column(name = "total_answers_correct")
+    Integer totalAnswersCorrect;
+
+    @Column(name = "total_answers_wrong")
+    Integer totalAnswersWrong;
+
+    @Column(name = "answers_correct_percent")
+    Float answersCorrectPercent;
+
+    @Column(name = "work_time")
+    LocalTime workTime;
+
+    @Column(name = "finish_time")
+    LocalTime finishTime;
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
@@ -55,19 +78,8 @@ public class MockTestEntity {
     @JoinColumn(name = "topic_id", referencedColumnName = "id")
     TopicEntity topic;
 
-    @ManyToOne
-    @JoinColumn(name = "create_by", referencedColumnName = "id")
-    UserEntity userCreate;
-
-    @ManyToOne
-    @JoinColumn(name = "update_by", referencedColumnName = "id")
-    UserEntity userUpdate;
-
     @OneToMany(mappedBy = "mockTest",cascade = CascadeType.ALL,orphanRemoval = true)
-    List<DetailMockTestEntity> detailMockTests;
-
-    @OneToMany(mappedBy = "mockTest",cascade = CascadeType.ALL,orphanRemoval = true)
-    List<ResultMockTestEntity> resultMockTests;
+    List<MockTestResultEntity> mockTestResults;
 
     @PrePersist
     void onCreate() {

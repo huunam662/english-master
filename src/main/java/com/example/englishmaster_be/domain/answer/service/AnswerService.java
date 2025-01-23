@@ -2,12 +2,10 @@ package com.example.englishmaster_be.domain.answer.service;
 
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerRequest;
 import com.example.englishmaster_be.exception.template.CustomException;
-import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.AnswerMapper;
 import com.example.englishmaster_be.model.answer.AnswerRepository;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
-import com.example.englishmaster_be.model.detail_mock_test.DetailMockTestEntity;
-import com.example.englishmaster_be.model.detail_mock_test.DetailMockTestRepository;
+import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailRepository;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
@@ -23,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 @Service
@@ -33,7 +30,7 @@ public class AnswerService implements IAnswerService {
 
     AnswerRepository answerRepository;
 
-    DetailMockTestRepository detailMockTestRepository;
+    MockTestDetailRepository detailMockTestRepository;
 
     IUserService userService;
 
@@ -114,11 +111,11 @@ public class AnswerService implements IAnswerService {
 
     @Override
     public AnswerEntity choiceAnswer(QuestionEntity question, MockTestEntity mockTest) {
-        for (DetailMockTestEntity detailMockTest : detailMockTestRepository.findAllByMockTest(mockTest)) {
-            if (detailMockTest.getAnswer().getQuestion().equals(question)) {
-                return detailMockTest.getAnswer();
-            }
-        }
+//        for (MockTestDetailEntity detailMockTest : detailMockTestRepository.findAllByMockTest(mockTest)) {
+//            if (detailMockTest.getAnswer().getQuestion().equals(question)) {
+//                return detailMockTest.getAnswer();
+//            }
+//        }
         return null;
     }
 

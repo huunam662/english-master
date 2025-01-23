@@ -5,14 +5,14 @@ import com.example.englishmaster_be.common.dto.response.FilterResponse;
 
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestDetailResponse;
 import com.example.englishmaster_be.domain.mock_test.service.IMockTestService;
-import com.example.englishmaster_be.mapper.DetailMockTestMapper;
+import com.example.englishmaster_be.mapper.MockTestDetailMapper;
 import com.example.englishmaster_be.mapper.MockTestMapper;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestFilterRequest;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestRequest;
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestPartResponse;
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionMockTestResponse;
-import com.example.englishmaster_be.model.detail_mock_test.DetailMockTestEntity;
+import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailEntity;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
@@ -104,9 +104,9 @@ public class MockTestController {
     @DefaultMessage("Create detail mock test successfully")
     public List<MockTestDetailResponse> addAnswerToMockTest(@PathVariable UUID mockTestId, @RequestBody List<UUID> listAnswerId) {
 
-        List<DetailMockTestEntity> detailMockTestEntityList = mockTestService.addAnswerToMockTest(mockTestId, listAnswerId);
+        List<MockTestDetailEntity> detailMockTestEntityList = mockTestService.addAnswerToMockTest(mockTestId, listAnswerId);
 
-        return DetailMockTestMapper.INSTANCE.toDetailMockTestResponseList(detailMockTestEntityList);
+        return MockTestDetailMapper.INSTANCE.toMockTestDetailResponseList(detailMockTestEntityList);
     }
 
 
@@ -114,9 +114,9 @@ public class MockTestController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public List<MockTestDetailResponse> listCorrectAnswer(@RequestParam int index, @RequestParam boolean isCorrect, @PathVariable UUID mockTestId) {
 
-        List<DetailMockTestEntity> detailMockTestEntityList = mockTestService.getListCorrectAnswer(index, isCorrect, mockTestId);
+        List<MockTestDetailEntity> detailMockTestEntityList = mockTestService.getListCorrectAnswer(index, isCorrect, mockTestId);
 
-        return DetailMockTestMapper.INSTANCE.toDetailMockTestResponseList(detailMockTestEntityList);
+        return MockTestDetailMapper.INSTANCE.toMockTestDetailResponseList(detailMockTestEntityList);
     }
 
     @GetMapping(value = "/{mockTestId:.+}/sendEmail")

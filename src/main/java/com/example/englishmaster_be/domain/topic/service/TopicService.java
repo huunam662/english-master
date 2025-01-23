@@ -1032,7 +1032,7 @@ public class TopicService implements ITopicService {
 
         List<PartEntity> partEntityList = topicEntity.getParts();
 
-        List<QuestionEntity> questionEntityList = questionQueryFactory.findAllQuestionsByTopicAndParts(topicEntity, partEntityList);
+        List<QuestionEntity> questionEntityList = questionQueryFactory.findAllQuestionsParentBy(topicEntity, partEntityList);
 
         return QuestionMapper.INSTANCE.toQuestionPartResponseList(questionEntityList, partEntityList, topicEntity, isAdmin);
     }

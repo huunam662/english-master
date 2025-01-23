@@ -81,7 +81,7 @@ public interface QuestionMapper {
 
         List<String> partTypesWithoutAnswerCorrectId = List.of("Words Fill Completion", "Words Matching");
 
-        boolean withAnswerCorrectId = isAdmin && partTypesWithoutAnswerCorrectId.stream().anyMatch(
+        boolean withAnswerCorrectId = isAdmin && partTypesWithoutAnswerCorrectId.stream().noneMatch(
                 partType -> partType.equalsIgnoreCase(partEntity.getPartType())
         );
 
@@ -171,7 +171,7 @@ public interface QuestionMapper {
 
         response.getPart().setTotalQuestion(
                 questionParents != null
-                        ? QuestionHelper.calculateTotalQuestionOf(questionParents)
+                        ? QuestionHelper.totalQuestionChildOf(questionParents)
                         : 0
         );
     }
