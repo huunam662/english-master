@@ -267,6 +267,18 @@ public class QuestionService implements IQuestionService {
     }
 
     @Override
+    public List<QuestionEntity> getQuestionsParentBy(List<PartEntity> partEntityList, TopicEntity topicEntity) {
+
+        if(partEntityList == null)
+            throw new BadRequestException("Part list is null");
+
+        if(topicEntity == null)
+            throw new BadRequestException("Topic entity is null");
+
+        return questionQueryFactory.findAllQuestionsParentBy(topicEntity, partEntityList);
+    }
+
+    @Override
     public List<QuestionEntity> listQuestionGroup(QuestionEntity question) {
         return questionRepository.findAllByQuestionGroupParent(question);
     }
@@ -382,7 +394,7 @@ public class QuestionService implements IQuestionService {
 
         List<PartEntity> partEntityList = partQueryFactory.findAllPartsByNameAndTopic(partName, topicEntity);
 
-        List<QuestionEntity> questionEntityList = questionQueryFactory.findAllQuestionsByTopicAndParts(topicEntity, partEntityList);
+        List<QuestionEntity> questionEntityList = questionQueryFactory.findAllQuestionsParentBy(topicEntity, partEntityList);
 
         return QuestionMapper.INSTANCE.toQuestionPartResponseList(questionEntityList, partEntityList, topicEntity, isAdmin);
     }

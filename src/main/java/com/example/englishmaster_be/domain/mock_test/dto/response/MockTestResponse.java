@@ -1,12 +1,10 @@
 package com.example.englishmaster_be.domain.mock_test.dto.response;
 
-import com.example.englishmaster_be.domain.user.dto.response.UserBasicResponse;
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.example.englishmaster_be.domain.mock_test_result.dto.response.MockTestResultResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.sql.Time;
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 
@@ -20,24 +18,28 @@ public class MockTestResponse {
 
     UUID mockTestId;
 
-    UUID topicId;
+    Integer totalScoreParts;
 
-    Integer correctAnswers;
+    Integer totalScoreFinish;
 
-    Integer score;
+    Integer totalQuestionsWork;
 
-    Time time;
+    Integer totalQuestionsChoose;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
-    LocalDateTime createAt;
+    Integer totalQuestionsSkip;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
-    LocalDateTime updateAt;
+    Integer totalAnswersCorrect;
 
-    UserBasicResponse user;
+    Integer totalAnswersWrong;
 
-    UserBasicResponse userCreate;
+    Float answersCorrectPercent;
 
-    UserBasicResponse userUpdate;
+    LocalTime workTime;
+
+    LocalTime finishTime;
+
+    MockTestTopicResponse topic;
+
+    List<MockTestResultResponse> mockTestResults;
 
 }

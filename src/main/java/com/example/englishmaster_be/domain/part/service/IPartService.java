@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.part.service;
 
+import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestPartRequest;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.shared.upload_file.dto.request.UploadMultipleFileRequest;
@@ -21,6 +22,8 @@ public interface IPartService {
     PartEntity uploadFilePart(UUID partId, MultipartFile contentData);
 
     PartEntity uploadTextPart(UUID partId, PartSaveContentRequest uploadTextRequest);
+
+    List<PartEntity> getPartsFromMockTestPartRequestList(List<MockTestPartRequest> mockTestPartRequestList);
 
     List<PartEntity> getListPart();
 

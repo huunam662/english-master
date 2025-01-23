@@ -3,6 +3,7 @@ package com.example.englishmaster_be.model.question;
 import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.content.ContentEntity;
+import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
@@ -33,6 +34,9 @@ public class QuestionEntity {
     @Column(name = "id")
     UUID questionId;
 
+    @Column(name = "question_title")
+    String questionTitle;
+
     @Column(name = "question_content", columnDefinition = "text")
     String questionContent;
 
@@ -54,20 +58,12 @@ public class QuestionEntity {
     @Column(name = "question_explain_vn")
     String questionExplainVn;
 
-    @Column(name = "question_numberical")
-    Integer questionNumberical;
-
     @Column(name="question_type")
     @Enumerated(EnumType.STRING)
     QuestionTypeEnum questionType;
 
     @Column(name = "number_choice", columnDefinition = "int default 1")
     Integer numberChoice;
-
-    String title;
-
-    @Column(name = "count_blank")
-    Integer countBlank;
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
@@ -108,6 +104,9 @@ public class QuestionEntity {
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     List<AnswerEntity> answers;
+
+    @OneToMany(mappedBy = "questionChild", cascade = CascadeType.ALL)
+    List<MockTestDetailEntity> detailMockTests;
 
     @ManyToMany
     @JoinTable(

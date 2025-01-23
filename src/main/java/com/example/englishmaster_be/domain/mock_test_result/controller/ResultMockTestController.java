@@ -1,12 +1,12 @@
-package com.example.englishmaster_be.domain.result_mock_test.controller;
+package com.example.englishmaster_be.domain.mock_test_result.controller;
 
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
-import com.example.englishmaster_be.model.result_mock_test.ResultMockTestEntity;
-import com.example.englishmaster_be.mapper.ResultMockTestMapper;
-import com.example.englishmaster_be.domain.result_mock_test.dto.request.ResultMockTestRequest;
-import com.example.englishmaster_be.domain.result_mock_test.dto.response.ResultMockTestResponse;
-import com.example.englishmaster_be.domain.result_mock_test.service.IResultMockTestService;
+import com.example.englishmaster_be.domain.mock_test_result.dto.response.MockTestResultResponse;
+import com.example.englishmaster_be.mapper.MockTestResultMapper;
+import com.example.englishmaster_be.model.mock_test_result.MockTestResultEntity;
+import com.example.englishmaster_be.domain.mock_test_result.dto.request.ResultMockTestRequest;
+import com.example.englishmaster_be.domain.mock_test_result.service.IResultMockTestService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -29,32 +29,32 @@ public class ResultMockTestController {
 
     @PostMapping(value = "/create")
     @DefaultMessage("Create result mock test successfully")
-    public ResultMockTestResponse createResultMockTest(ResultMockTestRequest resultMockTestRequest) {
+    public MockTestResultResponse createResultMockTest(ResultMockTestRequest resultMockTestRequest) {
 
-        ResultMockTestEntity resultMockTest = resultMockTestService.saveResultMockTest(resultMockTestRequest);
+        MockTestResultEntity resultMockTest = resultMockTestService.saveResultMockTest(resultMockTestRequest);
 
-        return ResultMockTestMapper.INSTANCE.toResultMockTestResponse(resultMockTest);
+        return MockTestResultMapper.INSTANCE.toMockTestResultResponse(resultMockTest);
     }
 
     @GetMapping("/getAllResult")
     @DefaultMessage("Get all result mock test successfully")
-    public List<ResultMockTestResponse> getAllResult() {
+    public List<MockTestResultResponse> getAllResult() {
 
-        List<ResultMockTestEntity> resultMockTestEntityList = resultMockTestService.getAllResultMockTests();
+        List<MockTestResultEntity> resultMockTestEntityList = resultMockTestService.getAllResultMockTests();
 
-        return ResultMockTestMapper.INSTANCE.toResultMockTestResponseList(resultMockTestEntityList);
+        return MockTestResultMapper.INSTANCE.toMockTestResultResponseList(resultMockTestEntityList);
     }
 
     @GetMapping("/getResultMockTestByPartAndMockTest")
     @DefaultMessage("Get result mock test successfully")
-    public List<ResultMockTestResponse> getResultMockTest(
+    public List<MockTestResultResponse> getResultMockTest(
             @RequestParam(required = false) UUID partId,
             @RequestParam(required = false) UUID mockTestId
     ) {
 
-        List<ResultMockTestEntity> resultMockTestEntityList = resultMockTestService.getResultMockTestsByPartIdAndMockTestId(partId, mockTestId);
+        List<MockTestResultEntity> resultMockTestEntityList = resultMockTestService.getResultMockTestsByPartIdAndMockTestId(partId, mockTestId);
 
-        return ResultMockTestMapper.INSTANCE.toResultMockTestResponseList(resultMockTestEntityList);
+        return MockTestResultMapper.INSTANCE.toMockTestResultResponseList(resultMockTestEntityList);
     }
 
     @DeleteMapping("/delete")

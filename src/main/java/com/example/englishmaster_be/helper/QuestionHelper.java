@@ -1,12 +1,16 @@
 package com.example.englishmaster_be.helper;
 
+import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
+import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestPartRequest;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
+import com.example.englishmaster_be.model.topic.TopicEntity;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public class QuestionHelper {
 
@@ -64,21 +68,44 @@ public class QuestionHelper {
         return questionParentsList;
     }
 
-    public static int calculateTotalQuestionOf(List<QuestionEntity> questionParents) {
+    public static int totalQuestionChildOf(List<QuestionEntity> questionParents) {
 
         if(questionParents == null) return 0;
 
-        int totalQuestion = questionParents.size();
-
-        int totalQuestionChild = questionParents.stream().map(
+        return questionParents.stream()
+                .filter(Objects::nonNull)
+                .map(
                 questionEntity -> {
-                    if(questionEntity.getQuestionGroupChildren() == null) return 0;
+                    if(questionEntity.getQuestionType().equals(QuestionTypeEnum.Words_Matching))
+                        return 1;
 
                     return questionEntity.getQuestionGroupChildren().size();
                 }
         ).reduce(0, Integer::sum);
+    }
 
-        return totalQuestion + totalQuestionChild;
+    public static int totalQuestionChildOf(List<PartEntity> partEntityList, TopicEntity topicEntity){
+
+        if(partEntityList == null || topicEntity == null) return 0;
+
+        return partEntityList.stream().map(
+                    PartEntity::getQuestions
+                )
+                .filter(Objects::nonNull)
+                .map(
+                        QuestionHelper::totalQuestionChildOf
+                ).reduce(0, Integer::sum);
+    }
+
+    public static int totalScoreQuestionsParent(List<QuestionEntity> questionEntityList){
+
+        if(questionEntityList == null) return 0;
+
+        return questionEntityList.stream()
+                .filter(Objects::nonNull)
+                .filter(QuestionEntity::getIsQuestionParent)
+                .map(QuestionEntity::getQuestionScore)
+                .reduce(0, Integer::sum);
     }
 
 }

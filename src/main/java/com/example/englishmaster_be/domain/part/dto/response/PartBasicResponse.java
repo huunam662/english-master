@@ -18,7 +18,7 @@ public class PartBasicResponse {
 
     String partName;
 
-    String partType;;
+    String partType;
 
     String partDescription;
 

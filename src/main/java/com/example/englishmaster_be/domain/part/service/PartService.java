@@ -2,6 +2,7 @@ package com.example.englishmaster_be.domain.part.service;
 
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
+import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestPartRequest;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
@@ -147,6 +148,16 @@ public class PartService implements IPartService {
         partRepository.delete(partEntity);
     }
 
+    @Override
+    public List<PartEntity> getPartsFromMockTestPartRequestList(List<MockTestPartRequest> mockTestPartRequestList) {
+
+        if(mockTestPartRequestList == null)
+            throw new BadRequestException("parts of mock test is null");
+
+        return mockTestPartRequestList.stream().map(
+                partMockTest -> getPartToId(partMockTest.getPartId())
+        ).toList();
+    }
 
     @Transactional
     @Override

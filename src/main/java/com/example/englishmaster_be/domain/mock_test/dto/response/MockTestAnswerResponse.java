@@ -1,22 +1,23 @@
 package com.example.englishmaster_be.domain.mock_test.dto.response;
 
-
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.util.UUID;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MockTestPartResponse {
+public class MockTestAnswerResponse {
 
-     UUID partId;
+    UUID answerId;
 
-     String partName;
+    String answerContent;
 
-     String partType;
+    String explainDetails;
+
+    Boolean correctAnswer;
 
 }

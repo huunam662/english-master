@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.config.integration.queryDSL;
+package com.example.englishmaster_be.config.integration.query_dsl;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;

@@ -1,7 +1,5 @@
 package com.example.englishmaster_be.domain.mock_test.dto.request;
 
-
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.util.List;
@@ -9,20 +7,14 @@ import java.util.UUID;
 
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MockTestRequest {
+public class MockTestQuestionParentRequest {
 
-   UUID topicId;
+    UUID questionParentId;
 
-   @Schema(example = "01:30:00")
-   String workTimeTopic;
-
-   @Schema(example = "00:30:00")
-   String workTimeFinal;
-
-   List<MockTestPartRequest> parts;
+    List<MockTestQuestionChildrenRequest> questionChildrenAnswers;
 
 }
