@@ -13,7 +13,7 @@ public class MockTestTotalCountResponse {
 
     int totalScoreParts = 0;
 
-    int totalScoreFinish = 0;
+    int totalScoreCorrect = 0;
 
     int totalAnswersWrong = 0;
 

@@ -33,14 +33,14 @@ public class MockTestEntity {
     @Column(name = "total_score_parts")
     Integer totalScoreParts;
 
-    @Column(name = "total_score_finish")
-    Integer totalScoreFinish;
+    @Column(name = "total_score_correct")
+    Integer totalScoreCorrect;
 
-    @Column(name = "total_questions_work")
-    Integer totalQuestionsWork;
+    @Column(name = "total_questions_parts")
+    Integer totalQuestionsParts;
 
-    @Column(name = "total_questions_choose")
-    Integer totalQuestionsChoose;
+    @Column(name = "total_questions_finish")
+    Integer totalQuestionsFinish;
 
     @Column(name = "total_questions_skip")
     Integer totalQuestionsSkip;
