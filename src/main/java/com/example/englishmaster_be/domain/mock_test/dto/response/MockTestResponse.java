@@ -3,7 +3,6 @@ package com.example.englishmaster_be.domain.mock_test.dto.response;
 import com.example.englishmaster_be.domain.mock_test_result.dto.response.MockTestResultResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
 import java.time.LocalTime;
 import java.util.*;
 
@@ -20,11 +19,11 @@ public class MockTestResponse {
 
     Integer totalScoreParts;
 
-    Integer totalScoreFinish;
+    Integer totalScoreCorrect;
 
-    Integer totalQuestionsWork;
+    Integer totalQuestionsParts;
 
-    Integer totalQuestionsChoose;
+    Integer totalQuestionsFinish;
 
     Integer totalQuestionsSkip;
 

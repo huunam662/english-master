@@ -106,8 +106,8 @@ public class MockTestUtil {
                         mockTestTotalCountResponse.getTotalAnswersCorrect() + 1
                 );
 
-                mockTestTotalCountResponse.setTotalScoreFinish(
-                        mockTestTotalCountResponse.getTotalScoreFinish() + questionAnswerChoose.getQuestionScore()
+                mockTestTotalCountResponse.setTotalScoreCorrect(
+                        mockTestTotalCountResponse.getTotalScoreCorrect() + questionAnswerChoose.getQuestionScore()
                 );
 
                 mockTestDetailEntity.setAnswerCorrectContent(answerChooseEntity.getAnswerContent());
@@ -154,8 +154,8 @@ public class MockTestUtil {
                         mockTestTotalCountResponse.getTotalAnswersCorrect() + 1
                 );
 
-                mockTestTotalCountResponse.setTotalScoreFinish(
-                        mockTestTotalCountResponse.getTotalScoreFinish() + questionMatching.getQuestionScore()
+                mockTestTotalCountResponse.setTotalScoreCorrect(
+                        mockTestTotalCountResponse.getTotalScoreCorrect() + questionMatching.getQuestionScore()
                 );
 
                 mockTestDetailEntity.setScoreAchieved(questionMatching.getQuestionScore());
@@ -213,8 +213,8 @@ public class MockTestUtil {
                             mockTestTotalCountResponse.getTotalAnswersCorrect() + 1
                     );
 
-                    mockTestTotalCountResponse.setTotalScoreFinish(
-                            mockTestTotalCountResponse.getTotalScoreFinish() + scoreFillTrue
+                    mockTestTotalCountResponse.setTotalScoreCorrect(
+                            mockTestTotalCountResponse.getTotalScoreCorrect() + scoreFillTrue
                     );
 
                     mockTestDetailEntity.setAnswerChoice(answerFillEntity);

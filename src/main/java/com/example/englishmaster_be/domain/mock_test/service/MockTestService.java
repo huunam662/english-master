@@ -191,17 +191,17 @@ public class MockTestService implements IMockTestService {
         }
 
         mockTestEntity.setTotalScoreParts(mockTestTotalCountResponse.getTotalScoreParts());
-        mockTestEntity.setTotalQuestionsChoose(mockTestTotalCountResponse.getTotalQuestionsChildMockTest());
-        mockTestEntity.setTotalQuestionsWork(mockTestTotalCountResponse.getTotalQuestionChildOfParts());
+        mockTestEntity.setTotalQuestionsFinish(mockTestTotalCountResponse.getTotalQuestionsChildMockTest());
+        mockTestEntity.setTotalQuestionsParts(mockTestTotalCountResponse.getTotalQuestionChildOfParts());
         mockTestEntity.setTotalAnswersCorrect(mockTestTotalCountResponse.getTotalAnswersCorrect());
         mockTestEntity.setTotalAnswersWrong(mockTestTotalCountResponse.getTotalAnswersWrong());
-        mockTestEntity.setTotalScoreFinish(mockTestTotalCountResponse.getTotalScoreFinish());
+        mockTestEntity.setTotalScoreCorrect(mockTestTotalCountResponse.getTotalScoreCorrect());
         mockTestEntity.setTotalQuestionsSkip(
-                mockTestEntity.getTotalQuestionsWork() - mockTestEntity.getTotalQuestionsChoose()
+                mockTestEntity.getTotalQuestionsParts() - mockTestEntity.getTotalQuestionsFinish()
         );
 
         float answersCorrectPercent = BigDecimal.valueOf(
-                    (float) mockTestEntity.getTotalScoreFinish() / mockTestEntity.getTotalScoreParts()
+                    (float) mockTestEntity.getTotalScoreCorrect() / mockTestEntity.getTotalScoreParts()
                 )
                 .setScale(2, RoundingMode.HALF_UP)
                 .floatValue();
