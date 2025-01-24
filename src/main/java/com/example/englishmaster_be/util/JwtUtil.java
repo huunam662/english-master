@@ -13,6 +13,8 @@ import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.encoders.Hex;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -33,8 +35,8 @@ import java.util.function.Function;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor
 public class JwtUtil {
 
     JwtValue jwtValue;

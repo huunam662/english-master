@@ -1,11 +1,8 @@
 package com.example.englishmaster_be.domain.mock_test.dto.response;
 
 
-import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -16,12 +13,10 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MockTestPartResponse {
 
-     UUID topicId;
+     UUID partId;
 
-     String topicName;
+     String partName;
 
-     String topicTime;
-
-     List<PartResponse> parts;
+     String partType;
 
 }

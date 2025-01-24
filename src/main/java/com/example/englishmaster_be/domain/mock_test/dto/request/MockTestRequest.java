@@ -1,10 +1,10 @@
 package com.example.englishmaster_be.domain.mock_test.dto.request;
 
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
-import java.sql.Time;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -15,10 +15,14 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MockTestRequest {
 
-    Integer score;
+   UUID topicId;
 
-	Time time;
+   @Schema(example = "01:30:00")
+   String workTimeTopic;
 
-	UUID topic_id;
+   @Schema(example = "00:30:00")
+   String workTimeFinal;
+
+   List<MockTestPartRequest> parts;
 
 }

@@ -3,15 +3,14 @@ package com.example.englishmaster_be.model.question;
 import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.content.ContentEntity;
+import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
-import com.example.englishmaster_be.model.question_label.QuestionLabelEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.hibernate.annotations.ColumnTransformer;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
@@ -35,6 +34,9 @@ public class QuestionEntity {
     @Column(name = "id")
     UUID questionId;
 
+    @Column(name = "question_title")
+    String questionTitle;
+
     @Column(name = "question_content", columnDefinition = "text")
     String questionContent;
 
@@ -56,20 +58,12 @@ public class QuestionEntity {
     @Column(name = "question_explain_vn")
     String questionExplainVn;
 
-    @Column(name = "question_numberical")
-    Integer questionNumberical;
-
     @Column(name="question_type")
     @Enumerated(EnumType.STRING)
     QuestionTypeEnum questionType;
 
     @Column(name = "number_choice", columnDefinition = "int default 1")
     Integer numberChoice;
-
-    String title;
-
-    @Column(name = "count_blank")
-    Integer countBlank;
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
@@ -111,6 +105,9 @@ public class QuestionEntity {
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
     List<AnswerEntity> answers;
 
+    @OneToMany(mappedBy = "questionChild", cascade = CascadeType.ALL)
+    List<MockTestDetailEntity> detailMockTests;
+
     @ManyToMany
     @JoinTable(
             name = "question_content",
@@ -118,9 +115,6 @@ public class QuestionEntity {
             inverseJoinColumns = @JoinColumn(name = "content_id")
     )
     List<ContentEntity> contentCollection;
-
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-    List<QuestionLabelEntity> labels;
 
     @Column(name = "has_hints")
     Boolean hasHints;

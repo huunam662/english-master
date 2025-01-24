@@ -7,9 +7,7 @@ import com.example.englishmaster_be.common.constant.RoleEnum;
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
 import com.example.englishmaster_be.domain.auth.dto.request.*;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.mapper.AuthMapper;
 import com.example.englishmaster_be.model.session_active.SessionActiveRepository;
-import com.example.englishmaster_be.model.otp.OtpRepository;
 import com.example.englishmaster_be.model.role.RoleRepository;
 import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
 import com.example.englishmaster_be.model.user.UserRepository;
@@ -38,13 +36,11 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.UUID;
 
 
@@ -98,7 +94,7 @@ public class AuthService implements IAuthService {
 
         SessionActiveEntity sessionActive = sessionActiveService.saveSessionActive(user, jwtToken);
 
-        return AuthMapper.INSTANCE.toUserAuthResponse(sessionActive, jwtToken);
+        return UserMapper.INSTANCE.toUserAuthResponse(sessionActive, jwtToken);
     }
 
 
@@ -254,7 +250,7 @@ public class AuthService implements IAuthService {
 
         sessionActiveRepository.delete(sessionActive);
 
-        return AuthMapper.INSTANCE.toUserAuthResponse(sessionActiveNew, newToken);
+        return UserMapper.INSTANCE.toUserAuthResponse(sessionActiveNew, newToken);
     }
 
 

@@ -2,7 +2,6 @@ package com.example.englishmaster_be.domain.mock_test.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
 import java.util.UUID;
 
 @Getter
@@ -13,14 +12,18 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MockTestDetailResponse {
 
-    UUID detailMockTestId;
-
-    UUID answerId;
+    UUID mockTestDetailId;
 
     String answerContent;
 
-    Boolean correctAnswer;
+    String answerCorrectContent;
 
-    Integer scoreAnswer;
+    Boolean isCorrectAnswer;
+
+    Integer scoreAchieved;
+
+    MockTestQuestionResponse questionChild;
+
+    MockTestAnswerResponse answerChoice;
 
 }

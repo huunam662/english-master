@@ -26,7 +26,7 @@ public class QuestionQueryFactory {
         return jpaQueryFactory.selectFrom(QQuestionEntity.questionEntity);
     }
 
-    public List<QuestionEntity> findAllQuestionsByTopicAndParts(TopicEntity topic, List<PartEntity> partTopicList){
+    public List<QuestionEntity> findAllQuestionsParentBy(TopicEntity topic, List<PartEntity> partTopicList){
 
         BooleanExpression conditionQueryPattern = QQuestionEntity.questionEntity.isQuestionParent
                 .and(QQuestionEntity.questionEntity.topics.contains(topic))

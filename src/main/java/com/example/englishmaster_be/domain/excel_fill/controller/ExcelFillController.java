@@ -3,9 +3,11 @@ package com.example.englishmaster_be.domain.excel_fill.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionListResponse;
+import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicContentResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
 import com.example.englishmaster_be.domain.excel_fill.service.IExcelFillService;
+import com.example.englishmaster_be.mapper.ExcelContentMapper;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "Excel")
@@ -45,7 +48,9 @@ public class ExcelFillController {
             @RequestPart("file") MultipartFile file
     ){
 
-        return excelService.importQuestionForTopicAndPart(topicId, partNumber, file);
+        List<ExcelQuestionResponse> excelQuestionResponses = excelService.importQuestionForTopicAndPart(topicId, partNumber, file);
+
+        return ExcelContentMapper.INSTANCE.toExcelQuestionListResponse(excelQuestionResponses);
     }
 
     @PostMapping(value = "/importAllPartsForTopic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

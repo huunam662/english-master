@@ -1,15 +1,14 @@
 package com.example.englishmaster_be.model.answer;
 
+import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.model.user_answer.UserAnswerEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -62,14 +61,8 @@ public class AnswerEntity {
     @JoinColumn(name = "question_id", referencedColumnName = "id")
     QuestionEntity question;
 
-    @ManyToMany
-    @JoinTable(
-            name = "user_answer_answers",
-            joinColumns = @JoinColumn(name = "answer_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "user_answer_id", referencedColumnName = "id")
-    )
-    List<UserAnswerEntity> userAnswers;
-
+    @OneToMany(mappedBy = "answerChoice", cascade = CascadeType.ALL)
+    List<MockTestDetailEntity> mockTestDetails;
 
     @PrePersist
     void onCreate() {
@@ -80,5 +73,16 @@ public class AnswerEntity {
     @PreUpdate
     void onUpdate() {
         updateAt = LocalDateTime.now();
+    }
+
+    @PreRemove
+    void onRemove() {
+
+        if(mockTestDetails != null){
+            mockTestDetails.forEach(
+                    mockTestDetailEntity -> mockTestDetailEntity.setAnswerChoice(null)
+            );
+        }
+
     }
 }
