@@ -56,6 +56,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
+import com.example.englishmaster_be.model.mock_test.QMockTestEntity;
 
 @Slf4j
 @Service
