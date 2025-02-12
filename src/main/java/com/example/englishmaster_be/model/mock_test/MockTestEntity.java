@@ -30,14 +30,8 @@ public class MockTestEntity {
     @Column(name = "id")
     UUID mockTestId;
 
-    @Column(name = "total_score_parts")
-    Integer totalScoreParts;
-
-    @Column(name = "total_score_correct")
-    Integer totalScoreCorrect;
-
-    @Column(name = "total_questions_parts")
-    Integer totalQuestionsParts;
+    @Column(name = "total_score")
+    Integer totalScore;
 
     @Column(name = "total_questions_finish")
     Integer totalQuestionsFinish;

@@ -1,8 +1,9 @@
 package com.example.englishmaster_be.model.mock_test_detail;
 
 import com.example.englishmaster_be.model.answer.AnswerEntity;
-import com.example.englishmaster_be.model.question.QuestionEntity;
+import com.example.englishmaster_be.model.mock_test.MockTestEntity;
 import com.example.englishmaster_be.model.mock_test_result.MockTestResultEntity;
+import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -27,8 +28,8 @@ import java.util.UUID;
 public class MockTestDetailEntity {
 
     @Id
-	@GeneratedValue(strategy = GenerationType.UUID)
-	@Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id")
     UUID mockTestDetailId;
 
     @Column(name = "answer_content")
@@ -48,10 +49,10 @@ public class MockTestDetailEntity {
     @Column(name = "create_at")
     LocalDateTime createAt;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	@UpdateTimestamp
-	@Column(name = "update_at")
-	LocalDateTime updateAt;
+    @Temporal(TemporalType.TIMESTAMP)
+    @UpdateTimestamp
+    @Column(name = "update_at")
+    LocalDateTime updateAt;
 
     @ManyToOne
     @JoinColumn(name = "result_mock_test_id", referencedColumnName = "id")

@@ -32,6 +32,12 @@ public class MockTestResultEntity {
     @Column(name = "id")
     UUID mockTestResultId;
 
+    @Column(name = "total_score_parts")
+    Integer totalScoreParts;
+
+    @Column(name = "total_correct")
+    Integer totalCorrect;
+
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
     @Column(name = "create_at")
