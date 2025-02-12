@@ -23,6 +23,6 @@ public class MockTestRequest {
    @Schema(example = "00:30:00")
    String workTimeFinal;
 
-   List<MockTestPartRequest> parts;
+//   List<MockTestPartRequest> parts;
 
 }
