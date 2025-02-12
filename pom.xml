@@ -334,7 +334,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
 
-            <!-- Maven Compiler Plugin với cấu hình Annotation Processing cho QueryDSL và Lombok, bắt buộc compile với API JDK 17 -->
+            <!-- Maven Compiler Plugin với cấu hình Annotation Processing cho QueryDSL, Lombok và MapStruct -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -365,7 +365,17 @@
                             <version>5.1.0</version>
                             <classifier>jakarta</classifier>
                         </path>
+                        <!-- MapStruct Processor (để tạo implementation của mapper) -->
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>1.6.2</version>
+                        </path>
                     </annotationProcessorPaths>
+                    <compilerArgs>
+                        <arg>-Amapstruct.defaultComponentModel=spring</arg>
+                        <arg>-Amapstruct.suppressGeneratorTimestamp=true</arg>
+                    </compilerArgs>
                 </configuration>
             </plugin>
 
