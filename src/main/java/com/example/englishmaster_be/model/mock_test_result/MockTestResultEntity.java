@@ -32,7 +32,7 @@ public class MockTestResultEntity {
     @Column(name = "id")
     UUID mockTestResultId;
 
-    @Column(name = "total_score_parts")
+    @Column(name = "total_score")
     Integer totalScoreParts;
 
     @Column(name = "total_correct")
