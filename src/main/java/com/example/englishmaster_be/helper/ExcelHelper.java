@@ -33,11 +33,11 @@ public class ExcelHelper {
                 (fileName == null || (!fileName.endsWith(".xls") && !fileName.endsWith(".xlsx")));
     }
 
-    public static void checkPartInScope(int partNumber){
+    public static void checkPartInScope(int partNumber) {
 
         List<Integer> partsScope = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
 
-        if(!partsScope.contains(partNumber))
+        if (!partsScope.contains(partNumber))
             throw new BadRequestException(String.format("Part number must one value in scope [%s]", String.join(", ", partsScope.stream().map(String::valueOf).toList())));
     }
 
@@ -49,37 +49,36 @@ public class ExcelHelper {
         String imagePath = null;
         int totalScore = 0;
 
-        if(iRowAudioOrQuestionContentPath != null){
+        if (iRowAudioOrQuestionContentPath != null) {
 
             Row audioOrQuestionContentRow = sheet.getRow(iRowAudioOrQuestionContentPath);
 
-            if(List.of(1, 2, 3, 4, 8).contains(partNumber)){
-                if(audioOrQuestionContentRow == null || !getStringCellValue(audioOrQuestionContentRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Audio.getHeaderName()))
+            if (List.of(1, 2, 3, 4, 8).contains(partNumber)) {
+                if (audioOrQuestionContentRow == null || !getStringCellValue(audioOrQuestionContentRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Audio.getHeaderName()))
                     throw new BadRequestException(String.format("'%s' tag is required in Sheet %s, You can fill is blank content audio !", ExcelQuestionConstant.Audio.getHeaderName(), sheet.getSheetName()));
-            }
-            else{
-                if(audioOrQuestionContentRow == null || !getStringCellValue(audioOrQuestionContentRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Question_Content.getHeaderName()))
+            } else {
+                if (audioOrQuestionContentRow == null || !getStringCellValue(audioOrQuestionContentRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Question_Content.getHeaderName()))
                     throw new BadRequestException(String.format("'%s' tag is required in Sheet %s, You can fill is blank question content !", ExcelQuestionConstant.Question_Content.getHeaderName(), sheet.getSheetName()));
             }
 
             audioPathOrQuestionContent = getStringCellValue(audioOrQuestionContentRow, 1);
         }
 
-        if(iRowImagePath != null){
+        if (iRowImagePath != null) {
 
             Row imageRow = sheet.getRow(iRowImagePath);
 
-            if(imageRow == null || !getStringCellValue(imageRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Image.getHeaderName()))
+            if (imageRow == null || !getStringCellValue(imageRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Image.getHeaderName()))
                 throw new BadRequestException(String.format("'%s' tag is required in Sheet %s, You can fill is blank content image !", ExcelQuestionConstant.Image.getHeaderName(), sheet.getSheetName()));
 
             imagePath = getStringCellValue(imageRow, 1);
         }
 
-        if(iRowTotalScore != null){
+        if (iRowTotalScore != null) {
 
             Row scoreRow = sheet.getRow(iRowTotalScore);
 
-            if(scoreRow == null || !getStringCellValue(scoreRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Score.getHeaderName()))
+            if (scoreRow == null || !getStringCellValue(scoreRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Score.getHeaderName()))
                 throw new BadRequestException(String.format("'%s' tag is required in Sheet %s, You can fill is blank content score !", ExcelQuestionConstant.Score.getHeaderName(), sheet.getSheetName()));
 
             Cell cellTotalScore = scoreRow.getCell(1);
@@ -93,15 +92,15 @@ public class ExcelHelper {
                 .totalScore(totalScore)
                 .build();
 
-        if(List.of(1, 2, 3, 4, 8).contains(partNumber))
+        if (List.of(1, 2, 3, 4, 8).contains(partNumber))
             excelQuestionContentResponse.setAudioPath(audioPathOrQuestionContent);
-        else if(List.of(6, 7).contains(partNumber))
+        else if (List.of(6, 7).contains(partNumber))
             excelQuestionContentResponse.setQuestionContent(audioPathOrQuestionContent);
 
         return excelQuestionContentResponse;
     }
 
-    public static ExcelTopicContentResponse collectTopicContentWith(Sheet sheet){
+    public static ExcelTopicContentResponse collectTopicContentWith(Sheet sheet) {
 
         int jColHeader = 0;
 
@@ -156,7 +155,7 @@ public class ExcelHelper {
         List<String> partsList = Arrays.stream(part.split(","))
                 .map(partItem -> {
 
-                    if(!partItem.split(":")[0].trim().toLowerCase().startsWith("part"))
+                    if (!partItem.split(":")[0].trim().toLowerCase().startsWith("part"))
                         throw new BadRequestException("Part name of questions must be start with key 'PART'");
 
                     return partItem.trim();
@@ -189,16 +188,16 @@ public class ExcelHelper {
 
     }
 
-    public static void checkCellTopicHeader(Sheet sheet, int iRowHeader, int jColOfRow, ExcelTopicConstant excelTopicConstant){
+    public static void checkCellTopicHeader(Sheet sheet, int iRowHeader, int jColOfRow, ExcelTopicConstant excelTopicConstant) {
 
         Row rowInSheet = sheet.getRow(iRowHeader);
 
-        if(rowInSheet == null)
+        if (rowInSheet == null)
             throw new BadRequestException(String.format("Row %d at Sheet %s does not exist", iRowHeader, sheet.getSheetName()));
 
         Cell cellAtCol = rowInSheet.getCell(jColOfRow);
 
-        if(cellAtCol == null || !getStringCellValue(rowInSheet, jColOfRow).equalsIgnoreCase(excelTopicConstant.getHeaderName()))
+        if (cellAtCol == null || !getStringCellValue(rowInSheet, jColOfRow).equalsIgnoreCase(excelTopicConstant.getHeaderName()))
             throw new BadRequestException(
                     String.format(
                             "'%s' of cell %d header at row %d is required in Sheet %s",
@@ -211,29 +210,29 @@ public class ExcelHelper {
 
     }
 
-    public static void checkHeaderTableQuestionPart1234567With(Sheet sheet, int iRowHeaderTable, int partNumber){
+    public static void checkHeaderTableQuestionPart1234567With(Sheet sheet, int iRowHeaderTable, int partNumber) {
 
         checkPartInScope(partNumber);
 
         Row rowHeaderTable = sheet.getRow(iRowHeaderTable);
 
-        if(rowHeaderTable == null)
+        if (rowHeaderTable == null)
             throw new BadRequestException(String.format("Row %d at Sheet %s does not exist", iRowHeaderTable, sheet.getSheetName()));
 
         int jColSTT_CellOnHeader = 0;
 
         checkCellQuestionHeaderTable(sheet, rowHeaderTable, iRowHeaderTable, jColSTT_CellOnHeader, ExcelQuestionConstant.STT);
 
-        if(List.of(3, 4, 5, 6, 7, 9).contains(partNumber)){
+        if (List.of(3, 4, 5, 6, 7, 9).contains(partNumber)) {
 
             int jColQuestionContent_CellOnHeader = 1;
 
-            if(List.of(3, 4, 5).contains(partNumber))
+            if (List.of(3, 4, 5).contains(partNumber))
                 checkCellQuestionHeaderTable(sheet, rowHeaderTable, iRowHeaderTable, jColQuestionContent_CellOnHeader, ExcelQuestionConstant.Question_Content);
             else
                 checkCellQuestionHeaderTable(sheet, rowHeaderTable, iRowHeaderTable, jColQuestionContent_CellOnHeader, ExcelQuestionConstant.Question_Content_Child);
 
-            if(partNumber != 9){
+            if (partNumber != 9) {
 
                 int jColA_CellOnHeader = 2;
 
@@ -256,23 +255,23 @@ public class ExcelHelper {
 
         int jColResultHeaderTable = 6;
 
-        if(List.of(1, 2, 8).contains(partNumber))
+        if (List.of(1, 2, 8).contains(partNumber))
             jColResultHeaderTable = 1;
-        else if(partNumber == 9)
+        else if (partNumber == 9)
             jColResultHeaderTable = 2;
 
         checkCellQuestionHeaderTable(sheet, rowHeaderTable, iRowHeaderTable, jColResultHeaderTable, ExcelQuestionConstant.Result);
 
         int jColScoreHeaderTable = 7;
 
-        if(List.of(1, 2, 8).contains(partNumber))
+        if (List.of(1, 2, 8).contains(partNumber))
             jColScoreHeaderTable = 2;
-        else if(partNumber == 9)
+        else if (partNumber == 9)
             jColScoreHeaderTable = 3;
 
         checkCellQuestionHeaderTable(sheet, rowHeaderTable, iRowHeaderTable, jColScoreHeaderTable, ExcelQuestionConstant.Score);
 
-        if(partNumber == 1){
+        if (partNumber == 1) {
 
             int jColImageHeaderTable = 3;
 
@@ -280,14 +279,14 @@ public class ExcelHelper {
         }
     }
 
-    public static void checkCellQuestionHeaderTable(Sheet sheet, Row rowHeaderTable, int iRowHeaderTable, int jColHeaderTable, ExcelQuestionConstant cellHeaderValue){
+    public static void checkCellQuestionHeaderTable(Sheet sheet, Row rowHeaderTable, int iRowHeaderTable, int jColHeaderTable, ExcelQuestionConstant cellHeaderValue) {
 
-        if(rowHeaderTable == null)
+        if (rowHeaderTable == null)
             rowHeaderTable = sheet.getRow(iRowHeaderTable);
 
         Cell cellOnHeaderTable = rowHeaderTable.getCell(jColHeaderTable);
 
-        if(cellOnHeaderTable == null || !getStringCellValue(rowHeaderTable, jColHeaderTable).equalsIgnoreCase(cellHeaderValue.getHeaderName()))
+        if (cellOnHeaderTable == null || !getStringCellValue(rowHeaderTable, jColHeaderTable).equalsIgnoreCase(cellHeaderValue.getHeaderName()))
             throw new BadRequestException(
                     String.format(
                             "'%s' of cell %d in header table row %d is required in Sheet %s",
