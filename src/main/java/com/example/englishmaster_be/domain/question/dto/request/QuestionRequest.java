@@ -19,7 +19,6 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class QuestionRequest {
 
-    @Hidden
     UUID questionId;
 
     UUID partId;

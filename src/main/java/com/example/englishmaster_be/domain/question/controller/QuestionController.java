@@ -17,6 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -24,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
+@Slf4j
 @Tag(name = "Question")
 @RestController
 @RequestMapping("/question")
@@ -44,7 +46,7 @@ public class QuestionController {
     ) {
 
         QuestionEntity question = questionService.saveQuestion(questionRequest);
-
+        log.error("vao dc");
         return QuestionMapper.INSTANCE.toQuestionResponse(question);
     }
 
