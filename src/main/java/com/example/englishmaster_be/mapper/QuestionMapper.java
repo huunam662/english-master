@@ -34,6 +34,7 @@ public interface QuestionMapper {
     @Mapping(target = "partId", source = "part.partId")
     @Mapping(target = "contents", expression = "java(ContentMapper.INSTANCE.toContentBasicResponseList(questionEntity.getContentCollection()))")
     @Mapping(target = "answers", expression = "java(AnswerMapper.INSTANCE.toAnswerResponseList(questionEntity.getAnswers()))")
+    @Mapping(target = "numberOfQuestionsChild", expression = "java(questionEntity.getQuestionGroupChildren() != null ? questionEntity.getQuestionGroupChildren().size() : 0)")
     QuestionResponse toQuestionResponse(QuestionEntity questionEntity);
 
     List<QuestionResponse> toQuestionResponseList(List<QuestionEntity> questionEntityList);
