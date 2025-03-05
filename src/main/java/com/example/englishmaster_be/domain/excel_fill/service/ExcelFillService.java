@@ -5,6 +5,7 @@ import com.example.englishmaster_be.common.constant.error.ErrorEnum;
 import com.example.englishmaster_be.common.constant.PartEnum;
 import com.example.englishmaster_be.common.constant.excel.ExcelQuestionConstant;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.*;
+import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
 import com.example.englishmaster_be.domain.status.service.IStatusService;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
@@ -12,6 +13,7 @@ import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.exception.template.CustomException;
 import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.ExcelContentMapper;
+import com.example.englishmaster_be.mapper.PartMapper;
 import com.example.englishmaster_be.mapper.QuestionMapper;
 import com.example.englishmaster_be.mapper.TopicMapper;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
@@ -449,7 +451,7 @@ public class ExcelFillService implements IExcelFillService {
                 }
 
                 questionChildren = questionRepository.save(questionChildren);
-
+                topicEntity.setNumberQuestion(topicEntity.getNumberQuestion() + 1);
                 if (questionChildren.getAnswers() == null)
                     questionChildren.setAnswers(new ArrayList<>());
 
@@ -608,7 +610,7 @@ public class ExcelFillService implements IExcelFillService {
                         .build();
 
                 questionChildren = questionRepository.save(questionChildren);
-
+                topicEntity.setNumberQuestion(topicEntity.getNumberQuestion() + 1);
                 if (questionChildren.getAnswers() == null)
                     questionChildren.setAnswers(new ArrayList<>());
 
@@ -820,7 +822,7 @@ public class ExcelFillService implements IExcelFillService {
                             .build();
 
                     questionChildren = questionRepository.save(questionChildren);
-
+                    topicEntity.setNumberQuestion(topicEntity.getNumberQuestion() + 1);
                     if (questionChildren.getAnswers() == null)
                         questionChildren.setAnswers(new ArrayList<>());
 
@@ -1027,7 +1029,7 @@ public class ExcelFillService implements IExcelFillService {
                             .build();
 
                     questionChildren = questionRepository.save(questionChildren);
-
+                    topicEntity.setNumberQuestion(topicEntity.getNumberQuestion() + 1);
                     if (questionChildren.getAnswers() == null)
                         questionChildren.setAnswers(new ArrayList<>());
 
@@ -1204,7 +1206,7 @@ public class ExcelFillService implements IExcelFillService {
                         .build();
 
                 questionChildren = questionRepository.save(questionChildren);
-
+                topicEntity.setNumberQuestion(topicEntity.getNumberQuestion() + 1);
                 if (questionChildren.getAnswers() == null)
                     questionChildren.setAnswers(new ArrayList<>());
 
@@ -1435,7 +1437,7 @@ public class ExcelFillService implements IExcelFillService {
                             .build();
 
                     questionChildren = questionRepository.save(questionChildren);
-
+                    topicEntity.setNumberQuestion(topicEntity.getNumberQuestion() + 1);
                     if (!questionParent.getQuestionGroupChildren().contains(questionChildren))
                         questionParent.getQuestionGroupChildren().add(questionChildren);
 

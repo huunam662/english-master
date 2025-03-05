@@ -149,7 +149,6 @@ public class TopicController {
         return topicService.getAllTopic(filterRequest);
     }
 
-    @GetMapping("/getTopic")
     @DefaultMessage("Get Topic successfully")
     public TopicResponse getTopic(@RequestParam("id") UUID id) {
 

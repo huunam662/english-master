@@ -5,6 +5,7 @@ import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
 import com.example.englishmaster_be.domain.part.dto.response.PartBasicResponse;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
+import com.example.englishmaster_be.model.question.QuestionEntity;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -22,8 +23,18 @@ public interface PartMapper {
 
     PartEntity toPartEntity(PartRequest partDto);
 
-    @Mapping(target = "totalQuestion", expression = "java(part.getQuestions() != null ? part.getQuestions().size() : 0)")
+    @Mapping(target = "totalQuestion", expression = "java(calculateTotalQuestion(part))")
     PartResponse toPartResponse(PartEntity part);
+
+    default int calculateTotalQuestion(PartEntity part) {
+        int totalQuestion = 0;
+        if (part != null && part.getQuestions() != null) {
+            for (QuestionEntity question : part.getQuestions()) {
+                totalQuestion += question.getNumberOfQuestionsChild();
+            }
+        }
+        return totalQuestion;
+    }
 
     List<PartResponse> toPartResponseList(List<PartEntity> partList);
 
