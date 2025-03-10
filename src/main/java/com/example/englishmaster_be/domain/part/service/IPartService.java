@@ -6,12 +6,14 @@ import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.shared.upload_file.dto.request.UploadMultipleFileRequest;
 import com.example.englishmaster_be.domain.part.dto.request.PartSaveContentRequest;
 import com.example.englishmaster_be.model.part.PartEntity;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface IPartService {
+
 
     PartEntity savePart(PartRequest partRequest);
 
