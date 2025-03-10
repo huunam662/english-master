@@ -617,4 +617,7 @@ public class MockTestService implements IMockTestService {
 
         return questionMockTestResponseList;
     }
+    public MockTestEntity getInformationMockTest(UUID mockTestId){
+        return findMockTestToId(mockTestId);
+    }
 }

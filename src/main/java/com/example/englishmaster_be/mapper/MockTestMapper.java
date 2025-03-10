@@ -4,8 +4,6 @@ import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestRequest
 import com.example.englishmaster_be.domain.mock_test.dto.response.*;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;
-import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailEntity;
-import com.example.englishmaster_be.model.mock_test_result.MockTestResultEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
@@ -40,4 +38,8 @@ public interface MockTestMapper {
     MockTestAnswerResponse toMockTestAnswerResponse(AnswerEntity answerEntity);
 
     List<MockTestAnswerResponse> toMockTestAnswerResponseList(List<AnswerEntity> answerEntityList);
+
+    @Mapping(target = "mockTestResponse" , expression = "java(toMockTestResponse(mockTestEntity))")
+    @Mapping(target = "mockTestResultResponses" , expression = "java(MockTestResultMapper.INSTANCE.toMockTestResultResponseList(mockTestEntity.getMockTestResults()))")
+    MockTestInforResponse toMockTestInforResponse(MockTestEntity mockTestEntity);
 }
