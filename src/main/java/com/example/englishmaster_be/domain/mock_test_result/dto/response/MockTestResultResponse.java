@@ -20,5 +20,4 @@ public class MockTestResultResponse {
     MockTestPartResponse part;
 
     List<MockTestDetailResponse> mockTestDetails;
-
 }
