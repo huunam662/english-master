@@ -4,6 +4,7 @@ import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
 
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestDetailResponse;
+import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestInforResponse;
 import com.example.englishmaster_be.domain.mock_test.service.IMockTestService;
 import com.example.englishmaster_be.mapper.MockTestDetailMapper;
 import com.example.englishmaster_be.mapper.MockTestMapper;
@@ -143,4 +144,11 @@ public class MockTestController {
         return mockTestService.getQuestionOfToMockTest(mockTestId, partId);
     }
 
+    @GetMapping(value = "/{mockTestId:.+}/mocketinfor")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @DefaultMessage("Show all info of mocktest")
+    public MockTestInforResponse getMockTestInfor(@PathVariable UUID mockTestId) {
+        MockTestEntity mockTestEntity = mockTestService.getInformationMockTest(mockTestId);
+        return MockTestMapper.INSTANCE.toMockTestInforResponse(mockTestEntity);
+    }
 }

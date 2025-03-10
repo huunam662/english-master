@@ -48,4 +48,6 @@ public interface IMockTestService {
 
     List<QuestionMockTestResponse> getQuestionOfToMockTest(UUID mockTestId, UUID partId);
 
+    MockTestEntity getInformationMockTest(UUID mockTestId);
+
 }
