@@ -379,7 +379,7 @@ public class MockTestService implements IMockTestService {
         }
 
         // Cập nhật tổng điểm và số câu đúng vào MockTestEntity.
-        int totalQuestions = mockTest.getTopic().getQuestions().size();
+        int totalQuestions = mockTest.getTopic().getNumberQuestion();
         int totalAttempted = listAnswerId.size();
         mockTest.setTotalScore(totalScore);
         mockTest.setTotalAnswersCorrect(totalCorrect);
