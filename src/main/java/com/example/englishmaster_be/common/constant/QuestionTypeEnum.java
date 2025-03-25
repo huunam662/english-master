@@ -13,6 +13,7 @@ public enum QuestionTypeEnum {
     text,
     audio,
     image,
-    Label
-
+    Label,
+    Ielts_Writing_Task_1,
+    Ielts_Writing_Task_2
 }
