@@ -18,4 +18,6 @@ public interface IResultMockTestService {
 
     MockTestResultEntity getResultMockTestById(UUID id);
 
+
+
 }

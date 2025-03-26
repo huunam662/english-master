@@ -4,8 +4,10 @@ import com.example.englishmaster_be.common.dto.response.FilterResponse;
 import com.example.englishmaster_be.common.thread.MessageResponseHolder;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.mock_test.dto.request.*;
+import com.example.englishmaster_be.domain.mock_test.dto.response.IMockTestToUserResponse;
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestPartResponse;
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestResponse;
+import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestToUserResponse;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionMockTestResponse;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
@@ -272,11 +274,10 @@ public class MockTestService implements IMockTestService {
     }
 
     @Override
-    public List<MockTestEntity> getListMockTestToUser(int index, UUID userId) {
-
-        UserEntity user = userService.getUserById(userId);
-
-        return getTop10MockTestToUser(index, user);
+    public List<IMockTestToUserResponse> getListMockTestToUser() {
+        UserEntity user = userService.currentUser();
+        List<IMockTestToUserResponse> projections = mockTestRepository.findExamResultForUser(user.getUserId());
+        return projections;
     }
 
     @Transactional

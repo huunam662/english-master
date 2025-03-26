@@ -3,15 +3,12 @@ package com.example.englishmaster_be.domain.mock_test.controller;
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
 
-import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestDetailResponse;
-import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestInforResponse;
+import com.example.englishmaster_be.domain.mock_test.dto.response.*;
 import com.example.englishmaster_be.domain.mock_test.service.IMockTestService;
 import com.example.englishmaster_be.mapper.MockTestDetailMapper;
 import com.example.englishmaster_be.mapper.MockTestMapper;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestFilterRequest;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestRequest;
-import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestPartResponse;
-import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionMockTestResponse;
 import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailEntity;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;
@@ -87,17 +84,12 @@ public class MockTestController {
         return mockTestService.getListMockTestOfAdmin(mockTestFilterRequest);
     }
 
-    @GetMapping(value = "/{userId:.+}/listTestToUser")
+    @GetMapping(value = "/listTestToUser")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Get top 10 mock test of UserEntity successfully")
-    public List<MockTestResponse> listMockTestToUser(
-            @RequestParam int index,
-            @PathVariable UUID userId
-    ) {
-
-        List<MockTestEntity> mockTestEntityList = mockTestService.getListMockTestToUser(index, userId);
-
-        return MockTestMapper.INSTANCE.toMockTestResponseList(mockTestEntityList);
+    @DefaultMessage("Get exam results for all the test users done")
+    public List<IMockTestToUserResponse> listMockTestToUser() {
+        List<IMockTestToUserResponse> result = mockTestService.getListMockTestToUser();
+        return result;
     }
 
     @PostMapping(value = "/{mockTestId:.+}/submitResult")
