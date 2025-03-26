@@ -29,8 +29,6 @@ public class PartResponse {
 
     String contentData;
 
-    Integer totalQuestion;
-
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
     LocalDateTime createAt;
 

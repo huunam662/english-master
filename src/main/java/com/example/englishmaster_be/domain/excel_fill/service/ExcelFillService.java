@@ -218,6 +218,13 @@ public class ExcelFillService implements IExcelFillService {
                     topicEntity.getParts().add(partEntity);
             }
 
+            if (topicEntity.getTopicName().contains("TOEIC")) {
+                topicEntity.setTopicType("TOEIC");
+            }
+            if (topicEntity.getTopicName().contains("IELTS")) {
+                topicEntity.setTopicType("IELTS");
+            }
+
             topicEntity = topicRepository.save(topicEntity);
 
             return ExcelContentMapper.INSTANCE.toExcelTopicResponse(topicEntity);

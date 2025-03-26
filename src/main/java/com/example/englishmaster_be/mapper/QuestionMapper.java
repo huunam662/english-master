@@ -4,6 +4,7 @@ import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestion
 import com.example.englishmaster_be.domain.part.dto.response.PartBasicResponse;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionDto;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionMatchingResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
@@ -27,16 +28,23 @@ public interface QuestionMapper {
 
     QuestionMapper INSTANCE = Mappers.getMapper(QuestionMapper.class);
 
+    @Mapping(target = "questionGroupChildren" , expression = "java(questionDtoToQuestionEntities(questionDto.getListQuestionChild()))")
     QuestionEntity toQuestionEntity(QuestionRequest questionDto);
+    default List<QuestionEntity> questionDtoToQuestionEntities(List<QuestionRequest> questionDto) {
+        if(questionDto == null){
+            return Collections.emptyList();
+        }
+        return questionDto.stream().map(this::toQuestionEntity).collect(Collectors.toList());
+    }
 
-    QuestionEntity toQuestionEntity(QuestionGroupRequest saveGroupQuestionDTO);
-
+    QuestionEntity toQuestionEntity(QuestionGroupRequest createGroupQuestionDTO);
     @Mapping(target = "partId", source = "part.partId")
     @Mapping(target = "contents", expression = "java(ContentMapper.INSTANCE.toContentBasicResponseList(questionEntity.getContentCollection()))")
     @Mapping(target = "answers", expression = "java(AnswerMapper.INSTANCE.toAnswerResponseList(questionEntity.getAnswers()))")
     @Mapping(target = "numberOfQuestionsChild", expression = "java(questionEntity.getQuestionGroupChildren() != null ? questionEntity.getQuestionGroupChildren().size() : 0)")
+    @Mapping(target = "questionsChildren" , expression = "java(toQuestionResponseList(questionEntity.getQuestionGroupChildren()))")
     QuestionResponse toQuestionResponse(QuestionEntity questionEntity);
-
+    
     List<QuestionResponse> toQuestionResponseList(List<QuestionEntity> questionEntityList);
 
     default List<QuestionResponse> toQuestionResponseList(List<QuestionEntity> questionEntityList, PartEntity partEntity) {

@@ -303,19 +303,18 @@ public class TopicService implements ITopicService {
     @Override
     public List<PartResponse> getPartToTopic(UUID topicId) {
 
-        TopicEntity topic = getTopicById(topicId);
 
         Pageable pageable = PageRequest.of(0, 7, Sort.by(Sort.Order.asc("partName")));
 
-        Page<PartEntity> page = partRepository.findByTopics(topic, pageable);
+        Page<PartEntity> page = partRepository.findByTopics(topicId, pageable);
 
         return page.getContent().stream().map(
                 partItem -> {
 
-                    int totalQuestion = totalQuestion(partItem, topicId);
+//                    int totalQuestion = totalQuestion(partItem, topicId);
 
                     PartResponse partResponse = PartMapper.INSTANCE.toPartResponse(partItem);
-                    partResponse.setTotalQuestion(totalQuestion);
+//                    partResponse.setTotalQuestion(totalQuestion);
 
                     return partResponse;
                 }
