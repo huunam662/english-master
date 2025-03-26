@@ -17,7 +17,15 @@ public enum PartEnum {
     PART_6("PART 6", "Text Completion"),
     PART_7("PART 7", "Reading Comprehension"),
     PART_8("PART 8", "Words Fill Completion"),
-    PART_9("PART 9", "Matching Words");
+    PART_9("PART 9", "Matching Words"),
+    PART_1_IELTS("PART 1", "Everyday conversation"),
+    PART_2_IELTS("PART 2", "Monologue on a social topic"),
+    PART_3_IELTS("PART 3", "Academic discussion"),
+    PART_4_IELTS("PART 4", "Academic lecture"),
+    PART_5_IELTS("PART 5", "General academic topic"),
+    PART_6_IELTS("PART 6", "More complex text"),
+    PART_7_IELTS("PART 7", "Advanced academic text");
+
 
     String name;
     String type;

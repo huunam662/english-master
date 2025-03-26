@@ -23,18 +23,8 @@ public interface PartMapper {
 
     PartEntity toPartEntity(PartRequest partDto);
 
-    @Mapping(target = "totalQuestion", expression = "java(calculateTotalQuestion(part))")
     PartResponse toPartResponse(PartEntity part);
 
-    default int calculateTotalQuestion(PartEntity part) {
-        int totalQuestion = 0;
-        if (part != null && part.getQuestions() != null) {
-            for (QuestionEntity question : part.getQuestions()) {
-                totalQuestion += question.getNumberOfQuestionsChild();
-            }
-        }
-        return totalQuestion;
-    }
 
     List<PartResponse> toPartResponseList(List<PartEntity> partList);
 

@@ -15,7 +15,8 @@ public interface PartRepository extends JpaRepository<PartEntity, UUID>, JpaSpec
 
     Optional<PartEntity> findByPartId(UUID partID);
 
-    Page<PartEntity> findByTopics(TopicEntity topic, Pageable pageable);
+    @Query("SELECT DISTINCT p FROM PartEntity p JOIN FETCH p.topics t WHERE t.topicId =:topicId ORDER BY p.partName ASC")
+    Page<PartEntity> findByTopics(UUID topicId, Pageable pageable);
 
     @Query("SELECT p FROM PartEntity p WHERE LOWER(p.partName) = LOWER(:partName)")
     Optional<PartEntity> findByPartName(@Param("partName") String partName);

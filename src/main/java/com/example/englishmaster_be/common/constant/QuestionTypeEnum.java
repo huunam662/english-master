@@ -3,6 +3,7 @@ package com.example.englishmaster_be.common.constant;
 public enum QuestionTypeEnum {
 
     Question_Parent,
+    Question_Child,
     Single_Choice,
     Multiple_Choice,
     Fill_In_Blank,
@@ -13,6 +14,10 @@ public enum QuestionTypeEnum {
     text,
     audio,
     image,
-    Label
-
+    Label,
+    Ielts_Writing_Task_1,
+    Ielts_Writing_Task_2,
+    Sentence,
+    Short_Answer_Label,
+    TABLE
 }

@@ -41,7 +41,6 @@ public class DictionaryController {
     @GetMapping("/image/{word}")
     @DefaultMessage("show successfully")
     public JsonNode getImage(@PathVariable String word) {
-
         return dictionaryService.getImage(word);
     }
 

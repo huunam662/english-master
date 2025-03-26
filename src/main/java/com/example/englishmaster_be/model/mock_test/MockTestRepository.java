@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.model.mock_test;
 
+import com.example.englishmaster_be.domain.mock_test.dto.response.IMockTestToUserResponse;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import org.springframework.data.domain.*;
@@ -49,4 +50,15 @@ public interface MockTestRepository extends JpaRepository<MockTestEntity, UUID> 
             @Param("year") String year,
             @Param("topic") TopicEntity topic
     );
+
+    @Query(value = """
+            select
+                mt.id as mockTestId, t.id as topicId, t.topic_name as testName,
+                mt.total_score as totalScore, t.topic_type as testType,
+                mt.create_at as examStartTime
+            from mock_test mt
+            join topics t on t.id = mt.topic_id
+            where mt.user_id = :userId
+            """, nativeQuery = true)
+    List<IMockTestToUserResponse> findExamResultForUser(@Param("userId") UUID userId);
 }

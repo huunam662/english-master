@@ -5,6 +5,7 @@ import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.content.service.IContentService;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.part.service.IPartService;
+import com.example.englishmaster_be.domain.question.dto.request.QuestionUpdateRequest;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
@@ -43,6 +44,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -77,154 +81,181 @@ public class QuestionService implements IQuestionService {
 
     IUploadService uploadService;
 
-
     @Transactional
     @SneakyThrows
     @Override
     public QuestionEntity saveQuestion(QuestionRequest questionRequest) {
-
-        UserEntity user = userService.currentUser();
-
+        UserEntity currentUser = userService.currentUser();
         PartEntity part = partService.getPartToId(questionRequest.getPartId());
 
-        QuestionEntity question;
 
-        if (questionRequest.getQuestionId() != null) {
+            return createNewQuestion(questionRequest, currentUser, part);
+    }
 
-            question = getQuestionById(questionRequest.getQuestionId());
 
-            question.setQuestionContent(questionRequest.getQuestionContent());
-            question.setQuestionScore(questionRequest.getQuestionScore());
-            question.setUserUpdate(user);
-            question.setHasHints(questionRequest.isHasHints());
+    public QuestionEntity updateQuestion(QuestionUpdateRequest questionupdateRequest){
+        UserEntity currentUser = userService.currentUser();
 
-            questionRepository.save(question);
+            return updateExistingQuestion(questionupdateRequest.getQuestionId(), questionupdateRequest, currentUser);
+        }
 
-            if (questionRequest.getListAnswer() != null && !questionRequest.getListAnswer().isEmpty()) {
-                for (AnswerBasicRequest listAnswerRequest : questionRequest.getListAnswer()) {
-                    AnswerEntity answer = answerService.getAnswerById(listAnswerRequest.getAnswerId());
-                    answer.setQuestion(question);
-                    answer.setAnswerContent(listAnswerRequest.getAnswerContent());
-                    answer.setCorrectAnswer(listAnswerRequest.getCorrectAnswer());
-                    answer.setUserUpdate(user);
 
-                    answerRepository.save(answer);
-                }
+    private QuestionEntity updateExistingQuestion(UUID questionId, QuestionUpdateRequest questionRequest, UserEntity currentUser) {
+        QuestionEntity question = getQuestionById(questionId);
+
+        updateQuestionProperties(question, questionRequest, currentUser);
+        questionRepository.save(question);
+
+        updateAnswersIfNeeded(questionRequest, question, currentUser);
+
+        updateChildQuestionsIfNeeded(questionRequest, currentUser);
+
+        updateQuestionMedia(question, questionRequest, currentUser);
+
+        questionRepository.save(question);
+        return getQuestionById(questionId);
+    }
+
+    private QuestionEntity createNewQuestion(QuestionRequest questionRequest, UserEntity currentUser, PartEntity part) {
+        QuestionEntity question = QuestionMapper.INSTANCE.toQuestionEntity(questionRequest);
+
+        question.setCreateAt(LocalDateTime.now());
+        question.setUserCreate(currentUser);
+        question.setUserUpdate(currentUser);
+        question.setPart(part);
+        question.setHasHints(questionRequest.isHasHints());
+
+        QuestionEntity createdQuestion = questionRepository.save(question);
+
+        if (questionRequest.getContentImage() != null && !questionRequest.getContentImage().isEmpty()) {
+            addContentToQuestion(
+                    createdQuestion,
+                    questionRequest.getContentImage(),
+                    fileUtil.mimeTypeFile(questionRequest.getContentImage()),
+                    currentUser
+            );
+        }
+
+        if (questionRequest.getContentAudio() != null && !questionRequest.getContentAudio().isEmpty()) {
+            addContentToQuestion(
+                    createdQuestion,
+                    questionRequest.getContentAudio(),
+                    fileUtil.mimeTypeFile(questionRequest.getContentAudio()),
+                    currentUser
+            );
+        }
+
+        return questionRepository.save(createdQuestion);
+    }
+
+    private void updateQuestionProperties(QuestionEntity question, QuestionUpdateRequest request, UserEntity user) {
+        question.setQuestionContent(request.getQuestionContent());
+        question.setQuestionScore(request.getQuestionScore());
+        question.setUserUpdate(user);
+        question.setHasHints(request.isHasHints());
+    }
+
+    private void updateAnswersIfNeeded(QuestionUpdateRequest request, QuestionEntity question, UserEntity user) {
+        if (request.getListAnswer() != null && !request.getListAnswer().isEmpty()) {
+            for (AnswerBasicRequest answerRequest : request.getListAnswer()) {
+                AnswerEntity answer = answerService.getAnswerById(answerRequest.getAnswerId());
+                answer.setQuestion(question);
+                answer.setAnswerContent(answerRequest.getAnswerContent());
+                answer.setCorrectAnswer(answerRequest.getCorrectAnswer());
+                answer.setUserUpdate(user);
+
+                answerRepository.save(answer);
             }
+        }
+    }
 
-            if (questionRequest.getListQuestionChild() != null && !questionRequest.getListQuestionChild().isEmpty()) {
-                for (QuestionRequest questionRequestChild : questionRequest.getListQuestionChild()) {
-                    QuestionEntity questionChild = getQuestionById(questionRequestChild.getQuestionId());
-                    questionChild.setQuestionContent(questionRequestChild.getQuestionContent());
-                    questionChild.setQuestionScore(questionRequestChild.getQuestionScore());
-                    questionChild.setUserUpdate(user);
+    private void updateChildQuestionsIfNeeded(QuestionUpdateRequest request, UserEntity user) {
+        if (request.getListQuestionChild() != null && !request.getListQuestionChild().isEmpty()) {
+            for (QuestionUpdateRequest childRequest : request.getListQuestionChild()) {
+                UUID childQuestionId = null; // Thêm logic xác định ID ở đây
 
-                    for (AnswerBasicRequest createListAnswerDTO : questionRequestChild.getListAnswer()) {
-                        AnswerEntity answer = answerService.getAnswerById(createListAnswerDTO.getAnswerId());
-                        answer.setQuestion(questionChild);
-                        answer.setAnswerContent(createListAnswerDTO.getAnswerContent());
-                        answer.setCorrectAnswer(createListAnswerDTO.getCorrectAnswer());
+                if (childQuestionId != null) {
+                    QuestionEntity childQuestion = getQuestionById(childQuestionId);
+                    updateQuestionProperties(childQuestion, childRequest, user);
+
+                    for (AnswerBasicRequest answerRequest : childRequest.getListAnswer()) {
+                        AnswerEntity answer = answerService.getAnswerById(answerRequest.getAnswerId());
+                        answer.setQuestion(childQuestion);
+                        answer.setAnswerContent(answerRequest.getAnswerContent());
+                        answer.setCorrectAnswer(answerRequest.getCorrectAnswer());
                         answer.setUserUpdate(user);
 
                         answerRepository.save(answer);
-
                     }
-                    questionRepository.save(questionChild);
+                    questionRepository.save(childQuestion);
                 }
             }
-
-            if (questionRequest.getContentImage() != null && !questionRequest.getContentImage().isEmpty()) {
-                for (ContentEntity content : question.getContentCollection()) {
-                    if (content.getContentType().contains("image")) {
-                        question.getContentCollection().remove(content);
-                        contentService.deleteContent(content.getContentId());
-                        uploadService.delete(
-                                FileDeleteRequest.builder()
-                                        .filepath(content.getContentData())
-                                        .build()
-                        );
-                    }
-                }
-
-                ContentEntity content = ContentEntity.builder()
-                        .contentData(questionRequest.getContentImage())
-                        .contentType(fileUtil.mimeTypeFile(questionRequest.getContentImage()))
-                        .userCreate(user)
-                        .userUpdate(user)
-                        .createAt(LocalDateTime.now())
-                        .updateAt(LocalDateTime.now())
-                        .build();
-
-                if (question.getContentCollection() == null)
-                    question.setContentCollection(new ArrayList<>());
-
-                question.getContentCollection().add(content);
-                contentRepository.save(content);
-            }
-            if (questionRequest.getContentAudio() != null && !questionRequest.getContentAudio().isEmpty()) {
-                for (ContentEntity content : question.getContentCollection()) {
-                    if (content.getContentType().contains("audio")) {
-                        question.getContentCollection().remove(content);
-                        contentService.deleteContent(content.getContentId());
-                        uploadService.delete(
-                                FileDeleteRequest.builder()
-                                        .filepath(content.getContentData())
-                                        .build()
-                        );
-                    }
-                }
-
-                ContentEntity content = ContentEntity.builder()
-                        .contentData(questionRequest.getContentAudio())
-                        .contentType(fileUtil.mimeTypeFile(questionRequest.getContentAudio()))
-                        .userCreate(user)
-                        .userUpdate(user)
-                        .createAt(LocalDateTime.now())
-                        .updateAt(LocalDateTime.now())
-                        .build();
-
-                if (question.getContentCollection() == null)
-                    question.setContentCollection(new ArrayList<>());
-
-                question.getContentCollection().add(content);
-                contentRepository.save(content);
-            }
-
-            questionRepository.save(question);
-
-            return getQuestionById(questionRequest.getQuestionId());
-        } else {
-
-            question = QuestionMapper.INSTANCE.toQuestionEntity(questionRequest);
-            question.setCreateAt(LocalDateTime.now());
-            question.setUserCreate(user);
-            question.setUserUpdate(user);
-            question.setPart(part);
-            question.setHasHints(questionRequest.isHasHints());
-
-            QuestionEntity createQuestion = questionRepository.save(question);
-
-            if (questionRequest.getContentImage() != null && !questionRequest.getContentImage().isEmpty()) {
-                ContentEntity content = ContentEntity.builder()
-                        .contentType(questionRequest.getContentImage())
-                        .contentData(fileUtil.mimeTypeFile(questionRequest.getContentImage()))
-                        .userCreate(user)
-                        .userUpdate(user)
-                        .createAt(LocalDateTime.now())
-                        .updateAt(LocalDateTime.now())
-                        .build();
-
-                if (question.getContentCollection() == null)
-                    question.setContentCollection(new ArrayList<>());
-
-                question.getContentCollection().add(content);
-                contentRepository.save(content);
-            }
-
-
-            return questionRepository.save(question);
         }
     }
+
+    private void updateQuestionMedia(QuestionEntity question, QuestionUpdateRequest request, UserEntity user) {
+        // Handle image content
+        if (request.getContentImage() != null && !request.getContentImage().isEmpty()) {
+            removeExistingContentByType(question, "image");
+            addContentToQuestion(
+                    question,
+                    request.getContentImage(),
+                    fileUtil.mimeTypeFile(request.getContentImage()),
+                    user
+            );
+        }
+
+        if (request.getContentAudio() != null && !request.getContentAudio().isEmpty()) {
+            removeExistingContentByType(question, "audio");
+            addContentToQuestion(
+                    question,
+                    request.getContentAudio(),
+                    fileUtil.mimeTypeFile(request.getContentAudio()),
+                    user
+            );
+        }
+    }
+
+    private void removeExistingContentByType(QuestionEntity question, String contentType) {
+        if (question.getContentCollection() != null) {
+            for (ContentEntity content : new ArrayList<>(question.getContentCollection())) {
+                if (content.getContentType().contains(contentType)) {
+                    question.getContentCollection().remove(content);
+                    contentService.deleteContent(content.getContentId());
+                    try {
+                        uploadService.delete(
+                                FileDeleteRequest.builder()
+                                        .filepath(content.getContentData())
+                                        .build()
+                        );
+                    } catch (FileNotFoundException e) {
+                        System.out.println("No Find File" + content.getContentData());
+                    } catch (IOException e){
+                        System.out.println("Error Delete File" + e.getMessage());
+                    }
+                }
+            }
+        }
+    }
+
+    private void addContentToQuestion(QuestionEntity question, String contentData, String contentType, UserEntity user) {
+        ContentEntity content = ContentEntity.builder()
+                .contentData(contentData)
+                .contentType(contentType)
+                .userCreate(user)
+                .userUpdate(user)
+                .createAt(LocalDateTime.now())
+                .updateAt(LocalDateTime.now())
+                .build();
+
+        if (question.getContentCollection() == null) {
+            question.setContentCollection(new ArrayList<>());
+        }
+
+        question.getContentCollection().add(content);
+        contentRepository.save(content);
+    }
+
 
     @Override
     public QuestionEntity getQuestionById(UUID questionId) {

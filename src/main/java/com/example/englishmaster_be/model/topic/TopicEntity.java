@@ -131,6 +131,5 @@ public class TopicEntity {
     @PreUpdate
     void onUpdate() {
         updateAt = LocalDateTime.now();
-
     }
 }
