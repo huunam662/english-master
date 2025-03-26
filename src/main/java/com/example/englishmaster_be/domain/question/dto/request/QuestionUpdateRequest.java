@@ -1,12 +1,11 @@
 package com.example.englishmaster_be.domain.question.dto.request;
 
-import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
 import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
-import io.swagger.v3.oas.annotations.Hidden;
+import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -17,8 +16,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class QuestionRequest {
+public class QuestionUpdateRequest {
 
+    UUID questionId;
 
     UUID partId;
 
@@ -40,7 +40,7 @@ public class QuestionRequest {
 
     List<AnswerBasicRequest> listAnswer;
 
-    List<QuestionRequest> listQuestionChild;
+    List<QuestionUpdateRequest> listQuestionChild;
 
     boolean hasHints;
 

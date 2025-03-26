@@ -3,6 +3,7 @@ package com.example.englishmaster_be.domain.question.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
+import com.example.englishmaster_be.domain.question.dto.request.QuestionUpdateRequest;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.mapper.AnswerMapper;
@@ -46,7 +47,6 @@ public class QuestionController {
     ) {
 
         QuestionEntity question = questionService.saveQuestion(questionRequest);
-        log.error("vao dc");
         return QuestionMapper.INSTANCE.toQuestionResponse(question);
     }
 
@@ -55,12 +55,12 @@ public class QuestionController {
     @DefaultMessage("Update question to topic successfully")
     public QuestionResponse editQuestion(
             @PathVariable UUID questionId,
-            @RequestBody QuestionRequest questionRequest
+            @RequestBody QuestionUpdateRequest questionRequest
     ) {
 
         questionRequest.setQuestionId(questionId);
 
-        QuestionEntity question = questionService.saveQuestion(questionRequest);
+        QuestionEntity question = questionService.updateQuestion(questionRequest);
 
         return QuestionMapper.INSTANCE.toQuestionResponse(question);
     }

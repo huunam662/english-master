@@ -3,6 +3,7 @@ package com.example.englishmaster_be.domain.question.service;
 import com.example.englishmaster_be.domain.part.dto.response.PartQuestionResponse;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
+import com.example.englishmaster_be.domain.question.dto.request.QuestionUpdateRequest;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionDto;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.model.part.PartEntity;
@@ -17,6 +18,8 @@ import java.util.UUID;
 public interface IQuestionService {
 
     QuestionEntity saveQuestion(QuestionRequest questionRequest);
+
+    QuestionEntity updateQuestion(QuestionUpdateRequest questionUpdateRequest);
 
     QuestionEntity getQuestionById(UUID questionId);
 
