@@ -15,6 +15,8 @@ public enum QuestionTypeEnum {
     audio,
     image,
     Label,
+    Ielts_Writing_Task_1,
+    Ielts_Writing_Task_2,
     Sentence,
     Short_Answer_Label,
     TABLE
