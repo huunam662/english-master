@@ -11,20 +11,20 @@ import com.example.englishmaster_be.model.session_active.SessionActiveRepository
 import com.example.englishmaster_be.model.role.RoleRepository;
 import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
 import com.example.englishmaster_be.model.user.UserRepository;
-import com.example.englishmaster_be.shared.invalid_token.service.IInvalidTokenService;
-import com.example.englishmaster_be.shared.otp.service.IOtpService;
-import com.example.englishmaster_be.shared.session_active.service.ISessionActiveService;
-import com.example.englishmaster_be.util.AuthUtil;
-import com.example.englishmaster_be.util.JwtUtil;
+import com.example.englishmaster_be.shared.service.invalid_token.IInvalidTokenService;
+import com.example.englishmaster_be.shared.service.otp.IOtpService;
+import com.example.englishmaster_be.shared.service.session_active.ISessionActiveService;
+import com.example.englishmaster_be.helper.AuthHelper;
+import com.example.englishmaster_be.shared.service.jwt.JwtService;
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;
 import com.example.englishmaster_be.domain.auth.dto.response.UserConfirmTokenResponse;
-import com.example.englishmaster_be.exception.template.BadRequestException;
-import com.example.englishmaster_be.exception.template.CustomException;
-import com.example.englishmaster_be.mapper.ConfirmationTokenMapper;
-import com.example.englishmaster_be.mapper.UserMapper;
+import com.example.englishmaster_be.advice.exception.template.BadRequestException;
+import com.example.englishmaster_be.advice.exception.template.CustomException;
+import com.example.englishmaster_be.converter.ConfirmationTokenConverter;
+import com.example.englishmaster_be.converter.UserConverter;
 import com.example.englishmaster_be.model.otp.OtpEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.util.MailerUtil;
+import com.example.englishmaster_be.shared.service.mailer.MailerService;
 import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -50,11 +50,11 @@ import java.util.UUID;
 public class AuthService implements IAuthService {
 
 
-    JwtUtil jwtUtil;
+    JwtService jwtUtil;
 
-    MailerUtil mailerUtil;
+    MailerService mailerUtil;
 
-    AuthUtil authUtil;
+    AuthHelper authUtil;
 
     AuthenticationManager authenticationManager;
 
@@ -94,7 +94,7 @@ public class AuthService implements IAuthService {
 
         SessionActiveEntity sessionActive = sessionActiveService.saveSessionActive(user, jwtToken);
 
-        return UserMapper.INSTANCE.toUserAuthResponse(sessionActive, jwtToken);
+        return UserConverter.INSTANCE.toUserAuthResponse(sessionActive, jwtToken);
     }
 
 
@@ -108,7 +108,7 @@ public class AuthService implements IAuthService {
         if(user != null && user.getEnabled())
             throw new BadRequestException("Email đã được sử dụng");
 
-        UserEntity userRegister = UserMapper.INSTANCE.toUserEntity(userRegisterRequest);
+        UserEntity userRegister = UserConverter.INSTANCE.toUserEntity(userRegisterRequest);
         userRegister.setUserId(user != null ? user.getUserId() : UUID.randomUUID());
         userRegister.setPassword(passwordEncoder.encode(userRegisterRequest.getPassword()));
         userRegister.setRole(roleRepository.findByRoleName(RoleEnum.USER));
@@ -142,7 +142,7 @@ public class AuthService implements IAuthService {
 
         sessionActive = sessionActiveRepository.save(sessionActive);
 
-        return ConfirmationTokenMapper.INSTANCE.toConfirmationTokenResponse(sessionActive);
+        return ConfirmationTokenConverter.INSTANCE.toConfirmationTokenResponse(sessionActive);
     }
 
 
@@ -250,7 +250,7 @@ public class AuthService implements IAuthService {
 
         sessionActiveRepository.delete(sessionActive);
 
-        return UserMapper.INSTANCE.toUserAuthResponse(sessionActiveNew, newToken);
+        return UserConverter.INSTANCE.toUserAuthResponse(sessionActiveNew, newToken);
     }
 
 

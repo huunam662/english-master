@@ -5,7 +5,7 @@ import com.example.englishmaster_be.domain.admin.service.IAdminService;
 import com.example.englishmaster_be.domain.user.dto.response.UserResponse;
 import com.example.englishmaster_be.domain.user.dto.request.UserFilterRequest;
 import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.mapper.UserMapper;
+import com.example.englishmaster_be.converter.UserConverter;
 import com.example.englishmaster_be.domain.admin.dto.response.CountMockTestTopicResponse;
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -90,7 +90,7 @@ public class AdminController {
 
         List<UserEntity> inactiveUsers = adminService.getUsersNotLoggedInLast10Days();
 
-        return UserMapper.INSTANCE.toUserResponseList(inactiveUsers);
+        return UserConverter.INSTANCE.toUserResponseList(inactiveUsers);
     }
 
     @GetMapping("/inactive-notify")
@@ -100,7 +100,7 @@ public class AdminController {
 
         List<UserEntity> notifyInactiveUsers = adminService.findUsersInactiveForDaysAndNotify(days);
 
-        return UserMapper.INSTANCE.toUserResponseList(notifyInactiveUsers);
+        return UserConverter.INSTANCE.toUserResponseList(notifyInactiveUsers);
     }
 
     @PostMapping("/notifyInactiveUsers")

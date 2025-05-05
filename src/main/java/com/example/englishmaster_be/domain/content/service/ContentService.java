@@ -2,23 +2,18 @@ package com.example.englishmaster_be.domain.content.service;
 
 import com.example.englishmaster_be.common.thread.MessageResponseHolder;
 import com.example.englishmaster_be.domain.content.dto.request.ContentRequest;
-import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
-import com.example.englishmaster_be.exception.template.BadRequestException;
-import com.example.englishmaster_be.mapper.ContentMapper;
+import com.example.englishmaster_be.advice.exception.template.BadRequestException;
+import com.example.englishmaster_be.converter.ContentConverter;
 import com.example.englishmaster_be.model.content.ContentEntity;
 import com.example.englishmaster_be.model.content.ContentRepository;
 import com.example.englishmaster_be.model.question.QuestionEntity;
-import com.example.englishmaster_be.domain.cloudinary.dto.response.CloudiaryUploadFileResponse;
 import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.domain.cloudinary.service.ICloudinaryService;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.util.FileUtil;
+import com.example.englishmaster_be.helper.FileHelper;
 import com.example.englishmaster_be.value.LinkValue;
-import com.google.cloud.storage.Bucket;
-import com.google.firebase.cloud.StorageClient;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -27,9 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,7 +33,7 @@ public class ContentService implements IContentService {
 
     LinkValue linkValue;
 
-    FileUtil fileUtil;
+    FileHelper fileUtil;
 
     ContentRepository contentRepository;
 
@@ -103,7 +96,7 @@ public class ContentService implements IContentService {
                 .userCreate(user)
                 .build();
 
-        ContentMapper.INSTANCE.flowToContentEntity(contentRequest, content);
+        ContentConverter.INSTANCE.flowToContentEntity(contentRequest, content);
 
         if(contentRequest.getImage() != null){
 

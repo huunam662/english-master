@@ -8,16 +8,16 @@ import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
 import com.example.englishmaster_be.model.part.PartRepository;
 import com.example.englishmaster_be.domain.part.dto.request.PartSaveContentRequest;
-import com.example.englishmaster_be.exception.template.CustomException;
-import com.example.englishmaster_be.exception.template.BadRequestException;
-import com.example.englishmaster_be.mapper.PartMapper;
+import com.example.englishmaster_be.advice.exception.template.CustomException;
+import com.example.englishmaster_be.advice.exception.template.BadRequestException;
+import com.example.englishmaster_be.converter.PartConverter;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.part.QPartEntity;
 import com.example.englishmaster_be.model.question.QQuestionEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.util.FileUtil;
+import com.example.englishmaster_be.helper.FileHelper;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +38,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PartService implements IPartService {
 
-    FileUtil fileUtil;
+    FileHelper fileUtil;
 
     JPAQueryFactory jpaQueryFactory;
 
@@ -90,7 +90,7 @@ public class PartService implements IPartService {
             partEntity.setContentType(fileUtil.mimeTypeFile(partRequest.getFile()));
         }
 
-        PartMapper.INSTANCE.flowToPartEntity(partRequest, partEntity);
+        PartConverter.INSTANCE.flowToPartEntity(partRequest, partEntity);
 
         partEntity.setUpdateAt(LocalDateTime.now());
         partEntity.setUserUpdate(user);

@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.question.dto.response;
 
-import com.example.englishmaster_be.mapper.AnswerMapper;
-import com.example.englishmaster_be.mapper.ContentMapper;
+import com.example.englishmaster_be.converter.AnswerConverter;
+import com.example.englishmaster_be.converter.ContentConverter;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
@@ -69,10 +69,10 @@ public class QuestionMockTestResponse {
         this.updateAt = question.getUpdateAt();
 
         if (Objects.nonNull(question.getAnswers()))
-            this.listAnswer = AnswerMapper.INSTANCE.toAnswerResponseList(question.getAnswers());
+            this.listAnswer = AnswerConverter.INSTANCE.toAnswerResponseList(question.getAnswers());
 
         if (Objects.nonNull(question.getContentCollection()))
-            contentList = question.getContentCollection().stream().map(ContentMapper.INSTANCE::toContentBasicResponse).toList();
+            contentList = question.getContentCollection().stream().map(ContentConverter.INSTANCE::toContentBasicResponse).toList();
 
     }
 

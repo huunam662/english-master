@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.domain.comment.service;
 
 import com.example.englishmaster_be.domain.comment.dto.request.CommentRequest;
-import com.example.englishmaster_be.exception.template.BadRequestException;
-import com.example.englishmaster_be.mapper.CommentMapper;
+import com.example.englishmaster_be.advice.exception.template.BadRequestException;
+import com.example.englishmaster_be.converter.CommentConverter;
 import com.example.englishmaster_be.model.comment.CommentEntity;
 import com.example.englishmaster_be.model.comment.CommentRepository;
 import com.example.englishmaster_be.model.post.PostEntity;
@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -87,7 +87,7 @@ public class CommentService implements ICommentService {
 
         comment = commentRepository.save(comment);
 
-        messagingTemplate.convertAndSend("/CommentEntity/TopicEntity/" + topicId, CommentMapper.INSTANCE.toCommentResponse(comment));
+        messagingTemplate.convertAndSend("/CommentEntity/TopicEntity/" + topicId, CommentConverter.INSTANCE.toCommentResponse(comment));
 
         return comment;
     }
@@ -108,7 +108,7 @@ public class CommentService implements ICommentService {
 
         comment = commentRepository.save(comment);
 
-        messagingTemplate.convertAndSend("/CommentEntity/PostEntity/" + postId, CommentMapper.INSTANCE.toCommentResponse(comment));
+        messagingTemplate.convertAndSend("/CommentEntity/PostEntity/" + postId, CommentConverter.INSTANCE.toCommentResponse(comment));
 
         return comment;
     }
@@ -135,7 +135,7 @@ public class CommentService implements ICommentService {
 
         comment = commentRepository.save(comment);
 
-        messagingTemplate.convertAndSend("/CommentEntity/commentParent/" + commentId, CommentMapper.INSTANCE.toCommentResponse(comment));
+        messagingTemplate.convertAndSend("/CommentEntity/commentParent/" + commentId, CommentConverter.INSTANCE.toCommentResponse(comment));
 
         return comment;
     }
@@ -155,7 +155,7 @@ public class CommentService implements ICommentService {
 
         comment  = commentRepository.save(comment);
 
-        messagingTemplate.convertAndSend("/CommentEntity/updateComment/" + updateCommentId.toString(), CommentMapper.INSTANCE.toCommentResponse(comment));
+        messagingTemplate.convertAndSend("/CommentEntity/updateComment/" + updateCommentId.toString(), CommentConverter.INSTANCE.toCommentResponse(comment));
 
         return comment;
     }

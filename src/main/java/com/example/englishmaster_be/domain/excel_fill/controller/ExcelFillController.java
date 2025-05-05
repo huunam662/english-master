@@ -4,12 +4,10 @@ package com.example.englishmaster_be.domain.excel_fill.controller;
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionListResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
-import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicContentResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
 import com.example.englishmaster_be.domain.excel_fill.service.IExcelFillService;
-import com.example.englishmaster_be.mapper.ExcelContentMapper;
+import com.example.englishmaster_be.converter.ExcelContentConverter;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +48,7 @@ public class ExcelFillController {
 
         List<ExcelQuestionResponse> excelQuestionResponses = excelService.importQuestionForTopicAndPart(topicId, partNumber, file);
 
-        return ExcelContentMapper.INSTANCE.toExcelQuestionListResponse(excelQuestionResponses);
+        return ExcelContentConverter.INSTANCE.toExcelQuestionListResponse(excelQuestionResponses);
     }
 
     @PostMapping(value = "/importAllPartsForTopic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

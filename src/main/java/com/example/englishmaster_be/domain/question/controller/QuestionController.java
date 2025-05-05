@@ -6,8 +6,8 @@ import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionUpdateRequest;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
-import com.example.englishmaster_be.mapper.AnswerMapper;
-import com.example.englishmaster_be.mapper.QuestionMapper;
+import com.example.englishmaster_be.converter.AnswerConverter;
+import com.example.englishmaster_be.converter.QuestionConverter;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
@@ -47,7 +47,7 @@ public class QuestionController {
     ) {
 
         QuestionEntity question = questionService.saveQuestion(questionRequest);
-        return QuestionMapper.INSTANCE.toQuestionResponse(question);
+        return QuestionConverter.INSTANCE.toQuestionResponse(question);
     }
 
     @PutMapping(value = "/{questionId:.+}/editQuestion")
@@ -62,7 +62,7 @@ public class QuestionController {
 
         QuestionEntity question = questionService.updateQuestion(questionRequest);
 
-        return QuestionMapper.INSTANCE.toQuestionResponse(question);
+        return QuestionConverter.INSTANCE.toQuestionResponse(question);
     }
 
 
@@ -76,7 +76,7 @@ public class QuestionController {
 
         QuestionEntity question = questionService.uploadFileQuestion(questionId, uploadMultiFileRequest);
 
-        return QuestionMapper.INSTANCE.toQuestionResponse(question);
+        return QuestionConverter.INSTANCE.toQuestionResponse(question);
     }
 
     @PutMapping(value = "/{questionId:.+}/updatefile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -90,7 +90,7 @@ public class QuestionController {
 
         QuestionEntity question = questionService.updateFileQuestion(questionId, oldFileName, newFile);
 
-        return QuestionMapper.INSTANCE.toQuestionResponse(question);
+        return QuestionConverter.INSTANCE.toQuestionResponse(question);
     }
 
     @PostMapping(value = "/create/groupQuestion")
@@ -102,7 +102,7 @@ public class QuestionController {
 
         QuestionEntity question = questionService.createGroupQuestion(groupQuestionRequest);
 
-        return QuestionMapper.INSTANCE.toQuestionResponse(question);
+        return QuestionConverter.INSTANCE.toQuestionResponse(question);
     }
 
 
@@ -116,7 +116,7 @@ public class QuestionController {
 
         List<QuestionEntity> questionList = questionService.getTop10Question(indexp, partId);
 
-        return QuestionMapper.INSTANCE.toQuestionResponseList(questionList);
+        return QuestionConverter.INSTANCE.toQuestionResponseList(questionList);
     }
 
     @GetMapping(value = "/{questionId:.+}/checkQuestionGroup")
@@ -134,7 +134,7 @@ public class QuestionController {
 
         List<QuestionEntity> questionEntityList = questionService.getQuestionGroupListByQuestionId(questionId);
 
-        return QuestionMapper.INSTANCE.toQuestionResponseList(questionEntityList);
+        return QuestionConverter.INSTANCE.toQuestionResponseList(questionEntityList);
     }
 
     @GetMapping(value = "/{questionId:.+}/listAnswer")
@@ -144,7 +144,7 @@ public class QuestionController {
 
         List<AnswerEntity> answerList = answerService.getListAnswerByQuestionId(questionId);
 
-        return AnswerMapper.INSTANCE.toAnswerResponseList(answerList);
+        return AnswerConverter.INSTANCE.toAnswerResponseList(answerList);
     }
 
     @DeleteMapping(value = "/{questionId:.+}/deleteQuestion")
@@ -163,7 +163,7 @@ public class QuestionController {
 
         QuestionEntity question = questionService.getQuestionById(questionId);
 
-        return QuestionMapper.INSTANCE.toQuestionResponse(question);
+        return QuestionConverter.INSTANCE.toQuestionResponse(question);
     }
 
     @GetMapping("/list-question")

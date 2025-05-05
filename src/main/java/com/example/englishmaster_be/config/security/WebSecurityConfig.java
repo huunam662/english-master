@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.config.security;
 
-import com.example.englishmaster_be.config.filter.AuthRequestFilterConfig;
+import com.example.englishmaster_be.config.middleware.filter.MiddlewareFilterConfig;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -19,7 +19,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -29,7 +28,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class WebSecurityConfig {
 
-    AuthRequestFilterConfig authTokenFilter;
+    MiddlewareFilterConfig authTokenFilter;
 
 
     @Bean

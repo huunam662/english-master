@@ -9,8 +9,8 @@ import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.user.dto.request.UserFilterRequest;
 import com.example.englishmaster_be.domain.user.dto.response.UserResponse;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.exception.template.BadRequestException;
-import com.example.englishmaster_be.mapper.UserMapper;
+import com.example.englishmaster_be.advice.exception.template.BadRequestException;
+import com.example.englishmaster_be.converter.UserConverter;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;
 import com.example.englishmaster_be.model.pack.PackEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
@@ -18,7 +18,7 @@ import com.example.englishmaster_be.model.user.QUserEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.model.user.UserRepository;
 import com.example.englishmaster_be.domain.admin.dto.response.CountMockTestTopicResponse;
-import com.example.englishmaster_be.util.MailerUtil;
+import com.example.englishmaster_be.shared.service.mailer.MailerService;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -45,7 +45,7 @@ public class AdminService implements IAdminService {
 
     JPAQueryFactory queryFactory;
 
-    MailerUtil mailerUtil;
+    MailerService mailerUtil;
 
     IUserService userService;
 
@@ -109,7 +109,7 @@ public class AdminService implements IAdminService {
                 .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
-                UserMapper.INSTANCE.toUserResponseList(query.fetch())
+                UserConverter.INSTANCE.toUserResponseList(query.fetch())
         );
 
         return filterResponse;

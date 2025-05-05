@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.domain.general_search.service;
 
-import com.example.englishmaster_be.mapper.FlashCardWordMapper;
-import com.example.englishmaster_be.mapper.NewsMapper;
-import com.example.englishmaster_be.mapper.TopicMapper;
+import com.example.englishmaster_be.converter.FlashCardWordConverter;
+import com.example.englishmaster_be.converter.NewsConverter;
+import com.example.englishmaster_be.converter.TopicConverter;
 import com.example.englishmaster_be.domain.general_search.dto.response.GeneralSearchAllResponse;
 import com.example.englishmaster_be.model.flash_card_word.FlashCardWordEntity;
 import com.example.englishmaster_be.model.flash_card_word.QFlashCardWordEntity;
@@ -55,9 +55,9 @@ public class GeneralSearchService implements IGeneralSearchService {
                 .fetch();
 
         return GeneralSearchAllResponse.builder()
-                .topicList(TopicMapper.INSTANCE.toTopicResponseList(topics))
-                .flashCardWordList(FlashCardWordMapper.INSTANCE.toFlashCardWordResponseList(flashCardWords))
-                .newsList(NewsMapper.INSTANCE.toNewsResponseList(newsList))
+                .topicList(TopicConverter.INSTANCE.toTopicResponseList(topics))
+                .flashCardWordList(FlashCardWordConverter.INSTANCE.toFlashCardWordResponseList(flashCardWords))
+                .newsList(NewsConverter.INSTANCE.toNewsResponseList(newsList))
                 .build();
 
     }

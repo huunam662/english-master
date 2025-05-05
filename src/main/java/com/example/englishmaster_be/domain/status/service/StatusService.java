@@ -1,10 +1,10 @@
 package com.example.englishmaster_be.domain.status.service;
 
-import com.example.englishmaster_be.mapper.StatusMapper;
+import com.example.englishmaster_be.converter.StatusConverter;
 import com.example.englishmaster_be.domain.status.dto.request.StatusRequest;
-import com.example.englishmaster_be.exception.template.CustomException;
+import com.example.englishmaster_be.advice.exception.template.CustomException;
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
-import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.advice.exception.template.BadRequestException;
 import com.example.englishmaster_be.domain.type.service.ITypeService;
 import com.example.englishmaster_be.model.status.QStatusEntity;
 import com.example.englishmaster_be.model.status.StatusEntity;
@@ -51,7 +51,7 @@ public class StatusService implements IStatusService {
         if(isExistedByStatusNameOfType(statusRequest.getStatusName(), type))
             throw new BadRequestException(String.format("Status name of type %s already exist", type.getTypeName()));
 
-        StatusMapper.INSTANCE.flowToStatusEntity(statusRequest, status);
+        StatusConverter.INSTANCE.flowToStatusEntity(statusRequest, status);
 
         status.setType(type);
 

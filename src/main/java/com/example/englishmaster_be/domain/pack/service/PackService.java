@@ -2,7 +2,7 @@ package com.example.englishmaster_be.domain.pack.service;
 
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.domain.pack.dto.request.PackRequest;
-import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.advice.exception.template.BadRequestException;
 import com.example.englishmaster_be.model.pack.PackRepository;
 import com.example.englishmaster_be.model.pack.PackEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
@@ -12,7 +12,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
+
 import java.util.List;
 import java.util.UUID;
 

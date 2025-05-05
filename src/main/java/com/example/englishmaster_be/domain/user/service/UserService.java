@@ -3,15 +3,13 @@ package com.example.englishmaster_be.domain.user.service;
 import com.example.englishmaster_be.common.constant.RoleEnum;
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.exam.dto.response.ExamResultResponse;
-import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.user.dto.request.*;
-import com.example.englishmaster_be.mapper.MockTestMapper;
-import com.example.englishmaster_be.mapper.TopicMapper;
-import com.example.englishmaster_be.exception.template.BadRequestException;
-import com.example.englishmaster_be.mapper.UserMapper;
-import com.example.englishmaster_be.model.content.ContentRepository;
+import com.example.englishmaster_be.converter.MockTestConverter;
+import com.example.englishmaster_be.converter.TopicConverter;
+import com.example.englishmaster_be.advice.exception.template.BadRequestException;
+import com.example.englishmaster_be.converter.UserConverter;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;
 import com.example.englishmaster_be.model.mock_test.QMockTestEntity;
 import com.example.englishmaster_be.model.topic.QTopicEntity;
@@ -61,7 +59,7 @@ public class UserService implements IUserService {
 
         UserEntity user = currentUser();
 
-        UserMapper.INSTANCE.flowToUserEntity(changeProfileRequest, user);
+        UserConverter.INSTANCE.flowToUserEntity(changeProfileRequest, user);
 
         if(changeProfileRequest.getAvatar() != null && !changeProfileRequest.getAvatar().isEmpty()){
 
@@ -126,7 +124,7 @@ public class UserService implements IUserService {
                 query.fetch().stream().map(
                         topic -> {
                             ExamResultResponse examResultResponse = ExamResultResponse.builder()
-                                    .topic(TopicMapper.INSTANCE.toTopicResponse(topic))
+                                    .topic(TopicConverter.INSTANCE.toTopicResponse(topic))
                                     .build();
 
                             JPAQuery<MockTestEntity> queryListMockTest = queryFactory.selectFrom(QMockTestEntity.mockTestEntity)
@@ -134,7 +132,7 @@ public class UserService implements IUserService {
                                     .where(QMockTestEntity.mockTestEntity.topic.eq(topic));
 
                             examResultResponse.setListMockTest(
-                                    MockTestMapper.INSTANCE.toMockTestResponseList(queryListMockTest.fetch())
+                                    MockTestConverter.INSTANCE.toMockTestResponseList(queryListMockTest.fetch())
                             );
 
                             return examResultResponse;

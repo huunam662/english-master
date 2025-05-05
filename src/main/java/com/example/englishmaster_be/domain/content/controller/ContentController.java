@@ -3,7 +3,7 @@ package com.example.englishmaster_be.domain.content.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.content.dto.request.ContentRequest;
-import com.example.englishmaster_be.mapper.ContentMapper;
+import com.example.englishmaster_be.converter.ContentConverter;
 import com.example.englishmaster_be.model.content.ContentEntity;
 import com.example.englishmaster_be.domain.content.dto.response.ContentResponse;
 import com.example.englishmaster_be.domain.content.service.IContentService;
@@ -32,7 +32,7 @@ public class ContentController {
 
         ContentEntity content = contentService.getContentByContentId(id);
 
-        return ContentMapper.INSTANCE.toContentResponse(content);
+        return ContentConverter.INSTANCE.toContentResponse(content);
     }
 
     @GetMapping("/contentData")
@@ -41,7 +41,7 @@ public class ContentController {
 
         ContentEntity content = contentService.getContentByTopicIdAndCode(topicId, code);
 
-        return ContentMapper.INSTANCE.toContentResponse(content);
+        return ContentConverter.INSTANCE.toContentResponse(content);
     }
 
     @DeleteMapping("/{contentId}")
@@ -58,7 +58,7 @@ public class ContentController {
 
         ContentEntity content = contentService.getContentByContentData(contentData);
 
-        return ContentMapper.INSTANCE.toContentResponse(content);
+        return ContentConverter.INSTANCE.toContentResponse(content);
     }
 
     @PostMapping(value = "/create-content")
@@ -69,7 +69,7 @@ public class ContentController {
 
         ContentEntity content = contentService.saveContent(contentRequest);
 
-        return ContentMapper.INSTANCE.toContentResponse(content);
+        return ContentConverter.INSTANCE.toContentResponse(content);
     }
 
     @PutMapping(value = "/{contentId}/update-content")
@@ -83,7 +83,7 @@ public class ContentController {
 
         ContentEntity content = contentService.saveContent(contentRequest);
 
-        return ContentMapper.INSTANCE.toContentResponse(content);
+        return ContentConverter.INSTANCE.toContentResponse(content);
     }
 
 

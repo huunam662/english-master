@@ -4,8 +4,8 @@ import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
 
 import com.example.englishmaster_be.domain.post.service.IPostService;
-import com.example.englishmaster_be.mapper.CommentMapper;
-import com.example.englishmaster_be.mapper.PostMapper;
+import com.example.englishmaster_be.converter.CommentConverter;
+import com.example.englishmaster_be.converter.PostConverter;
 import com.example.englishmaster_be.domain.post.dto.request.PostFilterRequest;
 import com.example.englishmaster_be.domain.post.dto.request.PostRequest;
 import com.example.englishmaster_be.domain.comment.dto.response.CommentResponse;
@@ -63,7 +63,7 @@ public class PostController {
 
         PostEntity post = postService.savePost(postRequest);
 
-        return PostMapper.INSTANCE.toPostResponse(post);
+        return PostConverter.INSTANCE.toPostResponse(post);
     }
 
     @PatchMapping(value = "/{postId:.+}/updatePost")
@@ -75,7 +75,7 @@ public class PostController {
 
         PostEntity post = postService.savePost(postRequest);
 
-        return PostMapper.INSTANCE.toPostResponse(post);
+        return PostConverter.INSTANCE.toPostResponse(post);
     }
 
     @GetMapping(value = "/{postId:.+}/getAllCommentToPost")
@@ -84,7 +84,7 @@ public class PostController {
 
         List<CommentEntity> commentEntityList = postService.getListCommentToPostId(postId);
 
-        return CommentMapper.INSTANCE.toCommentResponseList(commentEntityList);
+        return CommentConverter.INSTANCE.toCommentResponseList(commentEntityList);
     }
 
     @DeleteMapping(value = "/{postId:.+}/deletePost")

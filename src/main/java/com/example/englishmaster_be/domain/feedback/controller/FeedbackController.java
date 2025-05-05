@@ -7,7 +7,7 @@ import com.example.englishmaster_be.common.constant.sort.SortByFeedbackFieldsEnu
 import com.example.englishmaster_be.domain.feedback.service.IFeedbackService;
 import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackFilterRequest;
 import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackRequest;
-import com.example.englishmaster_be.mapper.FeedbackMapper;
+import com.example.englishmaster_be.converter.FeedbackConverter;
 import com.example.englishmaster_be.domain.feedback.dto.response.FeedbackResponse;
 import com.example.englishmaster_be.model.feedback.FeedbackEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -89,7 +89,7 @@ public class FeedbackController {
 
         FeedbackEntity feedback = feedbackService.saveFeedback(feedbackRequest);
 
-        return FeedbackMapper.INSTANCE.toFeedbackResponse(feedback);
+        return FeedbackConverter.INSTANCE.toFeedbackResponse(feedback);
     }
 
     @PatchMapping (value = "/{FeedbackId:.+}/enableFeedback")
@@ -115,7 +115,7 @@ public class FeedbackController {
 
         FeedbackEntity feedback = feedbackService.saveFeedback(feedbackRequest);
 
-        return FeedbackMapper.INSTANCE.toFeedbackResponse(feedback);
+        return FeedbackConverter.INSTANCE.toFeedbackResponse(feedback);
     }
 
     @DeleteMapping(value = "/{FeedbackId:.+}/deleteFeedback")

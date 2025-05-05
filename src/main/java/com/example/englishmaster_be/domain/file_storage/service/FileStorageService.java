@@ -3,7 +3,7 @@ package com.example.englishmaster_be.domain.file_storage.service;
 
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.file_storage.dto.response.ResourceResponse;
-import com.example.englishmaster_be.exception.template.ResourceNotFoundException;
+import com.example.englishmaster_be.advice.exception.template.ResourceNotFoundException;
 import com.example.englishmaster_be.value.BucketValue;
 import com.example.englishmaster_be.value.FileValue;
 import com.google.cloud.storage.Blob;

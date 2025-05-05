@@ -1,13 +1,13 @@
 package com.example.englishmaster_be.domain.type.service;
 
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
-import com.example.englishmaster_be.mapper.TypeMapper;
+import com.example.englishmaster_be.converter.TypeConverter;
 import com.example.englishmaster_be.domain.type.dto.request.TypeFilterRequest;
 import com.example.englishmaster_be.domain.type.dto.request.TypeRequest;
-import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.advice.exception.template.BadRequestException;
 import com.example.englishmaster_be.domain.type.dto.response.TypeResponse;
 import com.example.englishmaster_be.model.type.QTypeEntity;
-import com.example.englishmaster_be.helper.TypeHelper;
+import com.example.englishmaster_be.util.TypeUtil;
 import com.example.englishmaster_be.model.type.TypeEntity;
 import com.example.englishmaster_be.model.type.TypeRepository;
 import com.querydsl.core.types.OrderSpecifier;
@@ -61,7 +61,7 @@ public class TypeService implements ITypeService {
         long totalPages = (long) Math.ceil((double) totalElements / filterResponse.getPageSize());
         filterResponse.setTotalPages(totalPages);
 
-        OrderSpecifier<?> orderSpecifier = TypeHelper.buildTypeOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
+        OrderSpecifier<?> orderSpecifier = TypeUtil.buildTypeOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
 
         JPAQuery<TypeEntity> query = queryFactory
                 .selectFrom(QTypeEntity.typeEntity)
@@ -71,7 +71,7 @@ public class TypeService implements ITypeService {
                 .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
-                TypeMapper.INSTANCE.toTypeResponseList(query.fetch())
+                TypeConverter.INSTANCE.toTypeResponseList(query.fetch())
         );
 
         return filterResponse;
@@ -100,9 +100,9 @@ public class TypeService implements ITypeService {
         if(typeRequest.getTypeId() != null) {
             typeEntity = getTypeById(typeRequest.getTypeId());
 
-            TypeMapper.INSTANCE.flowToTypeEntity(typeRequest, typeEntity);
+            TypeConverter.INSTANCE.flowToTypeEntity(typeRequest, typeEntity);
         }
-        else typeEntity = TypeMapper.INSTANCE.toTypeEntity(typeRequest);
+        else typeEntity = TypeConverter.INSTANCE.toTypeEntity(typeRequest);
 
         return typeRepository.save(typeEntity);
 

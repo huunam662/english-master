@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.dictionary.service;
 
-import com.example.englishmaster_be.util.EnglishWordDictionaryUtil;
+import com.example.englishmaster_be.helper.EnglishWordDictionaryHelper;
 import com.example.englishmaster_be.domain.dictionary.dto.response.DictionarySuggestionResponse;
 import com.example.englishmaster_be.value.DictionaryValue;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -37,7 +37,7 @@ public class DictionaryService implements IDictionaryService {
 
     DictionaryValue dictionaryValue;
 
-    EnglishWordDictionaryUtil englishWordDictionaryHelper;
+    EnglishWordDictionaryHelper englishWordDictionaryHelper;
 
 
 

@@ -11,7 +11,7 @@ import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.model.session_active.SessionActiveRepository;
 import com.example.englishmaster_be.model.invalid_token.InvalidTokenRepository;
 import com.example.englishmaster_be.model.user.UserRepository;
-import com.example.englishmaster_be.shared.invalid_token.service.IInvalidTokenService;
+import com.example.englishmaster_be.shared.service.invalid_token.IInvalidTokenService;
 import com.example.englishmaster_be.value.JwtValue;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;

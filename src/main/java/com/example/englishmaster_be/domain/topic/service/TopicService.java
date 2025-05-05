@@ -17,13 +17,13 @@ import com.example.englishmaster_be.domain.status.service.IStatusService;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.mapper.*;
+import com.example.englishmaster_be.converter.*;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicQuestionListRequest;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicRequest;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicFilterRequest;
-import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.advice.exception.template.BadRequestException;
 import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicResponse;
@@ -48,7 +48,7 @@ import com.example.englishmaster_be.model.topic.QTopicEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.topic.TopicRepository;
 import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.util.FileUtil;
+import com.example.englishmaster_be.helper.FileHelper;
 import com.example.englishmaster_be.value.LinkValue;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -78,7 +78,7 @@ public class TopicService implements ITopicService {
 
     LinkValue linkValue;
 
-    FileUtil fileUtil;
+    FileHelper fileUtil;
 
     JPAQueryFactory jpaQueryFactory;
 
@@ -136,7 +136,7 @@ public class TopicService implements ITopicService {
                     .build();
         }
 
-        TopicMapper.INSTANCE.flowToTopicEntity(topicRequest, topic);
+        TopicConverter.INSTANCE.flowToTopicEntity(topicRequest, topic);
 
         if(topicRequest.getTopicImage() != null && !topicRequest.getTopicImage().isEmpty()){
 
@@ -194,7 +194,7 @@ public class TopicService implements ITopicService {
             packEntity = packRepository.save(packEntity);
         }
 
-        TopicMapper.INSTANCE.flowToTopicEntity(excelTopicContentResponse, topicEntity);
+        TopicConverter.INSTANCE.flowToTopicEntity(excelTopicContentResponse, topicEntity);
 
         topicEntity.setPack(packEntity);
 
@@ -239,7 +239,7 @@ public class TopicService implements ITopicService {
                 topicEntity.getParts().add(partEntity);
         }
 
-        return ExcelContentMapper.INSTANCE.toExcelTopicResponse(topicEntity);
+        return ExcelContentConverter.INSTANCE.toExcelTopicResponse(topicEntity);
 
     }
 
@@ -313,7 +313,7 @@ public class TopicService implements ITopicService {
 
 //                    int totalQuestion = totalQuestion(partItem, topicId);
 
-                    PartResponse partResponse = PartMapper.INSTANCE.toPartResponse(partItem);
+                    PartResponse partResponse = PartConverter.INSTANCE.toPartResponse(partItem);
 //                    partResponse.setTotalQuestion(totalQuestion);
 
                     return partResponse;
@@ -544,7 +544,7 @@ public class TopicService implements ITopicService {
                 .part(part)
                 .build();
 
-        QuestionMapper.INSTANCE.flowToQuestionEntity(questionByExcelFileResponse, question);
+        QuestionConverter.INSTANCE.flowToQuestionEntity(questionByExcelFileResponse, question);
 
         return questionRepository.save(question);
     }
@@ -564,7 +564,7 @@ public class TopicService implements ITopicService {
                     .userUpdate(user)
                     .build();
 
-            AnswerMapper.INSTANCE.flowToAnswerEntity(answerBasicRequest, answer);
+            AnswerConverter.INSTANCE.flowToAnswerEntity(answerBasicRequest, answer);
 
             answer = answerRepository.save(answer);
 
@@ -616,7 +616,7 @@ public class TopicService implements ITopicService {
             QuestionEntity question = saveQuestionFromExcelTemplate(questionByExcelFileResponse, user);
 
             // Xử lý câu trả lời
-            processAnswers(AnswerMapper.INSTANCE.toAnswerRequestList(questionByExcelFileResponse.getAnswers()), question, user);
+            processAnswers(AnswerConverter.INSTANCE.toAnswerRequestList(questionByExcelFileResponse.getAnswers()), question, user);
 
             // Tương tự cho questionChild
             if (questionByExcelFileResponse.getQuestionsChildren() != null && !questionByExcelFileResponse.getQuestionsChildren().isEmpty()) {
@@ -628,7 +628,7 @@ public class TopicService implements ITopicService {
 
                     questionChild = questionRepository.save(questionChild); // Lưu câu hỏi con trước
 
-                    processAnswers(AnswerMapper.INSTANCE.toAnswerRequestList(createQuestionChildDTO.getAnswers()), questionChild, user);
+                    processAnswers(AnswerConverter.INSTANCE.toAnswerRequestList(createQuestionChildDTO.getAnswers()), questionChild, user);
 
                     processContent(
                             null,
@@ -689,7 +689,7 @@ public class TopicService implements ITopicService {
                     .part(part)
                     .build();
 
-            QuestionMapper.INSTANCE.flowToQuestionEntity(questionRequest, question);
+            QuestionConverter.INSTANCE.flowToQuestionEntity(questionRequest, question);
 
             question = questionRepository.save(question);
 
@@ -702,7 +702,7 @@ public class TopicService implements ITopicService {
                             .userUpdate(user)
                             .build();
 
-                    AnswerMapper.INSTANCE.flowToAnswerEntity(answerBasicRequest, answer);
+                    AnswerConverter.INSTANCE.flowToAnswerEntity(answerBasicRequest, answer);
 
                     answerRepository.save(answer);
                 }
@@ -718,7 +718,7 @@ public class TopicService implements ITopicService {
                             .userUpdate(user)
                             .build();
 
-                    QuestionMapper.INSTANCE.flowToQuestionEntity(questionRequestItem, questionChild);
+                    QuestionConverter.INSTANCE.flowToQuestionEntity(questionRequestItem, questionChild);
 
                     questionChild = questionRepository.save(questionChild);
 
@@ -738,7 +738,7 @@ public class TopicService implements ITopicService {
                         answer.setUserUpdate(user);
                         answer.setUserCreate(user);
 
-                        AnswerMapper.INSTANCE.flowToAnswerEntity(answerBasicRequest, answer);
+                        AnswerConverter.INSTANCE.flowToAnswerEntity(answerBasicRequest, answer);
 
                         answer = answerRepository.save(answer);
 
@@ -832,7 +832,7 @@ public class TopicService implements ITopicService {
                         .userUpdate(user)
                         .build();
 
-                AnswerMapper.INSTANCE.flowToAnswerEntity(answerBasicRequest, answer);
+                AnswerConverter.INSTANCE.flowToAnswerEntity(answerBasicRequest, answer);
 
                 answerRepository.save(answer);
 
@@ -850,7 +850,7 @@ public class TopicService implements ITopicService {
                         .userUpdate(user)
                         .build();
 
-                QuestionMapper.INSTANCE.flowToQuestionEntity(questionRequestItem, questionChild);
+                QuestionConverter.INSTANCE.flowToQuestionEntity(questionRequestItem, questionChild);
 
                 questionChild = questionRepository.save(questionChild);
 
@@ -865,7 +865,7 @@ public class TopicService implements ITopicService {
                             .userUpdate(user)
                             .build();
 
-                    AnswerMapper.INSTANCE.flowToAnswerEntity(answerBasicRequest, answer);
+                    AnswerConverter.INSTANCE.flowToAnswerEntity(answerBasicRequest, answer);
 
                     answer = answerRepository.save(answer);
 
@@ -917,7 +917,7 @@ public class TopicService implements ITopicService {
         if (existPartInTopic(topic, part)){
 
             MessageResponseHolder.setMessage("Part of Question don't have in Topic");
-            return QuestionMapper.INSTANCE.toQuestionResponse(question);
+            return QuestionConverter.INSTANCE.toQuestionResponse(question);
         }
         else {
             topic.setUserUpdate(user);
@@ -926,7 +926,7 @@ public class TopicService implements ITopicService {
             topicRepository.save(topic);
 
             QuestionEntity question1 = questionService.getQuestionById(question.getQuestionId());
-            QuestionResponse questionResponse = QuestionMapper.INSTANCE.toQuestionResponse(question1, topic, part, isAdmin);
+            QuestionResponse questionResponse = QuestionConverter.INSTANCE.toQuestionResponse(question1, topic, part, isAdmin);
 
             if (questionService.checkQuestionGroup(question1.getQuestionId())) {
                 List<QuestionEntity> questionGroupList = questionService.listQuestionGroup(question1);
@@ -935,7 +935,7 @@ public class TopicService implements ITopicService {
                 for (QuestionEntity questionGroup : questionGroupList) {
 
                     AnswerEntity answerCorrect = answerService.correctAnswer(questionGroup);
-                    QuestionResponse questionGroupResponse = QuestionMapper.INSTANCE.toQuestionResponse(questionGroup, topic, part, isAdmin);
+                    QuestionResponse questionGroupResponse = QuestionConverter.INSTANCE.toQuestionResponse(questionGroup, topic, part, isAdmin);
                     questionGroupResponse.setAnswerCorrectId(answerCorrect.getAnswerId());
                     questionGroupResponseList.add(questionGroupResponse);
                 }
@@ -1016,7 +1016,7 @@ public class TopicService implements ITopicService {
                                             .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
-                TopicMapper.INSTANCE.toTopicResponseList(query.fetch())
+                TopicConverter.INSTANCE.toTopicResponseList(query.fetch())
         );
 
         return filterResponse;
@@ -1033,6 +1033,6 @@ public class TopicService implements ITopicService {
 
         List<QuestionEntity> questionEntityList = questionQueryFactory.findAllQuestionsParentBy(topicEntity, partEntityList);
 
-        return QuestionMapper.INSTANCE.toQuestionPartResponseList(questionEntityList, partEntityList, topicEntity, isAdmin);
+        return QuestionConverter.INSTANCE.toQuestionPartResponseList(questionEntityList, partEntityList, topicEntity, isAdmin);
     }
 }

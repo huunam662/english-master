@@ -2,10 +2,10 @@ package com.example.englishmaster_be.domain.post.service;
 
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.mapper.PostMapper;
+import com.example.englishmaster_be.converter.PostConverter;
 import com.example.englishmaster_be.domain.post.dto.request.PostFilterRequest;
 import com.example.englishmaster_be.domain.post.dto.request.PostRequest;
-import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.advice.exception.template.BadRequestException;
 import com.example.englishmaster_be.model.comment.CommentEntity;
 import com.example.englishmaster_be.model.post.PostEntity;
 import com.example.englishmaster_be.domain.post.dto.response.PostResponse;
@@ -75,7 +75,7 @@ public class PostService implements IPostService {
                                             .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
-                PostMapper.INSTANCE.toPostResponseList(query.fetch())
+                PostConverter.INSTANCE.toPostResponseList(query.fetch())
         );
 
         return filterResponse;

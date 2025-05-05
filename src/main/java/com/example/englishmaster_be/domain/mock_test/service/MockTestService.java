@@ -7,15 +7,14 @@ import com.example.englishmaster_be.domain.mock_test.dto.request.*;
 import com.example.englishmaster_be.domain.mock_test.dto.response.IMockTestToUserResponse;
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestPartResponse;
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestResponse;
-import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestToUserResponse;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionMockTestResponse;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.mapper.MockTestMapper;
-import com.example.englishmaster_be.exception.template.BadRequestException;
-import com.example.englishmaster_be.exception.template.CustomException;
+import com.example.englishmaster_be.converter.MockTestConverter;
+import com.example.englishmaster_be.advice.exception.template.BadRequestException;
+import com.example.englishmaster_be.advice.exception.template.CustomException;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailEntity;
 import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailRepository;
@@ -27,7 +26,7 @@ import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.mock_test_result.MockTestResultRepository;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.util.MockTestUtil;
+import com.example.englishmaster_be.helper.MockTestHelper;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -73,7 +72,7 @@ public class MockTestService implements IMockTestService {
 
     ResourceLoader resourceLoader;
 
-    MockTestUtil mockTestUtil;
+    MockTestHelper mockTestUtil;
 
     MockTestRepository mockTestRepository;
 
@@ -267,7 +266,7 @@ public class MockTestService implements IMockTestService {
                 .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
-                MockTestMapper.INSTANCE.toMockTestResponseList(query.fetch())
+                MockTestConverter.INSTANCE.toMockTestResponseList(query.fetch())
         );
 
         return filterResponse;

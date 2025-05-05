@@ -4,7 +4,7 @@ import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
 import com.example.englishmaster_be.common.constant.sort.SortByTypeFieldsEnum;
 
-import com.example.englishmaster_be.mapper.TypeMapper;
+import com.example.englishmaster_be.converter.TypeConverter;
 import com.example.englishmaster_be.domain.type.dto.request.TypeFilterRequest;
 import com.example.englishmaster_be.domain.type.dto.request.TypeRequest;
 import com.example.englishmaster_be.domain.type.dto.response.TypeResponse;
@@ -68,7 +68,7 @@ public class TypeController {
 
         TypeEntity typeEntity = typeService.getTypeById(id);
 
-        return TypeMapper.INSTANCE.toTypeResponse(typeEntity);
+        return TypeConverter.INSTANCE.toTypeResponse(typeEntity);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -80,7 +80,7 @@ public class TypeController {
 
         TypeEntity typeEntity = typeService.saveType(typeRequest);
 
-        return TypeMapper.INSTANCE.toTypeResponse(typeEntity);
+        return TypeConverter.INSTANCE.toTypeResponse(typeEntity);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -90,7 +90,7 @@ public class TypeController {
 
         TypeEntity typeEntity = typeService.saveType(typeRequest);
 
-        return TypeMapper.INSTANCE.toTypeResponse(typeEntity);
+        return TypeConverter.INSTANCE.toTypeResponse(typeEntity);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

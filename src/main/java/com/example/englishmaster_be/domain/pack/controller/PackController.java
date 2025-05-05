@@ -4,7 +4,7 @@ package com.example.englishmaster_be.domain.pack.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.pack.service.IPackService;
-import com.example.englishmaster_be.mapper.PackMapper;
+import com.example.englishmaster_be.converter.PackConverter;
 import com.example.englishmaster_be.domain.pack.dto.request.PackRequest;
 import com.example.englishmaster_be.domain.pack.dto.response.PackResponse;
 import com.example.englishmaster_be.model.pack.PackEntity;
@@ -34,7 +34,7 @@ public class PackController {
 
         PackEntity pack = packService.createPack(packRequest);
 
-        return PackMapper.INSTANCE.toPackResponse(pack);
+        return PackConverter.INSTANCE.toPackResponse(pack);
     }
 
     @GetMapping(value = "/listPack")
@@ -43,6 +43,6 @@ public class PackController {
 
         List<PackEntity> packEntityList = packService.getListPack();
 
-        return PackMapper.INSTANCE.toPackResponseList(packEntityList);
+        return PackConverter.INSTANCE.toPackResponseList(packEntityList);
     }
 }

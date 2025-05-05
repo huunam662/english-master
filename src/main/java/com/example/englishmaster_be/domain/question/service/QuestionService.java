@@ -11,7 +11,7 @@ import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.question.dto.response.*;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.exception.template.CustomException;
+import com.example.englishmaster_be.advice.exception.template.CustomException;
 import com.example.englishmaster_be.common.constant.error.ErrorEnum;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
@@ -24,13 +24,13 @@ import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.question.QuestionQueryFactory;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.exception.template.BadRequestException;
-import com.example.englishmaster_be.mapper.QuestionMapper;
+import com.example.englishmaster_be.advice.exception.template.BadRequestException;
+import com.example.englishmaster_be.converter.QuestionConverter;
 import com.example.englishmaster_be.model.answer.AnswerRepository;
 import com.example.englishmaster_be.model.content.ContentRepository;
 import com.example.englishmaster_be.model.part.PartRepository;
 import com.example.englishmaster_be.model.question.QuestionRepository;
-import com.example.englishmaster_be.util.FileUtil;
+import com.example.englishmaster_be.helper.FileHelper;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -55,7 +55,7 @@ import java.util.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class QuestionService implements IQuestionService {
 
-    FileUtil fileUtil;
+    FileHelper fileUtil;
 
     PartQueryFactory partQueryFactory;
 
@@ -117,7 +117,7 @@ public class QuestionService implements IQuestionService {
     }
 
     private QuestionEntity createNewQuestion(QuestionRequest questionRequest, UserEntity currentUser, PartEntity part) {
-        QuestionEntity question = QuestionMapper.INSTANCE.toQuestionEntity(questionRequest);
+        QuestionEntity question = QuestionConverter.INSTANCE.toQuestionEntity(questionRequest);
 
         question.setCreateAt(LocalDateTime.now());
         question.setUserCreate(currentUser);
@@ -394,7 +394,7 @@ public class QuestionService implements IQuestionService {
     @Override
     public QuestionEntity createGroupQuestion(QuestionGroupRequest createGroupQuestionDTO) {
 
-        QuestionEntity question = QuestionMapper.INSTANCE.toQuestionEntity(createGroupQuestionDTO);
+        QuestionEntity question = QuestionConverter.INSTANCE.toQuestionEntity(createGroupQuestionDTO);
 
         QuestionEntity questionGroup = getQuestionById(createGroupQuestionDTO.getQuestionGroupId());
 
@@ -427,7 +427,7 @@ public class QuestionService implements IQuestionService {
 
         List<QuestionEntity> questionEntityList = questionQueryFactory.findAllQuestionsParentBy(topicEntity, partEntityList);
 
-        return QuestionMapper.INSTANCE.toQuestionPartResponseList(questionEntityList, partEntityList, topicEntity, isAdmin);
+        return QuestionConverter.INSTANCE.toQuestionPartResponseList(questionEntityList, partEntityList, topicEntity, isAdmin);
     }
 
 

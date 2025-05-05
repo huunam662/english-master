@@ -3,10 +3,8 @@ package com.example.englishmaster_be.domain.part.service;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestPartRequest;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
 import com.example.englishmaster_be.model.topic.TopicEntity;
-import com.example.englishmaster_be.shared.upload_file.dto.request.UploadMultipleFileRequest;
 import com.example.englishmaster_be.domain.part.dto.request.PartSaveContentRequest;
 import com.example.englishmaster_be.model.part.PartEntity;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

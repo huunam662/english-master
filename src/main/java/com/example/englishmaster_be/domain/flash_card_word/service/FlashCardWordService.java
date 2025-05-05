@@ -1,12 +1,11 @@
 package com.example.englishmaster_be.domain.flash_card_word.service;
 
-import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.flash_card.service.IFlashCardService;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.domain.flash_card_word.dto.request.FlashCardWordRequest;
-import com.example.englishmaster_be.mapper.FlashCardWordMapper;
+import com.example.englishmaster_be.converter.FlashCardWordConverter;
 import com.example.englishmaster_be.model.flash_card.FlashCardEntity;
 import com.example.englishmaster_be.model.flash_card_word.FlashCardWordEntity;
 import com.example.englishmaster_be.model.flash_card_word.FlashCardWordRepository;
@@ -110,7 +109,7 @@ public class FlashCardWordService implements IFlashCardWordService {
                     .build();
         }
 
-        FlashCardWordMapper.INSTANCE.flowToFlashCardWordEntity(flashCardWordRequest, flashCardWord);
+        FlashCardWordConverter.INSTANCE.flowToFlashCardWordEntity(flashCardWordRequest, flashCardWord);
         flashCardWord.setUserUpdate(user);
         flashCardWord.setUpdateAt(LocalDateTime.now());
 

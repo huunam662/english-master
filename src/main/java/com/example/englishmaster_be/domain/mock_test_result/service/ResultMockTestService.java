@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.mock_test_result.service;
 
-import com.example.englishmaster_be.mapper.MockTestResultMapper;
+import com.example.englishmaster_be.converter.MockTestResultConverter;
 import com.example.englishmaster_be.domain.mock_test_result.dto.request.ResultMockTestRequest;
 import com.example.englishmaster_be.model.mock_test_result.MockTestResultRepository;
 import com.example.englishmaster_be.domain.mock_test.service.IMockTestService;
@@ -65,7 +65,7 @@ public class ResultMockTestService implements IResultMockTestService {
         resultMockTestEntity.setPart(part);
         resultMockTestEntity.setMockTest(mockTest);
 
-        MockTestResultMapper.INSTANCE.flowToResultMockTest(resultMockTest, resultMockTestEntity);
+        MockTestResultConverter.INSTANCE.flowToResultMockTest(resultMockTest, resultMockTestEntity);
 
         return resultMockTestRepository.save(resultMockTestEntity);
     }

@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.domain.answer.service;
 
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerRequest;
-import com.example.englishmaster_be.exception.template.CustomException;
-import com.example.englishmaster_be.mapper.AnswerMapper;
+import com.example.englishmaster_be.advice.exception.template.CustomException;
+import com.example.englishmaster_be.converter.AnswerConverter;
 import com.example.englishmaster_be.model.answer.AnswerRepository;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailRepository;
@@ -74,7 +74,7 @@ public class AnswerService implements IAnswerService {
         answer.setUpdateAt(LocalDateTime.now());
         answer.setUserUpdate(user);
 
-        AnswerMapper.INSTANCE.flowToAnswerEntity(answerRequest, answer);
+        AnswerConverter.INSTANCE.flowToAnswerEntity(answerRequest, answer);
 
         return answerRepository.save(answer);
     }

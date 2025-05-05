@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.config.web;
 
-import com.example.englishmaster_be.config.global.interceptor.GlobalInterceptorConfig;
+import com.example.englishmaster_be.config.middleware.interceptor.MiddlewareInterceptorConfig;
 import com.example.englishmaster_be.value.AppValue;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -11,9 +11,7 @@ import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Configuration
@@ -23,7 +21,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     AppValue appValue;
 
-    GlobalInterceptorConfig globalInterceptorHandler;
+    MiddlewareInterceptorConfig globalInterceptorHandler;
 
 
     @Override

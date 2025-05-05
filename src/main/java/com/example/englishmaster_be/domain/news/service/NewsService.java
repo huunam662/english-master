@@ -2,10 +2,9 @@ package com.example.englishmaster_be.domain.news.service;
 
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
 import com.example.englishmaster_be.common.thread.MessageResponseHolder;
-import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
-import com.example.englishmaster_be.mapper.NewsMapper;
+import com.example.englishmaster_be.converter.NewsConverter;
 import com.example.englishmaster_be.domain.news.dto.request.NewsRequest;
 import com.example.englishmaster_be.domain.news.dto.request.NewsFilterRequest;
 import com.example.englishmaster_be.domain.news.dto.response.NewsResponse;
@@ -98,7 +97,7 @@ public class NewsService implements INewsService {
                                     .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
-                NewsMapper.INSTANCE.toNewsResponseList(query.fetch())
+                NewsConverter.INSTANCE.toNewsResponseList(query.fetch())
         );
 
         return filterResponse;
@@ -132,7 +131,7 @@ public class NewsService implements INewsService {
                 .createAt(LocalDateTime.now())
                 .build();
 
-        NewsMapper.INSTANCE.flowToNewsEntity(newsRequest, news);
+        NewsConverter.INSTANCE.flowToNewsEntity(newsRequest, news);
 
         if(newsRequest.getImage() != null && !newsRequest.getImage().isEmpty()){
 
