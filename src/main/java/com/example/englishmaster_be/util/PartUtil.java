@@ -1,5 +1,7 @@
 package com.example.englishmaster_be.util;
 
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestPartRequest;
 import com.example.englishmaster_be.model.part.PartEntity;
 
@@ -11,7 +13,7 @@ public class PartUtil {
     public static List<UUID> convertToPartUUID(List<MockTestPartRequest> mockTestPartRequestList){
 
         if(mockTestPartRequestList == null)
-            throw new BadRequestException("parts list from Mock test is null");
+            throw new ErrorHolder(Error.BAD_REQUEST, "parts list from Mock test is null");
 
         return mockTestPartRequestList.stream().map(
                 MockTestPartRequest::getPartId

@@ -1,5 +1,7 @@
 package com.example.englishmaster_be.util;
 
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.common.constant.excel.ExcelQuestionConstant;
 import com.example.englishmaster_be.common.constant.excel.ExcelTopicConstant;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
@@ -34,7 +36,7 @@ public class ExcelUtil {
         List<Integer> partsScope = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
 
         if (!partsScope.contains(partNumber))
-            throw new BadRequestException(String.format("Part number must one value in scope [%s]", String.join(", ", partsScope.stream().map(String::valueOf).toList())));
+            throw new ErrorHolder(Error.BAD_REQUEST, String.format("Part number must one value in scope [%s]", String.join(", ", partsScope.stream().map(String::valueOf).toList())));
     }
 
     public static ExcelQuestionContentResponse collectQuestionContentPart1234567With(Sheet sheet, Integer iRowAudioOrQuestionContentPath, Integer iRowImagePath, Integer iRowTotalScore, int partNumber) {
@@ -51,10 +53,10 @@ public class ExcelUtil {
 
             if (List.of(1, 2, 3, 4, 8).contains(partNumber)) {
                 if (audioOrQuestionContentRow == null || !getStringCellValue(audioOrQuestionContentRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Audio.getHeaderName()))
-                    throw new BadRequestException(String.format("'%s' tag is required in Sheet %s, You can fill is blank content audio !", ExcelQuestionConstant.Audio.getHeaderName(), sheet.getSheetName()));
+                    throw new ErrorHolder(Error.BAD_REQUEST, String.format("'%s' tag is required in Sheet %s, You can fill is blank content audio !", ExcelQuestionConstant.Audio.getHeaderName(), sheet.getSheetName()));
             } else {
                 if (audioOrQuestionContentRow == null || !getStringCellValue(audioOrQuestionContentRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Question_Content.getHeaderName()))
-                    throw new BadRequestException(String.format("'%s' tag is required in Sheet %s, You can fill is blank question content !", ExcelQuestionConstant.Question_Content.getHeaderName(), sheet.getSheetName()));
+                    throw new ErrorHolder(Error.BAD_REQUEST, String.format("'%s' tag is required in Sheet %s, You can fill is blank question content !", ExcelQuestionConstant.Question_Content.getHeaderName(), sheet.getSheetName()));
             }
 
             audioPathOrQuestionContent = getStringCellValue(audioOrQuestionContentRow, 1);
@@ -65,7 +67,7 @@ public class ExcelUtil {
             Row imageRow = sheet.getRow(iRowImagePath);
 
             if (imageRow == null || !getStringCellValue(imageRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Image.getHeaderName()))
-                throw new BadRequestException(String.format("'%s' tag is required in Sheet %s, You can fill is blank content image !", ExcelQuestionConstant.Image.getHeaderName(), sheet.getSheetName()));
+                throw new ErrorHolder(Error.BAD_REQUEST, String.format("'%s' tag is required in Sheet %s, You can fill is blank content image !", ExcelQuestionConstant.Image.getHeaderName(), sheet.getSheetName()));
 
             imagePath = getStringCellValue(imageRow, 1);
         }
@@ -75,7 +77,7 @@ public class ExcelUtil {
             Row scoreRow = sheet.getRow(iRowTotalScore);
 
             if (scoreRow == null || !getStringCellValue(scoreRow, 0).equalsIgnoreCase(ExcelQuestionConstant.Score.getHeaderName()))
-                throw new BadRequestException(String.format("'%s' tag is required in Sheet %s, You can fill is blank content score !", ExcelQuestionConstant.Score.getHeaderName(), sheet.getSheetName()));
+                throw new ErrorHolder(Error.BAD_REQUEST, String.format("'%s' tag is required in Sheet %s, You can fill is blank content score !", ExcelQuestionConstant.Score.getHeaderName(), sheet.getSheetName()));
 
             Cell cellTotalScore = scoreRow.getCell(1);
 
@@ -152,7 +154,7 @@ public class ExcelUtil {
                 .map(partItem -> {
 
                     if (!partItem.split(":")[0].trim().toLowerCase().startsWith("part"))
-                        throw new BadRequestException("Part name of questions must be start with key 'PART'");
+                        throw new ErrorHolder(Error.BAD_REQUEST, "Part name of questions must be start with key 'PART'");
 
                     return partItem.trim();
                 })
@@ -189,12 +191,12 @@ public class ExcelUtil {
         Row rowInSheet = sheet.getRow(iRowHeader);
 
         if (rowInSheet == null)
-            throw new BadRequestException(String.format("Row %d at Sheet %s does not exist", iRowHeader, sheet.getSheetName()));
+            throw new ErrorHolder(Error.BAD_REQUEST, String.format("Row %d at Sheet %s does not exist", iRowHeader, sheet.getSheetName()));
 
         Cell cellAtCol = rowInSheet.getCell(jColOfRow);
 
         if (cellAtCol == null || !getStringCellValue(rowInSheet, jColOfRow).equalsIgnoreCase(excelTopicConstant.getHeaderName()))
-            throw new BadRequestException(
+            throw new ErrorHolder(Error.BAD_REQUEST,
                     String.format(
                             "'%s' of cell %d header at row %d is required in Sheet %s",
                             excelTopicConstant.getHeaderName(),
@@ -213,7 +215,7 @@ public class ExcelUtil {
         Row rowHeaderTable = sheet.getRow(iRowHeaderTable);
 
         if (rowHeaderTable == null)
-            throw new BadRequestException(String.format("Row %d at Sheet %s does not exist", iRowHeaderTable, sheet.getSheetName()));
+            throw new ErrorHolder(Error.BAD_REQUEST, String.format("Row %d at Sheet %s does not exist", iRowHeaderTable, sheet.getSheetName()));
 
         int jColSTT_CellOnHeader = 0;
 
@@ -283,7 +285,7 @@ public class ExcelUtil {
         Cell cellOnHeaderTable = rowHeaderTable.getCell(jColHeaderTable);
 
         if (cellOnHeaderTable == null || !getStringCellValue(rowHeaderTable, jColHeaderTable).equalsIgnoreCase(cellHeaderValue.getHeaderName()))
-            throw new BadRequestException(
+            throw new ErrorHolder(Error.BAD_REQUEST,
                     String.format(
                             "'%s' of cell %d in header table row %d is required in Sheet %s",
                             cellHeaderValue.getHeaderName(),
