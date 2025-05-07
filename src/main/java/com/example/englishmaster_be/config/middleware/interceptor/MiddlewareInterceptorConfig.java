@@ -1,16 +1,18 @@
 package com.example.englishmaster_be.config.middleware.interceptor;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
-import com.example.englishmaster_be.common.thread.MessageResponseHolder;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Nonnull;
 
+@Slf4j(topic = "MIDDLEWARE-INTERCEPTOR")
 @Component
 public class MiddlewareInterceptorConfig implements HandlerInterceptor {
 
@@ -23,17 +25,7 @@ public class MiddlewareInterceptorConfig implements HandlerInterceptor {
     {
         HandlerInterceptor.super.preHandle(request, response, handler);
 
-        System.out.println("-> preHandle in Interceptor");
-
-        if(handler instanceof HandlerMethod handlerMethod) {
-
-            DefaultMessage messageResponse = handlerMethod.getMethodAnnotation(DefaultMessage.class);
-
-            System.out.println("messageResponse: " + messageResponse);
-
-            if(messageResponse != null)
-                MessageResponseHolder.setMessage(messageResponse.value());
-        }
+        log.info("-> preHandle in Interceptor");
 
         return true;
     }
@@ -48,7 +40,7 @@ public class MiddlewareInterceptorConfig implements HandlerInterceptor {
     {
         HandlerInterceptor.super.postHandle(request, response, handler, modelAndView);
 
-        System.out.println("-> postHandle in Interceptor");
+        log.info("-> postHandle in Interceptor");
     }
 
     @Override
@@ -61,10 +53,6 @@ public class MiddlewareInterceptorConfig implements HandlerInterceptor {
     {
         HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
 
-        System.out.println("-> afterCompletion in Interceptor");
-
-        MessageResponseHolder.clear();
-
-        System.out.println("-> messageResponse after clear by thread holder: " + MessageResponseHolder.getMessage());
+        log.info("-> afterCompletion in Interceptor");
     }
 }

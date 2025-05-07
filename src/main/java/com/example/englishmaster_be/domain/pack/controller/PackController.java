@@ -4,7 +4,7 @@ package com.example.englishmaster_be.domain.pack.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.pack.service.IPackService;
-import com.example.englishmaster_be.converter.PackConverter;
+import com.example.englishmaster_be.mapper.PackMapper;
 import com.example.englishmaster_be.domain.pack.dto.request.PackRequest;
 import com.example.englishmaster_be.domain.pack.dto.response.PackResponse;
 import com.example.englishmaster_be.model.pack.PackEntity;
@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @Tag(name = "Pack")
@@ -34,7 +33,7 @@ public class PackController {
 
         PackEntity pack = packService.createPack(packRequest);
 
-        return PackConverter.INSTANCE.toPackResponse(pack);
+        return PackMapper.INSTANCE.toPackResponse(pack);
     }
 
     @GetMapping(value = "/listPack")
@@ -43,6 +42,6 @@ public class PackController {
 
         List<PackEntity> packEntityList = packService.getListPack();
 
-        return PackConverter.INSTANCE.toPackResponseList(packEntityList);
+        return PackMapper.INSTANCE.toPackResponseList(packEntityList);
     }
 }

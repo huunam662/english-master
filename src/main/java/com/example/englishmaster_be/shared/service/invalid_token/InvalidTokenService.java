@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.shared.service.invalid_token;
 
-import com.example.englishmaster_be.common.constant.InvalidTokenTypeEnum;
+import com.example.englishmaster_be.common.constant.InvalidTokenType;
 import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
 import com.example.englishmaster_be.shared.service.jwt.JwtService;
 import com.example.englishmaster_be.model.invalid_token.InvalidTokenEntity;
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class InvalidTokenService implements IInvalidTokenService {
 
@@ -45,7 +45,7 @@ public class InvalidTokenService implements IInvalidTokenService {
 
     @Transactional
     @Override
-    public void insertInvalidToken(SessionActiveEntity sessionActive, InvalidTokenTypeEnum typeInvalid) {
+    public void insertInvalidToken(SessionActiveEntity sessionActive, InvalidTokenType typeInvalid) {
 
         if(sessionActive == null) return;
 
@@ -69,7 +69,7 @@ public class InvalidTokenService implements IInvalidTokenService {
 
     @Transactional
     @Override
-    public void insertInvalidTokenList(List<SessionActiveEntity> sessionActiveEntityList, InvalidTokenTypeEnum typeInvalid) {
+    public void insertInvalidTokenList(List<SessionActiveEntity> sessionActiveEntityList, InvalidTokenType typeInvalid) {
 
         sessionActiveEntityList.forEach(sessionActiveEntity -> {
 

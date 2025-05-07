@@ -1,9 +1,10 @@
 package com.example.englishmaster_be.domain.file_storage.service;
 
 
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.file_storage.dto.response.ResourceResponse;
-import com.example.englishmaster_be.advice.exception.template.ResourceNotFoundException;
 import com.example.englishmaster_be.value.BucketValue;
 import com.example.englishmaster_be.value.FileValue;
 import com.google.cloud.storage.Blob;
@@ -14,7 +15,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.*;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ import java.util.List;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 public class FileStorageService implements IFileStorageService {
 
     FileValue fileValue;
@@ -41,7 +41,7 @@ public class FileStorageService implements IFileStorageService {
         try {
             Files.createDirectories(root);
         } catch (IOException e) {
-            throw new RuntimeException("Could not initialize folder for upload!");
+            throw new ErrorHolder(Error.SERVER_ERROR, "Could not initialize folder for upload!");
         }
     }
 
@@ -75,7 +75,7 @@ public class FileStorageService implements IFileStorageService {
 
         Blob blob = storage.get(bucketValue.getBucketNameStudentNodejs(), fileName);
 
-        if(blob == null) throw new ResourceNotFoundException("Image not found");
+        if(blob == null) throw new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Image not found");
 
         byte[] inputStream = blob.getContent();
 
@@ -123,7 +123,7 @@ public class FileStorageService implements IFileStorageService {
             if (e instanceof FileAlreadyExistsException) {
                 throw new FileAlreadyExistsException("A file_storage of that name already exists.");
             }
-            throw new RuntimeException("Save file_storage failed");
+            throw new ErrorHolder(Error.SERVER_ERROR, "Save file_storage failed");
         }
     }
 

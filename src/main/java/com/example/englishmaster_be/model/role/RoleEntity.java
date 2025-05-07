@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.model.role;
 
-import com.example.englishmaster_be.common.constant.RoleEnum;
+import com.example.englishmaster_be.common.constant.Role;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -31,7 +31,7 @@ public class RoleEntity implements GrantedAuthority {
 
     @Column(name = "role_name")
     @Enumerated(EnumType.STRING)
-    RoleEnum roleName;
+    Role roleName;
 
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
     List<UserEntity> users;

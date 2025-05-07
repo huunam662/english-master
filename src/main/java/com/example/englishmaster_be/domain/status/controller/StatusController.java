@@ -3,7 +3,7 @@ package com.example.englishmaster_be.domain.status.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.model.status.StatusEntity;
-import com.example.englishmaster_be.converter.StatusConverter;
+import com.example.englishmaster_be.mapper.StatusMapper;
 import com.example.englishmaster_be.domain.status.dto.request.StatusRequest;
 import com.example.englishmaster_be.domain.status.dto.response.StatusResponse;
 import com.example.englishmaster_be.domain.status.service.IStatusService;
@@ -33,7 +33,7 @@ public class StatusController {
 
         StatusEntity statusEntity = statusService.saveStatus(statusRequest);
 
-        return StatusConverter.INSTANCE.toStatusResponse(statusEntity);
+        return StatusMapper.INSTANCE.toStatusResponse(statusEntity);
     }
 
     @PutMapping("/updateStatus/{statusId}")
@@ -44,7 +44,7 @@ public class StatusController {
 
         StatusEntity status = statusService.saveStatus(statusRequest);
 
-        return StatusConverter.INSTANCE.toStatusResponse(status);
+        return StatusMapper.INSTANCE.toStatusResponse(status);
     }
 
     @GetMapping("/getStatusByTypeId/{id}")
@@ -53,7 +53,7 @@ public class StatusController {
 
         List<StatusEntity> statusEntityList = statusService.getAllStatusByType(id);
 
-        return StatusConverter.INSTANCE.toStatusResponseList(statusEntityList);
+        return StatusMapper.INSTANCE.toStatusResponseList(statusEntityList);
     }
 
     @GetMapping("/getStatusById/{id}")
@@ -62,7 +62,7 @@ public class StatusController {
 
         StatusEntity status = statusService.getStatusById(id);
 
-        return StatusConverter.INSTANCE.toStatusResponse(status);
+        return StatusMapper.INSTANCE.toStatusResponse(status);
     }
 
     @DeleteMapping("/{statusId}")

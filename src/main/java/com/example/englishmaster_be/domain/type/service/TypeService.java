@@ -1,10 +1,11 @@
 package com.example.englishmaster_be.domain.type.service;
 
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
-import com.example.englishmaster_be.converter.TypeConverter;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
+import com.example.englishmaster_be.mapper.TypeMapper;
 import com.example.englishmaster_be.domain.type.dto.request.TypeFilterRequest;
 import com.example.englishmaster_be.domain.type.dto.request.TypeRequest;
-import com.example.englishmaster_be.advice.exception.template.BadRequestException;
 import com.example.englishmaster_be.domain.type.dto.response.TypeResponse;
 import com.example.englishmaster_be.model.type.QTypeEntity;
 import com.example.englishmaster_be.util.TypeUtil;
@@ -17,7 +18,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
@@ -25,7 +25,7 @@ import java.util.UUID;
 
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class TypeService implements ITypeService {
 
@@ -71,7 +71,7 @@ public class TypeService implements ITypeService {
                 .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
-                TypeConverter.INSTANCE.toTypeResponseList(query.fetch())
+                TypeMapper.INSTANCE.toTypeResponseList(query.fetch())
         );
 
         return filterResponse;
@@ -86,7 +86,7 @@ public class TypeService implements ITypeService {
                 .fetchOne();
 
         return Optional.ofNullable(result).orElseThrow(
-                () -> new BadRequestException("Type not found")
+                () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND)
         );
     }
 
@@ -100,9 +100,9 @@ public class TypeService implements ITypeService {
         if(typeRequest.getTypeId() != null) {
             typeEntity = getTypeById(typeRequest.getTypeId());
 
-            TypeConverter.INSTANCE.flowToTypeEntity(typeRequest, typeEntity);
+            TypeMapper.INSTANCE.flowToTypeEntity(typeRequest, typeEntity);
         }
-        else typeEntity = TypeConverter.INSTANCE.toTypeEntity(typeRequest);
+        else typeEntity = TypeMapper.INSTANCE.toTypeEntity(typeRequest);
 
         return typeRepository.save(typeEntity);
 
@@ -112,7 +112,7 @@ public class TypeService implements ITypeService {
     public void deleteTypeById(UUID id) {
 
         TypeEntity type = typeRepository.findById(id).orElseThrow(
-                () -> new BadRequestException("TypeEntity not found")
+                () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND)
         );
 
         typeRepository.delete(type);

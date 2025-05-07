@@ -1,12 +1,12 @@
 package com.example.englishmaster_be.domain.mock_test.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 
 import com.example.englishmaster_be.domain.mock_test.dto.response.*;
 import com.example.englishmaster_be.domain.mock_test.service.IMockTestService;
-import com.example.englishmaster_be.converter.MockTestDetailConverter;
-import com.example.englishmaster_be.converter.MockTestConverter;
+import com.example.englishmaster_be.mapper.MockTestDetailMapper;
+import com.example.englishmaster_be.mapper.MockTestMapper;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestFilterRequest;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestRequest;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionMockTestResponse;
@@ -41,7 +41,7 @@ public class MockTestController {
 
         MockTestEntity mockTest = mockTestService.saveMockTest(saveMockTestRequest);
 
-        return MockTestConverter.INSTANCE.toMockTestResponse(mockTest);
+        return MockTestMapper.INSTANCE.toMockTestResponse(mockTest);
     }
 
     @GetMapping(value = "/getMockTestById")
@@ -51,7 +51,7 @@ public class MockTestController {
 
         MockTestEntity mockTest = mockTestService.findMockTestById(id);
 
-        return MockTestConverter.INSTANCE.toMockTestResponse(mockTest);
+        return MockTestMapper.INSTANCE.toMockTestResponse(mockTest);
     }
 
     @GetMapping(value = "/listMockTest")
@@ -61,7 +61,7 @@ public class MockTestController {
 
         List<MockTestEntity> listMockTest = mockTestService.getTop10MockTest(index);
 
-        return MockTestConverter.INSTANCE.toMockTestResponseList(listMockTest);
+        return MockTestMapper.INSTANCE.toMockTestResponseList(listMockTest);
     }
 
     @GetMapping(value = "/listMockTestAdmin")
@@ -99,7 +99,7 @@ public class MockTestController {
 
         List<MockTestDetailEntity> detailMockTestEntityList = mockTestService.addAnswerToMockTest(mockTestId, listAnswerId);
 
-        return MockTestDetailConverter.INSTANCE.toMockTestDetailResponseList(detailMockTestEntityList);
+        return MockTestDetailMapper.INSTANCE.toMockTestDetailResponseList(detailMockTestEntityList);
     }
 
 
@@ -109,7 +109,7 @@ public class MockTestController {
 
         List<MockTestDetailEntity> detailMockTestEntityList = mockTestService.getListCorrectAnswer(index, isCorrect, mockTestId);
 
-        return MockTestDetailConverter.INSTANCE.toMockTestDetailResponseList(detailMockTestEntityList);
+        return MockTestDetailMapper.INSTANCE.toMockTestDetailResponseList(detailMockTestEntityList);
     }
 
     @GetMapping(value = "/{mockTestId:.+}/sendEmail")
@@ -141,6 +141,6 @@ public class MockTestController {
     @DefaultMessage("Show all info of mocktest")
     public MockTestInforResponse getMockTestInfor(@PathVariable UUID mockTestId) {
         MockTestEntity mockTestEntity = mockTestService.getInformationMockTest(mockTestId);
-        return MockTestConverter.INSTANCE.toMockTestInforResponse(mockTestEntity);
+        return MockTestMapper.INSTANCE.toMockTestInforResponse(mockTestEntity);
     }
 }

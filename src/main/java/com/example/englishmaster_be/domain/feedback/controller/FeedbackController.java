@@ -1,13 +1,13 @@
 package com.example.englishmaster_be.domain.feedback.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
-import com.example.englishmaster_be.common.constant.sort.SortByFeedbackFieldsEnum;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
+import com.example.englishmaster_be.common.constant.sort.SortByFeedbackFields;
 
 import com.example.englishmaster_be.domain.feedback.service.IFeedbackService;
 import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackFilterRequest;
 import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackRequest;
-import com.example.englishmaster_be.converter.FeedbackConverter;
+import com.example.englishmaster_be.mapper.FeedbackMapper;
 import com.example.englishmaster_be.domain.feedback.dto.response.FeedbackResponse;
 import com.example.englishmaster_be.model.feedback.FeedbackEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -39,7 +39,7 @@ public class FeedbackController {
     public FilterResponse<?> listFeedbackOfAdmin(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
-            @RequestParam(value = "sortBy", defaultValue = "None") SortByFeedbackFieldsEnum sortBy,
+            @RequestParam(value = "sortBy", defaultValue = "None") SortByFeedbackFields sortBy,
             @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction sortDirection,
             @RequestParam(value = "search", defaultValue = "") String search,
             @RequestParam(value = "enable", defaultValue = "false") Boolean isEnable
@@ -64,7 +64,7 @@ public class FeedbackController {
             @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
             @RequestParam(value = "search", defaultValue = "") String search,
-            @RequestParam(value = "sortBy", defaultValue = "None") SortByFeedbackFieldsEnum sortBy,
+            @RequestParam(value = "sortBy", defaultValue = "None") SortByFeedbackFields sortBy,
               @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction sortDirection
     ){
 
@@ -89,7 +89,7 @@ public class FeedbackController {
 
         FeedbackEntity feedback = feedbackService.saveFeedback(feedbackRequest);
 
-        return FeedbackConverter.INSTANCE.toFeedbackResponse(feedback);
+        return FeedbackMapper.INSTANCE.toFeedbackResponse(feedback);
     }
 
     @PatchMapping (value = "/{FeedbackId:.+}/enableFeedback")
@@ -115,7 +115,7 @@ public class FeedbackController {
 
         FeedbackEntity feedback = feedbackService.saveFeedback(feedbackRequest);
 
-        return FeedbackConverter.INSTANCE.toFeedbackResponse(feedback);
+        return FeedbackMapper.INSTANCE.toFeedbackResponse(feedback);
     }
 
     @DeleteMapping(value = "/{FeedbackId:.+}/deleteFeedback")

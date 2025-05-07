@@ -1,12 +1,11 @@
 package com.example.englishmaster_be.domain.question.dto.request;
 
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
-import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
-import io.swagger.v3.oas.annotations.Hidden;
+import com.example.englishmaster_be.common.constant.QuestionType;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -32,7 +31,7 @@ public class QuestionRequest {
 
     Integer numberChoice;
 
-    QuestionTypeEnum questionType;
+    QuestionType questionType;
 
     String contentImage;
 

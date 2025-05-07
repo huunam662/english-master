@@ -3,7 +3,7 @@ package com.example.englishmaster_be.domain.part.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.part.service.IPartService;
-import com.example.englishmaster_be.converter.PartConverter;
+import com.example.englishmaster_be.mapper.PartMapper;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
 import com.example.englishmaster_be.domain.part.dto.request.PartSaveContentRequest;
 import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
@@ -40,7 +40,7 @@ public class PartController {
 
         PartEntity part = partService.savePart(partRequest);
 
-        return PartConverter.INSTANCE.toPartResponse(part);
+        return PartMapper.INSTANCE.toPartResponse(part);
     }
 
 
@@ -56,7 +56,7 @@ public class PartController {
 
         PartEntity part = partService.savePart(partRequest);
 
-        return PartConverter.INSTANCE.toPartResponse(part);
+        return PartMapper.INSTANCE.toPartResponse(part);
     }
 
     @PutMapping(value = "/{partId:.+}/uploadfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -69,7 +69,7 @@ public class PartController {
 
         PartEntity part = partService.uploadFilePart(partId, contentData);
 
-        return PartConverter.INSTANCE.toPartResponse(part);
+        return PartMapper.INSTANCE.toPartResponse(part);
     }
 
     @PutMapping(value = "/{partId:.+}/uploadText")
@@ -82,7 +82,7 @@ public class PartController {
 
         PartEntity part = partService.uploadTextPart(partId, uploadTextRequest);
 
-        return PartConverter.INSTANCE.toPartResponse(part);
+        return PartMapper.INSTANCE.toPartResponse(part);
     }
 
     @GetMapping(value = "/listPart")
@@ -91,7 +91,7 @@ public class PartController {
 
         List<PartEntity> partEntityList = partService.getListPart();
 
-        return PartConverter.INSTANCE.toPartResponseList(partEntityList);
+        return PartMapper.INSTANCE.toPartResponseList(partEntityList);
     }
 
     @DeleteMapping(value = "/{partId:.+}/delete")
@@ -111,6 +111,6 @@ public class PartController {
 
         PartEntity partEntity = partService.getPartToId(partId);
 
-        return PartConverter.INSTANCE.toPartResponse(partEntity);
+        return PartMapper.INSTANCE.toPartResponse(partEntity);
     }
 }

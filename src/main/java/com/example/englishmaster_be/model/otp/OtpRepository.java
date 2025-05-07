@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.model.otp;
 
-import com.example.englishmaster_be.common.constant.OtpStatusEnum;
+import com.example.englishmaster_be.common.constant.OtpStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -14,7 +14,7 @@ public interface OtpRepository extends JpaRepository<OtpEntity, UUID> {
 
     @Modifying
     @Query("DELETE FROM OtpEntity o WHERE o.email = :email AND o.status = :status")
-    void deleteByEmailAndStatus(@Param("email") String email, @Param("status") OtpStatusEnum status);
+    void deleteByEmailAndStatus(@Param("email") String email, @Param("status") OtpStatus status);
 
     @Modifying
     void deleteByEmail(String email);

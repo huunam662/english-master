@@ -4,7 +4,7 @@ package com.example.englishmaster_be.domain.comment.controller;
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.comment.service.ICommentService;
 import com.example.englishmaster_be.domain.comment.dto.request.CommentRequest;
-import com.example.englishmaster_be.converter.CommentConverter;
+import com.example.englishmaster_be.mapper.CommentMapper;
 import com.example.englishmaster_be.domain.comment.dto.response.CommentResponse;
 import com.example.englishmaster_be.model.comment.CommentEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,7 +33,7 @@ public class CommentController {
 
         List<CommentEntity> commentList = commentService.getListCommentByCommentId(commentId);
 
-        return CommentConverter.INSTANCE.toCommentResponseList(commentList);
+        return CommentMapper.INSTANCE.toCommentResponseList(commentList);
     }
 
     @PostMapping(value = "/{topicId:.+}/addCommentToTopic")
@@ -46,7 +46,7 @@ public class CommentController {
 
         CommentEntity comment = commentService.saveCommentToTopic(topicId, commentRequest);
 
-        return CommentConverter.INSTANCE.toCommentResponse(comment);
+        return CommentMapper.INSTANCE.toCommentResponse(comment);
     }
 
     @PostMapping(value = "/{postId:.+}/addCommentToPost")
@@ -59,7 +59,7 @@ public class CommentController {
 
         CommentEntity comment = commentService.saveCommentToPost(postId, commentRequest);
 
-        return CommentConverter.INSTANCE.toCommentResponse(comment);
+        return CommentMapper.INSTANCE.toCommentResponse(comment);
     }
 
 
@@ -73,7 +73,7 @@ public class CommentController {
 
         CommentEntity comment = commentService.saveCommentToComment(commentId, commentRequest);
 
-        return CommentConverter.INSTANCE.toCommentResponse(comment);
+        return CommentMapper.INSTANCE.toCommentResponse(comment);
     }
 
     @PatchMapping(value = "/{commentId:.+}/updateComment")
@@ -86,7 +86,7 @@ public class CommentController {
 
         CommentEntity comment = commentService.saveComment(commentId, commentRequest);
 
-        return CommentConverter.INSTANCE.toCommentResponse(comment);
+        return CommentMapper.INSTANCE.toCommentResponse(comment);
     }
 
     @DeleteMapping(value = "/{commentId:.+}/deleteComment")

@@ -4,7 +4,7 @@ package com.example.englishmaster_be.domain.flash_card.controller;
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.flash_card.service.IFlashCardService;
 import com.example.englishmaster_be.domain.flash_card.dto.request.FlashCardRequest;
-import com.example.englishmaster_be.converter.FlashCardConverter;
+import com.example.englishmaster_be.mapper.FlashCardMapper;
 import com.example.englishmaster_be.domain.flash_card_word.dto.response.FlashCardWordListResponse;
 import com.example.englishmaster_be.domain.flash_card.dto.response.FlashCardResponse;
 import com.example.englishmaster_be.model.flash_card.FlashCardEntity;
@@ -36,7 +36,7 @@ public class FlashCardController {
 
         FlashCardEntity flashCard = flashCardService.getFlashCardById(flashCardId);
 
-        return FlashCardConverter.INSTANCE.toFlashCardListWordResponse(flashCard);
+        return FlashCardMapper.INSTANCE.toFlashCardListWordResponse(flashCard);
     }
 
 
@@ -47,7 +47,7 @@ public class FlashCardController {
 
         List<FlashCardEntity> flashCardList = flashCardService.getListFlashCardByCurrentUser();
 
-        return FlashCardConverter.INSTANCE.toFlashCardResponseList(flashCardList);
+        return FlashCardMapper.INSTANCE.toFlashCardResponseList(flashCardList);
     }
 
 
@@ -60,7 +60,7 @@ public class FlashCardController {
 
         FlashCardEntity flashCard = flashCardService.saveFlashCard(flashCardRequest);
 
-        return FlashCardConverter.INSTANCE.toFlashCardResponse(flashCard);
+        return FlashCardMapper.INSTANCE.toFlashCardResponse(flashCard);
     }
 
     @PutMapping(value = "/{flashCardId:.+}/updateFlashCard")
@@ -75,7 +75,7 @@ public class FlashCardController {
 
         FlashCardEntity flashCard = flashCardService.saveFlashCard(flashCardRequest);
 
-        return FlashCardConverter.INSTANCE.toFlashCardResponse(flashCard);
+        return FlashCardMapper.INSTANCE.toFlashCardResponse(flashCard);
     }
 
     @DeleteMapping(value = "/{flashCardId:.+}/removeFlashCard")

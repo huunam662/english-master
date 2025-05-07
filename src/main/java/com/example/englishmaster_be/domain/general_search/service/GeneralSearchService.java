@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.domain.general_search.service;
 
-import com.example.englishmaster_be.converter.FlashCardWordConverter;
-import com.example.englishmaster_be.converter.NewsConverter;
-import com.example.englishmaster_be.converter.TopicConverter;
+import com.example.englishmaster_be.mapper.FlashCardWordMapper;
+import com.example.englishmaster_be.mapper.NewsMapper;
+import com.example.englishmaster_be.mapper.TopicMapper;
 import com.example.englishmaster_be.domain.general_search.dto.response.GeneralSearchAllResponse;
 import com.example.englishmaster_be.model.flash_card_word.FlashCardWordEntity;
 import com.example.englishmaster_be.model.flash_card_word.QFlashCardWordEntity;
@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class GeneralSearchService implements IGeneralSearchService {
 
@@ -55,9 +55,9 @@ public class GeneralSearchService implements IGeneralSearchService {
                 .fetch();
 
         return GeneralSearchAllResponse.builder()
-                .topicList(TopicConverter.INSTANCE.toTopicResponseList(topics))
-                .flashCardWordList(FlashCardWordConverter.INSTANCE.toFlashCardWordResponseList(flashCardWords))
-                .newsList(NewsConverter.INSTANCE.toNewsResponseList(newsList))
+                .topicList(TopicMapper.INSTANCE.toTopicResponseList(topics))
+                .flashCardWordList(FlashCardWordMapper.INSTANCE.toFlashCardWordResponseList(flashCardWords))
+                .newsList(NewsMapper.INSTANCE.toNewsResponseList(newsList))
                 .build();
 
     }

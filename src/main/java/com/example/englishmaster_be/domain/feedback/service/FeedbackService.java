@@ -1,14 +1,14 @@
 package com.example.englishmaster_be.domain.feedback.service;
 
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
-import com.example.englishmaster_be.common.thread.MessageResponseHolder;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackRequest;
 import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackFilterRequest;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.advice.exception.template.BadRequestException;
-import com.example.englishmaster_be.converter.FeedbackConverter;
+import com.example.englishmaster_be.mapper.FeedbackMapper;
 import com.example.englishmaster_be.model.feedback.FeedbackRepository;
 import com.example.englishmaster_be.model.feedback.QFeedbackEntity;
 import com.example.englishmaster_be.util.FeedbackUtil;
@@ -23,7 +23,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +30,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FeedbackService implements IFeedbackService {
 
@@ -49,7 +48,7 @@ public class FeedbackService implements IFeedbackService {
     public FeedbackEntity getFeedbackById(UUID feedbackId) {
         return feedbackRepository.findByFeedbackId(feedbackId)
                 .orElseThrow(
-                        () -> new BadRequestException("Feedback not found")
+                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Feedback not found")
                 );
     }
 
@@ -98,7 +97,7 @@ public class FeedbackService implements IFeedbackService {
                 .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
-                FeedbackConverter.INSTANCE.toFeedbackResponseList(query.fetch())
+                FeedbackMapper.INSTANCE.toFeedbackResponseList(query.fetch())
         );
 
         return filterResponse;
@@ -138,7 +137,7 @@ public class FeedbackService implements IFeedbackService {
                 .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
-                FeedbackConverter.INSTANCE.toFeedbackResponseList(query.fetch())
+                FeedbackMapper.INSTANCE.toFeedbackResponseList(query.fetch())
         );
 
         return filterResponse;
@@ -158,7 +157,7 @@ public class FeedbackService implements IFeedbackService {
 
         else feedback = FeedbackEntity.builder().build();
 
-        FeedbackConverter.INSTANCE.flowToFeedbackEntity(feedbackRequest, feedback);
+        FeedbackMapper.INSTANCE.flowToFeedbackEntity(feedbackRequest, feedback);
         feedback.setAvatar(user.getAvatar());
         feedback.setEnable(Boolean.TRUE);
 
@@ -174,10 +173,6 @@ public class FeedbackService implements IFeedbackService {
         feedback.setEnable(enable);
 
         feedbackRepository.save(feedback);
-        
-        if(enable) MessageResponseHolder.setMessage("Enable FeedbackEntity successfully");
-        
-        else MessageResponseHolder.setMessage("Disable FeedbackEntity successfully");
     }
 
     @Transactional

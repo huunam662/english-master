@@ -1,12 +1,13 @@
 package com.example.englishmaster_be.helper;
 
-import com.example.englishmaster_be.common.constant.InvalidTokenTypeEnum;
-import com.example.englishmaster_be.common.constant.OtpStatusEnum;
-import com.example.englishmaster_be.common.constant.SessionActiveTypeEnum;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.InvalidTokenType;
+import com.example.englishmaster_be.common.constant.OtpStatus;
+import com.example.englishmaster_be.common.constant.SessionActiveType;
+import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.advice.exception.template.BadRequestException;
-import com.example.englishmaster_be.converter.UserConverter;
+import com.example.englishmaster_be.mapper.UserMapper;
 import com.example.englishmaster_be.model.otp.OtpEntity;
 import com.example.englishmaster_be.model.otp.OtpRepository;
 import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
@@ -20,7 +21,6 @@ import com.example.englishmaster_be.shared.service.session_active.ISessionActive
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,7 +32,7 @@ import java.util.List;
 
 @Component
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 public class AuthHelper {
 
     JwtService jwtUtil;
@@ -58,13 +58,13 @@ public class AuthHelper {
     public UserAuthResponse saveNewPassword(UserEntity user, String newPassword, String otpCode) {
 
         if (passwordEncoder.matches(newPassword, user.getPassword()))
-            throw new BadRequestException("Mật khẩu mới không được khớp với mật khẩu cũ");
+            throw new ErrorHolder(Error.BAD_REQUEST, "New password mustn't match with old password.");
 
         this.updatePassword(otpCode, user.getEmail(), newPassword);
 
-        List<SessionActiveEntity> sessionActiveEntityList = sessionActiveService.getSessionActiveList(user.getUserId(), SessionActiveTypeEnum.REFRESH_TOKEN);
+        List<SessionActiveEntity> sessionActiveEntityList = sessionActiveService.getSessionActiveList(user.getUserId(), SessionActiveType.REFRESH_TOKEN);
 
-        invalidTokenService.insertInvalidTokenList(sessionActiveEntityList, InvalidTokenTypeEnum.PASSWORD_CHANGE);
+        invalidTokenService.insertInvalidTokenList(sessionActiveEntityList, InvalidTokenType.PASSWORD_CHANGE);
 
         sessionActiveRepository.deleteAll(sessionActiveEntityList);
 
@@ -74,7 +74,7 @@ public class AuthHelper {
 
         logoutUser();
 
-        return UserConverter.INSTANCE.toUserAuthResponse(sessionActive, jwtToken);
+        return UserMapper.INSTANCE.toUserAuthResponse(sessionActive, jwtToken);
     }
 
 
@@ -83,15 +83,15 @@ public class AuthHelper {
 
         OtpEntity otpRecord = otpService.getByEmailAndOtp(email, otp);
 
-        if (!OtpStatusEnum.VERIFIED.equals(otpRecord.getStatus()))
-            throw new BadRequestException("Vui lòng xác thực mã OTP");
+        if (!OtpStatus.VERIFIED.equals(otpRecord.getStatus()))
+            throw new ErrorHolder(Error.BAD_REQUEST, "Please verification OTP code.");
 
         UserEntity user = userService.getUserByEmail(otpRecord.getEmail());
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
 
-        otpRecord.setStatus(OtpStatusEnum.USED);
+        otpRecord.setStatus(OtpStatus.USED);
         otpRepository.save(otpRecord);
     }
 

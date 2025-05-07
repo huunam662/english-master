@@ -1,11 +1,11 @@
 package com.example.englishmaster_be.domain.user.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.user.dto.request.*;
 import com.example.englishmaster_be.domain.user.dto.response.UserProfileResponse;
 import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.converter.UserConverter;
+import com.example.englishmaster_be.mapper.UserMapper;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
@@ -35,7 +35,7 @@ public class UserController {
 
         UserEntity currentUser = userService.currentUser();
 
-        return UserConverter.INSTANCE.toInformationUserResponse(currentUser);
+        return UserMapper.INSTANCE.toInformationUserResponse(currentUser);
     }
 
     @PatchMapping(value = "/changeProfile")
@@ -47,7 +47,7 @@ public class UserController {
 
         UserEntity user = userService.changeProfile(changeProfileRequest);
 
-        return UserConverter.INSTANCE.toInformationUserResponse(user);
+        return UserMapper.INSTANCE.toInformationUserResponse(user);
     }
 
 

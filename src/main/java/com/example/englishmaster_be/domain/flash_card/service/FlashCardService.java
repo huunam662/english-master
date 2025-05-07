@@ -1,9 +1,11 @@
 package com.example.englishmaster_be.domain.flash_card.service;
 
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.flash_card.dto.request.FlashCardRequest;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
-import com.example.englishmaster_be.converter.FlashCardConverter;
+import com.example.englishmaster_be.mapper.FlashCardMapper;
 import com.example.englishmaster_be.model.flash_card.FlashCardEntity;
 import com.example.englishmaster_be.model.flash_card.FlashCardRepository;
 import com.example.englishmaster_be.model.user.UserEntity;
@@ -22,7 +24,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FlashCardService implements IFlashCardService {
 
@@ -38,7 +40,7 @@ public class FlashCardService implements IFlashCardService {
     public FlashCardEntity getFlashCardById(UUID flashCardId) {
         return flashCardRepository.findByFlashCardId(flashCardId)
                 .orElseThrow(
-                        () -> new IllegalArgumentException("FlashCardEntity not found with ID: " + flashCardId)
+                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "FlashCardEntity not found with ID: " + flashCardId)
                 );
     }
 
@@ -88,7 +90,7 @@ public class FlashCardService implements IFlashCardService {
                 .userCreate(user)
                 .build();
 
-        FlashCardConverter.INSTANCE.flowToFlashCardEntity(flashCardRequest, flashCard);
+        FlashCardMapper.INSTANCE.flowToFlashCardEntity(flashCardRequest, flashCard);
 
         if(flashCardRequest.getFlashCardImage() != null && !flashCardRequest.getFlashCardImage().isEmpty()){
 

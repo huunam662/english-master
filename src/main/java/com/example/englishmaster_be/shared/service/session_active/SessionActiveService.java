@@ -1,7 +1,8 @@
 package com.example.englishmaster_be.shared.service.session_active;
 
-import com.example.englishmaster_be.common.constant.SessionActiveTypeEnum;
-import com.example.englishmaster_be.advice.exception.template.BadRequestException;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.SessionActiveType;
+import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.model.session_active.SessionActiveQueryFactory;
 import com.example.englishmaster_be.model.session_active.SessionActiveRepository;
 import com.example.englishmaster_be.domain.user.service.IUserService;
@@ -13,7 +14,6 @@ import com.example.englishmaster_be.value.JwtValue;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.*;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class SessionActiveService implements ISessionActiveService {
 
@@ -48,7 +48,7 @@ public class SessionActiveService implements ISessionActiveService {
         return sessionActiveRepository.findByCode(code);
     }
 
-    public SessionActiveEntity getByCodeAndType(UUID code, SessionActiveTypeEnum type) {
+    public SessionActiveEntity getByCodeAndType(UUID code, SessionActiveType type) {
 
         return sessionActiveRepository.findByCodeAndType(code, type);
     }
@@ -85,7 +85,7 @@ public class SessionActiveService implements ISessionActiveService {
                 .user(user)
                 .code(UUID.randomUUID())
                 .token(tokenHash)
-                .type(SessionActiveTypeEnum.REFRESH_TOKEN)
+                .type(SessionActiveType.REFRESH_TOKEN)
                 .build();
 
         return sessionActiveRepository.save(sessionActiveEntity);
@@ -95,7 +95,7 @@ public class SessionActiveService implements ISessionActiveService {
     public void verifyExpiration(SessionActiveEntity token) {
 
         if(token.getCreateAt().plusSeconds(jwtValue.getJwtRefreshExpirationMs()/1000).isBefore(LocalDateTime.now()))
-            throw new BadRequestException("Refresh token was expired. Please make a new sign in request");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Refresh token was expired. Please make a new sign in request");
 
     }
 
@@ -103,7 +103,7 @@ public class SessionActiveService implements ISessionActiveService {
     @Override
     public void deleteAllTokenExpired(UserEntity user) {
         try{
-            List<SessionActiveEntity> confirmationTokenList = sessionActiveRepository.findAllByUserAndType(user, SessionActiveTypeEnum.REFRESH_TOKEN);
+            List<SessionActiveEntity> confirmationTokenList = sessionActiveRepository.findAllByUserAndType(user, SessionActiveType.REFRESH_TOKEN);
 
             for(SessionActiveEntity confirmationToken : confirmationTokenList){
                 if(confirmationToken.getCreateAt().plusSeconds(jwtValue.getJwtRefreshExpirationMs()/1000).isBefore(LocalDateTime.now())){
@@ -125,7 +125,7 @@ public class SessionActiveService implements ISessionActiveService {
         sessionActiveRepository.delete(sessionActiveEntity);
     }
 
-    public List<SessionActiveEntity> getSessionActiveList(UUID userId, SessionActiveTypeEnum sessionActiveType){
+    public List<SessionActiveEntity> getSessionActiveList(UUID userId, SessionActiveType sessionActiveType){
 
         UserEntity user = userService.getUserById(userId);
 

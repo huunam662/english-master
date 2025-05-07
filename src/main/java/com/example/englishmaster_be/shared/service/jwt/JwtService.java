@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.shared.service.jwt;
 
-import com.example.englishmaster_be.common.constant.InvalidTokenTypeEnum;
+import com.example.englishmaster_be.common.constant.InvalidTokenType;
 import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
 import com.example.englishmaster_be.shared.service.invalid_token.InvalidTokenService;
 import com.example.englishmaster_be.shared.service.session_active.SessionActiveService;
@@ -18,6 +18,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import javax.crypto.Mac;
 import java.nio.charset.StandardCharsets;
@@ -32,8 +33,8 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Slf4j
-@Component
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@Service
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class JwtService {
 
@@ -55,7 +56,7 @@ public class JwtService {
 
             if(sessionActive != null) {
 
-                invalidTokenService.insertInvalidToken(sessionActive, InvalidTokenTypeEnum.EXPIRED);
+                invalidTokenService.insertInvalidToken(sessionActive, InvalidTokenType.EXPIRED);
                 sessionActiveService.deleteBySessionEntity(sessionActive);
             }
         }

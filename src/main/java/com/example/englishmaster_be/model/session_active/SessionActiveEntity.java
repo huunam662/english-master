@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.model.session_active;
 
-import com.example.englishmaster_be.common.constant.SessionActiveTypeEnum;
+import com.example.englishmaster_be.common.constant.SessionActiveType;
 import com.example.englishmaster_be.model.user.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -28,7 +28,7 @@ public class SessionActiveEntity {
 
     @Column(name = "Type")
     @Enumerated(EnumType.STRING)
-    SessionActiveTypeEnum type;
+    SessionActiveType type;
 
     @Column(name = "code", columnDefinition = "UUID")
     UUID code;

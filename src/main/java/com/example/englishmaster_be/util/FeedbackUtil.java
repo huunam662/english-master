@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.util;
 
-import com.example.englishmaster_be.common.constant.sort.SortByFeedbackFieldsEnum;
+import com.example.englishmaster_be.common.constant.sort.SortByFeedbackFields;
 
 import com.example.englishmaster_be.model.feedback.QFeedbackEntity;
 import com.querydsl.core.types.OrderSpecifier;
@@ -8,7 +8,7 @@ import org.springframework.data.domain.Sort;
 
 public class FeedbackUtil {
 
-    public static OrderSpecifier<?> buildFeedbackOrderSpecifier(SortByFeedbackFieldsEnum sortBy, Sort.Direction sortDirection) {
+    public static OrderSpecifier<?> buildFeedbackOrderSpecifier(SortByFeedbackFields sortBy, Sort.Direction sortDirection) {
 
         boolean isAscending = sortDirection != null && sortDirection.isAscending();
 

@@ -4,7 +4,7 @@ package com.example.englishmaster_be.domain.flash_card_word.controller;
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.flash_card_word.service.IFlashCardWordService;
 import com.example.englishmaster_be.domain.flash_card_word.dto.request.FlashCardWordRequest;
-import com.example.englishmaster_be.converter.FlashCardWordConverter;
+import com.example.englishmaster_be.mapper.FlashCardWordMapper;
 import com.example.englishmaster_be.domain.flash_card_word.dto.response.FlashCardWordResponse;
 import com.example.englishmaster_be.model.flash_card_word.FlashCardWordEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -49,7 +49,7 @@ public class FlashCardWordController {
 
         FlashCardWordEntity flashCardWord = flashCardWordService.saveFlashCardWord(flashCardWordRequest);
 
-        return FlashCardWordConverter.INSTANCE.toFlashCardWordResponse(flashCardWord);
+        return FlashCardWordMapper.INSTANCE.toFlashCardWordResponse(flashCardWord);
     }
 
 
@@ -65,7 +65,7 @@ public class FlashCardWordController {
 
         FlashCardWordEntity flashCardWord = flashCardWordService.saveFlashCardWord(flashCardWordRequest);
 
-        return FlashCardWordConverter.INSTANCE.toFlashCardWordResponse(flashCardWord);
+        return FlashCardWordMapper.INSTANCE.toFlashCardWordResponse(flashCardWord);
     }
 
     @GetMapping("/searchByWord")

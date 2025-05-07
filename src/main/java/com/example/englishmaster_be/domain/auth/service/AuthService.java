@@ -1,10 +1,10 @@
 package com.example.englishmaster_be.domain.auth.service;
 
-import com.example.englishmaster_be.common.constant.InvalidTokenTypeEnum;
-import com.example.englishmaster_be.common.constant.SessionActiveTypeEnum;
-import com.example.englishmaster_be.common.constant.OtpStatusEnum;
-import com.example.englishmaster_be.common.constant.RoleEnum;
-import com.example.englishmaster_be.common.constant.error.ErrorEnum;
+import com.example.englishmaster_be.common.constant.InvalidTokenType;
+import com.example.englishmaster_be.common.constant.SessionActiveType;
+import com.example.englishmaster_be.common.constant.OtpStatus;
+import com.example.englishmaster_be.common.constant.Role;
+import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.auth.dto.request.*;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.model.session_active.SessionActiveRepository;
@@ -18,10 +18,9 @@ import com.example.englishmaster_be.helper.AuthHelper;
 import com.example.englishmaster_be.shared.service.jwt.JwtService;
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;
 import com.example.englishmaster_be.domain.auth.dto.response.UserConfirmTokenResponse;
-import com.example.englishmaster_be.advice.exception.template.BadRequestException;
-import com.example.englishmaster_be.advice.exception.template.CustomException;
-import com.example.englishmaster_be.converter.ConfirmationTokenConverter;
-import com.example.englishmaster_be.converter.UserConverter;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.mapper.ConfirmationTokenMapper;
+import com.example.englishmaster_be.mapper.UserMapper;
 import com.example.englishmaster_be.model.otp.OtpEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.shared.service.mailer.MailerService;
@@ -30,7 +29,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -45,7 +43,7 @@ import java.util.UUID;
 
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AuthService implements IAuthService {
 
@@ -86,7 +84,7 @@ public class AuthService implements IAuthService {
         UserDetails userDetails = (UserDetails) authentication.getPrincipal();
 
         if(!userDetails.isEnabled())
-            throw new CustomException(ErrorEnum.ACCOUNT_DISABLED);
+            throw new ErrorHolder(Error.ACCOUNT_DISABLED);
 
         UserEntity user = userService.getUserByEmail(userDetails.getUsername());
 
@@ -94,7 +92,7 @@ public class AuthService implements IAuthService {
 
         SessionActiveEntity sessionActive = sessionActiveService.saveSessionActive(user, jwtToken);
 
-        return UserConverter.INSTANCE.toUserAuthResponse(sessionActive, jwtToken);
+        return UserMapper.INSTANCE.toUserAuthResponse(sessionActive, jwtToken);
     }
 
 
@@ -106,16 +104,16 @@ public class AuthService implements IAuthService {
         UserEntity user = userRepository.findByEmail(userRegisterRequest.getEmail()).orElse(null);
 
         if(user != null && user.getEnabled())
-            throw new BadRequestException("Email đã được sử dụng");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Email is used.");
 
-        UserEntity userRegister = UserConverter.INSTANCE.toUserEntity(userRegisterRequest);
+        UserEntity userRegister = UserMapper.INSTANCE.toUserEntity(userRegisterRequest);
         userRegister.setUserId(user != null ? user.getUserId() : UUID.randomUUID());
         userRegister.setPassword(passwordEncoder.encode(userRegisterRequest.getPassword()));
-        userRegister.setRole(roleRepository.findByRoleName(RoleEnum.USER));
+        userRegister.setRole(roleRepository.findByRoleName(Role.USER));
         userRegister.setEnabled(Boolean.FALSE);
 
         if(user != null && user.getConfirmTokens() != null)
-            sessionActiveRepository.deleteByUserAndType(user, SessionActiveTypeEnum.CONFIRM);
+            sessionActiveRepository.deleteByUserAndType(user, SessionActiveType.CONFIRM);
 
         userRegister = userRepository.save(userRegister);
 
@@ -124,7 +122,7 @@ public class AuthService implements IAuthService {
         try {
             mailerUtil.sendConfirmationEmail(userRegister.getEmail(), confirmationTokenResponse.getCode());
         } catch (IOException | MessagingException e) {
-            throw new CustomException(ErrorEnum.SEND_EMAIL_FAILURE);
+            throw new ErrorHolder(Error.SEND_EMAIL_FAILURE);
         }
     }
 
@@ -134,7 +132,7 @@ public class AuthService implements IAuthService {
     public UserConfirmTokenResponse createConfirmationToken(UserEntity user) {
 
         SessionActiveEntity sessionActive = SessionActiveEntity.builder()
-                .type(SessionActiveTypeEnum.CONFIRM)
+                .type(SessionActiveType.CONFIRM)
                 .user(user)
                 .code(UUID.randomUUID())
                 .createAt(LocalDateTime.now())
@@ -142,7 +140,7 @@ public class AuthService implements IAuthService {
 
         sessionActive = sessionActiveRepository.save(sessionActive);
 
-        return ConfirmationTokenConverter.INSTANCE.toConfirmationTokenResponse(sessionActive);
+        return ConfirmationTokenMapper.INSTANCE.toConfirmationTokenResponse(sessionActive);
     }
 
 
@@ -150,16 +148,16 @@ public class AuthService implements IAuthService {
     @Override
     public void confirmRegister(UUID sessionActiveCode) {
 
-        SessionActiveEntity confirmToken = sessionActiveRepository.findByCodeAndType(sessionActiveCode, SessionActiveTypeEnum.CONFIRM);
+        SessionActiveEntity confirmToken = sessionActiveRepository.findByCodeAndType(sessionActiveCode, SessionActiveType.CONFIRM);
 
         if (confirmToken == null)
-            throw new BadRequestException("Không tồn tại");
+            throw new ErrorHolder(Error.RESOURCE_NOT_FOUND);
 
         if (confirmToken.getUser().getEnabled())
-            throw new BadRequestException("Tài khoản đã được xác thực");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Account had been verified.");
 
         if ((confirmToken.getCreateAt().plusMinutes(5)).isBefore(LocalDateTime.now()))
-            throw new BadRequestException("Phiên xác thực đã hết hạn, vui lòng đăng ký lại");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Verification session had been expired, try again.");
 
         UserEntity user = confirmToken.getUser();
 
@@ -167,7 +165,7 @@ public class AuthService implements IAuthService {
 
         userRepository.save(user);
 
-        sessionActiveRepository.deleteByUserAndType(user, SessionActiveTypeEnum.CONFIRM);
+        sessionActiveRepository.deleteByUserAndType(user, SessionActiveType.CONFIRM);
     }
 
 
@@ -177,12 +175,12 @@ public class AuthService implements IAuthService {
     public void forgotPassword(String email) {
 
         if (email == null || email.isEmpty())
-            throw new BadRequestException("Email là bắt buộc");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Email is required.");
 
         boolean emailExisting = userService.existsEmail(email);
 
         if(!emailExisting)
-            throw new BadRequestException("Email bạn đã đăng ký không tồn tại");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Your email does not existing.");
 
         OtpEntity otpEntity = otpService.generateOtp(email);
 
@@ -196,14 +194,14 @@ public class AuthService implements IAuthService {
     public void verifyOtp(String otp) {
 
         if (otp == null || otp.isEmpty())
-            throw new BadRequestException("Mã OTP là bắt buộc");
+            throw new ErrorHolder(Error.BAD_REQUEST, "OTP code is required.");
 
         OtpEntity otpEntity = otpService.getByOtp(otp);
 
         if (!otpService.isValidOtp(otpEntity))
-            throw new BadRequestException("Mã OTP đã hết hiệu lực");
+            throw new ErrorHolder(Error.BAD_REQUEST, "OTP is expired.");
 
-        otpService.updateOtpStatus(otpEntity.getEmail(), otp, OtpStatusEnum.VERIFIED);
+        otpService.updateOtpStatus(otpEntity.getEmail(), otp, OtpStatus.VERIFIED);
     }
 
 
@@ -223,7 +221,7 @@ public class AuthService implements IAuthService {
         UserEntity user = userService.currentUser();
 
         if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword()))
-            throw new BadRequestException("Mật khẩu cũ không hợp lệ");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Old password invalid.");
 
         return authUtil.saveNewPassword(user, changePasswordRequest.getNewPassword(), changePasswordRequest.getOtpCode());
     }
@@ -238,7 +236,7 @@ public class AuthService implements IAuthService {
         SessionActiveEntity sessionActive = sessionActiveService.getByCode(refresh);
 
         if (sessionActive == null)
-            throw new BadRequestException("Mã làm mới không hợp lệ");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Invalid refresh.");
 
         sessionActiveService.verifyExpiration(sessionActive);
 
@@ -246,11 +244,11 @@ public class AuthService implements IAuthService {
 
         SessionActiveEntity sessionActiveNew = sessionActiveService.saveSessionActive(sessionActive.getUser(), newToken);
 
-        invalidTokenService.insertInvalidToken(sessionActive, InvalidTokenTypeEnum.REPLACED);
+        invalidTokenService.insertInvalidToken(sessionActive, InvalidTokenType.REPLACED);
 
         sessionActiveRepository.delete(sessionActive);
 
-        return UserConverter.INSTANCE.toUserAuthResponse(sessionActiveNew, newToken);
+        return UserMapper.INSTANCE.toUserAuthResponse(sessionActiveNew, newToken);
     }
 
 
@@ -263,7 +261,7 @@ public class AuthService implements IAuthService {
 
         if(sessionActive != null){
 
-            invalidTokenService.insertInvalidToken(sessionActive, InvalidTokenTypeEnum.LOGOUT);
+            invalidTokenService.insertInvalidToken(sessionActive, InvalidTokenType.LOGOUT);
 
             sessionActiveRepository.delete(sessionActive);
         }

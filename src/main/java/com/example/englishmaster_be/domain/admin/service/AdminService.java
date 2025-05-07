@@ -1,16 +1,17 @@
 package com.example.englishmaster_be.domain.admin.service;
 
-import com.example.englishmaster_be.common.constant.RoleEnum;
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
-import com.example.englishmaster_be.common.thread.MessageResponseHolder;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.Role;
+import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
+
 import com.example.englishmaster_be.domain.mock_test.service.IMockTestService;
 import com.example.englishmaster_be.domain.pack.service.IPackService;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.user.dto.request.UserFilterRequest;
 import com.example.englishmaster_be.domain.user.dto.response.UserResponse;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.advice.exception.template.BadRequestException;
-import com.example.englishmaster_be.converter.UserConverter;
+import com.example.englishmaster_be.mapper.UserMapper;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;
 import com.example.englishmaster_be.model.pack.PackEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
@@ -27,7 +28,6 @@ import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -40,7 +40,7 @@ import java.util.UUID;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 public class AdminService implements IAdminService {
 
     JPAQueryFactory queryFactory;
@@ -78,7 +78,7 @@ public class AdminService implements IAdminService {
                 .offset((long) (filterRequest.getPage() - 1) * filterRequest.getSize())
                 .build();
 
-        BooleanExpression wherePattern = QUserEntity.userEntity.role.roleName.eq(RoleEnum.ADMIN);
+        BooleanExpression wherePattern = QUserEntity.userEntity.role.roleName.eq(Role.ADMIN);
 
         if (filterRequest.getEnable() != null)
             wherePattern.and(QUserEntity.userEntity.enabled.eq(filterRequest.getEnable()));
@@ -109,7 +109,7 @@ public class AdminService implements IAdminService {
                 .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
-                UserConverter.INSTANCE.toUserResponseList(query.fetch())
+                UserMapper.INSTANCE.toUserResponseList(query.fetch())
         );
 
         return filterResponse;
@@ -121,18 +121,12 @@ public class AdminService implements IAdminService {
     public void enableUser(UUID userId, Boolean enable) {
 
         if(enable == null)
-            throw new BadRequestException("The enable parameter is required");
+            throw new ErrorHolder(Error.BAD_REQUEST, "The enable parameter is required");
 
         UserEntity user = userService.getUserById(userId);
 
         user.setEnabled(enable);
         userRepository.save(user);
-
-        if (enable)
-            MessageResponseHolder.setMessage("Enable account of UserEntity successfully");
-        else
-            MessageResponseHolder.setMessage("Disable account of UserEntity successfully");
-
     }
 
     @Override

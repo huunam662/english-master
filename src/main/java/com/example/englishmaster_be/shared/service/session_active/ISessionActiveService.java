@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.shared.service.session_active;
 
-import com.example.englishmaster_be.common.constant.SessionActiveTypeEnum;
+import com.example.englishmaster_be.common.constant.SessionActiveType;
 import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 
@@ -12,7 +12,7 @@ public interface ISessionActiveService {
 
     SessionActiveEntity getByCode(UUID code);
 
-    SessionActiveEntity getByCodeAndType(UUID code, SessionActiveTypeEnum type);
+    SessionActiveEntity getByCodeAndType(UUID code, SessionActiveType type);
 
     SessionActiveEntity getByToken(String token);
 
@@ -26,6 +26,6 @@ public interface ISessionActiveService {
 
     void deleteBySessionEntity(SessionActiveEntity sessionActiveEntity);
 
-    List<SessionActiveEntity> getSessionActiveList(UUID userId, SessionActiveTypeEnum sessionActiveType);
+    List<SessionActiveEntity> getSessionActiveList(UUID userId, SessionActiveType sessionActiveType);
 
 }

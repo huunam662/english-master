@@ -1,10 +1,12 @@
 package com.example.englishmaster_be.domain.news.service;
 
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
-import com.example.englishmaster_be.common.thread.MessageResponseHolder;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
+
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
-import com.example.englishmaster_be.converter.NewsConverter;
+import com.example.englishmaster_be.mapper.NewsMapper;
 import com.example.englishmaster_be.domain.news.dto.request.NewsRequest;
 import com.example.englishmaster_be.domain.news.dto.request.NewsFilterRequest;
 import com.example.englishmaster_be.domain.news.dto.response.NewsResponse;
@@ -19,7 +21,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ import java.util.UUID;
 
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class NewsService implements INewsService {
 
@@ -48,7 +49,7 @@ public class NewsService implements INewsService {
     public NewsEntity findNewsById(UUID newsId) {
         return newsRepository.findByNewsId(newsId)
                 .orElseThrow(
-                        () -> new IllegalArgumentException("NewsEntity not found with ID: " + newsId)
+                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "NewsEntity not found with ID: " + newsId, false)
                 );
     }
 
@@ -97,7 +98,7 @@ public class NewsService implements INewsService {
                                     .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
-                NewsConverter.INSTANCE.toNewsResponseList(query.fetch())
+                NewsMapper.INSTANCE.toNewsResponseList(query.fetch())
         );
 
         return filterResponse;
@@ -131,7 +132,7 @@ public class NewsService implements INewsService {
                 .createAt(LocalDateTime.now())
                 .build();
 
-        NewsConverter.INSTANCE.flowToNewsEntity(newsRequest, news);
+        NewsMapper.INSTANCE.flowToNewsEntity(newsRequest, news);
 
         if(newsRequest.getImage() != null && !newsRequest.getImage().isEmpty()){
 
@@ -155,9 +156,6 @@ public class NewsService implements INewsService {
         NewsEntity news = findNewsById(newsId);
 
         news.setEnable(enable);
-
-        if(enable) MessageResponseHolder.setMessage("Enable news successfully");
-        else MessageResponseHolder.setMessage("Disable news successfully");
 
         newsRepository.save(news);
     }

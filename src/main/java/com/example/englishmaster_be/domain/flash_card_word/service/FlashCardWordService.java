@@ -5,7 +5,7 @@ import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.domain.flash_card_word.dto.request.FlashCardWordRequest;
-import com.example.englishmaster_be.converter.FlashCardWordConverter;
+import com.example.englishmaster_be.mapper.FlashCardWordMapper;
 import com.example.englishmaster_be.model.flash_card.FlashCardEntity;
 import com.example.englishmaster_be.model.flash_card_word.FlashCardWordEntity;
 import com.example.englishmaster_be.model.flash_card_word.FlashCardWordRepository;
@@ -30,7 +30,7 @@ import java.util.UUID;
 
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FlashCardWordService implements IFlashCardWordService {
 
@@ -109,7 +109,7 @@ public class FlashCardWordService implements IFlashCardWordService {
                     .build();
         }
 
-        FlashCardWordConverter.INSTANCE.flowToFlashCardWordEntity(flashCardWordRequest, flashCardWord);
+        FlashCardWordMapper.INSTANCE.flowToFlashCardWordEntity(flashCardWordRequest, flashCardWord);
         flashCardWord.setUserUpdate(user);
         flashCardWord.setUpdateAt(LocalDateTime.now());
 

@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.util;
 
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestPartRequest;
-import com.example.englishmaster_be.advice.exception.template.BadRequestException;
 import com.example.englishmaster_be.model.part.PartEntity;
 
 import java.util.List;

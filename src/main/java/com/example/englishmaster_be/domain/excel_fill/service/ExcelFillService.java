@@ -1,17 +1,16 @@
 package com.example.englishmaster_be.domain.excel_fill.service;
 
-import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
-import com.example.englishmaster_be.common.constant.error.ErrorEnum;
-import com.example.englishmaster_be.common.constant.PartEnum;
+import com.example.englishmaster_be.common.constant.QuestionType;
+import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.common.constant.PartType;
 import com.example.englishmaster_be.common.constant.excel.ExcelQuestionConstant;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.*;
 import com.example.englishmaster_be.domain.status.service.IStatusService;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.advice.exception.template.CustomException;
-import com.example.englishmaster_be.advice.exception.template.BadRequestException;
-import com.example.englishmaster_be.converter.ExcelContentConverter;
-import com.example.englishmaster_be.converter.TopicConverter;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.mapper.ExcelContentMapper;
+import com.example.englishmaster_be.mapper.TopicMapper;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.answer.AnswerRepository;
 import com.example.englishmaster_be.model.content.ContentEntity;
@@ -19,17 +18,14 @@ import com.example.englishmaster_be.model.content.ContentRepository;
 import com.example.englishmaster_be.model.pack.PackEntity;
 import com.example.englishmaster_be.model.pack.PackQueryFactory;
 import com.example.englishmaster_be.model.pack.PackRepository;
-import com.example.englishmaster_be.model.pack.QPackEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.part.PartQueryFactory;
 import com.example.englishmaster_be.model.part.PartRepository;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.util.ExcelUtil;
-import com.example.englishmaster_be.model.part.QPartEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.question.QuestionRepository;
 import com.example.englishmaster_be.model.status.StatusEntity;
-import com.example.englishmaster_be.model.topic.QTopicEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.topic.TopicQueryFactory;
 import com.example.englishmaster_be.model.topic.TopicRepository;
@@ -43,7 +39,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,9 +48,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ExcelFillService implements IExcelFillService {
 
@@ -101,7 +95,7 @@ public class ExcelFillService implements IExcelFillService {
             Sheet sheet = workbook.getSheetAt(sheetNumber);
 
             if (sheet == null)
-                throw new BadRequestException(String.format("Sheet %d does not exist", sheetNumber));
+                throw new ErrorHolder(Error.BAD_REQUEST, String.format("Sheet %d does not exist", sheetNumber));
 
             return ExcelUtil.collectTopicContentWith(sheet);
         }
@@ -113,10 +107,10 @@ public class ExcelFillService implements IExcelFillService {
     public ExcelTopicResponse importTopicExcel(MultipartFile file) {
 
         if (file == null || file.isEmpty())
-            throw new BadRequestException("Please select a file excel to upload");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Please select a file excel to upload");
 
         if (ExcelUtil.isExcelFile(file))
-            throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
+            throw new ErrorHolder(Error.FILE_IMPORT_IS_NOT_EXCEL);
 
         UserEntity currentUser = userService.currentUser();
 
@@ -129,7 +123,7 @@ public class ExcelFillService implements IExcelFillService {
             Sheet sheet = workbook.getSheetAt(sheetNumber);
 
             if (sheet == null)
-                throw new BadRequestException(String.format("Sheet %d does not exist", sheetNumber));
+                throw new ErrorHolder(Error.BAD_REQUEST, String.format("Sheet %d does not exist", sheetNumber));
 
             ExcelTopicContentResponse excelTopicContentResponse = ExcelUtil.collectTopicContentWith(sheet);
 
@@ -160,7 +154,7 @@ public class ExcelFillService implements IExcelFillService {
                         .userUpdate(currentUser)
                         .build();
 
-            TopicConverter.INSTANCE.flowToTopicEntity(excelTopicContentResponse, topicEntity);
+            TopicMapper.INSTANCE.flowToTopicEntity(excelTopicContentResponse, topicEntity);
 
             topicEntity = topicRepository.save(topicEntity);
 
@@ -220,7 +214,7 @@ public class ExcelFillService implements IExcelFillService {
 
             topicEntity = topicRepository.save(topicEntity);
 
-            return ExcelContentConverter.INSTANCE.toExcelTopicResponse(topicEntity);
+            return ExcelContentMapper.INSTANCE.toExcelTopicResponse(topicEntity);
 
         }
 //        catch (Exception e) {
@@ -245,7 +239,7 @@ public class ExcelFillService implements IExcelFillService {
             Sheet sheet = workbook.getSheetAt(sheetNumber);
 
             if (sheet == null)
-                throw new BadRequestException(String.format("Sheet %d does not exist", sheetNumber));
+                throw new ErrorHolder(Error.BAD_REQUEST, String.format("Sheet %d does not exist", sheetNumber));
 
             ExcelTopicContentResponse excelTopicContentResponse = ExcelUtil.collectTopicContentWith(sheet);
 
@@ -253,10 +247,10 @@ public class ExcelFillService implements IExcelFillService {
             List<String> partTypesList = excelTopicContentResponse.getPartTypesList();
 
             if (partNamesList == null || partNamesList.isEmpty())
-                throw new BadRequestException(String.format("Part name list is not exist or empty in sheet %d", sheetNumber));
+                throw new ErrorHolder(Error.BAD_REQUEST, String.format("Part name list is not exist or empty in sheet %d", sheetNumber));
 
             if (partTypesList == null || partTypesList.isEmpty())
-                throw new BadRequestException(String.format("Part type list is not exist or empty in sheet %d", sheetNumber));
+                throw new ErrorHolder(Error.BAD_REQUEST, String.format("Part type list is not exist or empty in sheet %d", sheetNumber));
 
             if (topicEntity.getParts() == null)
                 topicEntity.setParts(new ArrayList<>());
@@ -293,7 +287,7 @@ public class ExcelFillService implements IExcelFillService {
             topicEntity = topicRepository.save(topicEntity);
         }
 
-        return ExcelContentConverter.INSTANCE.toExcelTopicResponse(topicEntity);
+        return ExcelContentMapper.INSTANCE.toExcelTopicResponse(topicEntity);
     }
 
     @Transactional
@@ -302,13 +296,13 @@ public class ExcelFillService implements IExcelFillService {
     public ExcelQuestionListResponse importQuestionListeningPart12Excel(UUID topicId, MultipartFile file, int part) {
 
         if (file == null || file.isEmpty())
-            throw new BadRequestException("Please select a file excel to upload");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Please select a file excel to upload");
 
         if (part != 1 && part != 2)
-            throw new BadRequestException("Invalid Part value. It must be either 1 or 2");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Invalid Part value. It must be either 1 or 2");
 
         if (ExcelUtil.isExcelFile(file))
-            throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
+            throw new ErrorHolder(Error.FILE_IMPORT_IS_NOT_EXCEL);
 
         UserEntity currentUser = userService.currentUser();
 
@@ -325,29 +319,29 @@ public class ExcelFillService implements IExcelFillService {
             sheet = workbook.getSheetAt(part);
 
             if (sheet == null)
-                throw new BadRequestException(String.format("Sheet %d does not exist", part));
+                throw new ErrorHolder(Error.BAD_REQUEST, String.format("Sheet %d does not exist", part));
 
             int iRowPartName = 0;
 
             Row firstRow = sheet.getRow(iRowPartName);
 
             if (firstRow == null)
-                throw new BadRequestException("First row for part name is required in sheet with name is PART 1 or PART 2 !");
+                throw new ErrorHolder(Error.BAD_REQUEST, "First row for part name is required in sheet with name is PART 1 or PART 2 !");
 
             String partNameAtFirstRow = ExcelUtil.getStringCellValue(firstRow, 0);
 
             if (
-                    !partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_1.getName()) && part == 1
-                            || !partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_2.getName()) && part == 2
-            ) throw new BadRequestException("Part name at first row must defined with PART 1 or PART 2.");
+                    !partNameAtFirstRow.equalsIgnoreCase(PartType.PART_1_TOEIC.getName()) && part == 1
+                            || !partNameAtFirstRow.equalsIgnoreCase(PartType.PART_2_TOEIC.getName()) && part == 2
+            ) throw new ErrorHolder(Error.BAD_REQUEST, "Part name at first row must defined with PART 1 or PART 2.");
 
             String partType = excelTopicContentResponse.getPartTypesList().get(part - 1);
 
             PartEntity partEntity;
 
-            if (partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_1.getName()))
-                partEntity = partService.getPartToName(PartEnum.PART_1.getName(), partType, topicEntity);
-            else partEntity = partService.getPartToName(PartEnum.PART_2.getName(), partType, topicEntity);
+            if (partNameAtFirstRow.equalsIgnoreCase(PartType.PART_1_TOEIC.getName()))
+                partEntity = partService.getPartToName(PartType.PART_1_TOEIC.getName(), partType, topicEntity);
+            else partEntity = partService.getPartToName(PartType.PART_2_TOEIC.getName(), partType, topicEntity);
 
             // bỏ qua dòng đầu tiên vì đã được đọc
             int countRowWillFetch = sheet.getLastRowNum() - 1;
@@ -366,7 +360,7 @@ public class ExcelFillService implements IExcelFillService {
                     .userUpdate(currentUser)
                     .questionScore(excelQuestionContentResponse.getTotalScore())
                     .isQuestionParent(Boolean.TRUE)
-                    .questionType(QuestionTypeEnum.Question_Parent)
+                    .questionType(QuestionType.Question_Parent)
                     .build();
 
             questionParent = questionRepository.save(questionParent);
@@ -419,7 +413,7 @@ public class ExcelFillService implements IExcelFillService {
                         .part(partEntity)
                         .isQuestionParent(Boolean.FALSE)
                         .questionResult(resultTrueQuestion)
-                        .questionType(QuestionTypeEnum.Single_Choice)
+                        .questionType(QuestionType.Single_Choice)
                         .numberChoice(1)
                         .questionScore(scoreTrueQuestion)
                         .userCreate(currentUser)
@@ -484,7 +478,7 @@ public class ExcelFillService implements IExcelFillService {
 
             }
 
-            ExcelQuestionResponse excelQuestionResponse = ExcelContentConverter.INSTANCE.toExcelQuestionResponse(questionParent);
+            ExcelQuestionResponse excelQuestionResponse = ExcelContentMapper.INSTANCE.toExcelQuestionResponse(questionParent);
 
             excelQuestionResponse.setTopicId(topicId);
 
@@ -508,10 +502,10 @@ public class ExcelFillService implements IExcelFillService {
     public ExcelQuestionListResponse importQuestionReadingPart5Excel(UUID topicId, MultipartFile file) {
 
         if (file == null || file.isEmpty())
-            throw new BadRequestException("Please select a file excel to upload");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Please select a file excel to upload");
 
         if (ExcelUtil.isExcelFile(file))
-            throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
+            throw new ErrorHolder(Error.FILE_IMPORT_IS_NOT_EXCEL);
 
         UserEntity currentUser = userService.currentUser();
 
@@ -530,24 +524,24 @@ public class ExcelFillService implements IExcelFillService {
             sheet = workbook.getSheetAt(part);
 
             if (sheet == null)
-                throw new BadRequestException(String.format("Sheet %d does not exist", part));
+                throw new ErrorHolder(Error.BAD_REQUEST, String.format("Sheet %d does not exist", part));
 
             int iRowPartName = 0;
 
             Row firstRow = sheet.getRow(iRowPartName);
 
             if (firstRow == null)
-                throw new BadRequestException("First row for part name is required in sheet with name is PART 5!");
+                throw new ErrorHolder(Error.BAD_REQUEST, "First row for part name is required in sheet with name is PART 5!");
 
             String partNameAtFirstRow = ExcelUtil.getStringCellValue(firstRow, 0);
 
             if (
-                    !partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_5.getName())
-            ) throw new BadRequestException("Part name at first row must defined with PART 5.");
+                    !partNameAtFirstRow.equalsIgnoreCase(PartType.PART_5_TOEIC.getName())
+            ) throw new ErrorHolder(Error.BAD_REQUEST, "Part name at first row must defined with PART 5.");
 
             String partType = excelTopicContentResponse.getPartTypesList().get(part - 1);
 
-            PartEntity partEntity = partService.getPartToName(PartEnum.PART_5.getName(), partType, topicEntity);
+            PartEntity partEntity = partService.getPartToName(PartType.PART_5_TOEIC.getName(), partType, topicEntity);
 
             // bỏ qua dòng đầu tiên vì đã được đọc
             int countRowWillFetch = sheet.getLastRowNum() - 1;
@@ -564,7 +558,7 @@ public class ExcelFillService implements IExcelFillService {
                     .userUpdate(currentUser)
                     .questionScore(excelQuestionContentResponse.getTotalScore())
                     .isQuestionParent(Boolean.TRUE)
-                    .questionType(QuestionTypeEnum.Question_Parent)
+                    .questionType(QuestionType.Question_Parent)
                     .build();
 
             questionParent = questionRepository.save(questionParent);
@@ -601,7 +595,7 @@ public class ExcelFillService implements IExcelFillService {
                         .part(partEntity)
                         .questionGroupParent(questionParent)
                         .isQuestionParent(Boolean.FALSE)
-                        .questionType(QuestionTypeEnum.Single_Choice)
+                        .questionType(QuestionType.Single_Choice)
                         .numberChoice(1)
                         .userCreate(currentUser)
                         .userUpdate(currentUser)
@@ -641,7 +635,7 @@ public class ExcelFillService implements IExcelFillService {
 
             }
 
-            ExcelQuestionResponse excelQuestionResponse = ExcelContentConverter.INSTANCE.toExcelQuestionResponse(questionParent);
+            ExcelQuestionResponse excelQuestionResponse = ExcelContentMapper.INSTANCE.toExcelQuestionResponse(questionParent);
 
             excelQuestionResponse.setTopicId(topicId);
 
@@ -662,13 +656,13 @@ public class ExcelFillService implements IExcelFillService {
     public ExcelQuestionListResponse importQuestionListeningPart34Excel(UUID topicId, MultipartFile file, int part) {
 
         if (file == null || file.isEmpty())
-            throw new BadRequestException("Please select a file excel to upload");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Please select a file excel to upload");
 
         if (part != 3 && part != 4)
-            throw new BadRequestException("Invalid Part value. It must be either 3 or 4");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Invalid Part value. It must be either 3 or 4");
 
         if (ExcelUtil.isExcelFile(file))
-            throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
+            throw new ErrorHolder(Error.FILE_IMPORT_IS_NOT_EXCEL);
 
         TopicEntity topicEntity = topicService.getTopicById(topicId);
 
@@ -685,29 +679,29 @@ public class ExcelFillService implements IExcelFillService {
             sheet = workbook.getSheetAt(part);
 
             if (sheet == null)
-                throw new BadRequestException(String.format("Sheet %d does not exist", part));
+                throw new ErrorHolder(Error.BAD_REQUEST, String.format("Sheet %d does not exist", part));
 
             int iRowPartName = 0;
 
             Row firstRow = sheet.getRow(iRowPartName);
 
             if (firstRow == null)
-                throw new BadRequestException("First row for part name is required in sheet with name is PART 3 or PART 4!");
+                throw new ErrorHolder(Error.BAD_REQUEST, "First row for part name is required in sheet with name is PART 3 or PART 4!");
 
             String partNameAtFirstRow = ExcelUtil.getStringCellValue(firstRow, 0);
 
             if (
-                    !partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_3.getName()) && part == 3
-                            || !partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_4.getName()) && part == 4
-            ) throw new BadRequestException("Part name at first row must defined with PART 3 or PART 4.");
+                    !partNameAtFirstRow.equalsIgnoreCase(PartType.PART_3_TOEIC.getName()) && part == 3
+                            || !partNameAtFirstRow.equalsIgnoreCase(PartType.PART_4_TOEIC.getName()) && part == 4
+            ) throw new ErrorHolder(Error.BAD_REQUEST, "Part name at first row must defined with PART 3 or PART 4.");
 
             String partType = excelTopicContentResponse.getPartTypesList().get(part - 1);
 
             PartEntity partEntity;
 
-            if (partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_3.getName()))
-                partEntity = partService.getPartToName(PartEnum.PART_3.getName(), partType, topicEntity);
-            else partEntity = partService.getPartToName(PartEnum.PART_4.getName(), partType, topicEntity);
+            if (partNameAtFirstRow.equalsIgnoreCase(PartType.PART_3_TOEIC.getName()))
+                partEntity = partService.getPartToName(PartType.PART_3_TOEIC.getName(), partType, topicEntity);
+            else partEntity = partService.getPartToName(PartType.PART_4_TOEIC.getName(), partType, topicEntity);
 
             List<ExcelQuestionResponse> excelQuestionResponseList = new ArrayList<>();
 
@@ -731,7 +725,7 @@ public class ExcelFillService implements IExcelFillService {
                         .userUpdate(currentUser)
                         .questionScore(excelQuestionContentResponse.getTotalScore())
                         .isQuestionParent(Boolean.TRUE)
-                        .questionType(QuestionTypeEnum.Question_Parent)
+                        .questionType(QuestionType.Question_Parent)
                         .build();
 
                 questionParent = questionRepository.save(questionParent);
@@ -813,7 +807,7 @@ public class ExcelFillService implements IExcelFillService {
                             .part(partEntity)
                             .questionGroupParent(questionParent)
                             .isQuestionParent(Boolean.FALSE)
-                            .questionType(QuestionTypeEnum.Single_Choice)
+                            .questionType(QuestionType.Single_Choice)
                             .numberChoice(1)
                             .userCreate(currentUser)
                             .userUpdate(currentUser)
@@ -854,7 +848,7 @@ public class ExcelFillService implements IExcelFillService {
                     iRowBodyTable++;
                 }
 
-                ExcelQuestionResponse excelQuestionResponse = ExcelContentConverter.INSTANCE.toExcelQuestionResponse(questionParent);
+                ExcelQuestionResponse excelQuestionResponse = ExcelContentMapper.INSTANCE.toExcelQuestionResponse(questionParent);
 
                 excelQuestionResponse.setTopicId(topicId);
 
@@ -878,13 +872,13 @@ public class ExcelFillService implements IExcelFillService {
     public ExcelQuestionListResponse importQuestionReadingPart67Excel(UUID topicId, MultipartFile file, int part) {
 
         if (file == null || file.isEmpty())
-            throw new BadRequestException("Please select a file excel to upload");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Please select a file excel to upload");
 
         if (part != 6 && part != 7)
-            throw new BadRequestException("Invalid Part value. It must be either 6 or 7");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Invalid Part value. It must be either 6 or 7");
 
         if (ExcelUtil.isExcelFile(file))
-            throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
+            throw new ErrorHolder(Error.FILE_IMPORT_IS_NOT_EXCEL);
 
         TopicEntity topicEntity = topicService.getTopicById(topicId);
 
@@ -901,29 +895,29 @@ public class ExcelFillService implements IExcelFillService {
             sheet = workbook.getSheetAt(part);
 
             if (sheet == null)
-                throw new BadRequestException(String.format("Sheet %d does not exist", part));
+                throw new ErrorHolder(Error.BAD_REQUEST, String.format("Sheet %d does not exist", part));
 
             int iRowPartName = 0;
 
             Row firstRow = sheet.getRow(iRowPartName);
 
             if (firstRow == null)
-                throw new BadRequestException("First row for part name is required in sheet with name is PART 6 or PART 7!");
+                throw new ErrorHolder(Error.BAD_REQUEST, "First row for part name is required in sheet with name is PART 6 or PART 7!");
 
             String partNameAtFirstRow = ExcelUtil.getStringCellValue(firstRow, 0);
 
             if (
-                    !partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_6.getName()) && part == 6
-                            || !partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_7.getName()) && part == 7
-            ) throw new BadRequestException("Part name at first row must defined with PART 6 or PART 7.");
+                    !partNameAtFirstRow.equalsIgnoreCase(PartType.PART_6_TOEIC.getName()) && part == 6
+                            || !partNameAtFirstRow.equalsIgnoreCase(PartType.PART_7_TOEIC.getName()) && part == 7
+            ) throw new ErrorHolder(Error.BAD_REQUEST, "Part name at first row must defined with PART 6 or PART 7.");
 
             String partType = excelTopicContentResponse.getPartTypesList().get(part - 1);
 
             PartEntity partEntity;
 
-            if (partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_6.getName()))
-                partEntity = partService.getPartToName(PartEnum.PART_6.getName(), partType, topicEntity);
-            else partEntity = partService.getPartToName(PartEnum.PART_7.getName(), partType, topicEntity);
+            if (partNameAtFirstRow.equalsIgnoreCase(PartType.PART_6_TOEIC.getName()))
+                partEntity = partService.getPartToName(PartType.PART_6_TOEIC.getName(), partType, topicEntity);
+            else partEntity = partService.getPartToName(PartType.PART_7_TOEIC.getName(), partType, topicEntity);
 
             List<ExcelQuestionResponse> excelQuestionResponseList = new ArrayList<>();
 
@@ -947,7 +941,7 @@ public class ExcelFillService implements IExcelFillService {
                         .userUpdate(currentUser)
                         .questionScore(excelQuestionContentResponse.getTotalScore())
                         .isQuestionParent(Boolean.TRUE)
-                        .questionType(QuestionTypeEnum.Question_Parent)
+                        .questionType(QuestionType.Question_Parent)
                         .questionContent(excelQuestionContentResponse.getQuestionContent())
                         .build();
 
@@ -1020,7 +1014,7 @@ public class ExcelFillService implements IExcelFillService {
                             .part(partEntity)
                             .questionGroupParent(questionParent)
                             .isQuestionParent(Boolean.FALSE)
-                            .questionType(QuestionTypeEnum.Single_Choice)
+                            .questionType(QuestionType.Single_Choice)
                             .numberChoice(1)
                             .userCreate(currentUser)
                             .userUpdate(currentUser)
@@ -1061,7 +1055,7 @@ public class ExcelFillService implements IExcelFillService {
                     iRowBodyTable++;
                 }
 
-                ExcelQuestionResponse excelQuestionResponse = ExcelContentConverter.INSTANCE.toExcelQuestionResponse(questionParent);
+                ExcelQuestionResponse excelQuestionResponse = ExcelContentMapper.INSTANCE.toExcelQuestionResponse(questionParent);
 
                 excelQuestionResponse.setTopicId(topicId);
 
@@ -1077,388 +1071,6 @@ public class ExcelFillService implements IExcelFillService {
 //            throw new CustomException(part == 6 ? ErrorEnum.CAN_NOT_CREATE_PART_6_BY_EXCEL : ErrorEnum.CAN_NOT_CREATE_PART_7_BY_EXCEL);
 //        }
     }
-
-    @Transactional
-    @Override
-    @SneakyThrows
-    public ExcelQuestionListResponse importQuestionFillInBlankPart8Excel(UUID topicId, MultipartFile file) {
-
-        if (file == null || file.isEmpty())
-            throw new BadRequestException("Please select a file excel to upload");
-
-        if (ExcelUtil.isExcelFile(file))
-            throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
-
-        TopicEntity topicEntity = topicService.getTopicById(topicId);
-
-        UserEntity currentUser = userService.currentUser();
-
-        int part = 8;
-
-        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
-
-            int numberOfSheetTopicInformation = 0;
-
-            Sheet sheet = workbook.getSheetAt(numberOfSheetTopicInformation);
-
-            ExcelTopicContentResponse excelTopicContentResponse = ExcelUtil.collectTopicContentWith(sheet);
-
-            sheet = workbook.getSheetAt(part);
-
-            if (sheet == null)
-                throw new BadRequestException(String.format("Sheet %d does not exist", part));
-
-            int iRowPartName = 0;
-
-            Row firstRow = sheet.getRow(iRowPartName);
-
-            if (firstRow == null)
-                throw new BadRequestException("First row for part name is required in sheet with name is PART 8!");
-
-            String partNameAtFirstRow = ExcelUtil.getStringCellValue(firstRow, 0);
-
-            if (
-                    !partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_8.getName())
-            ) throw new BadRequestException("Part name at first row must defined with PART 8.");
-
-            String partType = excelTopicContentResponse.getPartTypesList().get(part - 1);
-
-            PartEntity partEntity = partService.getPartToName(PartEnum.PART_8.getName(), partType, topicEntity);
-
-            List<ExcelQuestionResponse> excelQuestionResponseList = new ArrayList<>();
-
-            // bỏ qua dòng đầu tiên vì đã được đọc
-            int countRowWillFetch = sheet.getLastRowNum() - 1;
-
-            int iRowAudioPath = iRowPartName + 1;
-
-            while (countRowWillFetch >= 0) {
-
-                int iRowImage = iRowAudioPath + 1;
-                int iRowTotalScore = iRowImage + 1;
-
-                ExcelQuestionContentResponse excelQuestionContentResponse = ExcelUtil.collectQuestionContentPart1234567With(sheet, iRowAudioPath, iRowImage, iRowTotalScore, part);
-
-                QuestionEntity questionParent = QuestionEntity.builder()
-                        .questionId(UUID.randomUUID())
-                        .part(partEntity)
-                        .topics(List.of(topicEntity))
-                        .userCreate(currentUser)
-                        .userUpdate(currentUser)
-                        .questionScore(excelQuestionContentResponse.getTotalScore())
-                        .isQuestionParent(Boolean.TRUE)
-                        .questionType(QuestionTypeEnum.Question_Parent)
-                        .build();
-
-                questionParent = questionRepository.save(questionParent);
-
-                if (questionParent.getContentCollection() == null)
-                    questionParent.setContentCollection(new ArrayList<>());
-
-                ContentEntity contentAudio = contentUtil.makeContentEntity(
-                        currentUser,
-                        topicEntity,
-                        excelQuestionContentResponse.getAudioPath()
-                );
-
-                contentAudio = contentRepository.save(contentAudio);
-
-                questionParent.setContentAudio(contentAudio.getContentData());
-
-                if (!questionParent.getContentCollection().contains(contentAudio))
-                    questionParent.getContentCollection().add(contentAudio);
-
-                ContentEntity contentImage = contentUtil.makeContentEntity(
-                        currentUser,
-                        topicEntity,
-                        excelQuestionContentResponse.getImagePath()
-                );
-
-                contentImage = contentRepository.save(contentImage);
-
-                questionParent.setContentImage(contentImage.getContentData());
-
-                if (!questionParent.getContentCollection().contains(contentImage))
-                    questionParent.getContentCollection().add(contentImage);
-
-                questionParent = questionRepository.save(questionParent);
-
-                int iRowQuestionContentChild = iRowTotalScore + 1;
-
-                ExcelUtil.checkCellQuestionHeaderTable(sheet, null, iRowQuestionContentChild, 0, ExcelQuestionConstant.Question_Content_Child);
-
-                String questionContentChild = ExcelUtil.getCellValueAsString(sheet, iRowQuestionContentChild, 1);
-
-                if (questionParent.getQuestionGroupChildren() == null)
-                    questionParent.setQuestionGroupChildren(new ArrayList<>());
-
-                QuestionEntity questionChildren = QuestionEntity.builder()
-                        .questionId(UUID.randomUUID())
-                        .questionGroupParent(questionParent)
-                        .numberChoice(0)
-                        .questionScore(0)
-                        .part(partEntity)
-                        .questionContent(questionContentChild)
-                        .questionType(QuestionTypeEnum.Fill_In_Blank)
-                        .isQuestionParent(Boolean.FALSE)
-                        .userUpdate(currentUser)
-                        .userUpdate(currentUser)
-                        .build();
-
-                questionChildren = questionRepository.save(questionChildren);
-                topicEntity.setNumberQuestion(topicEntity.getNumberQuestion() + 1);
-                if (questionChildren.getAnswers() == null)
-                    questionChildren.setAnswers(new ArrayList<>());
-
-                int iRowHeaderTable = iRowQuestionContentChild + 1;
-
-                ExcelUtil.checkHeaderTableQuestionPart1234567With(sheet, iRowHeaderTable, part);
-
-                int iRowBodyTable = iRowHeaderTable + 1;
-
-                //bỏ qua 5 dòng vị đã dọc audio, image, score, question content child, và check structure header table
-                countRowWillFetch -= 5;
-
-                List<String> answerResultList = new ArrayList<>();
-
-                while (true) {
-
-                    Row rowBodyTable = sheet.getRow(iRowBodyTable);
-
-                    if (rowBodyTable == null || countRowWillFetch < 0) {
-                        countRowWillFetch = -1;
-                        break;
-                    }
-
-                    Cell cellQuestionContent = rowBodyTable.getCell(0);
-
-                    if (
-                            cellQuestionContent.getCellType().equals(CellType.STRING)
-                                    && cellQuestionContent.getStringCellValue().equalsIgnoreCase(ExcelQuestionConstant.Audio.getHeaderName())
-                    ) {
-
-                        iRowAudioPath = iRowBodyTable;
-                        break;
-                    }
-
-                    int jColSTTAnswer = 0;
-                    int jColResultTrueAnswer = 1;
-                    int jColScoreTrueAnswer = 2;
-
-                    int sttAnswer = ExcelUtil.getNumericCellValue(rowBodyTable, jColSTTAnswer);
-                    String resultTrueQuestion = ExcelUtil.getStringCellValue(rowBodyTable, jColResultTrueAnswer);
-                    int scoreTrueAnswer = ExcelUtil.getNumericCellValue(rowBodyTable, jColScoreTrueAnswer);
-
-                    answerResultList.add(resultTrueQuestion);
-                    questionChildren.setQuestionScore(questionChildren.getQuestionScore() + scoreTrueAnswer);
-
-                    AnswerEntity answerEntity = AnswerEntity.builder()
-                            .answerId(UUID.randomUUID())
-                            .answerContent(String.format("%d_%s", sttAnswer, resultTrueQuestion))
-                            .correctAnswer(Boolean.TRUE)
-                            .question(questionChildren)
-                            .userCreate(currentUser)
-                            .userUpdate(currentUser)
-                            .build();
-
-                    answerEntity = answerRepository.save(answerEntity);
-
-                    questionChildren.getAnswers().add(answerEntity);
-
-                    countRowWillFetch--;
-
-                    iRowBodyTable++;
-                }
-
-                questionChildren.setQuestionResult(String.join("_", answerResultList));
-
-                questionChildren = questionRepository.save(questionChildren);
-
-                if (!questionParent.getQuestionGroupChildren().contains(questionChildren))
-                    questionParent.getQuestionGroupChildren().add(questionChildren);
-
-                ExcelQuestionResponse excelQuestionResponse = ExcelContentConverter.INSTANCE.toExcelQuestionResponse(questionParent);
-
-                excelQuestionResponse.setTopicId(topicId);
-
-                excelQuestionResponseList.add(excelQuestionResponse);
-            }
-
-            return ExcelQuestionListResponse.builder()
-                    .questions(excelQuestionResponseList)
-                    .build();
-        }
-    }
-
-
-    @Transactional
-    @Override
-    @SneakyThrows
-    public ExcelQuestionListResponse importQuestionMatchingWordsPart9Excel(UUID topicId, MultipartFile file) {
-
-        if (file == null || file.isEmpty())
-            throw new BadRequestException("Please select a file excel to upload");
-
-        if (ExcelUtil.isExcelFile(file))
-            throw new CustomException(ErrorEnum.FILE_IMPORT_IS_NOT_EXCEL);
-
-        TopicEntity topicEntity = topicService.getTopicById(topicId);
-
-        UserEntity currentUser = userService.currentUser();
-
-        int part = 9;
-
-        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
-
-            int numberOfSheetTopicInformation = 0;
-
-            Sheet sheet = workbook.getSheetAt(numberOfSheetTopicInformation);
-
-            ExcelTopicContentResponse excelTopicContentResponse = ExcelUtil.collectTopicContentWith(sheet);
-
-            sheet = workbook.getSheetAt(part);
-
-            if (sheet == null)
-                throw new BadRequestException(String.format("Sheet %d does not exist", part));
-
-            int iRowPartName = 0;
-
-            Row firstRow = sheet.getRow(iRowPartName);
-
-            if (firstRow == null)
-                throw new BadRequestException("First row for part name is required in sheet with name is PART 9!");
-
-            String partNameAtFirstRow = ExcelUtil.getStringCellValue(firstRow, 0);
-
-            if (
-                    !partNameAtFirstRow.equalsIgnoreCase(PartEnum.PART_9.getName())
-            ) throw new BadRequestException("Part name at first row must defined with PART 9.");
-
-            String partType = excelTopicContentResponse.getPartTypesList().get(part - 1);
-
-            PartEntity partEntity = partService.getPartToName(PartEnum.PART_9.getName(), partType, topicEntity);
-
-            List<ExcelQuestionResponse> excelQuestionResponseList = new ArrayList<>();
-
-            // bỏ qua dòng đầu tiên vì đã được đọc
-            int countRowWillFetch = sheet.getLastRowNum() - 1;
-
-            int iRowImage = iRowPartName + 1;
-
-            while (countRowWillFetch >= 0) {
-
-                int iRowTotalScore = iRowImage + 1;
-
-                ExcelQuestionContentResponse excelQuestionContentResponse = ExcelUtil.collectQuestionContentPart1234567With(sheet, null, iRowImage, iRowTotalScore, part);
-
-                QuestionEntity questionParent = QuestionEntity.builder()
-                        .questionId(UUID.randomUUID())
-                        .part(partEntity)
-                        .topics(List.of(topicEntity))
-                        .userCreate(currentUser)
-                        .userUpdate(currentUser)
-                        .questionScore(excelQuestionContentResponse.getTotalScore())
-                        .isQuestionParent(Boolean.TRUE)
-                        .questionType(QuestionTypeEnum.Question_Parent)
-                        .build();
-
-                questionParent = questionRepository.save(questionParent);
-
-                if (questionParent.getContentCollection() == null)
-                    questionParent.setContentCollection(new ArrayList<>());
-
-                ContentEntity contentImage = contentUtil.makeContentEntity(
-                        currentUser,
-                        topicEntity,
-                        excelQuestionContentResponse.getImagePath()
-                );
-
-                contentImage = contentRepository.save(contentImage);
-
-                questionParent.setContentImage(contentImage.getContentData());
-
-                if (!questionParent.getContentCollection().contains(contentImage))
-                    questionParent.getContentCollection().add(contentImage);
-
-                questionParent = questionRepository.save(questionParent);
-
-                if (questionParent.getQuestionGroupChildren() == null)
-                    questionParent.setQuestionGroupChildren(new ArrayList<>());
-
-                int iRowHeaderTable = iRowTotalScore + 1;
-
-                ExcelUtil.checkHeaderTableQuestionPart1234567With(sheet, iRowHeaderTable, part);
-
-                int iRowBodyTable = iRowHeaderTable + 1;
-
-                //bỏ qua 3 dòng vị đã dọc image, score, và check structure header table
-                countRowWillFetch -= 3;
-
-                while (true) {
-
-                    Row rowBodyTable = sheet.getRow(iRowBodyTable);
-
-                    if (rowBodyTable == null || countRowWillFetch < 0) {
-                        countRowWillFetch = -1;
-                        break;
-                    }
-
-                    Cell cellQuestionContent = rowBodyTable.getCell(0);
-
-                    if (
-                            cellQuestionContent.getCellType().equals(CellType.STRING)
-                                    && cellQuestionContent.getStringCellValue().equalsIgnoreCase(ExcelQuestionConstant.Image.getHeaderName())
-                    ) {
-
-                        iRowImage = iRowBodyTable;
-                        break;
-                    }
-
-                    int jColQuestionContentChild = 1;
-                    int jColResultTrueAnswer = 2;
-                    int jColScoreTrueAnswer = 3;
-
-                    String questionContentChild = ExcelUtil.getStringCellValue(rowBodyTable, jColQuestionContentChild);
-                    String resultTrueQuestion = ExcelUtil.getStringCellValue(rowBodyTable, jColResultTrueAnswer);
-                    int scoreTrueAnswer = ExcelUtil.getNumericCellValue(rowBodyTable, jColScoreTrueAnswer);
-
-                    QuestionEntity questionChildren = QuestionEntity.builder()
-                            .questionId(UUID.randomUUID())
-                            .questionGroupParent(questionParent)
-                            .numberChoice(1)
-                            .questionScore(scoreTrueAnswer)
-                            .part(partEntity)
-                            .questionContent(questionContentChild)
-                            .questionResult(resultTrueQuestion)
-                            .questionType(QuestionTypeEnum.Words_Matching)
-                            .isQuestionParent(Boolean.FALSE)
-                            .userUpdate(currentUser)
-                            .userUpdate(currentUser)
-                            .build();
-
-                    questionChildren = questionRepository.save(questionChildren);
-                    topicEntity.setNumberQuestion(topicEntity.getNumberQuestion() + 1);
-                    if (!questionParent.getQuestionGroupChildren().contains(questionChildren))
-                        questionParent.getQuestionGroupChildren().add(questionChildren);
-
-                    countRowWillFetch--;
-
-                    iRowBodyTable++;
-                }
-
-                ExcelQuestionResponse excelQuestionResponse = ExcelContentConverter.INSTANCE.toExcelQuestionResponse(questionParent);
-
-                excelQuestionResponse.setTopicId(topicId);
-
-                excelQuestionResponseList.add(excelQuestionResponse);
-            }
-
-            return ExcelQuestionListResponse.builder()
-                    .questions(excelQuestionResponseList)
-                    .build();
-        }
-    }
-
 
     @Transactional
     @Override
@@ -1487,16 +1099,6 @@ public class ExcelFillService implements IExcelFillService {
         } else if (List.of(6, 7).contains(partNumber)) {
 
             ExcelQuestionListResponse excelQuestionListResponse = importQuestionReadingPart67Excel(topicId, file, partNumber);
-
-            excelQuestionResponseList = excelQuestionListResponse.getQuestions();
-        } else if (partNumber == 8) {
-
-            ExcelQuestionListResponse excelQuestionListResponse = importQuestionFillInBlankPart8Excel(topicId, file);
-
-            excelQuestionResponseList = excelQuestionListResponse.getQuestions();
-        } else if (partNumber == 9) {
-
-            ExcelQuestionListResponse excelQuestionListResponse = importQuestionMatchingWordsPart9Excel(topicId, file);
 
             excelQuestionResponseList = excelQuestionListResponse.getQuestions();
         }

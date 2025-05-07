@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.mock_test.service;
 
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
-import com.example.englishmaster_be.common.thread.MessageResponseHolder;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
+
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.mock_test.dto.request.*;
 import com.example.englishmaster_be.domain.mock_test.dto.response.IMockTestToUserResponse;
@@ -12,9 +12,8 @@ import com.example.englishmaster_be.domain.question.dto.response.QuestionMockTes
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.converter.MockTestConverter;
-import com.example.englishmaster_be.advice.exception.template.BadRequestException;
-import com.example.englishmaster_be.advice.exception.template.CustomException;
+import com.example.englishmaster_be.mapper.MockTestMapper;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailEntity;
 import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailRepository;
@@ -37,7 +36,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -45,7 +43,7 @@ import org.springframework.data.domain.*;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import com.example.englishmaster_be.common.constant.error.ErrorEnum;
+import com.example.englishmaster_be.common.constant.error.Error;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileCopyUtils;
 
@@ -62,7 +60,7 @@ import com.example.englishmaster_be.model.mock_test.QMockTestEntity;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MockTestService implements IMockTestService {
 
@@ -96,7 +94,7 @@ public class MockTestService implements IMockTestService {
 
         return mockTestRepository.findByMockTestId(mockTestId)
                 .orElseThrow(
-                        () -> new CustomException(ErrorEnum.MOCK_TEST_NOT_FOUND)
+                        () -> new ErrorHolder(Error.MOCK_TEST_NOT_FOUND)
                 );
     }
 
@@ -105,16 +103,16 @@ public class MockTestService implements IMockTestService {
     public MockTestEntity saveMockTest(MockTestRequest mockTestRequest) {
         // Kiểm tra dữ liệu đầu vào
         if (mockTestRequest == null) {
-            throw new BadRequestException("Mock test request is null");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Mock test request is null");
         }
         if (mockTestRequest.getTopicId() == null) {
-            throw new BadRequestException("Topic id in mock test request is null");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Topic id in mock test request is null");
         }
         if (mockTestRequest.getWorkTimeTopic() == null || mockTestRequest.getWorkTimeTopic().isBlank()) {
-            throw new BadRequestException("Work time topic is null or empty");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Work time topic is null or empty");
         }
         if (mockTestRequest.getWorkTimeFinal() == null || mockTestRequest.getWorkTimeFinal().isBlank()) {
-            throw new BadRequestException("Work time final is null or empty");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Work time final is null or empty");
         }
 
         // Lấy user hiện hành và topic của bài thi
@@ -129,7 +127,7 @@ public class MockTestService implements IMockTestService {
             workTimeTopic = LocalTime.parse(mockTestRequest.getWorkTimeTopic(), timeFormatter);
             workTimeFinal = LocalTime.parse(mockTestRequest.getWorkTimeFinal(), timeFormatter);
         } catch (DateTimeParseException e) {
-            throw new BadRequestException("Invalid time format. Expected HH:mm:ss");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Invalid time format. Expected HH:mm:ss");
         }
 
         // Tính khoảng thời gian giữa workTimeFinal và workTimeTopic
@@ -180,7 +178,7 @@ public class MockTestService implements IMockTestService {
 
         return mockTestRepository.findByMockTestId(mockTestId)
                 .orElseThrow(
-                        () -> new CustomException(ErrorEnum.MOCK_TEST_NOT_FOUND)
+                        () -> new ErrorHolder(Error.MOCK_TEST_NOT_FOUND)
                 );
     }
 
@@ -266,7 +264,7 @@ public class MockTestService implements IMockTestService {
                 .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
-                MockTestConverter.INSTANCE.toMockTestResponseList(query.fetch())
+                MockTestMapper.INSTANCE.toMockTestResponseList(query.fetch())
         );
 
         return filterResponse;
@@ -299,7 +297,7 @@ public class MockTestService implements IMockTestService {
             // Lấy đối tượng Answer; nếu không tìm thấy sẽ ném exception
             AnswerEntity answer = answerService.getAnswerById(answerId);
             if (answer == null) {
-                throw new BadRequestException("Answer not found for id: " + answerId);
+                throw new ErrorHolder(Error.BAD_REQUEST, "Answer not found for id: " + answerId);
             }
 
             // Lấy id của part mà câu hỏi của đáp án này thuộc về
@@ -510,11 +508,6 @@ public class MockTestService implements IMockTestService {
 
         List<MockTestDetailEntity> detailMockTestList = getTop10DetailToCorrect(index, isCorrect, mockTest);
 
-        if (isCorrect)
-            MessageResponseHolder.setMessage("Get top 10 AnswerEntity correct successfully");
-        else
-            MessageResponseHolder.setMessage("Get top 10 AnswerEntity wrong successfully");
-
         return detailMockTestList;
     }
 
@@ -553,7 +546,7 @@ public class MockTestService implements IMockTestService {
 //        MockTestEntity mockTest = findMockTestToId(mockTestId);
 //
 //        if (!currentUser.equals(mockTest.getUser()))
-//            throw new BadRequestException("You cannot view other people's tests");
+//            throw new ErrorHolder(Error.BAD_REQUEST, )("You cannot view other people's tests");
 //
 //        MockTestPartResponse partMockTestResponse = MockTestMapper.INSTANCE.toPartMockTestResponse(mockTest);
 //
@@ -585,7 +578,7 @@ public class MockTestService implements IMockTestService {
         MockTestEntity mockTest = findMockTestToId(mockTestId);
 
         if (!currentUser.equals(mockTest.getUser()))
-            throw new BadRequestException("You cannot view other people's tests");
+            throw new ErrorHolder(Error.BAD_REQUEST, "You cannot view other people's tests");
 
         List<QuestionEntity> questionList = topicService.getQuestionOfPartToTopic(mockTest.getTopic().getTopicId(), partId);
 

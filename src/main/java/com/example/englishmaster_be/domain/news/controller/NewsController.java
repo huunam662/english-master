@@ -1,10 +1,10 @@
 package com.example.englishmaster_be.domain.news.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 
 import com.example.englishmaster_be.domain.news.service.INewsService;
-import com.example.englishmaster_be.converter.NewsConverter;
+import com.example.englishmaster_be.mapper.NewsMapper;
 import com.example.englishmaster_be.domain.news.dto.request.NewsFilterRequest;
 import com.example.englishmaster_be.domain.news.dto.request.NewsRequest;
 import com.example.englishmaster_be.domain.news.dto.response.NewsResponse;
@@ -69,7 +69,7 @@ public class NewsController {
 
         List<NewsEntity> newsEntityList = newsService.listNewsOfUser(newsFilterRequest);
 
-        return NewsConverter.INSTANCE.toNewsResponseList(newsEntityList);
+        return NewsMapper.INSTANCE.toNewsResponseList(newsEntityList);
     }
 
 
@@ -82,7 +82,7 @@ public class NewsController {
 
         NewsEntity news = newsService.saveNews(newsRequest);
 
-        return NewsConverter.INSTANCE.toNewsResponse(news);
+        return NewsMapper.INSTANCE.toNewsResponse(news);
     }
 
 
@@ -98,7 +98,7 @@ public class NewsController {
 
         NewsEntity news = newsService.saveNews(newsRequest);
 
-        return NewsConverter.INSTANCE.toNewsResponse(news);
+        return NewsMapper.INSTANCE.toNewsResponse(news);
     }
 
 
@@ -126,7 +126,7 @@ public class NewsController {
 
         List<NewsEntity> newsEntityList = newsService.searchByTitle(title);
 
-        return NewsConverter.INSTANCE.toNewsResponseList(newsEntityList);
+        return NewsMapper.INSTANCE.toNewsResponseList(newsEntityList);
     }
 
 }

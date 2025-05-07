@@ -9,7 +9,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.0</version>
+        <version>3.3.3</version>
         <relativePath/>
     </parent>
 
@@ -365,7 +365,7 @@
                             <version>5.1.0</version>
                             <classifier>jakarta</classifier>
                         </path>
-                        <!-- MapStruct Processor (để tạo implementation của mapper) -->
+                        <!-- MapStruct Processor (để tạo implementation của Mapper) -->
                         <path>
                             <groupId>org.mapstruct</groupId>
                             <artifactId>mapstruct-processor</artifactId>
@@ -399,6 +399,7 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 

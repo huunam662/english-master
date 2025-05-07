@@ -26,7 +26,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Component
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MockTestHelper {
 

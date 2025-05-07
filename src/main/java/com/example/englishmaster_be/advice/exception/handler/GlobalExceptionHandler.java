@@ -1,21 +1,26 @@
 package com.example.englishmaster_be.advice.exception.handler;
 
-import com.example.englishmaster_be.common.constant.error.ErrorEnum;
-import com.example.englishmaster_be.advice.exception.template.BadRequestException;
-import com.example.englishmaster_be.advice.exception.template.CustomException;
-import com.example.englishmaster_be.advice.exception.template.RefreshTokenException;
-import com.example.englishmaster_be.advice.exception.template.ResourceNotFoundException;
-import com.example.englishmaster_be.common.dto.response.ExceptionResponseModel;
+import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.shared.dto.response.ResultApiResponse;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
+import io.swagger.v3.core.util.Json;
 import jakarta.mail.MessagingException;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -23,47 +28,82 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.rmi.ServerException;
 import java.util.*;
 
+@Slf4j(topic = "GLOBAL-EXCEPTION-HANDLER")
 @RestControllerAdvice
-public class  GlobalExceptionHandler {
+public class  GlobalExceptionHandler implements AccessDeniedHandler, AuthenticationEntryPoint {
 
+    private void logError(Error error, Exception ex){
 
-    @ExceptionHandler(CustomException.class)
-    public ExceptionResponseModel handleCustomException(CustomException e) {
+        log.error("{} -> code {}", ex, error.getStatusCode().value());
+    }
 
-        ErrorEnum error = e.getError();
+    public void printError(Error error, HttpServletResponse response) throws IOException {
 
-        return ExceptionResponseModel.builder()
-                .status(error.getStatusCode())
-                .code(error.getStatusCode().value())
-                .message(error.getMessage())
-                .build();
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setStatus(error.getStatusCode().value());
+        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        response.getWriter().write(
+                Json.pretty(
+                        ResultApiResponse.ErrorResponse.build(error)
+                )
+        );
+    }
+
+    @Override
+    public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
+
+        Error error = Error.UNAUTHENTICATED;
+
+        logError(error, authException);
+
+        this.printError(error, response);
+    }
+
+    @Override
+    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+
+        Error error = Error.UNAUTHORIZED;
+
+        logError(error, accessDeniedException);
+
+        this.printError(error, response);
+    }
+
+    @ExceptionHandler(ErrorHolder.class)
+    public ResultApiResponse.ErrorResponse handleCustomException(ErrorHolder e) {
+
+        Error error = e.getError();
+
+        logError(error, e);
+
+        return ResultApiResponse.ErrorResponse.build(e);
     }
 
     @ExceptionHandler({
-            ResourceNotFoundException.class,
             NoSuchElementException.class
     })
-    public ExceptionResponseModel handlingResourceNotFoundException(ResourceNotFoundException ignored){
+    public ResultApiResponse.ErrorResponse handlingResourceNotFoundException(NoSuchElementException e){
 
-        String message = "Resource not found";
+        Error error = Error.RESOURCE_NOT_FOUND;
 
-        if(ignored.getMessage() != null || ignored.getMessage().isEmpty())
-            message = ignored.getMessage();
+        logError(error, e);
 
-        return ExceptionResponseModel.builder()
-                .status(HttpStatus.NOT_FOUND)
-                .code(HttpStatus.NOT_FOUND.value())
-                .message(message)
-                .build();
+        return ResultApiResponse.ErrorResponse.build(error);
     }
 
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ExceptionResponseModel handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+    public ResultApiResponse.ErrorResponse handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+
+        Error error = Error.BAD_REQUEST;
+
+        logError(error, e);
 
         Throwable cause = e.getCause();
 
@@ -83,19 +123,16 @@ public class  GlobalExceptionHandler {
             errors.put("invalidValue", invalidValue);
         }
 
-        return ExceptionResponseModel.builder()
-                .status(HttpStatus.BAD_REQUEST)
-                .code(HttpStatus.BAD_REQUEST.value())
-                .message("Invalid request")
-                .errors(errors)
-                .build();
+        return ResultApiResponse.ErrorResponse.build(error, errors);
     }
 
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ExceptionResponseModel handleValidationExceptions(MethodArgumentNotValidException exception){
+    public ResultApiResponse.ErrorResponse handleValidationExceptions(MethodArgumentNotValidException exception){
 
-        String message = "Ràng buộc thất bại";
+        Error error = Error.BAD_REQUEST;
+
+        logError(error, exception);
 
         BindingResult bindingResult = exception.getBindingResult();
 
@@ -111,125 +148,91 @@ public class  GlobalExceptionHandler {
 
             errors.put(fieldErrors.get(lastIndex).getField(), fieldErrors.get(lastIndex).getDefaultMessage());
         }
-        return ExceptionResponseModel.builder()
-                .status(HttpStatus.BAD_REQUEST)
-                .code(HttpStatus.BAD_REQUEST.value())
-                .message(message)
-                .errors(errors)
-                .build();
+        return ResultApiResponse.ErrorResponse.build(error, errors);
     }
 
     @ExceptionHandler({
             UsernameNotFoundException.class,
             BadCredentialsException.class
     })
-    public ExceptionResponseModel handleBadCredentialsException(AuthenticationException ignored) {
+    public ResultApiResponse.ErrorResponse handleBadCredentialsException(AuthenticationException e) {
 
-        String message = "Sai tên tài khoản hoặc mât khẩu";
+        Error error = Error.BAD_CREDENTIALS;
 
-        return ExceptionResponseModel.builder()
-                .status(HttpStatus.UNAUTHORIZED)
-                .code(HttpStatus.UNAUTHORIZED.value())
-                .message(message)
-                .build();
+        logError(error, e);
+
+        return ResultApiResponse.ErrorResponse.build(error);
     }
 
     @ExceptionHandler(DisabledException.class)
-    public ExceptionResponseModel handleDisabledException(DisabledException ignored) {
+    public ResultApiResponse.ErrorResponse handleDisabledException(DisabledException e) {
 
-        ErrorEnum error = ErrorEnum.ACCOUNT_DISABLED;
+        Error error = Error.ACCOUNT_DISABLED;
 
-        return ExceptionResponseModel.builder()
-                .status(error.getStatusCode())
-                .code(error.getStatusCode().value())
-                .message(error.getMessage())
-                .build();
+        logError(error, e);
+
+        return ResultApiResponse.ErrorResponse.build(error);
     }
 
 
     @ExceptionHandler(HttpClientErrorException.class)
-    public ExceptionResponseModel handleHttpClientErrorException(HttpClientErrorException ignored) {
+    public ResultApiResponse.ErrorResponse handleHttpClientErrorException(HttpClientErrorException e) {
 
-        ErrorEnum error = ErrorEnum.UPLOAD_FILE_FAILURE;
+        Error error = Error.UPLOAD_FILE_FAILURE;
 
-        return ExceptionResponseModel.builder()
-                .status(error.getStatusCode())
-                .code(error.getStatusCode().value())
-                .message(error.getMessage())
-                .build();
+        logError(error, e);
+
+        return ResultApiResponse.ErrorResponse.build(error);
     }
 
     @ExceptionHandler(AuthenticationException.class)
-    public ExceptionResponseModel handleAuthenticationException(AuthenticationException e) {
+    public ResultApiResponse.ErrorResponse handleAuthenticationException(AuthenticationException e) {
 
-        return ExceptionResponseModel.builder()
-                .status(HttpStatus.UNAUTHORIZED)
-                .code(HttpStatus.UNAUTHORIZED.value())
-                .message(e.getMessage())
-                .build();
+        Error error = Error.UNAUTHENTICATED;
+
+        logError(error, e);
+
+        return ResultApiResponse.ErrorResponse.build(error);
     }
 
 
     @ExceptionHandler({
             MessagingException.class,
-            BadRequestException.class,
             IllegalArgumentException.class,
             FileAlreadyExistsException.class,
             UnsupportedOperationException.class
     })
-    public ExceptionResponseModel handleIllegalArgumentException(Exception exception) {
+    public ResultApiResponse.ErrorResponse handleIllegalArgumentException(Exception exception) {
 
-        return ExceptionResponseModel.builder()
-                .status(HttpStatus.BAD_REQUEST)
-                .code(HttpStatus.BAD_REQUEST.value())
-                .message(exception.getMessage())
-                .build();
+        Error error = Error.BAD_REQUEST;
+
+        logError(error, exception);
+
+        return ResultApiResponse.ErrorResponse.build(error);
     }
-
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ExceptionResponseModel handleConflictException(Exception exception) {
-
-        return ExceptionResponseModel.builder()
-                .status(HttpStatus.CONFLICT)
-                .code(HttpStatus.CONFLICT.value())
-                .message(exception.getMessage())
-                .build();
-    }
-
 
     @ExceptionHandler({
             Exception.class,
-            ServerException.class
+            ServerException.class,
+            DataIntegrityViolationException.class
     })
-    public ExceptionResponseModel handleInternalException(Exception exception) {
+    public ResultApiResponse.ErrorResponse handleInternalException(Exception exception) {
 
-        return ExceptionResponseModel.builder()
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .message(exception.getMessage())
-                .build();
+        Error error = Error.SERVER_ERROR;
+
+        logError(error, exception);
+
+        return ResultApiResponse.ErrorResponse.build(error);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
-    public ExceptionResponseModel handleAccessDeniedException(AccessDeniedException ignored) {
+    public ResultApiResponse.ErrorResponse handleAccessDeniedException(AccessDeniedException e) {
 
-        ErrorEnum error = ErrorEnum.UNAUTHORIZED;
+        Error error = Error.UNAUTHORIZED;
 
-        return ExceptionResponseModel.builder()
-                .status(error.getStatusCode())
-                .code(error.getStatusCode().value())
-                .message(error.getMessage())
-                .build();
-    }
+        logError(error, e);
 
-    @ExceptionHandler(RefreshTokenException.class)
-    public ExceptionResponseModel handleTokenRefreshException(RefreshTokenException ex) {
-
-        return ExceptionResponseModel.builder()
-                .message(ex.getMessage())
-                .status(HttpStatus.FORBIDDEN)
-                .code(HttpStatus.FORBIDDEN.value())
-                .build();
+        return ResultApiResponse.ErrorResponse.build(error);
     }
 
 }

@@ -1,8 +1,9 @@
 package com.example.englishmaster_be.domain.comment.service;
 
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.comment.dto.request.CommentRequest;
-import com.example.englishmaster_be.advice.exception.template.BadRequestException;
-import com.example.englishmaster_be.converter.CommentConverter;
+import com.example.englishmaster_be.mapper.CommentMapper;
 import com.example.englishmaster_be.model.comment.CommentEntity;
 import com.example.englishmaster_be.model.comment.CommentRepository;
 import com.example.englishmaster_be.model.post.PostEntity;
@@ -14,7 +15,6 @@ import com.example.englishmaster_be.domain.user.service.IUserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CommentService implements ICommentService {
 
@@ -38,7 +38,6 @@ public class CommentService implements ICommentService {
     ITopicService topicService;
 
     IPostService postService;
-
 
 
     @Override
@@ -59,7 +58,7 @@ public class CommentService implements ICommentService {
     public CommentEntity getCommentById(UUID commentID) {
         return commentRepository.findByCommentId(commentID)
                 .orElseThrow(
-                        () -> new IllegalArgumentException("CommentEntity not found with ID: " + commentID)
+                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Comment not found: " + commentID)
                 );
     }
 
@@ -87,7 +86,7 @@ public class CommentService implements ICommentService {
 
         comment = commentRepository.save(comment);
 
-        messagingTemplate.convertAndSend("/CommentEntity/TopicEntity/" + topicId, CommentConverter.INSTANCE.toCommentResponse(comment));
+        messagingTemplate.convertAndSend("/CommentEntity/TopicEntity/" + topicId, CommentMapper.INSTANCE.toCommentResponse(comment));
 
         return comment;
     }
@@ -108,7 +107,7 @@ public class CommentService implements ICommentService {
 
         comment = commentRepository.save(comment);
 
-        messagingTemplate.convertAndSend("/CommentEntity/PostEntity/" + postId, CommentConverter.INSTANCE.toCommentResponse(comment));
+        messagingTemplate.convertAndSend("/CommentEntity/PostEntity/" + postId, CommentMapper.INSTANCE.toCommentResponse(comment));
 
         return comment;
     }
@@ -135,7 +134,7 @@ public class CommentService implements ICommentService {
 
         comment = commentRepository.save(comment);
 
-        messagingTemplate.convertAndSend("/CommentEntity/commentParent/" + commentId, CommentConverter.INSTANCE.toCommentResponse(comment));
+        messagingTemplate.convertAndSend("/CommentEntity/commentParent/" + commentId, CommentMapper.INSTANCE.toCommentResponse(comment));
 
         return comment;
     }
@@ -149,13 +148,13 @@ public class CommentService implements ICommentService {
         CommentEntity comment = getCommentById(updateCommentId);
 
         if(!comment.getUserComment().getUserId().equals(user.getUserId()))
-            throw new BadRequestException("Don't update CommentEntity");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Don't update Comment");
 
         comment.setContent(commentRequest.getCommentContent());
 
         comment  = commentRepository.save(comment);
 
-        messagingTemplate.convertAndSend("/CommentEntity/updateComment/" + updateCommentId.toString(), CommentConverter.INSTANCE.toCommentResponse(comment));
+        messagingTemplate.convertAndSend("/CommentEntity/updateComment/" + updateCommentId.toString(), CommentMapper.INSTANCE.toCommentResponse(comment));
 
         return comment;
     }
@@ -169,7 +168,7 @@ public class CommentService implements ICommentService {
         CommentEntity comment = getCommentById(commentId);
 
         if(!comment.getUserComment().getUserId().equals(user.getUserId()))
-            throw new BadRequestException("Don't update CommentEntity");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Don't delete Comment");
 
         commentRepository.delete(comment);
 

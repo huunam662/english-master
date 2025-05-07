@@ -1,16 +1,16 @@
 
 package com.example.englishmaster_be.advice.response;
 
-import com.example.englishmaster_be.common.dto.response.ExceptionResponseModel;
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
-import com.example.englishmaster_be.common.dto.response.ResponseModel;
-import com.example.englishmaster_be.common.thread.MessageResponseHolder;
+import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
+import com.example.englishmaster_be.shared.dto.response.ResultApiResponse;
+
 import com.example.englishmaster_be.domain.file_storage.dto.response.ResourceResponse;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -23,43 +23,37 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
+import javax.xml.transform.Result;
+
+@Slf4j(topic = "GLOBAL-OBJECT-RESPONSE-WRAPPER")
 @RestControllerAdvice
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class GlobalObjectResponseWrapper implements ResponseBodyAdvice<Object> {
 
-    HttpServletRequest httpServletRequest;
-
     @Override
     public boolean supports(
             @NonNull MethodParameter returnType,
-            @NonNull Class<? extends HttpMessageConverter<?>> converterType
+            @NonNull Class<? extends HttpMessageConverter<?>> MapperType
     ) {
 
         // (1) -> Nhận biết hướng đi của request và vị trí của handler response
-        String requestURI = httpServletRequest.getRequestURI();
-        String packageName = returnType.getContainingClass().getPackageName();
         Class<?> declaringClass = returnType.getDeclaringClass();
-
-        System.out.println("----------- supports ResponseBodyAdvice -----------");
-        System.out.println("requestURI: " + requestURI);
-        System.out.println("packageName: " + packageName);
-        System.out.println("declaringClass: " + declaringClass);
-        System.out.println("annotation declaringClass: " + declaringClass.getAnnotation(RestController.class));
-        System.out.println("----------- supports ResponseBodyAdvice -----------");
+        String packageName = declaringClass.getPackageName();
+        Class<?> objectReturnType = returnType.getParameterType();
         // -> end (1)
 
+        log.info("Package: {}", packageName);
+        log.info("declaringClass: {}", declaringClass);
+
         // -> Cho phép beforeBodyWrite nhận xử lý nếu thỏa điều kiện dưới đây
-        return !requestURI.contains("/v3/api-docs")
-                && !packageName.contains("org.springdoc.webmvc")
-                && !declaringClass.getPackageName().contains("org.springdoc.webmvc")
-                && (
-                    declaringClass.getAnnotation(RestController.class) != null
-                    ||
-                    returnType.getParameterType().equals(ResponseModel.class)
-                    ||
-                    returnType.getParameterType().equals(ExceptionResponseModel.class)
-                );
+        return !packageName.contains("springdoc") &&
+                !packageName.contains("swagger") &&
+                (
+                        declaringClass.getAnnotation(RestController.class) != null ||
+                                objectReturnType.equals(ResultApiResponse.ErrorResponse.class)
+                ) && !objectReturnType.equals(byte[].class) &&
+                !objectReturnType.equals(byte.class);
     }
 
     @Override
@@ -67,18 +61,12 @@ public class GlobalObjectResponseWrapper implements ResponseBodyAdvice<Object> {
             Object body,
             @NonNull MethodParameter returnType,
             @NonNull MediaType selectedContentType,
-            @NonNull Class<? extends HttpMessageConverter<?>> selectedConverterType,
+            @NonNull Class<? extends HttpMessageConverter<?>> selectedMapperType,
             @NonNull ServerHttpRequest request,
             @NonNull ServerHttpResponse response
     ) {
 
-        System.out.println("----------- beforeBodyWrite -----------");
-        System.out.println(returnType.getContainingClass().getPackageName());
-        if(body != null) System.out.println(body.getClass().getSimpleName());
-        System.out.println(returnType.getMethod());
-        System.out.println("----------- beforeBodyWrite -----------");
-
-        if(body instanceof ExceptionResponseModel exceptionResponseModel) {
+        if(body instanceof ResultApiResponse.ErrorResponse exceptionResponseModel) {
 
             response.setStatusCode(exceptionResponseModel.getStatus());
 
@@ -101,13 +89,7 @@ public class GlobalObjectResponseWrapper implements ResponseBodyAdvice<Object> {
             return resourceResponse.getResource();
         }
 
-        if(body instanceof ResponseModel responseModel)
-            body = responseModel.getResponseData();
-
-        else if(body instanceof ResponseEntity<?> responseEntity)
-            body = responseEntity.getBody();
-
-        else if(body instanceof FilterResponse<?> filterResponse){
+        if(body instanceof FilterResponse<?> filterResponse){
 
             if(filterResponse.getContent() != null)
                 filterResponse.setContentLength(filterResponse.getContent().size());
@@ -115,11 +97,15 @@ public class GlobalObjectResponseWrapper implements ResponseBodyAdvice<Object> {
             filterResponse.withPreviousAndNextPage();
         }
 
-        return ResponseModel.builder()
+        DefaultMessage defaultMessage = returnType.getMethodAnnotation(DefaultMessage.class);
+
+        log.info("Result api response with message: {}", defaultMessage);
+
+        return ResultApiResponse.builder()
                 .success(Boolean.TRUE)
                 .status(HttpStatus.OK)
                 .code(HttpStatus.OK.value())
-                .message(MessageResponseHolder.getMessage())
+                .message(defaultMessage != null ? defaultMessage.value() : "")
                 .path(request.getURI().getPath())
                 .responseData(body)
                 .build();

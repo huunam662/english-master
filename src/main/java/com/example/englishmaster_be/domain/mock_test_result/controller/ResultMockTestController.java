@@ -3,7 +3,7 @@ package com.example.englishmaster_be.domain.mock_test_result.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.mock_test_result.dto.response.MockTestResultResponse;
-import com.example.englishmaster_be.converter.MockTestResultConverter;
+import com.example.englishmaster_be.mapper.MockTestResultMapper;
 import com.example.englishmaster_be.model.mock_test_result.MockTestResultEntity;
 import com.example.englishmaster_be.domain.mock_test_result.dto.request.ResultMockTestRequest;
 import com.example.englishmaster_be.domain.mock_test_result.service.IResultMockTestService;
@@ -33,7 +33,7 @@ public class ResultMockTestController {
 
         MockTestResultEntity resultMockTest = resultMockTestService.saveResultMockTest(resultMockTestRequest);
 
-        return MockTestResultConverter.INSTANCE.toMockTestResultResponse(resultMockTest);
+        return MockTestResultMapper.INSTANCE.toMockTestResultResponse(resultMockTest);
     }
 
     @GetMapping("/getAllResult")
@@ -42,7 +42,7 @@ public class ResultMockTestController {
 
         List<MockTestResultEntity> resultMockTestEntityList = resultMockTestService.getAllResultMockTests();
 
-        return MockTestResultConverter.INSTANCE.toMockTestResultResponseList(resultMockTestEntityList);
+        return MockTestResultMapper.INSTANCE.toMockTestResultResponseList(resultMockTestEntityList);
     }
 
     @GetMapping("/getResultMockTestByPartAndMockTest")
@@ -54,7 +54,7 @@ public class ResultMockTestController {
 
         List<MockTestResultEntity> resultMockTestEntityList = resultMockTestService.getResultMockTestsByPartIdAndMockTestId(partId, mockTestId);
 
-        return MockTestResultConverter.INSTANCE.toMockTestResultResponseList(resultMockTestEntityList);
+        return MockTestResultMapper.INSTANCE.toMockTestResultResponseList(resultMockTestEntityList);
     }
 
     @DeleteMapping("/delete")

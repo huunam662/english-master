@@ -1,10 +1,9 @@
 package com.example.englishmaster_be.domain.type.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
-import com.example.englishmaster_be.common.constant.sort.SortByTypeFieldsEnum;
-
-import com.example.englishmaster_be.converter.TypeConverter;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
+import com.example.englishmaster_be.common.constant.sort.SortByTypeFields;
+import com.example.englishmaster_be.mapper.TypeMapper;
 import com.example.englishmaster_be.domain.type.dto.request.TypeFilterRequest;
 import com.example.englishmaster_be.domain.type.dto.request.TypeRequest;
 import com.example.englishmaster_be.domain.type.dto.response.TypeResponse;
@@ -45,7 +44,7 @@ public class TypeController {
             @Schema(description = "Tìm kiếm")
             @RequestParam(value = "search", defaultValue = "") String search,
             @Schema(description = "Sắp xếp theo trường", allowableValues = {"None", "TypeName", "NameSlug"})
-            @RequestParam(value = "sortBy", defaultValue = "None") SortByTypeFieldsEnum sortBy,
+            @RequestParam(value = "sortBy", defaultValue = "None") SortByTypeFields sortBy,
             @Schema(description = "Tùy chọn tăng giảm", allowableValues = {"ASC", "DESC"})
             @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction direction
     ) {
@@ -68,7 +67,7 @@ public class TypeController {
 
         TypeEntity typeEntity = typeService.getTypeById(id);
 
-        return TypeConverter.INSTANCE.toTypeResponse(typeEntity);
+        return TypeMapper.INSTANCE.toTypeResponse(typeEntity);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -80,7 +79,7 @@ public class TypeController {
 
         TypeEntity typeEntity = typeService.saveType(typeRequest);
 
-        return TypeConverter.INSTANCE.toTypeResponse(typeEntity);
+        return TypeMapper.INSTANCE.toTypeResponse(typeEntity);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -90,7 +89,7 @@ public class TypeController {
 
         TypeEntity typeEntity = typeService.saveType(typeRequest);
 
-        return TypeConverter.INSTANCE.toTypeResponse(typeEntity);
+        return TypeMapper.INSTANCE.toTypeResponse(typeEntity);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

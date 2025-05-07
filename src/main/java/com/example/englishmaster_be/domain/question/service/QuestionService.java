@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.question.service;
 
-import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
+import com.example.englishmaster_be.common.constant.QuestionType;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.content.service.IContentService;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
@@ -11,8 +11,8 @@ import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.question.dto.response.*;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.advice.exception.template.CustomException;
-import com.example.englishmaster_be.common.constant.error.ErrorEnum;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
@@ -24,8 +24,7 @@ import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.question.QuestionQueryFactory;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.advice.exception.template.BadRequestException;
-import com.example.englishmaster_be.converter.QuestionConverter;
+import com.example.englishmaster_be.mapper.QuestionMapper;
 import com.example.englishmaster_be.model.answer.AnswerRepository;
 import com.example.englishmaster_be.model.content.ContentRepository;
 import com.example.englishmaster_be.model.part.PartRepository;
@@ -35,7 +34,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -51,7 +49,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class QuestionService implements IQuestionService {
 
@@ -117,7 +115,7 @@ public class QuestionService implements IQuestionService {
     }
 
     private QuestionEntity createNewQuestion(QuestionRequest questionRequest, UserEntity currentUser, PartEntity part) {
-        QuestionEntity question = QuestionConverter.INSTANCE.toQuestionEntity(questionRequest);
+        QuestionEntity question = QuestionMapper.INSTANCE.toQuestionEntity(questionRequest);
 
         question.setCreateAt(LocalDateTime.now());
         question.setUserCreate(currentUser);
@@ -301,10 +299,10 @@ public class QuestionService implements IQuestionService {
     public List<QuestionEntity> getQuestionsParentBy(List<PartEntity> partEntityList, TopicEntity topicEntity) {
 
         if(partEntityList == null)
-            throw new BadRequestException("Part list is null");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Part list is null");
 
         if(topicEntity == null)
-            throw new BadRequestException("Topic entity is null");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Topic entity is null");
 
         return questionQueryFactory.findAllQuestionsParentBy(topicEntity, partEntityList);
     }
@@ -327,7 +325,7 @@ public class QuestionService implements IQuestionService {
     public QuestionEntity uploadFileQuestion(UUID questionId, List<MultipartFile> uploadMultiFileDTO) {
 
         if (uploadMultiFileDTO == null || uploadMultiFileDTO.isEmpty())
-            throw new BadRequestException("File upload required");
+            throw new ErrorHolder(Error.BAD_REQUEST, "File upload required");
 
         UserEntity user = userService.currentUser();
 
@@ -362,7 +360,7 @@ public class QuestionService implements IQuestionService {
     public QuestionEntity updateFileQuestion(UUID questionId, String oldFileName, MultipartFile newFile) {
 
         if (newFile == null || newFile.isEmpty())
-            throw new CustomException(ErrorEnum.NULL_OR_EMPTY_FILE);
+            throw new ErrorHolder(Error.NULL_OR_EMPTY_FILE);
 
         UserEntity user = userService.currentUser();
 
@@ -371,7 +369,7 @@ public class QuestionService implements IQuestionService {
         ContentEntity content = question.getContentCollection().stream().filter(
                 contentItem -> contentItem.getContentData().equals(oldFileName)
         ).findFirst().orElseThrow(
-                () -> new BadRequestException("ContentEntity not found with content image name: " + oldFileName)
+                () -> new ErrorHolder(Error.BAD_REQUEST, "ContentEntity not found with content image name: " + oldFileName, false)
         );
 
         uploadService.delete(
@@ -394,7 +392,7 @@ public class QuestionService implements IQuestionService {
     @Override
     public QuestionEntity createGroupQuestion(QuestionGroupRequest createGroupQuestionDTO) {
 
-        QuestionEntity question = QuestionConverter.INSTANCE.toQuestionEntity(createGroupQuestionDTO);
+        QuestionEntity question = QuestionMapper.INSTANCE.toQuestionEntity(createGroupQuestionDTO);
 
         QuestionEntity questionGroup = getQuestionById(createGroupQuestionDTO.getQuestionGroupId());
 
@@ -427,11 +425,11 @@ public class QuestionService implements IQuestionService {
 
         List<QuestionEntity> questionEntityList = questionQueryFactory.findAllQuestionsParentBy(topicEntity, partEntityList);
 
-        return QuestionConverter.INSTANCE.toQuestionPartResponseList(questionEntityList, partEntityList, topicEntity, isAdmin);
+        return QuestionMapper.INSTANCE.toQuestionPartResponseList(questionEntityList, partEntityList, topicEntity, isAdmin);
     }
 
 
-    List<QuestionEntity> filterQuestionByType( List<QuestionEntity> questionEntities,QuestionTypeEnum type ){
+    List<QuestionEntity> filterQuestionByType(List<QuestionEntity> questionEntities, QuestionType type ){
         List<QuestionEntity> filteredQuestionEntities = new ArrayList<>();
         for(QuestionEntity questionEntity: questionEntities){
             if(questionEntity.getQuestionType()== type){

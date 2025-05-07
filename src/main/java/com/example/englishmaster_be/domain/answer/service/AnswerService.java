@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.domain.answer.service;
 
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerRequest;
-import com.example.englishmaster_be.advice.exception.template.CustomException;
-import com.example.englishmaster_be.converter.AnswerConverter;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.mapper.AnswerMapper;
 import com.example.englishmaster_be.model.answer.AnswerRepository;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailRepository;
@@ -14,17 +14,16 @@ import com.example.englishmaster_be.domain.user.service.IUserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.englishmaster_be.common.constant.error.ErrorEnum;
+import com.example.englishmaster_be.common.constant.error.Error;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AnswerService implements IAnswerService {
 
@@ -74,7 +73,7 @@ public class AnswerService implements IAnswerService {
         answer.setUpdateAt(LocalDateTime.now());
         answer.setUserUpdate(user);
 
-        AnswerConverter.INSTANCE.flowToAnswerEntity(answerRequest, answer);
+        AnswerMapper.INSTANCE.flowToAnswerEntity(answerRequest, answer);
 
         return answerRepository.save(answer);
     }
@@ -88,7 +87,7 @@ public class AnswerService implements IAnswerService {
     public AnswerEntity getAnswerById(UUID answerID) {
 
         return answerRepository.findByAnswerId(answerID)
-                .orElseThrow(() -> new CustomException(ErrorEnum.ANSWER_NOT_FOUND));
+                .orElseThrow(() -> new ErrorHolder(Error.ANSWER_NOT_FOUND));
     }
 
     @Transactional
@@ -105,7 +104,7 @@ public class AnswerService implements IAnswerService {
 
         return answerRepository.findByQuestionAndCorrectAnswer(question, Boolean.TRUE)
                 .orElseThrow(
-                        () -> new CustomException(ErrorEnum.ANSWER_BY_CORRECT_QUESTION_NOT_FOUND)
+                        () -> new ErrorHolder(Error.ANSWER_BY_CORRECT_QUESTION_NOT_FOUND)
                 );
     }
 

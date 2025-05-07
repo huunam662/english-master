@@ -1,8 +1,9 @@
 package com.example.englishmaster_be.shared.service.otp;
 
-import com.example.englishmaster_be.common.constant.OtpStatusEnum;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.OtpStatus;
+import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.advice.exception.template.BadRequestException;
 import com.example.englishmaster_be.util.OtpUtil;
 import com.example.englishmaster_be.model.otp.OtpEntity;
 import com.example.englishmaster_be.model.otp.OtpRepository;
@@ -10,7 +11,6 @@ import com.example.englishmaster_be.model.user.UserEntity;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +19,7 @@ import java.time.LocalDateTime;
 
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OtpService implements IOtpService {
 
@@ -32,7 +32,7 @@ public class OtpService implements IOtpService {
     public OtpEntity getByOtp(String otp) {
 
         return otpRepository.findByOtp(otp).orElseThrow(
-                () -> new BadRequestException("Mã OTP không hợp lệ")
+                () -> new ErrorHolder(Error.BAD_REQUEST, "OTP invalid.")
         );
     }
 
@@ -40,7 +40,7 @@ public class OtpService implements IOtpService {
     public OtpEntity getByEmailAndOtp(String email, String otp) {
 
         return otpRepository.findByEmailAndOtp(email, otp).orElseThrow(
-                () -> new BadRequestException("Mã OTP không hợp lệ")
+                () -> new ErrorHolder(Error.BAD_REQUEST, "OTP invalid.")
         );
     }
 
@@ -60,7 +60,7 @@ public class OtpService implements IOtpService {
                 .otp(otpCode)
                 .email(email)
                 .user(user)
-                .status(OtpStatusEnum.UN_VERIFIED)
+                .status(OtpStatus.UN_VERIFIED)
                 .expirationTime(LocalDateTime.now().plusMinutes(2))
                 .createdAt(LocalDateTime.now())
                 .build();
@@ -72,14 +72,14 @@ public class OtpService implements IOtpService {
     public boolean isValidOtp(OtpEntity otpEntity) {
 
         if(otpEntity == null)
-            throw new BadRequestException("Mã OTP không hợp lệ");
+            throw new ErrorHolder(Error.BAD_REQUEST, "OTP invalid.");
 
         return LocalDateTime.now().isBefore(otpEntity.getExpirationTime());
     }
 
     @Transactional
     @Override
-    public void updateOtpStatus(String email, String otp, OtpStatusEnum status) {
+    public void updateOtpStatus(String email, String otp, OtpStatus status) {
 
         OtpEntity otpEntity = getByEmailAndOtp(email, otp);
 

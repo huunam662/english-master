@@ -2,7 +2,7 @@ package com.example.englishmaster_be.domain.file_storage.controller;
 
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
-import com.example.englishmaster_be.common.constant.ResourceTypeLoadEnum;
+import com.example.englishmaster_be.common.constant.ResourceTypeLoad;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.file_storage.dto.response.ResourceResponse;
 import com.example.englishmaster_be.domain.file_storage.service.IFileStorageService;
@@ -33,7 +33,7 @@ public class FileStorageController {
 
         ResourceResponse resourceResponse = fileStorageService.load(fileName);
 
-        resourceResponse.setTypeLoad(ResourceTypeLoadEnum.ATTACHMENT); // Tải tập tin
+        resourceResponse.setTypeLoad(ResourceTypeLoad.ATTACHMENT); // Tải tập tin
 
         return resourceResponse;
     }
@@ -46,7 +46,7 @@ public class FileStorageController {
 
         ResourceResponse resourceResponse = fileStorageService.load(fileName);
 
-        resourceResponse.setTypeLoad(ResourceTypeLoadEnum.INLINE); // Xem tập tin
+        resourceResponse.setTypeLoad(ResourceTypeLoad.INLINE); // Xem tập tin
 
         return resourceResponse;
     }

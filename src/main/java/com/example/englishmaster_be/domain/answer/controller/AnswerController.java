@@ -5,7 +5,7 @@ import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerCorrectResponse;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerRequest;
-import com.example.englishmaster_be.converter.AnswerConverter;
+import com.example.englishmaster_be.mapper.AnswerMapper;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,7 +34,7 @@ public class AnswerController {
 
         AnswerEntity answer = answerService.saveAnswer(answerRequest);
 
-        return AnswerConverter.INSTANCE.toAnswerResponse(answer);
+        return AnswerMapper.INSTANCE.toAnswerResponse(answer);
     }
 
     @PutMapping(value = "/{answerId:.+}/update")
@@ -46,7 +46,7 @@ public class AnswerController {
 
         AnswerEntity answer = answerService.saveAnswer(answerRequest);
 
-        return AnswerConverter.INSTANCE.toAnswerResponse(answer);
+        return AnswerMapper.INSTANCE.toAnswerResponse(answer);
     }
 
     @DeleteMapping(value = "/{answerId:.+}/delete")
@@ -64,7 +64,7 @@ public class AnswerController {
 
         AnswerEntity answer = answerService.getAnswerById(answerId);
 
-        return AnswerConverter.INSTANCE.toAnswerResponse(answer);
+        return AnswerMapper.INSTANCE.toAnswerResponse(answer);
     }
 
     @GetMapping(value = "/{answerId:.+}/checkCorrect")
@@ -74,7 +74,7 @@ public class AnswerController {
 
         AnswerEntity answer = answerService.getAnswerById(answerId);
 
-        return AnswerConverter.INSTANCE.toCheckCorrectAnswerResponse(answer);
+        return AnswerMapper.INSTANCE.toCheckCorrectAnswerResponse(answer);
     }
 
 }

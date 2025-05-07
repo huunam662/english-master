@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.part.service;
 
-import com.example.englishmaster_be.common.constant.error.ErrorEnum;
+import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestPartRequest;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
@@ -8,12 +8,10 @@ import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
 import com.example.englishmaster_be.model.part.PartRepository;
 import com.example.englishmaster_be.domain.part.dto.request.PartSaveContentRequest;
-import com.example.englishmaster_be.advice.exception.template.CustomException;
-import com.example.englishmaster_be.advice.exception.template.BadRequestException;
-import com.example.englishmaster_be.converter.PartConverter;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.mapper.PartMapper;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.part.QPartEntity;
-import com.example.englishmaster_be.model.question.QQuestionEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.domain.user.service.IUserService;
@@ -23,7 +21,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +31,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PartService implements IPartService {
 
@@ -65,12 +62,12 @@ public class PartService implements IPartService {
             partEntity = getPartToId(partRequest.getPartId());
 
             if(isExistedPartNameWithDiff(partEntity, partRequest.getPartName()))
-                throw new BadRequestException(messageBadRequestException);
+                throw new ErrorHolder(Error.CONFLICT, messageBadRequestException);
         }
         else{
 
             if(isExistedPartName(partRequest.getPartName()))
-                throw new BadRequestException(messageBadRequestException);
+                throw new ErrorHolder(Error.CONFLICT, messageBadRequestException);
 
             partEntity = PartEntity.builder()
                     .userCreate(user)
@@ -90,7 +87,7 @@ public class PartService implements IPartService {
             partEntity.setContentType(fileUtil.mimeTypeFile(partRequest.getFile()));
         }
 
-        PartConverter.INSTANCE.flowToPartEntity(partRequest, partEntity);
+        PartMapper.INSTANCE.flowToPartEntity(partRequest, partEntity);
 
         partEntity.setUpdateAt(LocalDateTime.now());
         partEntity.setUserUpdate(user);
@@ -109,7 +106,7 @@ public class PartService implements IPartService {
     public PartEntity getPartToId(UUID partId) {
         return partRepository.findByPartId(partId)
                 .orElseThrow(
-                        () -> new CustomException(ErrorEnum.PART_NOT_FOUND)
+                        () -> new ErrorHolder(Error.PART_NOT_FOUND)
                 );
     }
 
@@ -124,7 +121,7 @@ public class PartService implements IPartService {
                 ).fetchOne();
 
         return Optional.ofNullable(partEntity).orElseThrow(
-                () -> new CustomException(ErrorEnum.PART_NOT_FOUND)
+                () -> new ErrorHolder(Error.PART_NOT_FOUND)
         );
     }
 
@@ -152,7 +149,7 @@ public class PartService implements IPartService {
     public List<PartEntity> getPartsFromMockTestPartRequestList(List<MockTestPartRequest> mockTestPartRequestList) {
 
         if(mockTestPartRequestList == null)
-            throw new BadRequestException("parts of mock test is null");
+            throw new ErrorHolder(Error.RESOURCE_NOT_FOUND, "parts of mock test is null");
 
         return mockTestPartRequestList.stream().map(
                 partMockTest -> getPartToId(partMockTest.getPartId())
@@ -167,7 +164,7 @@ public class PartService implements IPartService {
                 contentData == null
                         ||
                         contentData.isEmpty()
-        ) throw new CustomException(ErrorEnum.NULL_OR_EMPTY_FILE);
+        ) throw new ErrorHolder(Error.NULL_OR_EMPTY_FILE);
 
         UserEntity user = userService.currentUser();
 

@@ -3,9 +3,8 @@ package com.example.englishmaster_be.domain.upload.service;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
-import com.example.englishmaster_be.advice.exception.template.CustomException;
-import com.example.englishmaster_be.common.constant.error.ErrorEnum;
-import com.example.englishmaster_be.advice.exception.template.BadRequestException;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.value.UploadValue;
 import com.example.englishmaster_be.model.content.ContentEntity;
@@ -18,7 +17,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
@@ -34,7 +32,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UploadService implements IUploadService {
 
@@ -78,10 +76,10 @@ public class UploadService implements IUploadService {
     public FileResponse upload(MultipartFile file, String dir, boolean isPrivateFile) {
 
         if (file == null || file.isEmpty())
-            throw new BadRequestException("File is null or empty");
+            throw new ErrorHolder(Error.BAD_REQUEST, "File is null or empty");
 
         if (file.getContentType() == null)
-            throw new BadRequestException("Invalid file_storage TypeEntity");
+            throw new ErrorHolder(Error.BAD_REQUEST , "Invalid file storage type");
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         HttpHeaders headers = createHttpHeaders(MediaType.MULTIPART_FORM_DATA);
@@ -142,7 +140,7 @@ public class UploadService implements IUploadService {
         String existsContent = contentRepository.findContentDataByTopicIdAndCode(topicId, code);
 
         if(existsContent != null)
-            throw new CustomException(ErrorEnum.CODE_EXISTED_IN_TOPIC);
+            throw new ErrorHolder(Error.CODE_EXISTED_IN_TOPIC);
 
         TopicEntity topicEntity = topicService.getTopicById(topicId);
 

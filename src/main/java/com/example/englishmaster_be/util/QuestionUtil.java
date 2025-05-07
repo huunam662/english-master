@@ -1,6 +1,12 @@
 package com.example.englishmaster_be.util;
 
-import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
+import com.example.englishmaster_be.common.constant.PartType;
+import com.example.englishmaster_be.common.constant.QuestionType;
+import com.example.englishmaster_be.mapper.QuestionMapper;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionMatchingResponse;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
+import com.example.englishmaster_be.mapper.QuestionMapper;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
@@ -13,6 +19,49 @@ import java.util.Objects;
 
 public class QuestionUtil {
 
+    public static List<QuestionPartResponse> parseQuestionPartResponseList(List<QuestionEntity> questionEntityList, List<PartEntity> partEntityList, TopicEntity topicEntity, Boolean isAdmin){
+
+        if(questionEntityList == null) return null;
+
+        return partEntityList.stream().map(
+                partEntity -> {
+
+                    List<QuestionEntity> questionEntityListFilter = questionEntityList.stream().filter(
+                            questionEntity -> questionEntity.getPart().equals(partEntity)
+                                    && questionEntity.getTopics().contains(topicEntity)
+                    ).toList();
+
+                    QuestionPartResponse questionPartResponse = QuestionMapper.INSTANCE.toQuestionPartResponse(questionEntityListFilter, partEntity, topicEntity, isAdmin);
+
+                    questionEntityList.removeAll(questionEntityListFilter);
+
+                    return questionPartResponse;
+
+                }
+        ).toList();
+    }
+
+    public static List<QuestionResponse> parseQuestionResponseList(List<QuestionEntity> questionEntityList, TopicEntity topicEntity, PartEntity partEntity, Boolean isAdmin){
+
+        if(questionEntityList == null) return null;
+
+        questionEntityList = shuffleQuestionsAndAnswers(questionEntityList, partEntity);
+
+        return questionEntityList.stream().map(
+                questionEntity -> {
+
+                    QuestionResponse questionResponse = QuestionMapper.INSTANCE.toQuestionResponse(questionEntity, topicEntity, partEntity, isAdmin);
+
+                    if(questionResponse == null) return null;
+
+                    questionResponse.setNumberOfQuestionsChild(questionEntity.getQuestionGroupChildren() != null ? questionEntity.getQuestionGroupChildren().size() : 0);
+
+                    return questionResponse;
+                }
+        ).toList();
+    }
+
+
     public static List<QuestionEntity> shuffleQuestionsAndAnswers(List<QuestionEntity> questionParentsList, PartEntity partEntity) {
 
         if(questionParentsList == null || partEntity == null) return null;
@@ -21,10 +70,10 @@ public class QuestionUtil {
 
         Collections.shuffle(questionParentsList);
 
-        List<String> partTypesNotShuffle = List.of("Picture Description", "Question - Response", "Words Fill Completion", "Words Matching");
+        List<PartType> partTypesNotShuffle = List.of(PartType.PART_1_TOEIC, PartType.PART_2_TOEIC);
 
         boolean notShuffleAnswer = partTypesNotShuffle.stream().anyMatch(
-                partType -> partType.equalsIgnoreCase(partEntity.getPartType())
+                partType -> partType.getType().equalsIgnoreCase(partEntity.getPartType())
         );
 
         boolean partTypeIsTextCompletion = partEntity.getPartType().equalsIgnoreCase("Text Completion");
@@ -75,7 +124,7 @@ public class QuestionUtil {
                 .filter(Objects::nonNull)
                 .map(
                 questionEntity -> {
-                    if(questionEntity.getQuestionType().equals(QuestionTypeEnum.Words_Matching))
+                    if(questionEntity.getQuestionType().equals(QuestionType.Words_Matching))
                         return 1;
 
                     return questionEntity.getQuestionGroupChildren().size();

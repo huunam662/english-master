@@ -1,14 +1,14 @@
 package com.example.englishmaster_be.domain.topic.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionListResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
-import com.example.englishmaster_be.converter.CommentConverter;
-import com.example.englishmaster_be.converter.TopicConverter;
+import com.example.englishmaster_be.mapper.CommentMapper;
+import com.example.englishmaster_be.mapper.TopicMapper;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicQuestionListRequest;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicRequest;
@@ -51,7 +51,7 @@ public class TopicController {
 
         TopicEntity topic = topicService.getTopicById(topicId);
 
-        return TopicConverter.INSTANCE.toTopicResponse(topic);
+        return TopicMapper.INSTANCE.toTopicResponse(topic);
     }
 
     @PostMapping(value = "/create")
@@ -63,7 +63,7 @@ public class TopicController {
         
         TopicEntity topic = topicService.saveTopic(topicRequest);
 
-        return TopicConverter.INSTANCE.toTopicResponse(topic);
+        return TopicMapper.INSTANCE.toTopicResponse(topic);
     }
 
     @PostMapping(value = "/createTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -100,7 +100,7 @@ public class TopicController {
 
         TopicEntity topic = topicService.saveTopic(topicRequest);
 
-        return TopicConverter.INSTANCE.toTopicResponse(topic);
+        return TopicMapper.INSTANCE.toTopicResponse(topic);
     }
 
     @PutMapping(value = "/{topicId:.+}/uploadImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -113,7 +113,7 @@ public class TopicController {
 
         TopicEntity topic = topicService.uploadFileImage(topicId, contentData);
 
-        return TopicConverter.INSTANCE.toTopicResponse(topic);
+        return TopicMapper.INSTANCE.toTopicResponse(topic);
     }
 
     @DeleteMapping(value = "/{topicId:.+}/delete")
@@ -154,7 +154,7 @@ public class TopicController {
 
         TopicEntity topic = topicService.getTopicById(id);
 
-        return TopicConverter.INSTANCE.toTopicResponse(topic);
+        return TopicMapper.INSTANCE.toTopicResponse(topic);
     }
 
 
@@ -285,7 +285,7 @@ public class TopicController {
 
         List<CommentEntity> commentEntityList = topicService.listComment(topicId);
 
-        return CommentConverter.INSTANCE.toCommentResponseList(commentEntityList);
+        return CommentMapper.INSTANCE.toCommentResponseList(commentEntityList);
     }
 
 
@@ -301,7 +301,7 @@ public class TopicController {
 
         List<TopicEntity> topicEntityList = topicService.getTopicsByStartTime(startDate);
 
-        return TopicConverter.INSTANCE.toTopicResponseList(topicEntityList);
+        return TopicMapper.INSTANCE.toTopicResponseList(topicEntityList);
     }
 
     @GetMapping("/{topicId}/list-question-from-all-part")

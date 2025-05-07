@@ -1,11 +1,12 @@
 package com.example.englishmaster_be.domain.post.service;
 
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.converter.PostConverter;
+import com.example.englishmaster_be.mapper.PostMapper;
 import com.example.englishmaster_be.domain.post.dto.request.PostFilterRequest;
 import com.example.englishmaster_be.domain.post.dto.request.PostRequest;
-import com.example.englishmaster_be.advice.exception.template.BadRequestException;
 import com.example.englishmaster_be.model.comment.CommentEntity;
 import com.example.englishmaster_be.model.post.PostEntity;
 import com.example.englishmaster_be.domain.post.dto.response.PostResponse;
@@ -18,7 +19,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PostService implements IPostService {
 
@@ -45,7 +45,7 @@ public class PostService implements IPostService {
 
         return postRepository.findByPostId(postId)
                 .orElseThrow(
-                        () -> new BadRequestException("PostEntity not found")
+                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND)
                 );
     }
 
@@ -75,7 +75,7 @@ public class PostService implements IPostService {
                                             .limit(filterResponse.getPageSize());
 
         filterResponse.setContent(
-                PostConverter.INSTANCE.toPostResponseList(query.fetch())
+                PostMapper.INSTANCE.toPostResponseList(query.fetch())
         );
 
         return filterResponse;
@@ -95,7 +95,7 @@ public class PostService implements IPostService {
             post = getPostById(postRequest.getPostId());
 
             if(!post.getUserPost().getUserId().equals(user.getUserId()))
-                throw new BadRequestException("Don't update PostEntity");
+                throw new ErrorHolder(Error.BAD_REQUEST, "Don't update PostEntity");
 
         }
         else post = PostEntity.builder()
@@ -133,7 +133,7 @@ public class PostService implements IPostService {
         PostEntity post = getPostById(postId);
 
         if(!post.getUserPost().getUserId().equals(user.getUserId()))
-            throw new BadRequestException("Don't delete PostEntity");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Don't delete PostEntity");
 
         postRepository.delete(post);
 

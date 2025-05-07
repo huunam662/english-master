@@ -1,9 +1,9 @@
 package com.example.englishmaster_be.config.middleware.filter;
 
-import com.example.englishmaster_be.common.constant.error.ErrorEnum;
+import com.example.englishmaster_be.advice.exception.handler.GlobalExceptionHandler;
+import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.shared.service.jwt.JwtService;
-import com.example.englishmaster_be.common.dto.response.ExceptionResponseModel;
-import com.example.englishmaster_be.advice.exception.template.CustomException;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.shared.service.invalid_token.IInvalidTokenService;
 import io.swagger.v3.core.util.Json;
 import jakarta.servlet.FilterChain;
@@ -21,9 +21,10 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
-@Slf4j
+@Slf4j(topic = "MIDDLEWARE-FILTER")
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -35,15 +36,16 @@ public class MiddlewareFilterConfig extends OncePerRequestFilter {
 
     IInvalidTokenService invalidTokenService;
 
+    GlobalExceptionHandler globalExceptionHandler;
 
     @Override
     protected void doFilterInternal(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull FilterChain filterChain
-    ) {
+    ) throws IOException {
 
-        System.out.println("-> doFilterInternal");
+        log.info("-> doFilterInternal");
 
         try{
 
@@ -56,14 +58,14 @@ public class MiddlewareFilterConfig extends OncePerRequestFilter {
                 String jwtToken = headerAuth.substring(prefixHeaderAuth.length()).trim();
 
                 if (!jwtUtil.isValidToken(jwtToken) || invalidTokenService.inValidToken(jwtToken))
-                    throw new CustomException(ErrorEnum.UNAUTHENTICATED);
+                    throw new ErrorHolder(Error.UNAUTHENTICATED);
 
                 String username = jwtUtil.extractUsername(jwtToken);
 
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
                 if(!userDetails.isEnabled())
-                    throw new CustomException(ErrorEnum.ACCOUNT_DISABLED);
+                    throw new ErrorHolder(Error.ACCOUNT_DISABLED);
 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
@@ -73,8 +75,6 @@ public class MiddlewareFilterConfig extends OncePerRequestFilter {
 
             }
 
-//            System.out.println("request.getRequestURI(): " + request.getRequestURI());
-
             filterChain.doFilter(request, response);
 
         }
@@ -82,31 +82,14 @@ public class MiddlewareFilterConfig extends OncePerRequestFilter {
 
             logger.error("Cannot set user authentication: {}", e);
 
-            if(e instanceof CustomException customException) {
-                writeExceptionBodyResponse(response, customException.getError());
-                return;
-            }
+            Error error = Error.UNAUTHENTICATED;
 
-            writeExceptionBodyResponse(response, ErrorEnum.UNAUTHENTICATED);
+            if(e instanceof ErrorHolder errorHolder)
+                error = errorHolder.getError();
+
+            log.error("{} -> code {}", e, error.getStatusCode());
+
+            globalExceptionHandler.printError(error, response);
         }
-    }
-
-
-    @SneakyThrows
-    private void writeExceptionBodyResponse(HttpServletResponse response, ErrorEnum error){
-
-        response.setStatus(error.getStatusCode().value());
-        response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.getWriter().write(
-                Json.pretty(
-                        ExceptionResponseModel.builder()
-                                .success(Boolean.FALSE)
-                                .status(error.getStatusCode())
-                                .code(error.getStatusCode().value())
-                                .message(error.getMessage())
-                                .build()
-                )
-        );
     }
 }
