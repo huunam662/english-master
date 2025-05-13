@@ -71,7 +71,7 @@ public class ResultApiResponse {
             return ErrorResponse.builder()
                     .status(error.getStatusCode())
                     .code(error.getStatusCode().value())
-                    .message(errorHolder.getMessage())
+                    .message(errorHolder.getToClient() ? errorHolder.getMessage() : error.getMessage())
                     .build();
         }
 

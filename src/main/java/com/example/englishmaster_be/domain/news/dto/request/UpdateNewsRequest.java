@@ -1,12 +1,10 @@
 package com.example.englishmaster_be.domain.news.dto.request;
 
-import io.swagger.annotations.ApiModelProperty;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
@@ -16,20 +14,13 @@ import java.util.UUID;
 @AllArgsConstructor
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class NewsRequest {
+public class UpdateNewsRequest extends CreateNewsRequest {
 
-    @Hidden
+    @NotNull(message = "News Id is required.")
     UUID newsId;
 
-    @Schema(description = "Tiêu đề")
-    String title;
-
-    @Schema(description = "Nội dung")
-    String content;
-
-    @Schema(description = "Kích hoạt")
+    @NotNull(message = "Enable status of news is required.")
+    @Schema(example = "true")
     Boolean enable;
-
-    String image;
 
 }

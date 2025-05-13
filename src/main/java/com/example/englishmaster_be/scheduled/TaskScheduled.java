@@ -58,7 +58,6 @@ public class TaskScheduled {
         deleteInvalidToken();
         deleteAllSessionConfirm();
         invalidTokenExpired();
-
     }
 
     @Transactional

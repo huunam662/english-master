@@ -30,6 +30,8 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +44,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class UserService implements IUserService {
+public class UserService implements IUserService, UserDetailsService {
 
     JPAQueryFactory queryFactory;
 
@@ -174,6 +176,17 @@ public class UserService implements IUserService {
     }
 
     @Override
+    public Boolean currentUserIsAdmin(UserDetails userDetails) {
+
+        if(userDetails == null)
+            userDetails = currentUser();
+
+        UserEntity currentUser = (UserEntity) userDetails;
+
+        return currentUser.getRole().getRoleName().equals(Role.ADMIN);
+    }
+
+    @Override
     public UserEntity getUserByEmail(String email) {
 
         return userRepository.findByEmail(email).orElseThrow(
@@ -181,6 +194,13 @@ public class UserService implements IUserService {
         );
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+        return userRepository.findByEmail(username).orElseThrow(
+                () -> new ErrorHolder(Error.BAD_CREDENTIALS)
+        );
+    }
 
     @Override
     public boolean existsEmail(String email) {

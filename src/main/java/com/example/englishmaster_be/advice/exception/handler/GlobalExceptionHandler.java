@@ -3,6 +3,8 @@ package com.example.englishmaster_be.advice.exception.handler;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.shared.dto.response.ResultApiResponse;
+import com.fasterxml.jackson.core.JsonLocation;
+import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import io.swagger.v3.core.util.Json;
 import jakarta.mail.MessagingException;
@@ -17,6 +19,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -36,7 +39,7 @@ import java.util.*;
 
 @Slf4j(topic = "GLOBAL-EXCEPTION-HANDLER")
 @RestControllerAdvice
-public class  GlobalExceptionHandler implements AccessDeniedHandler, AuthenticationEntryPoint {
+public class GlobalExceptionHandler implements AccessDeniedHandler, AuthenticationEntryPoint {
 
     private void logError(Error error, Exception ex){
 
@@ -115,12 +118,26 @@ public class  GlobalExceptionHandler implements AccessDeniedHandler, Authenticat
 
             String invalidValue = invalidFormatException.getValue().toString();
 
-//            String expectedType = invalidFormatException.getTargetType().getSimpleName();
+            String expectedType = invalidFormatException.getTargetType().getSimpleName();
 
-            errors = new HashMap<>();
+            errors = Map.of(
+                    "fieldName", fieldName,
+                    "invalidValue", invalidValue,
+                    "type", String.format("%s value not type of %s", invalidValue, expectedType)
+            );
+        }
+        else if(cause instanceof JsonParseException jsonParseException){
 
-            errors.put("fieldName", fieldName);
-            errors.put("invalidValue", invalidValue);
+            JsonLocation location = jsonParseException.getLocation();
+
+            int line = location.getLineNr();
+            int column = location.getColumnNr();
+
+            String messageResponse = String.format("Line: %d, column: %d -> %s", line, column, "can not parse by JSON.");
+
+            errors = Map.of(
+                    "parser", messageResponse
+            );
         }
 
         return ResultApiResponse.ErrorResponse.build(error, errors);
@@ -153,7 +170,8 @@ public class  GlobalExceptionHandler implements AccessDeniedHandler, Authenticat
 
     @ExceptionHandler({
             UsernameNotFoundException.class,
-            BadCredentialsException.class
+            BadCredentialsException.class,
+            InternalAuthenticationServiceException.class
     })
     public ResultApiResponse.ErrorResponse handleBadCredentialsException(AuthenticationException e) {
 
