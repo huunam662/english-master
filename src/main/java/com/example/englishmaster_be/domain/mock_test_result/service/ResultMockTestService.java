@@ -1,5 +1,7 @@
 package com.example.englishmaster_be.domain.mock_test_result.service;
 
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.mapper.MockTestResultMapper;
 import com.example.englishmaster_be.domain.mock_test_result.dto.request.ResultMockTestRequest;
 import com.example.englishmaster_be.model.mock_test_result.MockTestResultRepository;
@@ -26,7 +28,7 @@ import java.util.UUID;
 import java.util.stream.StreamSupport;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ResultMockTestService implements IResultMockTestService {
 
@@ -97,7 +99,7 @@ public class ResultMockTestService implements IResultMockTestService {
     @Override
     public MockTestResultEntity getResultMockTestById(UUID id) {
         return resultMockTestRepository.findById(id).orElseThrow(
-                () -> new RuntimeException("Result mock test not found")
+                () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Result mock test not found")
         );
     }
 

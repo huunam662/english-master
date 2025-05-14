@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.question.dto.response;
 
-import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
+import com.example.englishmaster_be.common.constant.QuestionType;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
 import com.example.englishmaster_be.domain.content.dto.response.ContentBasicResponse;
 import lombok.*;
@@ -45,7 +45,7 @@ public class QuestionResponse {
 
     Boolean isQuestionParent;
 
-    QuestionTypeEnum questionType;
+    QuestionType questionType;
 
     List<ContentBasicResponse> contents;
 

@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class GeneralSearchService implements IGeneralSearchService {
 

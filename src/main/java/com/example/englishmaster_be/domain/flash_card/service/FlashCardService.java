@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.domain.flash_card.service;
 
-import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.flash_card.dto.request.FlashCardRequest;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
@@ -8,9 +9,7 @@ import com.example.englishmaster_be.mapper.FlashCardMapper;
 import com.example.englishmaster_be.model.flash_card.FlashCardEntity;
 import com.example.englishmaster_be.model.flash_card.FlashCardRepository;
 import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.domain.file_storage.service.IFileStorageService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.google.cloud.storage.Blob;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -20,12 +19,12 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
+
 import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FlashCardService implements IFlashCardService {
 
@@ -41,7 +40,7 @@ public class FlashCardService implements IFlashCardService {
     public FlashCardEntity getFlashCardById(UUID flashCardId) {
         return flashCardRepository.findByFlashCardId(flashCardId)
                 .orElseThrow(
-                        () -> new IllegalArgumentException("FlashCardEntity not found with ID: " + flashCardId)
+                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "FlashCardEntity not found with ID: " + flashCardId)
                 );
     }
 

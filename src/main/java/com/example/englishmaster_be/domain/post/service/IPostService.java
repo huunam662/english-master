@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.post.service;
 
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.post.dto.request.PostFilterRequest;
 import com.example.englishmaster_be.domain.post.dto.request.PostRequest;
 import com.example.englishmaster_be.model.comment.CommentEntity;

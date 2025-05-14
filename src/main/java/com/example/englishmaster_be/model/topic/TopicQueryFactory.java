@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Component
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TopicQueryFactory {
 

@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.file_storage.dto.response;
 
-import com.example.englishmaster_be.common.constant.ResourceTypeLoadEnum;
+import com.example.englishmaster_be.common.constant.ResourceTypeLoad;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.core.io.Resource;
@@ -19,7 +19,7 @@ public class ResourceResponse {
 
     Long contentLength;
 
-    ResourceTypeLoadEnum typeLoad;
+    ResourceTypeLoad typeLoad;
 
     Resource resource;
 

@@ -2380,7 +2380,7 @@
   <commands xmi:id="_j0yIcaRfEe6JisMYU39Rhg" elementId="org.eclipse.egit.ui.team.CherryPick" commandName="Cherry Pick" category="_j0plraRfEe6JisMYU39Rhg"/>
   <commands xmi:id="_j0yIcqRfEe6JisMYU39Rhg" elementId="org.eclipse.buildship.ui.commands.openbuildscript" commandName="Open Gradle Build Script" description="Opens the Gradle build script for the selected Gradle project" category="_j0plmKRfEe6JisMYU39Rhg"/>
   <commands xmi:id="_j0yIc6RfEe6JisMYU39Rhg" elementId="org.eclipse.egit.ui.FetchGitHubPR" commandName="Fetch GitHub Pull Request" category="_j0plraRfEe6JisMYU39Rhg"/>
-  <commands xmi:id="_j0yIdKRfEe6JisMYU39Rhg" elementId="org.eclipse.jpt.jpa.eclipselink.ui.convertJavaConverters" commandName="Move Java Converters to XML..." category="_j0plsqRfEe6JisMYU39Rhg"/>
+  <commands xmi:id="_j0yIdKRfEe6JisMYU39Rhg" elementId="org.eclipse.jpt.jpa.eclipselink.ui.convertJavaMappers" commandName="Move Java Mappers to XML..." category="_j0plsqRfEe6JisMYU39Rhg"/>
   <commands xmi:id="_j0yIdaRfEe6JisMYU39Rhg" elementId="org.eclipse.buildship.ui.commands.openrunconfiguration" commandName="Open Gradle Run Configuration" description="Opens the Run Configuration for the selected Gradle tasks" category="_j0plqqRfEe6JisMYU39Rhg"/>
   <commands xmi:id="_j0yIdqRfEe6JisMYU39Rhg" elementId="org.eclipse.egit.ui.history.DeleteTag" commandName="&amp;Delete Tag" category="_j0pluqRfEe6JisMYU39Rhg"/>
   <commands xmi:id="_j0yId6RfEe6JisMYU39Rhg" elementId="org.eclipse.jdt.ui.edit.text.remove.occurrence.annotations" commandName="Remove Occurrence Annotations" description="Removes the occurrence annotations from the current editor" category="_j0pltaRfEe6JisMYU39Rhg"/>

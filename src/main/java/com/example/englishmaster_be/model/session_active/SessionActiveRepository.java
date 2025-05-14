@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.model.session_active;
 
-import com.example.englishmaster_be.common.constant.SessionActiveTypeEnum;
+import com.example.englishmaster_be.common.constant.SessionActiveType;
 import com.example.englishmaster_be.model.user.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,13 +16,13 @@ public interface SessionActiveRepository extends JpaRepository<SessionActiveEnti
 
     SessionActiveEntity findByCode(UUID code);
 
-    SessionActiveEntity findByCodeAndType(UUID code, SessionActiveTypeEnum type);
+    SessionActiveEntity findByCodeAndType(UUID code, SessionActiveType type);
 
-    SessionActiveEntity findByUserAndType(UserEntity user, SessionActiveTypeEnum type);
+    SessionActiveEntity findByUserAndType(UserEntity user, SessionActiveType type);
 
-    List<SessionActiveEntity> findAllByUserAndType(UserEntity user, SessionActiveTypeEnum type);
+    List<SessionActiveEntity> findAllByUserAndType(UserEntity user, SessionActiveType type);
 
-    void deleteByUserAndType(UserEntity user, SessionActiveTypeEnum type);
+    void deleteByUserAndType(UserEntity user, SessionActiveType type);
 
     @Query("SELECT s FROM SessionActiveEntity s WHERE s.user.userId = :userId")
     Iterable<? extends SessionActiveEntity> findByUserId(@Param("userId") UUID userId);

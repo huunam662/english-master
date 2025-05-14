@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.model.question;
 
-import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
+import com.example.englishmaster_be.common.constant.QuestionType;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.content.ContentEntity;
 import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailEntity;
@@ -60,7 +60,7 @@ public class QuestionEntity {
 
     @Column(name="question_type")
     @Enumerated(EnumType.STRING)
-    QuestionTypeEnum questionType;
+    QuestionType questionType;
 
     @Column(name = "number_choice", columnDefinition = "int default 1")
     Integer numberChoice;

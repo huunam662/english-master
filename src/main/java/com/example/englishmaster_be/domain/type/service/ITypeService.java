@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.type.service;
 
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.type.dto.request.TypeFilterRequest;
 import com.example.englishmaster_be.domain.type.dto.request.TypeRequest;
 import com.example.englishmaster_be.model.type.TypeEntity;

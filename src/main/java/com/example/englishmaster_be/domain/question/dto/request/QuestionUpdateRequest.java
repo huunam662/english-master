@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.question.dto.request;
 
-import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
+import com.example.englishmaster_be.common.constant.QuestionType;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -32,7 +32,7 @@ public class QuestionUpdateRequest {
 
     Integer numberChoice;
 
-    QuestionTypeEnum questionType;
+    QuestionType questionType;
 
     String contentImage;
 

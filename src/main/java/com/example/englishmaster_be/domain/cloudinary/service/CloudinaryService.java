@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CloudinaryService implements ICloudinaryService {
 

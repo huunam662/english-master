@@ -1,11 +1,10 @@
 package com.example.englishmaster_be.domain.mock_test.service;
 
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestFilterRequest;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestRequest;
 import com.example.englishmaster_be.domain.mock_test.dto.response.IMockTestToUserResponse;
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestPartResponse;
-import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestToUserResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionMockTestResponse;
 import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailEntity;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;

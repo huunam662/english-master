@@ -345,11 +345,11 @@ CodeCache: size=49152Kb used=18395Kb max_used=19516Kb free=30756Kb
  full_count=0
 
 Compilation events (20 events):
-Event: 26801.380 Thread 0x00000219e9d05a20 9791       1       ch.qos.logback.classic.pattern.LineSeparatorConverter::convert (4 bytes)
+Event: 26801.380 Thread 0x00000219e9d05a20 9791       1       ch.qos.logback.classic.pattern.LineSeparatorMapper::convert (4 bytes)
 Event: 26801.380 Thread 0x00000219e9d05a20 nmethod 9791 0x00000219dcc11990 code [0x00000219dcc11b20, 0x00000219dcc11bf8]
-Event: 26801.380 Thread 0x00000219e35e7480 9792       1       ch.qos.logback.classic.pattern.ThrowableProxyConverter::convert (9 bytes)
+Event: 26801.380 Thread 0x00000219e35e7480 9792       1       ch.qos.logback.classic.pattern.ThrowableProxyMapper::convert (9 bytes)
 Event: 26801.380 Thread 0x00000219e35e7480 nmethod 9792 0x00000219dcc11610 code [0x00000219dcc117a0, 0x00000219dcc118c8]
-Event: 26801.380 Thread 0x00000219e9d05f30 9793   !   1       ch.qos.logback.classic.pattern.ThrowableProxyConverter::convert (188 bytes)
+Event: 26801.380 Thread 0x00000219e9d05f30 9793   !   1       ch.qos.logback.classic.pattern.ThrowableProxyMapper::convert (188 bytes)
 Event: 26801.381 Thread 0x00000219e9d05f30 nmethod 9793 0x00000219dcc10790 code [0x00000219dcc10a40, 0x00000219dcc11138]
 Event: 26801.381 Thread 0x00000219e9d05a20 9794       1       ch.qos.logback.core.joran.spi.ConsoleTarget$2::write (8 bytes)
 Event: 26801.381 Thread 0x00000219e35e7480 9795       1       org.springframework.ide.vscode.commons.util.NullOutputStream::write (1 bytes)

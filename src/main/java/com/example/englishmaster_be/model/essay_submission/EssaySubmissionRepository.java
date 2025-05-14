@@ -22,7 +22,7 @@ public interface EssaySubmissionRepository extends JpaRepository<EssaySubmission
                       sub.essay_feedback as essayFeedback
                from essay_submission sub
                join mock_test mt on mt.id = sub.mock_test_id
-               join topic_part tp on tp.topic_id = mt.topic_id
+               join topic_part tp on tp.topic_id = mt.topic_id  
                join part p on p.id = tp.part_id
                join topic_question tq on tq.topic_id = mt.topic_id
                join question q on q.id = tq.question_id

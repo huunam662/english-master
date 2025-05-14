@@ -2,9 +2,8 @@ package com.example.englishmaster_be.domain.status.service;
 
 import com.example.englishmaster_be.mapper.StatusMapper;
 import com.example.englishmaster_be.domain.status.dto.request.StatusRequest;
-import com.example.englishmaster_be.exception.template.CustomException;
-import com.example.englishmaster_be.common.constant.error.ErrorEnum;
-import com.example.englishmaster_be.exception.template.BadRequestException;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.type.service.ITypeService;
 import com.example.englishmaster_be.model.status.QStatusEntity;
 import com.example.englishmaster_be.model.status.StatusEntity;
@@ -15,7 +14,6 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +22,7 @@ import java.util.UUID;
 
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(makeFinal = true, level = AccessLevel.PRIVATE)
 public class StatusService implements IStatusService {
 
@@ -49,7 +47,7 @@ public class StatusService implements IStatusService {
             status = StatusEntity.builder().build();
 
         if(isExistedByStatusNameOfType(statusRequest.getStatusName(), type))
-            throw new BadRequestException(String.format("Status name of type %s already exist", type.getTypeName()));
+            throw new ErrorHolder(Error.CONFLICT, String.format("Status name of type %s already exist", type.getTypeName()));
 
         StatusMapper.INSTANCE.flowToStatusEntity(statusRequest, status);
 
@@ -87,7 +85,7 @@ public class StatusService implements IStatusService {
     public StatusEntity getStatusById(UUID statusId) {
 
         return statusRepository.findById(statusId).orElseThrow(
-                () -> new CustomException(ErrorEnum.STATUS_NOT_FOUND)
+                () -> new ErrorHolder(Error.STATUS_NOT_FOUND)
         );
     }
 
@@ -95,7 +93,7 @@ public class StatusService implements IStatusService {
     public StatusEntity getStatusByName(String statusName) {
 
         return statusRepository.findByStatusName(statusName).orElseThrow(
-                () -> new CustomException(ErrorEnum.STATUS_NOT_FOUND)
+                () -> new ErrorHolder(Error.STATUS_NOT_FOUND)
         );
     }
 

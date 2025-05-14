@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.domain.news.dto.request.NewsRequest;
+import com.example.englishmaster_be.domain.news.dto.request.CreateNewsRequest;
+import com.example.englishmaster_be.domain.news.dto.request.UpdateNewsRequest;
 import com.example.englishmaster_be.domain.news.dto.response.NewsResponse;
 import com.example.englishmaster_be.model.news.NewsEntity;
 import org.mapstruct.Builder;
@@ -20,8 +21,14 @@ public interface NewsMapper {
 
     List<NewsResponse> toNewsResponseList(List<NewsEntity> newsEntityList);
 
+    @Mapping(target = "image", ignore = true)
+    void flowToNewsEntity(CreateNewsRequest newsRequest, @MappingTarget NewsEntity newsEntity);
+
     @Mapping(target = "newsId", ignore = true)
     @Mapping(target = "enable", defaultValue = "false")
     @Mapping(target = "image", ignore = true)
-    void flowToNewsEntity(NewsRequest newsRequest, @MappingTarget NewsEntity newsEntity);
+    void flowToNewsEntity(UpdateNewsRequest newsRequest, @MappingTarget NewsEntity newsEntity);
+
+    NewsEntity toNewsEntity(CreateNewsRequest newsRequest);
+
 }

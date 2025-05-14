@@ -120,6 +120,11 @@ public class UserEntity implements UserDetails {
         return this.getEmail();
     }
 
+    @JsonIgnore
+    public String getPassword() {
+        return password;
+    }
+
     @Override
     @JsonIgnore
     public boolean isAccountNonExpired() {

@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.topic.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionListResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;

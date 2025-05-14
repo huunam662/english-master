@@ -1,6 +1,8 @@
 package com.example.englishmaster_be.domain.dictionary.service;
 
-import com.example.englishmaster_be.util.EnglishWordDictionaryUtil;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.helper.EnglishWordDictionaryHelper;
 import com.example.englishmaster_be.domain.dictionary.dto.response.DictionarySuggestionResponse;
 import com.example.englishmaster_be.value.DictionaryValue;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -27,7 +29,7 @@ import java.util.stream.Collectors;
 
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DictionaryService implements IDictionaryService {
 
@@ -37,7 +39,7 @@ public class DictionaryService implements IDictionaryService {
 
     DictionaryValue dictionaryValue;
 
-    EnglishWordDictionaryUtil englishWordDictionaryHelper;
+    EnglishWordDictionaryHelper englishWordDictionaryHelper;
 
 
 
@@ -103,7 +105,7 @@ public class DictionaryService implements IDictionaryService {
         JsonNode results = jsonResponse.get("results");
 
         if (results == null || results.isEmpty())
-            throw new NoSuchElementException("The urls is empty or not found");
+            throw new ErrorHolder(Error.RESOURCE_NOT_FOUND, "The urls is empty or not found");
 
         JsonNode firstResult = results.get(0);
 

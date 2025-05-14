@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.user.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.user.dto.request.*;
 import com.example.englishmaster_be.domain.user.dto.response.UserProfileResponse;
 import com.example.englishmaster_be.model.user.UserEntity;

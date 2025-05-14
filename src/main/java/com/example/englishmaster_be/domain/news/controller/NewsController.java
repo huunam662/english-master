@@ -1,14 +1,16 @@
 package com.example.englishmaster_be.domain.news.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.domain.news.dto.request.UpdateNewsRequest;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 
 import com.example.englishmaster_be.domain.news.service.INewsService;
 import com.example.englishmaster_be.mapper.NewsMapper;
 import com.example.englishmaster_be.domain.news.dto.request.NewsFilterRequest;
-import com.example.englishmaster_be.domain.news.dto.request.NewsRequest;
+import com.example.englishmaster_be.domain.news.dto.request.CreateNewsRequest;
 import com.example.englishmaster_be.domain.news.dto.response.NewsResponse;
 import com.example.englishmaster_be.model.news.NewsEntity;
+import com.example.englishmaster_be.shared.dto.response.ResourceKeyResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -72,33 +74,33 @@ public class NewsController {
         return NewsMapper.INSTANCE.toNewsResponseList(newsEntityList);
     }
 
+    @GetMapping("/{newId}")
+    public NewsResponse getNewsById(@PathVariable UUID newId){
+
+        NewsEntity newResult = newsService.getNewsById(newId);
+
+        return NewsMapper.INSTANCE.toNewsResponse(newResult);
+    }
 
     @PostMapping(value = "/createNews")
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Create news successfully")
-    public NewsResponse createNews(
-            @RequestBody NewsRequest newsRequest
+    public ResourceKeyResponse createNews(
+            @RequestBody CreateNewsRequest newsRequest
     ){
 
-        NewsEntity news = newsService.saveNews(newsRequest);
-
-        return NewsMapper.INSTANCE.toNewsResponse(news);
+        return newsService.createNews(newsRequest);
     }
 
 
-    @PatchMapping(value = "/{newsId:.+}/updateNews")
+    @PutMapping(value = "/updateNews")
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Update NewsEntity successfully")
-    public NewsResponse updateNews(
-            @PathVariable UUID newsId,
-            @RequestBody NewsRequest newsRequest
+    public ResourceKeyResponse updateNews(
+            @RequestBody UpdateNewsRequest newsRequest
     ){
 
-        newsRequest.setNewsId(newsId);
-
-        NewsEntity news = newsService.saveNews(newsRequest);
-
-        return NewsMapper.INSTANCE.toNewsResponse(news);
+        return newsService.updateNews(newsRequest);
     }
 
 

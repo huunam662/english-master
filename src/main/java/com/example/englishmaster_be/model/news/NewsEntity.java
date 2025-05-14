@@ -58,7 +58,6 @@ public class NewsEntity {
     UserEntity userUpdate;
 
 
-
     @PrePersist
     void onCreate() {
         createAt = LocalDateTime.now();

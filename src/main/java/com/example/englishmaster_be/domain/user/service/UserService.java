@@ -1,17 +1,16 @@
 package com.example.englishmaster_be.domain.user.service;
 
-import com.example.englishmaster_be.common.constant.RoleEnum;
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.Role;
+import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.exam.dto.response.ExamResultResponse;
-import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.user.dto.request.*;
 import com.example.englishmaster_be.mapper.MockTestMapper;
 import com.example.englishmaster_be.mapper.TopicMapper;
-import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.UserMapper;
-import com.example.englishmaster_be.model.content.ContentRepository;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;
 import com.example.englishmaster_be.model.mock_test.QMockTestEntity;
 import com.example.englishmaster_be.model.topic.QTopicEntity;
@@ -25,13 +24,14 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,9 +42,9 @@ import java.util.UUID;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class UserService implements IUserService {
+public class UserService implements IUserService, UserDetailsService {
 
     JPAQueryFactory queryFactory;
 
@@ -150,7 +150,7 @@ public class UserService implements IUserService {
     public UserEntity getUserById(UUID userId) {
 
         return userRepository.findById(userId).orElseThrow(
-                () -> new BadRequestException("Người dùng không tồn tại")
+                () -> new ErrorHolder(Error.BAD_REQUEST, "User not existed.")
         );
     }
 
@@ -162,7 +162,7 @@ public class UserService implements IUserService {
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails)
             return getUserByEmail(userDetails.getUsername());
 
-        throw new AuthenticationServiceException("Vui lòng xác thực người dùng");
+        throw new AuthenticationServiceException("Please authenticate first.");
     }
 
     @Override
@@ -172,17 +172,35 @@ public class UserService implements IUserService {
 
         return currentUser.getRole()
                 .getRoleName()
-                .equals(RoleEnum.ADMIN);
+                .equals(Role.ADMIN);
+    }
+
+    @Override
+    public Boolean currentUserIsAdmin(UserDetails userDetails) {
+
+        if(userDetails == null)
+            userDetails = currentUser();
+
+        UserEntity currentUser = (UserEntity) userDetails;
+
+        return currentUser.getRole().getRoleName().equals(Role.ADMIN);
     }
 
     @Override
     public UserEntity getUserByEmail(String email) {
 
         return userRepository.findByEmail(email).orElseThrow(
-                () -> new BadRequestException("Người dùng không tồn tại")
+                () -> new ErrorHolder(Error.BAD_REQUEST, "User not existed.")
         );
     }
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+        return userRepository.findByEmail(username).orElseThrow(
+                () -> new ErrorHolder(Error.BAD_CREDENTIALS)
+        );
+    }
 
     @Override
     public boolean existsEmail(String email) {

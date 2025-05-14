@@ -11,7 +11,6 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
 import java.util.List;
-import java.util.UUID;
 
 @Mapper(builder = @Builder(disableBuilder = true))
 public interface ContentMapper {

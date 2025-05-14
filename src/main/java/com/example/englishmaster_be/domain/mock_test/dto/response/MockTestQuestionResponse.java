@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.mock_test.dto.response;
 
-import com.example.englishmaster_be.common.constant.QuestionTypeEnum;
+import com.example.englishmaster_be.common.constant.QuestionType;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -29,6 +29,6 @@ public class MockTestQuestionResponse {
     String questionResult;
 
     @Enumerated(EnumType.STRING)
-    QuestionTypeEnum questionType;
+    QuestionType questionType;
 
 }

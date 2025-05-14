@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.posts.dto.request;
 
-import com.example.englishmaster_be.common.constant.OrderEnum;
+import com.example.englishmaster_be.common.constant.SortDirectionType;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import jakarta.validation.constraints.Max;
@@ -17,7 +17,7 @@ import org.springdoc.core.annotations.ParameterObject;
 public class PageOptionRequest {
 
     @Parameter(description = "OrderEnum direction (ASC or DESC)", in = ParameterIn.QUERY, example = "DESC", required = false)
-    private OrderEnum order = OrderEnum.DESC;
+    private SortDirectionType order = SortDirectionType.DESC;
 
     @Parameter(description = "Page number", in = ParameterIn.QUERY, example = "1", required = false)
     @Min(value = 1, message = "Page index must be greater than or equal to 1")

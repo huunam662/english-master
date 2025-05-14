@@ -5,7 +5,6 @@ import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
 import com.example.englishmaster_be.domain.part.dto.response.PartBasicResponse;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
-import com.example.englishmaster_be.model.question.QuestionEntity;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
