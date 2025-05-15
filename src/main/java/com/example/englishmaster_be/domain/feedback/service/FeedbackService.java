@@ -1,18 +1,17 @@
 package com.example.englishmaster_be.domain.feedback.service;
 
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
-import com.example.englishmaster_be.common.thread.MessageResponseHolder;
-import com.example.englishmaster_be.domain.file_storage.service.IFileStorageService;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackRequest;
 import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackFilterRequest;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.mapper.FeedbackMapper;
 import com.example.englishmaster_be.model.feedback.FeedbackRepository;
 import com.example.englishmaster_be.model.feedback.QFeedbackEntity;
-import com.example.englishmaster_be.helper.FeedbackHelper;
+import com.example.englishmaster_be.util.FeedbackUtil;
 import com.example.englishmaster_be.model.feedback.FeedbackEntity;
 import com.example.englishmaster_be.domain.feedback.dto.response.FeedbackResponse;
 import com.example.englishmaster_be.model.user.UserEntity;
@@ -24,7 +23,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,7 +30,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FeedbackService implements IFeedbackService {
 
@@ -50,7 +48,7 @@ public class FeedbackService implements IFeedbackService {
     public FeedbackEntity getFeedbackById(UUID feedbackId) {
         return feedbackRepository.findByFeedbackId(feedbackId)
                 .orElseThrow(
-                        () -> new BadRequestException("Feedback not found")
+                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Feedback not found")
                 );
     }
 
@@ -92,7 +90,7 @@ public class FeedbackService implements IFeedbackService {
                                     .selectFrom(QFeedbackEntity.feedbackEntity)
                                     .where(wherePattern);
 
-        OrderSpecifier<?> orderSpecifier = FeedbackHelper.buildFeedbackOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
+        OrderSpecifier<?> orderSpecifier = FeedbackUtil.buildFeedbackOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
 
         query.orderBy(orderSpecifier)
                 .offset(filterResponse.getOffset())
@@ -129,7 +127,7 @@ public class FeedbackService implements IFeedbackService {
         long totalPages = (long) Math.ceil((float) totalElements / filterResponse.getPageSize());
         filterResponse.setTotalPages(totalPages);
 
-        OrderSpecifier<?> orderSpecifier = FeedbackHelper.buildFeedbackOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
+        OrderSpecifier<?> orderSpecifier = FeedbackUtil.buildFeedbackOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
 
         JPAQuery<FeedbackEntity> query = queryFactory
                 .selectFrom(QFeedbackEntity.feedbackEntity)
@@ -175,10 +173,6 @@ public class FeedbackService implements IFeedbackService {
         feedback.setEnable(enable);
 
         feedbackRepository.save(feedback);
-        
-        if(enable) MessageResponseHolder.setMessage("Enable FeedbackEntity successfully");
-        
-        else MessageResponseHolder.setMessage("Disable FeedbackEntity successfully");
     }
 
     @Transactional

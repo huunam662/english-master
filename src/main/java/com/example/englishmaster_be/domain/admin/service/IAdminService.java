@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.admin.service;
 
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.user.dto.request.UserFilterRequest;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.domain.admin.dto.response.CountMockTestTopicResponse;

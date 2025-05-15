@@ -26,14 +26,14 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    @DefaultMessage("Đăng nhập thành công")
+    @DefaultMessage("Login successful.")
     public UserAuthResponse login(@RequestBody UserLoginRequest loginDTO) {
 
         return authService.login(loginDTO);
     }
 
     @PostMapping("/register")
-    @DefaultMessage("Kiểm tra Email của bạn để xác thực đăng ký")
+    @DefaultMessage("Send email for register successful.")
     public void register(
             @Valid @RequestBody UserRegisterRequest userRegisterRequest
     ) {
@@ -42,7 +42,7 @@ public class AuthController {
     }
 
     @GetMapping("/register/confirm")
-    @DefaultMessage("Xác thực đăng ký thành công. Cảm ơn bạn, một thành viên của chúng tôi")
+    @DefaultMessage("Verification successful.")
     public void confirmRegister(@RequestParam("token") UUID sessionActiveCode) {
 
         authService.confirmRegister(sessionActiveCode);
@@ -50,7 +50,7 @@ public class AuthController {
 
 
     @GetMapping("/mailer/otp")
-    @DefaultMessage("Hãy kiểm tra email của bạn để nhận mã xác thực")
+    @DefaultMessage("Check verify code at email.")
     public void forgetPassword(@RequestParam("email") String email) {
 
         authService.forgotPassword(email);
@@ -58,14 +58,14 @@ public class AuthController {
 
 
     @GetMapping("/verify/otp")
-    @DefaultMessage("Xác thực mã OTP thành công")
+    @DefaultMessage("Verification OTP code successful.")
     public void verifyOtp(@RequestParam String otp) {
 
         authService.verifyOtp(otp);
     }
 
     @PostMapping("/change/password")
-    @DefaultMessage("Cập nhật mật khẩu thành công")
+    @DefaultMessage("Update password successful.")
     public UserAuthResponse changePassword(@Valid @RequestBody UserChangePasswordRequest changePasswordRequest){
 
         return authService.changePassword(changePasswordRequest);
@@ -73,7 +73,7 @@ public class AuthController {
 
 
     @PostMapping("/change/password/forgot")
-    @DefaultMessage("Cập nhật mật khẩu thành công")
+    @DefaultMessage("Update password successful.")
     public UserAuthResponse changePasswordForgot(@Valid @RequestBody UserChangePwForgotRequest changePwForgotRequest) {
 
         return authService.changePasswordForgot(changePwForgotRequest);
@@ -82,7 +82,7 @@ public class AuthController {
 
 
     @PostMapping("/refresh/token")
-    @DefaultMessage("Mã truy cập được tạo thành công")
+    @DefaultMessage("Access code created successful.")
     public UserAuthResponse refreshToken(@RequestBody UserRefreshTokenRequest refreshTokenDTO) {
 
         return authService.refreshToken(refreshTokenDTO);
@@ -91,7 +91,7 @@ public class AuthController {
 
 
     @PostMapping("/logout")
-    @DefaultMessage("Đăng xuất thành công")
+    @DefaultMessage("Logout successful.")
     public void logoutUser(@RequestBody UserLogoutRequest userLogoutDTO) {
 
         authService.logoutOf(userLogoutDTO);

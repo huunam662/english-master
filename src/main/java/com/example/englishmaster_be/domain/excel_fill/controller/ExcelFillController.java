@@ -4,12 +4,10 @@ package com.example.englishmaster_be.domain.excel_fill.controller;
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionListResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
-import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicContentResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
 import com.example.englishmaster_be.domain.excel_fill.service.IExcelFillService;
 import com.example.englishmaster_be.mapper.ExcelContentMapper;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -43,7 +41,7 @@ public class ExcelFillController {
     @DefaultMessage("File processed successfully")
     public ExcelQuestionListResponse importQuestionForTopicAndPart(
             @RequestParam("topicId") UUID topicId,
-            @Parameter(description = "Part number must one value in scope [1, 2, 3, 4, 5, 6, 7, 8, 9]")
+            @Parameter(description = "Part number must one value in scope [1, 2, 3, 4, 5, 6, 7]")
             @RequestParam(value = "partNumber") int partNumber,
             @RequestPart("file") MultipartFile file
     ){

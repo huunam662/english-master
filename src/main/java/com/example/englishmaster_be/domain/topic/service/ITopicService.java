@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.topic.service;
 
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionListResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;

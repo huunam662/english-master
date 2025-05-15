@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.model.invalid_token;
 
-import com.example.englishmaster_be.common.constant.InvalidTokenTypeEnum;
-import com.example.englishmaster_be.common.constant.SessionActiveTypeEnum;
+import com.example.englishmaster_be.common.constant.InvalidTokenType;
 import com.example.englishmaster_be.model.user.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -33,7 +32,7 @@ public class InvalidTokenEntity {
 
     @Column(name = "type")
     @Enumerated(EnumType.STRING)
-    InvalidTokenTypeEnum type;
+    InvalidTokenType type;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")

@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.post.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 
 import com.example.englishmaster_be.domain.post.service.IPostService;
 import com.example.englishmaster_be.mapper.CommentMapper;

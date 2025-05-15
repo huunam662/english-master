@@ -2399,7 +2399,7 @@ anal fin
 analgesic
 analogous
 analogue
-analogue-to-digital converter
+analogue-to-digital Mapper
 analogy
 analphabetic
 anal-retentive
@@ -12364,7 +12364,7 @@ catalyser
 catalysis
 catalyst
 catalytic
-catalytic converter
+catalytic Mapper
 catamite
 catananche
 cat and mouse
@@ -16653,7 +16653,7 @@ conversion factor
 conversion van
 convert
 converted rice
-converter reactor
+Mapper reactor
 convertible
 convert something to one's own use
 convex
@@ -21161,7 +21161,7 @@ digital native
 digital nomad
 digital signature
 digital television
-digital-to-analogue converter
+digital-to-analogue Mapper
 digital video recorder
 digital watermark
 digital watermarking
@@ -22744,7 +22744,7 @@ downcase
 downcast
 downchange
 downcomer
-downconverter
+downMapper
 downcountry
 downcurved
 downcut
@@ -90486,7 +90486,7 @@ telecon
 teleconference
 teleconferencing
 teleconnection
-teleconverter
+teleMapper
 telecopier
 telecottage
 teledu
@@ -93380,7 +93380,7 @@ torpefy
 torpid
 torpor
 torque
-torque converter
+torque Mapper
 torque wrench
 torr
 torrefied
@@ -106182,10 +106182,10 @@ analgesics
 analog
 analogues
 analogs
-analogue to digital converter
-analogue to digital converters
-analog to digital converter
-analogs to digital converter
+analogue to digital Mapper
+analogue to digital Mappers
+analog to digital Mapper
+analogs to digital Mapper
 analogue to digital convertor
 analogues to digital convertor
 analog to digital convertor
@@ -110805,8 +110805,8 @@ bespoke
 bespeaking
 bespoken
 bessarabians
-bessemer converter
-bessemer converters
+bessemer Mapper
+bessemer Mappers
 bests
 bested
 besting
@@ -116855,7 +116855,7 @@ catalysers
 catalyzer
 catalyzers
 catalysts
-catalytic converters
+catalytic Mappers
 catalytic convertor
 catalytic convertors
 catamites
@@ -121880,7 +121880,7 @@ conversion vans
 converts
 converted
 converting
-converter reactors
+Mapper reactors
 convertor reactor
 convertor reactors
 convertibles
@@ -128175,9 +128175,9 @@ digitalising
 digital natives
 digital nomads
 digital signatures
-digital-to-analogue converters
-digital-to-analog converter
-digital-to-analog converters
+digital-to-analogue Mappers
+digital-to-analog Mapper
+digital-to-analog Mappers
 digital-to-analogue convertor
 digital-to-analogue convertors
 digital-to-analog convertor
@@ -130077,9 +130077,9 @@ downchanges
 downchanged
 downchanging
 downcomers
-downconverters
-down-converter
-down-converters
+downMappers
+down-Mapper
+down-Mappers
 down-country
 down-curved
 downcuts
@@ -206049,7 +206049,7 @@ telecom
 telecons
 teleconferences
 teleconnections
-teleconverters
+teleMappers
 telecopiers
 telecottages
 teledus
@@ -208461,7 +208461,7 @@ torpefied
 torpefying
 torqued
 torquing
-torque converters
+torque Mappers
 torque convertor
 torque convertors
 torque wrenches
@@ -225167,8 +225167,8 @@ conversationalist
 conversationalists
 conversely
 conversions
-converter
-converters
+Mapper
+Mappers
 convertor
 convertors
 convincingly

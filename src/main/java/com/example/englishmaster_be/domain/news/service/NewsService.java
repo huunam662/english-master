@@ -1,17 +1,21 @@
 package com.example.englishmaster_be.domain.news.service;
 
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
-import com.example.englishmaster_be.common.thread.MessageResponseHolder;
-import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
-import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.domain.news.dto.request.UpdateNewsRequest;
+import com.example.englishmaster_be.domain.user.service.IUserService;
+import com.example.englishmaster_be.model.user.UserEntity;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
+
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.mapper.NewsMapper;
-import com.example.englishmaster_be.domain.news.dto.request.NewsRequest;
+import com.example.englishmaster_be.domain.news.dto.request.CreateNewsRequest;
 import com.example.englishmaster_be.domain.news.dto.request.NewsFilterRequest;
 import com.example.englishmaster_be.domain.news.dto.response.NewsResponse;
 import com.example.englishmaster_be.model.news.NewsRepository;
 import com.example.englishmaster_be.model.news.NewsEntity;
 import com.example.englishmaster_be.model.news.QNewsEntity;
+import com.example.englishmaster_be.shared.dto.response.ResourceKeyResponse;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -20,12 +24,12 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.time.LocalDateTime;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -34,7 +38,7 @@ import java.util.UUID;
 
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class NewsService implements INewsService {
 
@@ -44,12 +48,14 @@ public class NewsService implements INewsService {
 
     IUploadService uploadService;
 
+    IUserService userService;
+
 
     @Override
-    public NewsEntity findNewsById(UUID newsId) {
+    public NewsEntity getNewsById(UUID newsId) {
         return newsRepository.findByNewsId(newsId)
                 .orElseThrow(
-                        () -> new IllegalArgumentException("NewsEntity not found with ID: " + newsId)
+                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "NewsEntity not found with ID: " + newsId, false)
                 );
     }
 
@@ -121,44 +127,54 @@ public class NewsService implements INewsService {
     @Transactional
     @Override
     @SneakyThrows
-    public NewsEntity saveNews(NewsRequest newsRequest) {
+    public ResourceKeyResponse createNews(CreateNewsRequest newsRequest) {
 
-        NewsEntity news;
+        UserEntity currentUser = userService.currentUser();
 
-        if(newsRequest.getNewsId() != null)
-            news = findNewsById(newsRequest.getNewsId());
+        boolean userIsAdmin = userService.currentUserIsAdmin(currentUser);
 
-        else news = NewsEntity.builder()
-                .createAt(LocalDateTime.now())
+        if(!userIsAdmin) throw new ErrorHolder(Error.UNAUTHORIZED);
+
+        NewsEntity newsEntity = NewsMapper.INSTANCE.toNewsEntity(newsRequest);
+
+        newsEntity.setEnable(true);
+        newsEntity.setUserCreate(currentUser);
+        newsEntity.setUserUpdate(currentUser);
+
+        newsEntity = newsRepository.save(newsEntity);
+
+        return ResourceKeyResponse.builder()
+                .resourceId(newsEntity.getNewsId())
                 .build();
+    }
 
-        NewsMapper.INSTANCE.flowToNewsEntity(newsRequest, news);
+    @Override
+    public ResourceKeyResponse updateNews(UpdateNewsRequest newsRequest) {
 
-        if(newsRequest.getImage() != null && !newsRequest.getImage().isEmpty()){
+        UserEntity currentUser = userService.currentUser();
 
-            if(news.getImage() != null && !news.getImage().isEmpty())
-                uploadService.delete(
-                        FileDeleteRequest.builder()
-                                .filepath(news.getImage())
-                                .build()
-                );
+        boolean userIsAdmin = userService.currentUserIsAdmin(currentUser);
 
-            news.setImage(newsRequest.getImage());
-        }
+        if(!userIsAdmin) throw new ErrorHolder(Error.UNAUTHORIZED);
 
-        return newsRepository.save(news);
+        NewsEntity newsResultFetch = getNewsById(newsRequest.getNewsId());
+
+        NewsMapper.INSTANCE.flowToNewsEntity(newsRequest, newsResultFetch);
+
+        newsResultFetch = newsRepository.save(newsResultFetch);
+
+        return ResourceKeyResponse.builder()
+                .resourceId(newsResultFetch.getNewsId())
+                .build();
     }
 
     @Transactional
     @Override
     public void enableNews(UUID newsId, boolean enable) {
 
-        NewsEntity news = findNewsById(newsId);
+        NewsEntity news = getNewsById(newsId);
 
         news.setEnable(enable);
-
-        if(enable) MessageResponseHolder.setMessage("Enable news successfully");
-        else MessageResponseHolder.setMessage("Disable news successfully");
 
         newsRepository.save(news);
     }
@@ -166,7 +182,7 @@ public class NewsService implements INewsService {
     @Override
     public void deleteNews(UUID newsId) {
 
-        NewsEntity news = findNewsById(newsId);
+        NewsEntity news = getNewsById(newsId);
 
 //        if(news.getImage() != null && !news.getImage().isEmpty())
 //            fileStorageService.delete(news.getImage());

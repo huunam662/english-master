@@ -1,24 +1,24 @@
 package com.example.englishmaster_be.domain.pack.service;
 
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.domain.pack.dto.request.PackRequest;
-import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.model.pack.PackRepository;
 import com.example.englishmaster_be.model.pack.PackEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
+
 import java.util.List;
 import java.util.UUID;
 
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PackService implements IPackService {
 
@@ -32,7 +32,7 @@ public class PackService implements IPackService {
         PackEntity isExistedPack = checkPack(packRequest.getPackName());
 
         if(isExistedPack != null)
-            throw new BadRequestException("Create pack fail: The pack name is already exist");
+            throw new ErrorHolder(Error.CONFLICT, "Create pack fail: The pack name is already exist");
 
         UserEntity user = userService.currentUser();
 
@@ -61,14 +61,14 @@ public class PackService implements IPackService {
 
         return packRepository.findByPackId(packId)
                 .orElseThrow(
-                        () -> new BadRequestException("PackEntity not found")
+                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "PackEntity not found", false)
                 );
     }
 
     @Override
     public PackEntity getPackByName(String packName) {
         return packRepository.findByPackName(packName).orElseThrow(
-                () -> new BadRequestException("PackEntity not found with name: " + packName)
+                () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "PackEntity not found with name: " + packName, false)
         );
     }
 

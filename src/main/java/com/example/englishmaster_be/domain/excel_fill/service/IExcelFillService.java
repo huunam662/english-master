@@ -27,10 +27,6 @@ public interface IExcelFillService {
 
     ExcelQuestionListResponse importQuestionListeningPart34Excel(UUID topicId, MultipartFile file, int part);
 
-    ExcelQuestionListResponse importQuestionFillInBlankPart8Excel(UUID topicId, MultipartFile file);
-
-    ExcelQuestionListResponse importQuestionMatchingWordsPart9Excel(UUID topicId, MultipartFile file);
-
     List<ExcelQuestionResponse> importQuestionForTopicAndPart(UUID topicId, int partNumber, MultipartFile file);
 
     ExcelQuestionListResponse importQuestionAllPartsExcel(UUID topicId, MultipartFile file);

@@ -1,6 +1,5 @@
 package com.example.englishmaster_be.domain.flash_card_word.service;
 
-import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.flash_card.service.IFlashCardService;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
@@ -31,7 +30,7 @@ import java.util.UUID;
 
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FlashCardWordService implements IFlashCardWordService {
 

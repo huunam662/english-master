@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.scheduled;
 
-import com.example.englishmaster_be.common.constant.InvalidTokenTypeEnum;
-import com.example.englishmaster_be.common.constant.SessionActiveTypeEnum;
+import com.example.englishmaster_be.common.constant.InvalidTokenType;
+import com.example.englishmaster_be.common.constant.SessionActiveType;
 import com.example.englishmaster_be.model.invalid_token.InvalidTokenEntity;
 import com.example.englishmaster_be.model.invalid_token.QInvalidTokenEntity;
 import com.example.englishmaster_be.model.session_active.QSessionActiveEntity;
@@ -11,7 +11,7 @@ import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.model.session_active.SessionActiveRepository;
 import com.example.englishmaster_be.model.invalid_token.InvalidTokenRepository;
 import com.example.englishmaster_be.model.user.UserRepository;
-import com.example.englishmaster_be.shared.invalid_token.service.IInvalidTokenService;
+import com.example.englishmaster_be.shared.service.invalid_token.IInvalidTokenService;
 import com.example.englishmaster_be.value.JwtValue;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -58,7 +58,6 @@ public class TaskScheduled {
         deleteInvalidToken();
         deleteAllSessionConfirm();
         invalidTokenExpired();
-
     }
 
     @Transactional
@@ -121,7 +120,7 @@ public class TaskScheduled {
             JPAQuery<SessionActiveEntity> query = queryFactory
                     .selectFrom(QSessionActiveEntity.sessionActiveEntity)
                     .where(
-                            QSessionActiveEntity.sessionActiveEntity.type.eq(SessionActiveTypeEnum.CONFIRM).or(
+                            QSessionActiveEntity.sessionActiveEntity.type.eq(SessionActiveType.CONFIRM).or(
                                     QSessionActiveEntity.sessionActiveEntity.token.isNull()
                             )
                     );
@@ -155,7 +154,7 @@ public class TaskScheduled {
                                         .atZone(ZoneId.systemDefault())
                                         .toLocalDateTime()
                         ).and(
-                                QSessionActiveEntity.sessionActiveEntity.type.eq(SessionActiveTypeEnum.CONFIRM).not()
+                                QSessionActiveEntity.sessionActiveEntity.type.eq(SessionActiveType.CONFIRM).not()
                         ).and(
                                 QSessionActiveEntity.sessionActiveEntity.token.isNotNull()
                         )
@@ -163,7 +162,7 @@ public class TaskScheduled {
 
             List<SessionActiveEntity> sessionActiveEntityList = query.fetch();
 
-            invalidTokenService.insertInvalidTokenList(sessionActiveEntityList, InvalidTokenTypeEnum.EXPIRED);
+            invalidTokenService.insertInvalidTokenList(sessionActiveEntityList, InvalidTokenType.EXPIRED);
 
             sessionActiveRepository.deleteAll(sessionActiveEntityList);
         }

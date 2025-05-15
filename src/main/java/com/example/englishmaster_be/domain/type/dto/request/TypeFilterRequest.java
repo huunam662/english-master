@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.type.dto.request;
 
-import com.example.englishmaster_be.common.dto.request.FilterRequest;
-import com.example.englishmaster_be.common.constant.sort.SortByTypeFieldsEnum;
+import com.example.englishmaster_be.shared.dto.request.FilterRequest;
+import com.example.englishmaster_be.common.constant.sort.SortByTypeFields;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -20,7 +20,7 @@ public class TypeFilterRequest extends FilterRequest {
     String search;
 
     @Schema(description = "Sắp xếp theo trường", defaultValue = "None")
-    SortByTypeFieldsEnum sortBy;
+    SortByTypeFields sortBy;
 
     @Schema(description = "Tùy chọn tăng giảm", defaultValue = "DESC")
     Sort.Direction direction;

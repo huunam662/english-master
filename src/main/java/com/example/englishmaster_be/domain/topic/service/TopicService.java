@@ -1,8 +1,10 @@
 package com.example.englishmaster_be.domain.topic.service;
 
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
-import com.example.englishmaster_be.common.thread.MessageResponseHolder;
-import com.example.englishmaster_be.common.constant.RoleEnum;
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
+
+import com.example.englishmaster_be.common.constant.Role;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.content.service.IContentService;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
@@ -23,7 +25,6 @@ import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicQuestionListRequest;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicRequest;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicFilterRequest;
-import com.example.englishmaster_be.exception.template.BadRequestException;
 import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicResponse;
@@ -48,7 +49,7 @@ import com.example.englishmaster_be.model.topic.QTopicEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.topic.TopicRepository;
 import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.util.FileUtil;
+import com.example.englishmaster_be.helper.FileHelper;
 import com.example.englishmaster_be.value.LinkValue;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -59,7 +60,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -72,13 +72,13 @@ import java.util.*;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TopicService implements ITopicService {
 
     LinkValue linkValue;
 
-    FileUtil fileUtil;
+    FileHelper fileUtil;
 
     JPAQueryFactory jpaQueryFactory;
 
@@ -256,7 +256,7 @@ public class TopicService implements ITopicService {
     public TopicEntity uploadFileImage(UUID topicId, MultipartFile contentData) {
 
         if(contentData == null || contentData.isEmpty())
-            throw new BadRequestException("File required non empty or null content");
+            throw new ErrorHolder(Error.BAD_REQUEST, "File required non empty or null content");
 
         UserEntity user = userService.currentUser();
 
@@ -367,7 +367,7 @@ public class TopicService implements ITopicService {
             }
         }
 
-        throw new BadRequestException("Delete Part to Topic fail: Topic don't have Part");
+        throw new ErrorHolder(Error.BAD_REQUEST, "Delete Part to Topic fail: Topic don't have Part");
     }
 
     @Override
@@ -445,8 +445,6 @@ public class TopicService implements ITopicService {
 
         List<String> listLinkCdn = topicRepository.findAllTopicImages();
 
-        MessageResponseHolder.setMessage("Found " + listLinkCdn.size() + " links");
-
         return listLinkCdn.stream()
                 .filter(linkCdn -> linkCdn != null && !linkCdn.isEmpty())
                 .map(linkCdn -> linkValue.getLinkFileShowImageBE() + linkCdn)
@@ -484,9 +482,6 @@ public class TopicService implements ITopicService {
         topic.setStatus(statusUpdate);
 
         topicRepository.save(topic);
-
-        MessageResponseHolder.setMessage(enable ? "TopicEntity enabled successfully" : "TopicEntity disabled successfully");
-
     }
 
 
@@ -507,7 +502,7 @@ public class TopicService implements ITopicService {
         UserEntity user = userService.currentUser();
 
         if(!existQuestionInTopic(topic, question))
-            throw new BadRequestException("Question don't have in Topic");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Question don't have in Topic");
 
         topic.setUserUpdate(user);
 
@@ -650,14 +645,11 @@ public class TopicService implements ITopicService {
 
             PartEntity part = question.getPart();
 
-            if (existPartInTopic(topic, part))
-                MessageResponseHolder.setMessage("PartEntity of QuestionEntity don't have in TopicEntity");
-            else {
+            if (!existPartInTopic(topic, part)){
                 topic.setUserUpdate(user);
                 topic.setUpdateAt(LocalDateTime.now());
                 topic.getQuestions().add(question);
                 topicRepository.save(topic);
-                MessageResponseHolder.setMessage("Add QuestionEntity to TopicEntity successfully");
             }
         }
     }
@@ -787,14 +779,11 @@ public class TopicService implements ITopicService {
 
             TopicEntity topic = getTopicById(topicId);
 
-            if (existPartInTopic(topic, part))
-                MessageResponseHolder.setMessage("Part of Question haven't in Topic");
-            else {
+            if (!existPartInTopic(topic, part)) {
                 topic.setUserUpdate(user);
                 topic.setUpdateAt(LocalDateTime.now());
                 topic.getQuestions().add(question);
                 topicRepository.save(topic);
-                MessageResponseHolder.setMessage("Add Question to Topic successfully");
             }
         }
     }
@@ -808,7 +797,7 @@ public class TopicService implements ITopicService {
 
         PartEntity part = partService.getPartToId(questionRequest.getPartId());
 
-        Boolean isAdmin = user.getRole().getRoleName().equals(RoleEnum.ADMIN);
+        Boolean isAdmin = user.getRole().getRoleName().equals(Role.ADMIN);
 
         QuestionEntity question = QuestionEntity.builder()
                 .questionContent(questionRequest.getQuestionContent())
@@ -915,8 +904,6 @@ public class TopicService implements ITopicService {
         TopicEntity topic = getTopicById(topicId);
 
         if (existPartInTopic(topic, part)){
-
-            MessageResponseHolder.setMessage("Part of Question don't have in Topic");
             return QuestionMapper.INSTANCE.toQuestionResponse(question);
         }
         else {
@@ -946,8 +933,6 @@ public class TopicService implements ITopicService {
                 questionResponse.setAnswerCorrectId(answerCorrect.getAnswerId());
             }
 
-            MessageResponseHolder.setMessage("Add QuestionEntity to TopicEntity successfully");
-
             return questionResponse;
         }
     }
@@ -965,7 +950,7 @@ public class TopicService implements ITopicService {
 
         UserEntity currentUser = userService.currentUser();
 
-        boolean isUser = currentUser.getRole().getRoleName().equals(RoleEnum.USER);
+        boolean isUser = currentUser.getRole().getRoleName().equals(Role.USER);
 
         if(isUser) wherePattern = wherePattern.and(QTopicEntity.topicEntity.enable.eq(Boolean.TRUE));
 

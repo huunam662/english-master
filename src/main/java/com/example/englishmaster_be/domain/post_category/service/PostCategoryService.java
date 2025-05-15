@@ -1,5 +1,7 @@
 package com.example.englishmaster_be.domain.post_category.service;
 
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.post_category.dto.request.PostCategoryRequest;
 import com.example.englishmaster_be.value.MicroserviceValue;
 import jakarta.persistence.EntityNotFoundException;
@@ -21,7 +23,7 @@ import java.util.UUID;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Autowired, @Lazy})
+@RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class PostCategoryService implements IPostCategoryService {
 
@@ -39,7 +41,7 @@ public class PostCategoryService implements IPostCategoryService {
                 }
         );
         if (response.getBody() == null) {
-            throw new RuntimeException("response body is null");
+            throw new ErrorHolder(Error.SERVER_ERROR, "response body is null");
         }
         return response.getBody();
     }

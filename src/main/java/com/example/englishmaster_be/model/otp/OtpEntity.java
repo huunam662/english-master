@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.model.otp;
 
-import com.example.englishmaster_be.common.constant.OtpStatusEnum;
+import com.example.englishmaster_be.common.constant.OtpStatus;
 import com.example.englishmaster_be.model.user.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -36,7 +36,7 @@ public class OtpEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status")
-    OtpStatusEnum status;
+    OtpStatus status;
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp

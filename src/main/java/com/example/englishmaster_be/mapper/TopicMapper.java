@@ -2,10 +2,8 @@ package com.example.englishmaster_be.mapper;
 
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicContentResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
-import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicRequest;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicBasicResponse;
-import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicResponse;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
@@ -14,7 +12,6 @@ import org.mapstruct.factory.Mappers;
 
 import java.time.LocalTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Mapper(builder = @Builder(disableBuilder = true), imports = {LocalTime.class})
 public interface TopicMapper {

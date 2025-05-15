@@ -169,10 +169,10 @@ public class GeminiClient {
             try {
                 HttpResponse<String> response =
                         client.httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
-                ObjectMapper mapper = new ObjectMapper();
+                ObjectMapper Mapper = new ObjectMapper();
                 Object result;
                 if (responseSchema != null) {
-                    result = mapper.readValue(extractContentFromModelResponse(response.body()), responseSchema);
+                    result = Mapper.readValue(extractContentFromModelResponse(response.body()), responseSchema);
                 }
                 result = extractContentFromModelResponse(response.body());
                 logger.debug("Response Body: {}", result);
@@ -184,8 +184,8 @@ public class GeminiClient {
         }
 
         private String buildRequestBody() {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL); // Exclude null fields
+            ObjectMapper Mapper = new ObjectMapper();
+            Mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL); // Exclude null fields
             try {
                 Map<String, Object> requestMap = new HashMap<>();
                 requestMap.put("contents", request.getContents());
@@ -196,7 +196,7 @@ public class GeminiClient {
                     requestMap.put("systemInstruction", request.getSystemInstruction());
                 }
 
-                String jsonBody = mapper.writeValueAsString(requestMap);
+                String jsonBody = Mapper.writeValueAsString(requestMap);
                 logger.info("Built request body: {}", jsonBody);
                 return jsonBody;
             } catch (Exception e) {
