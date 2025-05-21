@@ -24,7 +24,7 @@ public class DictionaryController {
 
     @GetMapping("/search/{word}")
     @DefaultMessage("Search successfully")
-    public JsonNode searchWords(@PathVariable String word) {
+    public JsonNode searchWords(@PathVariable("word") String word) {
 
         return dictionaryService.searchWords(word);
     }
@@ -32,7 +32,7 @@ public class DictionaryController {
 
     @GetMapping("/suggest/{word}")
     @DefaultMessage("Show successfully")
-    public DictionarySuggestionResponse getSuggestions(@PathVariable String word) {
+    public DictionarySuggestionResponse getSuggestions(@PathVariable("word") String word) {
 
         return dictionaryService.getSuggestions(word);
     }
@@ -40,7 +40,7 @@ public class DictionaryController {
 
     @GetMapping("/image/{word}")
     @DefaultMessage("show successfully")
-    public JsonNode getImage(@PathVariable String word) {
+    public JsonNode getImage(@PathVariable("word") String word) {
         return dictionaryService.getImage(word);
     }
 

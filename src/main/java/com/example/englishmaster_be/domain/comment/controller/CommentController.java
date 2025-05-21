@@ -29,7 +29,7 @@ public class CommentController {
 
     @GetMapping(value = "/{commentId:.+}/getAllComment")
     @DefaultMessage("Show list successfully")
-    public List<CommentResponse> getListCommentToCommentId(@PathVariable UUID commentId){
+    public List<CommentResponse> getListCommentToCommentId(@PathVariable("commentId") UUID commentId){
 
         List<CommentEntity> commentList = commentService.getListCommentByCommentId(commentId);
 
@@ -53,7 +53,7 @@ public class CommentController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Create successfully")
     public CommentResponse createCommentToNews(
-            @PathVariable UUID newsId,
+            @PathVariable("newsId") UUID newsId,
             @RequestBody CommentRequest commentRequest
     ){
 
@@ -67,7 +67,7 @@ public class CommentController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Create successfully")
     public CommentResponse createCommentToComment(
-            @PathVariable UUID commentId,
+            @PathVariable("commentId") UUID commentId,
             @RequestBody CommentRequest commentRequest
     ){
 
@@ -80,7 +80,7 @@ public class CommentController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Update successfully")
     public CommentResponse updateComment(
-            @PathVariable UUID commentId,
+            @PathVariable("commentId") UUID commentId,
             @RequestBody CommentRequest commentRequest
     ){
 
@@ -92,7 +92,7 @@ public class CommentController {
     @DeleteMapping(value = "/{commentId:.+}/deleteComment")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Delete successfully")
-    public void deleteComment(@PathVariable UUID commentId){
+    public void deleteComment(@PathVariable("commentId") UUID commentId){
 
         commentService.deleteComment(commentId);
     }

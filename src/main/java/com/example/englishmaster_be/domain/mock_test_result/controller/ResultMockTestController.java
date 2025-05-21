@@ -48,8 +48,8 @@ public class ResultMockTestController {
     @GetMapping("/getResultMockTestByPartAndMockTest")
     @DefaultMessage("Get result mock test successfully")
     public List<MockTestResultResponse> getResultMockTest(
-            @RequestParam(required = false) UUID partId,
-            @RequestParam(required = false) UUID mockTestId
+            @RequestParam(value = "partId", required = false) UUID partId,
+            @RequestParam(value = "mockTestId", required = false) UUID mockTestId
     ) {
 
         List<MockTestResultEntity> resultMockTestEntityList = resultMockTestService.getResultMockTestsByPartIdAndMockTestId(partId, mockTestId);
@@ -59,9 +59,9 @@ public class ResultMockTestController {
 
     @DeleteMapping("/delete")
     @DefaultMessage("Delete result mock test successfully")
-    public void deleteResultMockTest(@RequestParam UUID uuid) {
+    public void deleteResultMockTest(@RequestParam("id") UUID id) {
 
-        resultMockTestService.deleteResultMockTestById(uuid);
+        resultMockTestService.deleteResultMockTestById(id);
     }
 
 

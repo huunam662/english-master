@@ -75,7 +75,7 @@ public class NewsController {
     }
 
     @GetMapping("/{newId}")
-    public NewsResponse getNewsById(@PathVariable UUID newId){
+    public NewsResponse getNewsById(@PathVariable("newId") UUID newId){
 
         NewsEntity newResult = newsService.getNewsById(newId);
 
@@ -106,7 +106,7 @@ public class NewsController {
 
     @PatchMapping (value = "/{newsId:.+}/enableNews")
     @PreAuthorize("hasRole('ADMIN')")
-    public void enableNews(@PathVariable UUID newsId, @RequestParam boolean enable){
+    public void enableNews(@PathVariable("newsId") UUID newsId, @RequestParam("enable") boolean enable){
 
         newsService.enableNews(newsId, enable);
     }
@@ -115,7 +115,7 @@ public class NewsController {
     @DeleteMapping(value = "/{newsId:.+}/deleteNews")
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Delete news successfully")
-    public void deleteNews(@PathVariable UUID newsId){
+    public void deleteNews(@PathVariable("newsId") UUID newsId){
 
         newsService.deleteNews(newsId);
     }

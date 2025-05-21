@@ -54,7 +54,7 @@ public class QuestionController {
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Update question to topic successfully")
     public QuestionResponse editQuestion(
-            @PathVariable UUID questionId,
+            @PathVariable("questionId") UUID questionId,
             @RequestBody QuestionUpdateRequest questionRequest
     ) {
 
@@ -70,7 +70,7 @@ public class QuestionController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Upload question successfully")
     public QuestionResponse uploadFileQuestion(
-            @PathVariable UUID questionId,
+            @PathVariable("questionId") UUID questionId,
             @RequestPart List<MultipartFile> uploadMultiFileRequest
     ) {
 
@@ -83,7 +83,7 @@ public class QuestionController {
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Update file question successfully")
     public QuestionResponse updateFileQuestion(
-            @PathVariable UUID questionId,
+            @PathVariable("questionId") UUID questionId,
             @RequestParam("oldFileName") String oldFileName,
             @RequestPart MultipartFile newFile
     ) {
@@ -110,11 +110,11 @@ public class QuestionController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("List top 10 question successfully")
     public List<QuestionResponse> getTop10Question(
-            @PathVariable UUID partId,
-            @RequestParam int indexp
+            @PathVariable("partId") UUID partId,
+            @RequestParam("index") int index
     ) {
 
-        List<QuestionEntity> questionList = questionService.getTop10Question(indexp, partId);
+        List<QuestionEntity> questionList = questionService.getTop10Question(index, partId);
 
         return QuestionMapper.INSTANCE.toQuestionResponseList(questionList);
     }
@@ -122,7 +122,7 @@ public class QuestionController {
     @GetMapping(value = "/{questionId:.+}/checkQuestionGroup")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Question has question group")
-    public void checkQuestionGroup(@PathVariable UUID questionId) {
+    public void checkQuestionGroup(@PathVariable("questionId") UUID questionId) {
 
         questionService.checkQuestionGroup(questionId);
     }
@@ -130,7 +130,7 @@ public class QuestionController {
     @GetMapping(value = "/{questionId:.+}/listQuestionGroup")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("List question group successfully")
-    public List<QuestionResponse> getQuestionGroupToQuestion(@PathVariable UUID questionId) {
+    public List<QuestionResponse> getQuestionGroupToQuestion(@PathVariable("questionId") UUID questionId) {
 
         List<QuestionEntity> questionEntityList = questionService.getQuestionGroupListByQuestionId(questionId);
 
@@ -140,7 +140,7 @@ public class QuestionController {
     @GetMapping(value = "/{questionId:.+}/listAnswer")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("List answer to question successfully")
-    public List<AnswerResponse> getAnswerToQuestion(@PathVariable UUID questionId) {
+    public List<AnswerResponse> getAnswerToQuestion(@PathVariable("questionId") UUID questionId) {
 
         List<AnswerEntity> answerList = answerService.getListAnswerByQuestionId(questionId);
 
@@ -150,7 +150,7 @@ public class QuestionController {
     @DeleteMapping(value = "/{questionId:.+}/deleteQuestion")
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Delete question successfully")
-    public void deleteQuestion(@PathVariable UUID questionId) {
+    public void deleteQuestion(@PathVariable("questionId") UUID questionId) {
 
         questionService.deleteQuestion(questionId);
     }
@@ -159,7 +159,7 @@ public class QuestionController {
     @GetMapping(value = "/{questionId:.+}/content")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Show content question successfully")
-    public QuestionResponse getContentToQuestion(@PathVariable UUID questionId) {
+    public QuestionResponse getContentToQuestion(@PathVariable("questionId") UUID questionId) {
 
         QuestionEntity question = questionService.getQuestionById(questionId);
 

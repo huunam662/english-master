@@ -82,7 +82,7 @@ public class FeedbackController {
 
     @PostMapping(value = "/createFeedback" )
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Đánh giá thành công")
+    @DefaultMessage("Feedback successful.")
     public FeedbackResponse createFeedback(
             @RequestBody @Valid FeedbackRequest feedbackRequest
     ){
@@ -92,22 +92,22 @@ public class FeedbackController {
         return FeedbackMapper.INSTANCE.toFeedbackResponse(feedback);
     }
 
-    @PatchMapping (value = "/{FeedbackId:.+}/enableFeedback")
+    @PatchMapping (value = "/{feedbackId:.+}/enableFeedback")
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Save successfully")
     public void enableFeedback(
-            @PathVariable UUID FeedbackId,
+            @PathVariable("feedbackId") UUID feedbackId,
             @RequestParam(defaultValue = "true") Boolean enable
     ){
         
-        feedbackService.enableFeedback(FeedbackId, enable);
+        feedbackService.enableFeedback(feedbackId, enable);
     }
 
     @PatchMapping(value = "/{feedbackId:.+}/updateFeedback")
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Save successfully")
     public FeedbackResponse updateFeedback(
-            @PathVariable UUID feedbackId,
+            @PathVariable("feedbackId") UUID feedbackId,
             @RequestBody @Valid FeedbackRequest feedbackRequest
     ){
 
@@ -118,11 +118,11 @@ public class FeedbackController {
         return FeedbackMapper.INSTANCE.toFeedbackResponse(feedback);
     }
 
-    @DeleteMapping(value = "/{FeedbackId:.+}/deleteFeedback")
+    @DeleteMapping(value = "/{feedbackId:.+}/deleteFeedback")
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Delete successfully")
-    public void deleteFeedback(@PathVariable UUID FeedbackId){
+    public void deleteFeedback(@PathVariable("feedbackId") UUID feedbackId){
 
-        feedbackService.deleteFeedback(FeedbackId);
+        feedbackService.deleteFeedback(feedbackId);
     }
 }
