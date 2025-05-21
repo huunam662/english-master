@@ -164,6 +164,9 @@ public class UploadService implements IUploadService {
     public void delete(FileDeleteRequest dto) {
 
         String path = extractPathFromFilepath(dto.getFilepath());
+
+        if(path == null) return;
+
         String encodedPath = Base64.getEncoder().encodeToString(path.getBytes(StandardCharsets.UTF_8));
         String url = uploadValue.getDeleteApiUrl() + encodedPath;
         HttpHeaders headers = createHttpHeaders(MediaType.APPLICATION_JSON);
@@ -180,6 +183,6 @@ public class UploadService implements IUploadService {
         return Optional.ofNullable(filepath)
                 .filter(fp -> fp.contains("/public/"))
                 .map(fp -> fp.substring(fp.indexOf("/public/")))
-                .orElseThrow(() -> new IllegalArgumentException("The file_storage path structure is not correct"));
+                .orElse(null);
     }
 }

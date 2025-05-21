@@ -40,13 +40,13 @@ public class FlashCardService implements IFlashCardService {
     public FlashCardEntity getFlashCardById(UUID flashCardId) {
         return flashCardRepository.findByFlashCardId(flashCardId)
                 .orElseThrow(
-                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "FlashCardEntity not found with ID: " + flashCardId)
+                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "FlashCardEntity not found with ID: " + flashCardId, false)
                 );
     }
 
     @Override
     public List<FlashCardEntity> getFlashCardByUser(UserEntity user) {
-        return flashCardRepository.findByUser(user, Sort.by(Sort.Order.desc("updateAt")));
+        return flashCardRepository.findByUserCreate(user, Sort.by(Sort.Order.desc("updateAt")));
     }
 
     @Override
@@ -83,11 +83,13 @@ public class FlashCardService implements IFlashCardService {
 
         FlashCardEntity flashCard;
 
-        if(flashCardRequest.getFlashCardId() != null)
+        if(flashCardRequest.getFlashCardId() != null) {
             flashCard = getFlashCardById(flashCardRequest.getFlashCardId());
-
+            flashCard.setUserUpdate(user);
+        }
         else flashCard = FlashCardEntity.builder()
                 .userCreate(user)
+                .userUpdate(user)
                 .build();
 
         FlashCardMapper.INSTANCE.flowToFlashCardEntity(flashCardRequest, flashCard);
