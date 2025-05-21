@@ -80,8 +80,6 @@ public class AdminController {
         return adminService.getCountMockTestOfTopic(date, packId);
     }
 
-
-
     // API để tìm kiếm người dùng lâu ngày chưa đăng nhập
     @GetMapping("/users/inactive")
     @PreAuthorize("hasRole('ADMIN')")

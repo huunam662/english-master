@@ -35,7 +35,6 @@ public class ContentHelper {
         if(contentEntity != null) return contentEntity;
 
         return ContentEntity.builder()
-                .contentId(UUID.randomUUID())
                 .contentData(contentData)
                 .contentType(fileUtil.mimeTypeFile(contentData))
                 .userCreate(byUser)

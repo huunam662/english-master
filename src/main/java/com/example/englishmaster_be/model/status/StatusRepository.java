@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface StatusRepository extends JpaRepository<StatusEntity, UUID> {
 
     @Query("SELECT s FROM StatusEntity s WHERE s.statusName = :statusName")
-    Optional<StatusEntity> findByStatusName(String statusName);
+    Optional<StatusEntity> findByStatusName(@Param("statusName") String statusName);
 
 
     @Query("SELECT EXISTS(SELECT s FROM StatusEntity s WHERE s.statusName = :statusName AND s.type = :type)")

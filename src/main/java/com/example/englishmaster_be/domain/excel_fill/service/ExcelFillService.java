@@ -133,7 +133,6 @@ public class ExcelFillService implements IExcelFillService {
             if (packEntity == null) {
 
                 packEntity = PackEntity.builder()
-                        .packId(UUID.randomUUID())
                         .userCreate(currentUser)
                         .userUpdate(currentUser)
                         .packName(excelTopicContentResponse.getPackName())
@@ -147,7 +146,6 @@ public class ExcelFillService implements IExcelFillService {
 
             if (topicEntity == null)
                 topicEntity = TopicEntity.builder()
-                        .topicId(UUID.randomUUID())
                         .status(statusEntity)
                         .pack(packEntity)
                         .userCreate(currentUser)
@@ -188,7 +186,6 @@ public class ExcelFillService implements IExcelFillService {
                 if (partEntity == null) {
 
                     partEntity = PartEntity.builder()
-                            .partId(UUID.randomUUID())
                             .contentData("")
                             .contentType(fileUtil.mimeTypeFile(""))
                             .partName(partNameAtI)
@@ -353,7 +350,6 @@ public class ExcelFillService implements IExcelFillService {
             ExcelQuestionContentResponse excelQuestionContentResponse = ExcelUtil.collectQuestionContentPart1234567With(sheet, iRowAudioPath, null, iRowTotalScore, part);
 
             QuestionEntity questionParent = QuestionEntity.builder()
-                    .questionId(UUID.randomUUID())
                     .part(partEntity)
                     .topics(List.of(topicEntity))
                     .userCreate(currentUser)
@@ -381,8 +377,6 @@ public class ExcelFillService implements IExcelFillService {
             if (!questionParent.getContentCollection().contains(contentAudio))
                 questionParent.getContentCollection().add(contentAudio);
 
-            questionParent = questionRepository.save(questionParent);
-
             if (questionParent.getQuestionGroupChildren() == null)
                 questionParent.setQuestionGroupChildren(new ArrayList<>());
 
@@ -408,7 +402,6 @@ public class ExcelFillService implements IExcelFillService {
                 int scoreTrueQuestion = (int) rowBodyTable.getCell(jColQuestionScore).getNumericCellValue();
 
                 QuestionEntity questionChildren = QuestionEntity.builder()
-                        .questionId(UUID.randomUUID())
                         .questionGroupParent(questionParent)
                         .part(partEntity)
                         .isQuestionParent(Boolean.FALSE)
@@ -458,7 +451,6 @@ public class ExcelFillService implements IExcelFillService {
                 for (int i = 0; i < keysLength; i++) {
 
                     AnswerEntity answer = AnswerEntity.builder()
-                            .answerId(UUID.randomUUID())
                             .question(questionChildren)
                             .userCreate(currentUser)
                             .userUpdate(currentUser)
@@ -551,7 +543,6 @@ public class ExcelFillService implements IExcelFillService {
             ExcelQuestionContentResponse excelQuestionContentResponse = ExcelUtil.collectQuestionContentPart1234567With(sheet, null, null, iRowTotalScore, part);
 
             QuestionEntity questionParent = QuestionEntity.builder()
-                    .questionId(UUID.randomUUID())
                     .part(partEntity)
                     .topics(List.of(topicEntity))
                     .userCreate(currentUser)
@@ -590,7 +581,6 @@ public class ExcelFillService implements IExcelFillService {
                 int scoreTrueQuestion = (int) rowBodyTable.getCell(jColQuestionScore).getNumericCellValue();
 
                 QuestionEntity questionChildren = QuestionEntity.builder()
-                        .questionId(UUID.randomUUID())
                         .questionContent(questionContent)
                         .part(partEntity)
                         .questionGroupParent(questionParent)
@@ -616,7 +606,6 @@ public class ExcelFillService implements IExcelFillService {
                     String answerContent = ExcelUtil.getStringCellValue(rowBodyTable, j);
 
                     AnswerEntity answerEntity = AnswerEntity.builder()
-                            .answerId(UUID.randomUUID())
                             .answerContent(answerContent)
                             .correctAnswer(answerContent.equalsIgnoreCase(resultTrueQuestion))
                             .question(questionChildren)
@@ -718,7 +707,6 @@ public class ExcelFillService implements IExcelFillService {
                 ExcelQuestionContentResponse excelQuestionContentResponse = ExcelUtil.collectQuestionContentPart1234567With(sheet, iRowAudioPath, iRowImage, iRowTotalScore, part);
 
                 QuestionEntity questionParent = QuestionEntity.builder()
-                        .questionId(UUID.randomUUID())
                         .part(partEntity)
                         .topics(List.of(topicEntity))
                         .userCreate(currentUser)
@@ -758,8 +746,6 @@ public class ExcelFillService implements IExcelFillService {
 
                 if (!questionParent.getContentCollection().contains(contentImage))
                     questionParent.getContentCollection().add(contentImage);
-
-                questionParent = questionRepository.save(questionParent);
 
                 if (questionParent.getQuestionGroupChildren() == null)
                     questionParent.setQuestionGroupChildren(new ArrayList<>());
@@ -802,7 +788,6 @@ public class ExcelFillService implements IExcelFillService {
                     int scoreTrueQuestion = (int) rowBodyTable.getCell(jColQuestionScore).getNumericCellValue();
 
                     QuestionEntity questionChildren = QuestionEntity.builder()
-                            .questionId(UUID.randomUUID())
                             .questionContent(questionContent)
                             .part(partEntity)
                             .questionGroupParent(questionParent)
@@ -828,7 +813,6 @@ public class ExcelFillService implements IExcelFillService {
                         String answerContent = ExcelUtil.getStringCellValue(rowBodyTable, j);
 
                         AnswerEntity answerEntity = AnswerEntity.builder()
-                                .answerId(UUID.randomUUID())
                                 .answerContent(answerContent)
                                 .correctAnswer(answerContent.equalsIgnoreCase(resultTrueQuestion))
                                 .question(questionChildren)
@@ -934,7 +918,6 @@ public class ExcelFillService implements IExcelFillService {
                 ExcelQuestionContentResponse excelQuestionContentResponse = ExcelUtil.collectQuestionContentPart1234567With(sheet, iRowQuestionContent, iRowImage, iRowTotalScore, part);
 
                 QuestionEntity questionParent = QuestionEntity.builder()
-                        .questionId(UUID.randomUUID())
                         .part(partEntity)
                         .topics(List.of(topicEntity))
                         .userCreate(currentUser)
@@ -964,8 +947,6 @@ public class ExcelFillService implements IExcelFillService {
 
                     if (!questionParent.getContentCollection().contains(contentImage))
                         questionParent.getContentCollection().add(contentImage);
-
-                    questionParent = questionRepository.save(questionParent);
                 }
 
                 if (questionParent.getQuestionGroupChildren() == null)
@@ -1009,7 +990,6 @@ public class ExcelFillService implements IExcelFillService {
                     int scoreTrueQuestion = (int) rowBodyTable.getCell(jColQuestionScore).getNumericCellValue();
 
                     QuestionEntity questionChildren = QuestionEntity.builder()
-                            .questionId(UUID.randomUUID())
                             .questionContent(questionContentChild)
                             .part(partEntity)
                             .questionGroupParent(questionParent)
@@ -1035,7 +1015,6 @@ public class ExcelFillService implements IExcelFillService {
                         String answerContent = ExcelUtil.getStringCellValue(rowBodyTable, j);
 
                         AnswerEntity answerEntity = AnswerEntity.builder()
-                                .answerId(UUID.randomUUID())
                                 .answerContent(answerContent)
                                 .correctAnswer(answerContent.equalsIgnoreCase(resultTrueQuestion))
                                 .question(questionChildren)
