@@ -51,10 +51,6 @@ public class FlashCardEntity {
     LocalDateTime updateAt;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    UserEntity user;
-
-    @ManyToOne
     @JoinColumn(name = "create_by", referencedColumnName = "id")
     UserEntity userCreate;
 

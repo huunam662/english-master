@@ -92,7 +92,7 @@ public class UserEntity implements UserDetails {
     @OneToMany(mappedBy = "userCreate", cascade = CascadeType.ALL)
     List<NewsEntity> news;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "userCreate", cascade = CascadeType.ALL)
     List<FlashCardEntity> flashCards;
 
 
