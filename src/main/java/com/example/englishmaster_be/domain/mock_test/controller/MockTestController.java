@@ -47,7 +47,7 @@ public class MockTestController {
     @GetMapping(value = "/getMockTestById")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Find mock test successfully")
-    public MockTestResponse getMockTest(@RequestParam UUID id) {
+    public MockTestResponse getMockTest(@RequestParam("id") UUID id) {
 
         MockTestEntity mockTest = mockTestService.findMockTestById(id);
 
@@ -57,7 +57,7 @@ public class MockTestController {
     @GetMapping(value = "/listMockTest")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Get top 10 mock test successfully")
-    public List<MockTestResponse> listTop10MockTest(@RequestParam int index) {
+    public List<MockTestResponse> listTop10MockTest(@RequestParam("index") int index) {
 
         List<MockTestEntity> listMockTest = mockTestService.getTop10MockTest(index);
 
@@ -95,7 +95,7 @@ public class MockTestController {
     @PostMapping(value = "/{mockTestId:.+}/submitResult")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Create detail mock test successfully")
-    public List<MockTestDetailResponse> addAnswerToMockTest(@PathVariable UUID mockTestId, @RequestBody List<UUID> listAnswerId) {
+    public List<MockTestDetailResponse> addAnswerToMockTest(@PathVariable("mockTestId") UUID mockTestId, @RequestBody List<UUID> listAnswerId) {
 
         List<MockTestDetailEntity> detailMockTestEntityList = mockTestService.addAnswerToMockTest(mockTestId, listAnswerId);
 
@@ -105,7 +105,7 @@ public class MockTestController {
 
     @GetMapping(value = "/{mockTestId:.+}/listCorrectAnswer")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public List<MockTestDetailResponse> listCorrectAnswer(@RequestParam int index, @RequestParam boolean isCorrect, @PathVariable UUID mockTestId) {
+    public List<MockTestDetailResponse> listCorrectAnswer(@RequestParam("index") int index, @RequestParam("isCorrect") boolean isCorrect, @PathVariable("mockTestId") UUID mockTestId) {
 
         List<MockTestDetailEntity> detailMockTestEntityList = mockTestService.getListCorrectAnswer(index, isCorrect, mockTestId);
 
@@ -115,7 +115,7 @@ public class MockTestController {
     @GetMapping(value = "/{mockTestId:.+}/sendEmail")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Send email successfully")
-    public void sendEmailToMock(@PathVariable UUID mockTestId) {
+    public void sendEmailToMock(@PathVariable("mockTestId") UUID mockTestId) {
 
         mockTestService.sendEmailToMock(mockTestId);
     }
@@ -123,7 +123,7 @@ public class MockTestController {
     @GetMapping(value = "/{mockTestId:.+}/listPart")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Show part to mock test successfully")
-    public MockTestPartResponse getPartToMockTest(@PathVariable UUID mockTestId) {
+    public MockTestPartResponse getPartToMockTest(@PathVariable("mockTestId") UUID mockTestId) {
 
         return mockTestService.getPartToMockTest(mockTestId);
     }
@@ -131,7 +131,7 @@ public class MockTestController {
     @GetMapping(value = "/{mockTestId:.+}/listQuestionToPart")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Show question of part to mock test successfully")
-    public List<QuestionMockTestResponse> getQuestionOfToMockTest(@PathVariable UUID mockTestId, @RequestParam UUID partId) {
+    public List<QuestionMockTestResponse> getQuestionOfToMockTest(@PathVariable("mockTestId") UUID mockTestId, @RequestParam("partId") UUID partId) {
 
         return mockTestService.getQuestionOfToMockTest(mockTestId, partId);
     }
@@ -139,7 +139,7 @@ public class MockTestController {
     @GetMapping(value = "/{mockTestId:.+}/mocketinfor")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Show all info of mocktest")
-    public MockTestInforResponse getMockTestInfor(@PathVariable UUID mockTestId) {
+    public MockTestInforResponse getMockTestInfor(@PathVariable("mockTestId") UUID mockTestId) {
         MockTestEntity mockTestEntity = mockTestService.getInformationMockTest(mockTestId);
         return MockTestMapper.INSTANCE.toMockTestInforResponse(mockTestEntity);
     }

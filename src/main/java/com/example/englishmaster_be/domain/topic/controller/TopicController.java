@@ -47,7 +47,7 @@ public class TopicController {
     @GetMapping(value = "/{topicId:.+}/inforTopic")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Show list topic successfully")
-    public TopicResponse getInformationTopic(@PathVariable UUID topicId) {
+    public TopicResponse getInformationTopic(@PathVariable("topicId") UUID topicId) {
 
         TopicEntity topic = topicService.getTopicById(topicId);
 
@@ -80,7 +80,7 @@ public class TopicController {
     @PutMapping(value = "/{topicId:.+}/updateTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @DefaultMessage("Update topic successfully")
     public ExcelTopicResponse updateTopicByExcelFile(
-            @PathVariable UUID topicId,
+            @PathVariable("topicId") UUID topicId,
             @RequestParam("file") MultipartFile file
     ) {
 
@@ -92,7 +92,7 @@ public class TopicController {
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Update topic successfully")
     public TopicResponse updateTopic(
-            @PathVariable UUID topicId,
+            @PathVariable("topicId") UUID topicId,
             @RequestBody TopicRequest topicRequest
     ) {
 
@@ -107,7 +107,7 @@ public class TopicController {
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Upload Topic file storage successfully")
     public TopicResponse uploadFileImage(
-            @PathVariable UUID topicId,
+            @PathVariable("topicId") UUID topicId,
             @RequestPart("contentData") MultipartFile contentData
     ) {
 
@@ -169,7 +169,7 @@ public class TopicController {
     @PostMapping(value = "/{topicId:.+}/addPart")
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Add Part to Topic successfully")
-    public void addPartToTopic(@PathVariable UUID topicId, @RequestParam UUID partId) {
+    public void addPartToTopic(@PathVariable("topicId") UUID topicId, @RequestParam("partId") UUID partId) {
 
         topicService.addPartToTopic(topicId, partId);
     }
@@ -177,7 +177,7 @@ public class TopicController {
     @DeleteMapping(value = "/{topicId:.+}/deletePart")
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Delete Part to Topic successfully")
-    public void deletePartToTopic(@PathVariable UUID topicId, @RequestParam UUID partId) {
+    public void deletePartToTopic(@PathVariable("topicId") UUID topicId, @RequestParam("partId") UUID partId) {
 
         topicService.deletePartToTopic(topicId, partId);
     }
@@ -185,7 +185,7 @@ public class TopicController {
     @PostMapping(value = "/{topicId:.+}/addQuestion")
     @PreAuthorize("hasRole('ADMIN')")
     public QuestionResponse addQuestionToTopic(
-            @PathVariable UUID topicId,
+            @PathVariable("topicId") UUID topicId,
             @ModelAttribute QuestionRequest createQuestionDTO
     ) {
 
@@ -195,7 +195,7 @@ public class TopicController {
     @PostMapping(value = "/{topicId:.+}/addListQuestion")
     @PreAuthorize("hasRole('ADMIN')")
     public void addListQuestionToTopic(
-            @PathVariable UUID topicId,
+            @PathVariable("topicId") UUID topicId,
             @ModelAttribute("listQuestion") TopicQuestionListRequest createQuestionDTOList
     ) {
 
@@ -219,7 +219,7 @@ public class TopicController {
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Add Questions to Topic successfully")
     public ExcelQuestionListResponse addQuestionAllPartsToTopicByExcelFile(
-            @PathVariable UUID topicId,
+            @PathVariable("topicId") UUID topicId,
             @RequestParam("file") MultipartFile file
     ) {
 
@@ -242,8 +242,8 @@ public class TopicController {
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Delete Question to Topic successfully")
     public void deleteQuestionToTopic(
-            @PathVariable UUID topicId,
-            @RequestParam UUID questionId
+            @PathVariable("topicId") UUID topicId,
+            @RequestParam("questionId") UUID questionId
     ) {
 
         topicService.deleteQuestionToTopic(topicId, questionId);
@@ -253,7 +253,7 @@ public class TopicController {
     @GetMapping(value = "/{topicId:.+}/listPart")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Show Part to Topic successfully")
-    public List<PartResponse> getPartToTopic(@PathVariable UUID topicId) {
+    public List<PartResponse> getPartToTopic(@PathVariable("topicId") UUID topicId) {
 
         return topicService.getPartToTopic(topicId);
     }
@@ -262,8 +262,8 @@ public class TopicController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Show Question of Part to Topic successfully")
     public List<QuestionPartResponse> getQuestionOfToTopicPart(
-            @PathVariable UUID topicId,
-            @RequestParam String partName
+            @PathVariable("topicId") UUID topicId,
+            @RequestParam("partName") String partName
     ) {
 
         return topicService.getQuestionOfToTopicPart(topicId, partName);
@@ -272,7 +272,7 @@ public class TopicController {
 
     @PatchMapping(value = "/{topicId:.+}/enableTopic")
     @PreAuthorize("hasRole('ADMIN')")
-    public void enableTopic(@PathVariable UUID topicId, @RequestParam boolean enable) {
+    public void enableTopic(@PathVariable("topicId") UUID topicId, @RequestParam("enable") boolean enable) {
 
         topicService.enableTopic(topicId, enable);
     }
@@ -281,7 +281,7 @@ public class TopicController {
     @GetMapping(value = "/{topicId:.+}/listComment")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Show list Comment successfully")
-    public List<CommentResponse> listComment(@PathVariable UUID topicId) {
+    public List<CommentResponse> listComment(@PathVariable("topicId") UUID topicId) {
 
         List<CommentEntity> commentEntityList = topicService.listComment(topicId);
 
@@ -293,7 +293,7 @@ public class TopicController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Topic retrieved successfully")
     public List<TopicResponse> getTopicByStartTime(
-            @RequestParam
+            @RequestParam("startDate")
             @Parameter(description = "format startDate is 'yyyy-MM-dd'", example = "2025-01-12")
             @DateTimeFormat(pattern ="yyyy-MM-dd")
             LocalDate startDate
@@ -308,7 +308,7 @@ public class TopicController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Topic questions all part successfully")
     public List<QuestionPartResponse> getQuestionFromAllPart(
-            @PathVariable UUID topicId
+            @PathVariable("topicId") UUID topicId
     ) {
 
         return topicService.getQuestionPartListOfTopic(topicId);

@@ -48,7 +48,7 @@ public class PartController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Update part successfully")
     public PartResponse updatePart(
-            @PathVariable UUID partId,
+            @PathVariable("partId") UUID partId,
             @RequestBody PartRequest partRequest
     ) {
 
@@ -63,7 +63,7 @@ public class PartController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Upload file content part successfully")
     public PartResponse uploadFilePart(
-            @PathVariable UUID partId,
+            @PathVariable("partId") UUID partId,
             @RequestPart("contentData") MultipartFile contentData
     ) {
 
@@ -76,7 +76,7 @@ public class PartController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Upload file part content successfully")
     public PartResponse uploadTextPart(
-            @PathVariable UUID partId,
+            @PathVariable("partId") UUID partId,
             @RequestBody PartSaveContentRequest uploadTextRequest
     ) {
 
@@ -97,7 +97,7 @@ public class PartController {
     @DeleteMapping(value = "/{partId:.+}/delete")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Delete part successfully")
-    public void deletePart(@PathVariable UUID partId) {
+    public void deletePart(@PathVariable("partId") UUID partId) {
 
         partService.deletePart(partId);
     }
@@ -106,7 +106,7 @@ public class PartController {
     @GetMapping(value = "/{partId:.+}/content")
     @DefaultMessage("Show information part successfully")
     public PartResponse getPartToId(
-            @PathVariable UUID partId
+            @PathVariable("partId") UUID partId
     ) {
 
         PartEntity partEntity = partService.getPartToId(partId);

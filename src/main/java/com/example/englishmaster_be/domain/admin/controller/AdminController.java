@@ -33,7 +33,7 @@ public class AdminController {
 
     @GetMapping(value = "/getAllUser")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("List UserEntity successfully")
+    @DefaultMessage("List User successfully")
     public FilterResponse<?> getAllUser(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) int page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) int size,
@@ -56,22 +56,22 @@ public class AdminController {
 
     @PatchMapping(value = "/{userId:.+}/enableUser")
     @PreAuthorize("hasRole('ADMIN')")
-    public void enableUser(@PathVariable UUID userId, @RequestParam Boolean enable) {
+    public void enableUser(@PathVariable("userId") UUID userId, @RequestParam("enable") Boolean enable) {
 
         adminService.enableUser(userId, enable);
     }
 
     @DeleteMapping(value = "/{userId:.+}/deleteUser")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Delete account of UserEntity successfully")
-    public void deleteUser(@PathVariable UUID userId) {
+    @DefaultMessage("Delete account of User successfully")
+    public void deleteUser(@PathVariable("userId") UUID userId) {
 
         adminService.deleteUser(userId);
     }
 
     @GetMapping(value = "/countMockTestOfTopic")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("List TopicEntity and count mock test successfully")
+    @DefaultMessage("List Topic and count mock test successfully")
     public List<CountMockTestTopicResponse> countMockTestOfTopic(
             @RequestParam(value = "date", required = false) String date,
             @RequestParam(value = "pack") UUID packId

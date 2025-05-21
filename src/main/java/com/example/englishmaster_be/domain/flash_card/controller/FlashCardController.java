@@ -32,7 +32,7 @@ public class FlashCardController {
     @GetMapping(value = "/{flashCardId:.+}/listFlashCardWord")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Show list successfully")
-    public FlashCardWordListResponse getWordToFlashCard(@PathVariable UUID flashCardId){
+    public FlashCardWordListResponse getWordToFlashCard(@PathVariable("flashCardId") UUID flashCardId){
 
         FlashCardEntity flashCard = flashCardService.getFlashCardById(flashCardId);
 
@@ -67,7 +67,7 @@ public class FlashCardController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Save successfully")
     public FlashCardResponse updateFlashCard(
-            @PathVariable UUID flashCardId,
+            @PathVariable("flashCardId") UUID flashCardId,
             @ModelAttribute FlashCardRequest flashCardRequest
     ){
 
@@ -81,7 +81,7 @@ public class FlashCardController {
     @DeleteMapping(value = "/{flashCardId:.+}/removeFlashCard")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Delete successfully")
-    public void removeWord(@PathVariable UUID flashCardId){
+    public void removeWord(@PathVariable("flashCardId") UUID flashCardId){
 
         flashCardService.delete(flashCardId);
     }
