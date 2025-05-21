@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.model.comment;
 
-import com.example.englishmaster_be.model.post.PostEntity;
+import com.example.englishmaster_be.model.news.NewsEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -9,7 +9,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -53,8 +52,8 @@ public class CommentEntity {
     TopicEntity topic;
 
     @ManyToOne
-    @JoinColumn(name = "post_id", referencedColumnName = "id")
-    PostEntity post;
+    @JoinColumn(name = "news_id", referencedColumnName = "id")
+    NewsEntity news;
 
     @ManyToOne
     @JoinColumn(name = "comment_parent", referencedColumnName = "id")
@@ -62,7 +61,6 @@ public class CommentEntity {
 
     @OneToMany(mappedBy = "commentParent")
     List<CommentEntity> commentChildren;
-
 
 
     @PrePersist

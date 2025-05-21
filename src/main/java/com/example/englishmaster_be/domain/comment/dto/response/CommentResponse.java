@@ -20,7 +20,7 @@ public class CommentResponse {
 
     UUID topicId;
 
-    UUID postId;
+    UUID newsId;
 
     String contentComment;
 
