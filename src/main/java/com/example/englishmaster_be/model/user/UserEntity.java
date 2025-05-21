@@ -2,10 +2,10 @@ package com.example.englishmaster_be.model.user;
 
 import com.example.englishmaster_be.model.comment.CommentEntity;
 import com.example.englishmaster_be.model.invalid_token.InvalidTokenEntity;
+import com.example.englishmaster_be.model.news.NewsEntity;
 import com.example.englishmaster_be.model.otp.OtpEntity;
 import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
 import com.example.englishmaster_be.model.flash_card.FlashCardEntity;
-import com.example.englishmaster_be.model.post.PostEntity;
 import com.example.englishmaster_be.model.role.RoleEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,7 +16,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
@@ -90,8 +89,8 @@ public class UserEntity implements UserDetails {
     @OneToMany(mappedBy = "userComment", cascade = CascadeType.ALL)
     Collection<CommentEntity> comments;
 
-    @OneToMany(mappedBy = "userPost", cascade = CascadeType.ALL)
-    List<PostEntity> posts;
+    @OneToMany(mappedBy = "userCreate", cascade = CascadeType.ALL)
+    List<NewsEntity> news;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     List<FlashCardEntity> flashCards;

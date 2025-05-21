@@ -36,28 +36,28 @@ public class CommentController {
         return CommentMapper.INSTANCE.toCommentResponseList(commentList);
     }
 
-    @PostMapping(value = "/{topicId:.+}/addCommentToTopic")
+//    @PostMapping(value = "/{topicId:.+}/addCommentToTopic")
+//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+//    @DefaultMessage("Create successfully")
+//    public CommentResponse createCommentToTopic(
+//            @PathVariable UUID topicId,
+//            @RequestBody CommentRequest commentRequest
+//    ){
+//
+//        CommentEntity comment = commentService.saveCommentToTopic(topicId, commentRequest);
+//
+//        return CommentMapper.INSTANCE.toCommentResponse(comment);
+//    }
+
+    @PostMapping(value = "/{newsId:.+}/addCommentToNews")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Create successfully")
-    public CommentResponse createCommentToTopic(
-            @PathVariable UUID topicId,
+    public CommentResponse createCommentToNews(
+            @PathVariable UUID newsId,
             @RequestBody CommentRequest commentRequest
     ){
 
-        CommentEntity comment = commentService.saveCommentToTopic(topicId, commentRequest);
-
-        return CommentMapper.INSTANCE.toCommentResponse(comment);
-    }
-
-    @PostMapping(value = "/{postId:.+}/addCommentToPost")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Create successfully")
-    public CommentResponse createCommentToPost(
-            @PathVariable UUID postId,
-            @RequestBody CommentRequest commentRequest
-    ){
-
-        CommentEntity comment = commentService.saveCommentToPost(postId, commentRequest);
+        CommentEntity comment = commentService.saveCommentToNews(newsId, commentRequest);
 
         return CommentMapper.INSTANCE.toCommentResponse(comment);
     }

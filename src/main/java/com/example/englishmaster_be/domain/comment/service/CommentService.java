@@ -3,15 +3,16 @@ package com.example.englishmaster_be.domain.comment.service;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.comment.dto.request.CommentRequest;
+import com.example.englishmaster_be.domain.news.service.INewsService;
 import com.example.englishmaster_be.mapper.CommentMapper;
 import com.example.englishmaster_be.model.comment.CommentEntity;
 import com.example.englishmaster_be.model.comment.CommentRepository;
-import com.example.englishmaster_be.model.post.PostEntity;
+import com.example.englishmaster_be.model.news.NewsEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.domain.post.service.IPostService;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
+import com.example.englishmaster_be.shared.service.ws_message.IWsMessageService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -19,7 +20,6 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -37,7 +37,9 @@ public class CommentService implements ICommentService {
 
     ITopicService topicService;
 
-    IPostService postService;
+    INewsService newsService;
+
+    IWsMessageService wsMessageService;
 
 
     @Override
@@ -86,28 +88,24 @@ public class CommentService implements ICommentService {
 
         comment = commentRepository.save(comment);
 
-        messagingTemplate.convertAndSend("/CommentEntity/TopicEntity/" + topicId, CommentMapper.INSTANCE.toCommentResponse(comment));
-
         return comment;
     }
 
     @Transactional
     @Override
-    public CommentEntity saveCommentToPost(UUID postId, CommentRequest commentRequest) {
+    public CommentEntity saveCommentToNews(UUID newsId, CommentRequest commentRequest) {
 
         UserEntity user = userService.currentUser();
 
-        PostEntity post = postService.getPostById(postId);
+        NewsEntity news = newsService.getNewsById(newsId);
 
         CommentEntity comment = CommentEntity.builder()
                 .userComment(user)
-                .post(post)
+                .news(news)
                 .content(commentRequest.getCommentContent())
                 .build();
 
         comment = commentRepository.save(comment);
-
-        messagingTemplate.convertAndSend("/CommentEntity/PostEntity/" + postId, CommentMapper.INSTANCE.toCommentResponse(comment));
 
         return comment;
     }
@@ -129,12 +127,11 @@ public class CommentService implements ICommentService {
         if(commentParent.getTopic() != null)
             comment.setTopic(commentParent.getTopic());
 
-        if(commentParent.getPost() != null)
-            comment.setPost(commentParent.getPost());
-
         comment = commentRepository.save(comment);
 
-        messagingTemplate.convertAndSend("/CommentEntity/commentParent/" + commentId, CommentMapper.INSTANCE.toCommentResponse(comment));
+        UserEntity userTag = commentParent.getUserComment();
+
+        wsMessageService.sendToUsers(userTag, comment);
 
         return comment;
     }

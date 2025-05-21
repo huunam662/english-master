@@ -18,7 +18,7 @@ public interface ICommentService {
 
     CommentEntity saveCommentToTopic(UUID topicId, CommentRequest commentRequest);
 
-    CommentEntity saveCommentToPost(UUID postId, CommentRequest commentRequest);
+    CommentEntity saveCommentToNews(UUID newsId, CommentRequest commentRequest);
 
     CommentEntity saveCommentToComment(UUID commentId, CommentRequest createCommentDTO);
 
