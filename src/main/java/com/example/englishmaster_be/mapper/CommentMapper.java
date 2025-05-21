@@ -16,7 +16,7 @@ public interface CommentMapper {
 
     @Mapping(target = "contentComment", source = "content")
     @Mapping(target = "topicId", source = "topic.topicId")
-    @Mapping(target = "postId", source = "post.postId")
+    @Mapping(target = "newsId", source = "news.newsId")
     @Mapping(target = "tagAuthorParent", source = "commentParent.userComment.name")
     @Mapping(target = "authorComment", source = "userComment")
     @Mapping(target = "hasCommentParent", expression = "java(comment != null && comment.getCommentParent() != null)")

@@ -107,7 +107,10 @@ public class AuthService implements IAuthService {
             throw new ErrorHolder(Error.BAD_REQUEST, "Email is used.");
 
         UserEntity userRegister = UserMapper.INSTANCE.toUserEntity(userRegisterRequest);
-        userRegister.setUserId(user != null ? user.getUserId() : UUID.randomUUID());
+
+        if(user != null)
+            userRegister.setUserId(user.getUserId());
+
         userRegister.setPassword(passwordEncoder.encode(userRegisterRequest.getPassword()));
         userRegister.setRole(roleRepository.findByRoleName(Role.USER));
         userRegister.setEnabled(Boolean.FALSE);
