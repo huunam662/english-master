@@ -28,7 +28,7 @@ public class ContentController {
 
     @GetMapping
     @DefaultMessage("Get successfully")
-    public ContentResponse getContentById(@RequestParam UUID id) {
+    public ContentResponse getContentById(@RequestParam("id") UUID id) {
 
         ContentEntity content = contentService.getContentByContentId(id);
 
@@ -37,17 +37,17 @@ public class ContentController {
 
     @GetMapping("/contentData")
     @DefaultMessage("Get successfully")
-    public ContentResponse getContentData(@RequestParam UUID topicId, @RequestParam String code) {
+    public ContentResponse getContentData(@RequestParam("topicId") UUID topicId, @RequestParam("code") String code) {
 
         ContentEntity content = contentService.getContentByTopicIdAndCode(topicId, code);
 
         return ContentMapper.INSTANCE.toContentResponse(content);
     }
 
-    @DeleteMapping("/{contentId}")
+    @DeleteMapping("/{contentId:.+}")
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Delete successfully")
-    public void deleteContentData(@PathVariable UUID contentId) {
+    public void deleteContentData(@PathVariable("contentId") UUID contentId) {
 
         contentService.deleteContent(contentId);
     }
@@ -72,10 +72,10 @@ public class ContentController {
         return ContentMapper.INSTANCE.toContentResponse(content);
     }
 
-    @PutMapping(value = "/{contentId}/update-content")
+    @PutMapping(value = "/{contentId:.+}/update-content")
     @DefaultMessage("Update successfully")
     public ContentResponse updateContent(
-            @PathVariable UUID contentId,
+            @PathVariable("contentId") UUID contentId,
             @RequestBody ContentRequest contentRequest
     ) {
 

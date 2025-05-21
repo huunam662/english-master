@@ -41,7 +41,7 @@ public class FileStorageController {
     @GetMapping("/show/{fileName:.+}")
     @DefaultMessage("Load file successfully")
     public ResourceResponse showImage(
-            @PathVariable String fileName
+            @PathVariable("fileName") String fileName
     ) {
 
         ResourceResponse resourceResponse = fileStorageService.load(fileName);

@@ -40,7 +40,7 @@ public class AnswerController {
     @PutMapping(value = "/{answerId:.+}/update")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Save successfully")
-    public AnswerResponse updateAnswer(@PathVariable UUID answerId, @RequestBody AnswerRequest answerRequest) {
+    public AnswerResponse updateAnswer(@PathVariable("answerId") UUID answerId, @RequestBody AnswerRequest answerRequest) {
 
         answerRequest.setAnswerId(answerId);
 
@@ -52,7 +52,7 @@ public class AnswerController {
     @DeleteMapping(value = "/{answerId:.+}/delete")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Delete successfully")
-    public void deleteAnswer(@PathVariable UUID answerId) {
+    public void deleteAnswer(@PathVariable("answerId") UUID answerId) {
 
         answerService.deleteAnswer(answerId);
     }
@@ -60,7 +60,7 @@ public class AnswerController {
     @GetMapping(value = "/{answerId:.+}/getDetailAnswer")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Detail successfully")
-    public AnswerResponse getDetailAnswer(@PathVariable UUID answerId) {
+    public AnswerResponse getDetailAnswer(@PathVariable("answerId") UUID answerId) {
 
         AnswerEntity answer = answerService.getAnswerById(answerId);
 
@@ -70,7 +70,7 @@ public class AnswerController {
     @GetMapping(value = "/{answerId:.+}/checkCorrect")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Check successfully")
-    public AnswerCorrectResponse checkCorrectAnswer(@PathVariable UUID answerId) {
+    public AnswerCorrectResponse checkCorrectAnswer(@PathVariable("answerId") UUID answerId) {
 
         AnswerEntity answer = answerService.getAnswerById(answerId);
 

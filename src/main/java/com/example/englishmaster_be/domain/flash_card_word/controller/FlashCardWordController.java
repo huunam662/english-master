@@ -32,7 +32,7 @@ public class FlashCardWordController {
     @DeleteMapping(value = "/{flashCardWordId:.+}/removeWord")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Delete successfully")
-    public void removeWord(@PathVariable UUID flashCardWordId){
+    public void removeWord(@PathVariable("flashCardWordId") UUID flashCardWordId){
 
         flashCardWordService.delete(flashCardWordId);
     }
@@ -41,7 +41,7 @@ public class FlashCardWordController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Save successfully")
     public FlashCardWordResponse addWordToFlashCard(
-            @PathVariable UUID flashCardId,
+            @PathVariable("flashCardId") UUID flashCardId,
             @RequestBody FlashCardWordRequest flashCardWordRequest
     ){
 
@@ -57,7 +57,7 @@ public class FlashCardWordController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Save successfully")
     public FlashCardWordResponse updateWord(
-            @PathVariable UUID flashCardWordId,
+            @PathVariable("flashCardWordId") UUID flashCardWordId,
             @RequestBody FlashCardWordRequest flashCardWordRequest
     ){
 
