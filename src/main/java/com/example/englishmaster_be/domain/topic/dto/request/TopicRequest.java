@@ -40,8 +40,6 @@ public class TopicRequest {
 	@Schema(example = "01:20:30")
 	String workTime;
 
-	Integer numberQuestion;
-
 	String topicImage;
 
 	List<UUID> listPart;

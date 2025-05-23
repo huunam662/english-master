@@ -1,8 +1,5 @@
 package com.example.englishmaster_be.domain.status.dto.response;
 
-import com.example.englishmaster_be.domain.type.dto.response.TypeResponse;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -21,7 +18,5 @@ public class StatusResponse {
     String statusName;
 
     Boolean flag;
-
-    TypeResponse type;
 
 }

@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.type.dto.response;
+package com.example.englishmaster_be.domain.pack_type.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -7,16 +7,12 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TypeResponse {
+public class PackTypeKeyResponse {
 
-    UUID typeId;
-
-    String typeName;
-
-    String nameSlug;
+    UUID packTypeId;
 
 }

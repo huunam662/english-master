@@ -74,9 +74,9 @@ public class AuthController {
 
     @PostMapping("/change/password/forgot")
     @DefaultMessage("Update password successful.")
-    public UserAuthResponse changePasswordForgot(@Valid @RequestBody UserChangePwForgotRequest changePwForgotRequest) {
+    public void changePasswordForgot(@Valid @RequestBody UserChangePwForgotRequest changePwForgotRequest) {
 
-        return authService.changePasswordForgot(changePwForgotRequest);
+        authService.changePasswordForgot(changePwForgotRequest);
     }
 
 

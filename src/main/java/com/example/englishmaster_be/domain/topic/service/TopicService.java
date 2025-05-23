@@ -164,6 +164,7 @@ public class TopicService implements ITopicService {
         topic.setUserUpdate(user);
         topic.setPack(pack);
         topic.setEnable(Boolean.TRUE);
+        topic.setNumberQuestion(0);
 
         return topicRepository.save(topic);
     }
