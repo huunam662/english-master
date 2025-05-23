@@ -210,11 +210,11 @@ public class AuthService implements IAuthService {
 
     @Transactional
     @Override
-    public UserAuthResponse changePasswordForgot(UserChangePwForgotRequest changePasswordRequest) {
+    public void changePasswordForgot(UserChangePwForgotRequest changePasswordRequest) {
 
         OtpEntity otpEntity = otpService.getByOtp(changePasswordRequest.getOtpCode());
 
-        return authUtil.saveNewPassword(otpEntity.getUser(), changePasswordRequest.getNewPassword(), changePasswordRequest.getOtpCode());
+        authUtil.saveNewPassword(otpEntity.getUser(), changePasswordRequest.getNewPassword(), changePasswordRequest.getOtpCode());
     }
 
     @Transactional

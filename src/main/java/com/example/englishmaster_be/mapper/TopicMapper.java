@@ -30,20 +30,9 @@ public interface TopicMapper {
     TopicBasicResponse toTopicBasicResponse(TopicEntity topicEntity);
 
     @Mapping(target = "topicId", ignore = true)
-    @Mapping(target = "numberQuestion",  expression = "java(calculateNumberQuestion(topicEntity))")
     @Mapping(target = "topicImage", ignore = true)
     @Mapping(target = "workTime", expression = "java(LocalTime.parse(topicRequest.getWorkTime()))")
     void flowToTopicEntity(TopicRequest topicRequest, @MappingTarget TopicEntity topicEntity);
-
-    default int calculateNumberQuestion(TopicEntity topicEntity) {
-        int numberQuestion = 0;
-        if (topicEntity!= null && topicEntity.getQuestions() != null) {
-            for (QuestionEntity question : topicEntity.getQuestions()) {
-                numberQuestion+=question.getNumberOfQuestionsChild();
-            }
-        }
-        return numberQuestion;
-    }
 
 
     void flowToTopicEntity(ExcelTopicResponse topicByExcelFileResponse, @MappingTarget TopicEntity topicEntity);

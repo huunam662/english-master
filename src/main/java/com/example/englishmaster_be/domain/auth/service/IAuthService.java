@@ -21,7 +21,7 @@ public interface IAuthService {
 
     UserAuthResponse changePassword(UserChangePasswordRequest changePasswordRequest);
 
-    UserAuthResponse changePasswordForgot(UserChangePwForgotRequest changePasswordRequest);
+    void changePasswordForgot(UserChangePwForgotRequest changePasswordRequest);
 
     UserAuthResponse refreshToken(UserRefreshTokenRequest refreshTokenRequest);
 

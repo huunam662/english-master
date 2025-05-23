@@ -47,15 +47,6 @@ public class StatusController {
         return StatusMapper.INSTANCE.toStatusResponse(status);
     }
 
-    @GetMapping("/getStatusByTypeId/{id}")
-    @DefaultMessage("List status successfully")
-    public List<StatusResponse> getStatusByTypeId(@PathVariable("id") UUID id) {
-
-        List<StatusEntity> statusEntityList = statusService.getAllStatusByType(id);
-
-        return StatusMapper.INSTANCE.toStatusResponseList(statusEntityList);
-    }
-
     @GetMapping("/getStatusById/{id}")
     @DefaultMessage("Get status successfully")
     public StatusResponse getStatusById(@PathVariable("id") UUID id) {
