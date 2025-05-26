@@ -14,6 +14,7 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.List;
 import java.util.UUID;
 
@@ -75,46 +76,46 @@ public class QuestionEntity {
     @Column(name = "update_at")
     LocalDateTime updateAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by", referencedColumnName = "id")
     UserEntity userCreate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "update_by", referencedColumnName = "id")
     UserEntity userUpdate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "part_id", referencedColumnName = "id")
     PartEntity part;
     
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "topic_question",
             joinColumns = @JoinColumn(name = "question_id"),
             inverseJoinColumns = @JoinColumn(name = "topic_id")
     )
-    List<TopicEntity> topics;
+    Set<TopicEntity> topics;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_group", referencedColumnName = "id")
     QuestionEntity questionGroupParent;
 
-    @OneToMany(mappedBy = "questionGroupParent")
-    List<QuestionEntity> questionGroupChildren;
+    @OneToMany(mappedBy = "questionGroupParent", fetch = FetchType.LAZY)
+    Set<QuestionEntity> questionGroupChildren;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL)
-    List<AnswerEntity> answers;
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    Set<AnswerEntity> answers;
 
-    @OneToMany(mappedBy = "questionChild", cascade = CascadeType.ALL)
-    List<MockTestDetailEntity> detailMockTests;
+    @OneToMany(mappedBy = "questionChild", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    Set<MockTestDetailEntity> detailMockTests;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "question_content",
             joinColumns = @JoinColumn(name = "question_id"),
             inverseJoinColumns = @JoinColumn(name = "content_id")
     )
-    List<ContentEntity> contentCollection;
+    Set<ContentEntity> contentCollection;
 
     @Column(name = "has_hints")
     Boolean hasHints;

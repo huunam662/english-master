@@ -11,6 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,25 +51,25 @@ public class ContentEntity {
     @Column(name = "update_at")
     LocalDateTime updateAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by", referencedColumnName = "id")
     UserEntity userCreate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "update_by", referencedColumnName = "id")
     UserEntity userUpdate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_id", referencedColumnName = "id")
     TopicEntity topic;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "question_content",
             joinColumns = @JoinColumn(name = "content_id"),
             inverseJoinColumns = @JoinColumn(name = "question_id")
     )
-    List<QuestionEntity> questions;
+    Set<QuestionEntity> questions;
 
     @PrePersist
     void onCreate() {

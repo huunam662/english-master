@@ -12,6 +12,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.List;
 import java.util.UUID;
 
@@ -66,16 +67,16 @@ public class PartEntity {
     @JoinColumn(name = "update_by", referencedColumnName = "id")
     UserEntity userUpdate;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "topic_part",
             joinColumns = @JoinColumn(name = "part_id"),
             inverseJoinColumns = @JoinColumn(name = "topic_id")
     )
-	List<TopicEntity> topics;
+    Set<TopicEntity> topics;
 
-    @OneToMany(mappedBy = "part")
-    List<QuestionEntity> questions;
+    @OneToMany(mappedBy = "part", fetch = FetchType.LAZY)
+    Set<QuestionEntity> questions;
 
 
 

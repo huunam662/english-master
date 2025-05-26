@@ -247,7 +247,7 @@ public class QuestionService implements IQuestionService {
                 .build();
 
         if (question.getContentCollection() == null) {
-            question.setContentCollection(new ArrayList<>());
+            question.setContentCollection(new HashSet<>());
         }
 
         question.getContentCollection().add(content);
@@ -332,7 +332,7 @@ public class QuestionService implements IQuestionService {
         QuestionEntity question = getQuestionById(questionId);
 
         if (question.getContentCollection() == null)
-            question.setContentCollection(new ArrayList<>());
+            question.setContentCollection(new HashSet<>());
 
         for (var file : uploadMultiFileDTO) {
 
@@ -411,21 +411,13 @@ public class QuestionService implements IQuestionService {
 
         QuestionEntity question = getQuestionById(questionId);
 
-        return question.getQuestionGroupChildren();
+        return question.getQuestionGroupChildren().stream().toList();
     }
 
     @Override
     public List<QuestionPartResponse> getAllPartQuestions(String partName, UUID topicId) {
 
-        Boolean isAdmin = userService.currentUserIsAdmin();
-
-        TopicEntity topicEntity = topicService.getTopicById(topicId);
-
-        List<PartEntity> partEntityList = partQueryFactory.findAllPartsByNameAndTopic(partName, topicEntity);
-
-        List<QuestionEntity> questionEntityList = questionQueryFactory.findAllQuestionsParentBy(topicEntity, partEntityList);
-
-        return QuestionMapper.INSTANCE.toQuestionPartResponseList(questionEntityList, partEntityList, topicEntity, isAdmin);
+        return topicService.getQuestionOfToTopicPart(topicId, partName);
     }
 
 

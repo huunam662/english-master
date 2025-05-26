@@ -41,7 +41,7 @@ public class SessionActiveEntity {
     @CreationTimestamp
     LocalDateTime createAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     UserEntity user;
 

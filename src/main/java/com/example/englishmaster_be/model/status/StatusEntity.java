@@ -7,7 +7,10 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.Cascade;
 import org.hibernate.annotations.CascadeType;
+
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -33,8 +36,8 @@ public class StatusEntity {
     @Column(name = "flag")
     Boolean flag;
 
-    @OneToMany(mappedBy = "status")
+    @OneToMany(mappedBy = "status", fetch = FetchType.LAZY)
     @Cascade({CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
-    List<TopicEntity> topicList;
+    Set<TopicEntity> topicList;
 
 }

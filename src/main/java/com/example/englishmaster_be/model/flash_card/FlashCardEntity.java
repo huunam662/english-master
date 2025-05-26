@@ -11,6 +11,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.List;
 import java.util.UUID;
 
@@ -50,16 +51,16 @@ public class FlashCardEntity {
     @Column(name = "update_at")
     LocalDateTime updateAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by", referencedColumnName = "id")
     UserEntity userCreate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "update_by", referencedColumnName = "id")
     UserEntity userUpdate;
 
-    @OneToMany(mappedBy = "flashCard", cascade = CascadeType.ALL)
-    List<FlashCardWordEntity> flashCardWords;
+    @OneToMany(mappedBy = "flashCard", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    Set<FlashCardWordEntity> flashCardWords;
 
 
 

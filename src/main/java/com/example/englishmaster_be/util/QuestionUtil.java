@@ -12,36 +12,11 @@ import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 public class QuestionUtil {
 
-    public static List<QuestionPartResponse> parseQuestionPartResponseList(List<QuestionEntity> questionEntityList, List<PartEntity> partEntityList, TopicEntity topicEntity, Boolean isAdmin){
-
-        if(questionEntityList == null) return null;
-
-        return partEntityList.stream().map(
-                partEntity -> {
-
-                    List<QuestionEntity> questionEntityListFilter = questionEntityList.stream().filter(
-                            questionEntity -> questionEntity.getPart().equals(partEntity)
-                                    && questionEntity.getTopics().contains(topicEntity)
-                    ).toList();
-
-                    QuestionPartResponse questionPartResponse = QuestionMapper.INSTANCE.toQuestionPartResponse(questionEntityListFilter, partEntity, topicEntity, isAdmin);
-
-                    questionEntityList.removeAll(questionEntityListFilter);
-
-                    return questionPartResponse;
-
-                }
-        ).toList();
-    }
-
-    public static List<QuestionResponse> parseQuestionResponseList(List<QuestionEntity> questionEntityList, TopicEntity topicEntity, PartEntity partEntity, Boolean isAdmin){
+    public static List<QuestionResponse> parseQuestionResponseList(Collection<QuestionEntity> questionEntityList, PartEntity partEntity){
 
         if(questionEntityList == null) return null;
 
@@ -50,11 +25,20 @@ public class QuestionUtil {
         return questionEntityList.stream().map(
                 questionEntity -> {
 
-                    QuestionResponse questionResponse = QuestionMapper.INSTANCE.toQuestionResponse(questionEntity, topicEntity, partEntity, isAdmin);
+                    QuestionResponse questionResponse;
 
-                    if(questionResponse == null) return null;
+                    Boolean isQuestionParent = questionEntity.getIsQuestionParent();
 
-                    questionResponse.setNumberOfQuestionsChild(questionEntity.getQuestionGroupChildren() != null ? questionEntity.getQuestionGroupChildren().size() : 0);
+                    if(isQuestionParent) {
+
+                        questionResponse = QuestionMapper.INSTANCE.toQuestionResponse(questionEntity);
+                        questionResponse.setNumberOfQuestionsChild(questionEntity.getQuestionGroupChildren() != null ? questionEntity.getQuestionGroupChildren().size() : 0);
+                    }
+                    else {
+
+                        questionResponse = QuestionMapper.INSTANCE.toQuestionChildResponse(questionEntity);
+                        questionResponse.setNumberOfQuestionsChild(0);
+                    }
 
                     return questionResponse;
                 }
@@ -62,13 +46,13 @@ public class QuestionUtil {
     }
 
 
-    public static List<QuestionEntity> shuffleQuestionsAndAnswers(List<QuestionEntity> questionParentsList, PartEntity partEntity) {
+    public static List<QuestionEntity> shuffleQuestionsAndAnswers(Collection<QuestionEntity> questionParentsList, PartEntity partEntity) {
 
         if(questionParentsList == null || partEntity == null) return null;
 
-        questionParentsList = new ArrayList<>(questionParentsList);
+        List<QuestionEntity> questionParentsShuffle = new ArrayList<>(questionParentsList);
 
-        Collections.shuffle(questionParentsList);
+        Collections.shuffle(questionParentsShuffle);
 
         List<PartType> partTypesNotShuffle = List.of(PartType.PART_1_TOEIC, PartType.PART_2_TOEIC);
 
@@ -76,11 +60,11 @@ public class QuestionUtil {
                 partType -> partType.getType().equalsIgnoreCase(partEntity.getPartType())
         );
 
-        boolean partTypeIsTextCompletion = partEntity.getPartType().equalsIgnoreCase("Text Completion");
+        boolean partTypeIsTextCompletion = partEntity.getPartType().equalsIgnoreCase(PartType.PART_6_TOEIC.getType());
 
-        questionParentsList.forEach(questionEntity -> {
+        questionParentsShuffle.forEach(questionEntity -> {
 
-            if(questionEntity.getQuestionGroupChildren() != null) {
+            if(questionEntity.getIsQuestionParent() && questionEntity.getQuestionGroupChildren() != null) {
 
                 List<QuestionEntity> questionsList4Shuffle = new ArrayList<>(questionEntity.getQuestionGroupChildren());
 
@@ -93,7 +77,7 @@ public class QuestionUtil {
                             if (questionGroupChildEntity.getQuestionGroupChildren() != null)
                                 questionGroupChildEntity.setQuestionGroupChildren(null);
 
-                            if(!notShuffleAnswer){
+                            if(!notShuffleAnswer && !questionGroupChildEntity.getIsQuestionParent()){
 
                                 if(questionGroupChildEntity.getAnswers() != null){
 
@@ -101,22 +85,22 @@ public class QuestionUtil {
 
                                     Collections.shuffle(answersList4Shuffle);
 
-                                    questionGroupChildEntity.setAnswers(answersList4Shuffle);
+                                    questionGroupChildEntity.setAnswers(new HashSet<>(answersList4Shuffle));
                                 }
                             }
 
                         }
                 );
 
-                questionEntity.setQuestionGroupChildren(questionsList4Shuffle);
+                questionEntity.setQuestionGroupChildren(new HashSet<>(questionsList4Shuffle));
             }
 
         });
 
-        return questionParentsList;
+        return new ArrayList<>(questionParentsShuffle);
     }
 
-    public static int totalQuestionChildOf(List<QuestionEntity> questionParents) {
+    public static int totalQuestionChildOf(Collection<QuestionEntity> questionParents) {
 
         if(questionParents == null) return 0;
 
@@ -132,7 +116,7 @@ public class QuestionUtil {
         ).reduce(0, Integer::sum);
     }
 
-    public static int totalQuestionChildOf(List<PartEntity> partEntityList, TopicEntity topicEntity){
+    public static int totalQuestionChildOf(Collection<PartEntity> partEntityList, TopicEntity topicEntity){
 
         if(partEntityList == null || topicEntity == null) return 0;
 
@@ -145,7 +129,7 @@ public class QuestionUtil {
                 ).reduce(0, Integer::sum);
     }
 
-    public static int totalScoreQuestionsParent(List<QuestionEntity> questionEntityList){
+    public static int totalScoreQuestionsParent(Collection<QuestionEntity> questionEntityList){
 
         if(questionEntityList == null) return 0;
 

@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper(builder = @Builder(disableBuilder = true))
@@ -19,7 +20,7 @@ public interface FlashCardMapper {
 
     FlashCardResponse toFlashCardResponse(FlashCardEntity flashCard);
 
-    List<FlashCardResponse> toFlashCardResponseList(List<FlashCardEntity> flashCardList);
+    List<FlashCardResponse> toFlashCardResponseList(Collection<FlashCardEntity> flashCardList);
 
     @Mapping(target = "flashCardWords", expression = "java(FlashCardWordMapper.INSTANCE.toFlashCardWordResponseList(flashCard.getFlashCardWords()))")
     FlashCardWordListResponse toFlashCardListWordResponse(FlashCardEntity flashCard);

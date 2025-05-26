@@ -7,6 +7,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper(builder = @Builder(disableBuilder = true))
@@ -23,6 +24,6 @@ public interface CommentMapper {
     @Mapping(target = "hasCommentChildren", expression = "java(comment != null && comment.getCommentChildren() != null && !comment.getCommentChildren().isEmpty())")
     CommentResponse toCommentResponse(CommentEntity comment);
 
-    List<CommentResponse> toCommentResponseList(List<CommentEntity> commentList);
+    List<CommentResponse> toCommentResponseList(Collection<CommentEntity> commentList);
 
 }

@@ -18,5 +18,12 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
     // Lấy danh sách người dùng lâu không đăng nhập
     @Query("SELECT u FROM UserEntity u WHERE u.lastLogin < :cutoffDate")
     List<UserEntity> findUsersNotLoggedInSince(@Param("cutoffDate") LocalDateTime cutoffDate);
+
+    @Query("""
+        SELECT u, r FROM UserEntity u
+        INNER JOIN RoleEntity r ON u.role.roleId = r.roleId
+        WHERE u.email = :email
+    """)
+    Optional<UserEntity> findUserJoinRoleByEmail(@Param("email") String email);
 }
 

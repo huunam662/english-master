@@ -11,6 +11,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Set;
 import java.util.List;
 import java.util.UUID;
 
@@ -64,16 +65,16 @@ public class MockTestEntity {
     @Column(name = "update_at")
     LocalDateTime updateAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     UserEntity user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_id", referencedColumnName = "id")
     TopicEntity topic;
 
-    @OneToMany(mappedBy = "mockTest",cascade = CascadeType.ALL,orphanRemoval = true)
-    List<MockTestResultEntity> mockTestResults;
+    @OneToMany(mappedBy = "mockTest",cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    Set<MockTestResultEntity> mockTestResults;
 
     @PrePersist
     void onCreate() {

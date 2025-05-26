@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper(builder = @Builder(disableBuilder = true))
@@ -19,7 +20,7 @@ public interface FeedbackMapper {
     @Mapping(target = "feedbackId", source = "id")
     FeedbackResponse toFeedbackResponse(FeedbackEntity feedback);
 
-    List<FeedbackResponse> toFeedbackResponseList(List<FeedbackEntity> feedbackList);
+    List<FeedbackResponse> toFeedbackResponseList(Collection<FeedbackEntity> feedbackList);
 
     @Mapping(target = "id", ignore = true)
     FeedbackEntity toFeedbackEntity(FeedbackRequest feedbackRequest);

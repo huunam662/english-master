@@ -29,5 +29,34 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID> {
 
     @Query("SELECT t.topicImage FROM TopicEntity t order by t.topicId")
     List<String> findAllTopicImages();
+
+    @Query(value = """
+       SELECT DISTINCT t FROM TopicEntity t
+        LEFT JOIN FETCH t.parts p
+        LEFT JOIN FETCH p.questions qp
+        LEFT JOIN FETCH qp.questionGroupChildren qgc
+        LEFT JOIN FETCH qgc.answers a
+        LEFT JOIN FETCH qp.contentCollection ctqp
+        LEFT JOIN FETCH qgc.contentCollection ctqgc
+        WHERE t.topicId = :topicId
+            AND LOWER(p.partName) = LOWER(:partName)
+            AND qp.isQuestionParent = TRUE
+            AND qgc.isQuestionParent = FALSE
+    """)
+    Optional<TopicEntity> findTopicQuestionsFromTopicAndPart(@Param("topicId") UUID topicId, @Param("partName") String partName);
+
+    @Query(value = """
+        SELECT DISTINCT t FROM TopicEntity t
+        LEFT JOIN FETCH t.parts p
+        LEFT JOIN FETCH p.questions qp
+        LEFT JOIN FETCH qp.questionGroupChildren qgc
+        LEFT JOIN FETCH qgc.answers a
+        LEFT JOIN FETCH qp.contentCollection ctqp
+        LEFT JOIN FETCH qgc.contentCollection ctqgc
+        WHERE t.topicId = :topicId
+            AND qp.isQuestionParent = TRUE
+            AND qgc.isQuestionParent = FALSE
+    """)
+    Optional<TopicEntity> findTopicQuestionsFromTopic(@Param("topicId") UUID topicId);
 }
 

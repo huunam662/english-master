@@ -18,7 +18,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 import java.sql.Time;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -81,44 +83,44 @@ public class TopicEntity {
     @Column(name = "update_time")
     LocalDateTime updateTime;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by", referencedColumnName = "id")
     UserEntity userCreate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "update_by", referencedColumnName = "id")
     UserEntity userUpdate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pack_id", referencedColumnName = "id")
     PackEntity pack;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id", referencedColumnName = "id")
     StatusEntity status;
 
-    @OneToMany(mappedBy = "topic")
-    List<ContentEntity> contents;
+    @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY)
+    Set<ContentEntity> contents;
 
-    @OneToMany(mappedBy = "topic")
-    List<CommentEntity> comments;
+    @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY)
+    Set<CommentEntity> comments;
 
-    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, orphanRemoval = true)
-    List<MockTestEntity> mockTests;
+    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    Set<MockTestEntity> mockTests;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "topic_question",
             joinColumns = @JoinColumn(name = "topic_id"),
             inverseJoinColumns = @JoinColumn(name = "question_id")
     )
-    List<QuestionEntity> questions;
+    Set<QuestionEntity> questions;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(name = "topic_part",
             joinColumns = @JoinColumn(name = "topic_id"),
             inverseJoinColumns = @JoinColumn(name = "part_id")
     )
-    List<PartEntity> parts;
+    Set<PartEntity> parts;
 
     @PrePersist
     void onCreate() {

@@ -17,10 +17,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 
 @Entity
@@ -70,30 +67,30 @@ public class UserEntity implements UserDetails {
     @Column(name = "update_at")
     LocalDateTime updateAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role", referencedColumnName = "id")
     RoleEntity role;
 
-    @OneToMany(mappedBy = "user")
-    List<OtpEntity> OTPs;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    Set<OtpEntity> OTPs;
 
-    @OneToMany(mappedBy = "user")
-    List<SessionActiveEntity> sessionActives;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    Set<SessionActiveEntity> sessionActives;
 
-    @OneToMany(mappedBy = "user")
-    List<InvalidTokenEntity> invalidTokens;
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    Set<InvalidTokenEntity> invalidTokens;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    List<SessionActiveEntity> confirmTokens;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    Set<SessionActiveEntity> confirmTokens;
 
-    @OneToMany(mappedBy = "userComment", cascade = CascadeType.ALL)
-    Collection<CommentEntity> comments;
+    @OneToMany(mappedBy = "userComment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    Set<CommentEntity> comments;
 
-    @OneToMany(mappedBy = "userCreate", cascade = CascadeType.ALL)
-    List<NewsEntity> news;
+    @OneToMany(mappedBy = "userCreate", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    Set<NewsEntity> news;
 
-    @OneToMany(mappedBy = "userCreate", cascade = CascadeType.ALL)
-    List<FlashCardEntity> flashCards;
+    @OneToMany(mappedBy = "userCreate", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    Set<FlashCardEntity> flashCards;
 
 
     @PrePersist
