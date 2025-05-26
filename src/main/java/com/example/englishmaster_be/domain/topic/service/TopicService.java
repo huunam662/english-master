@@ -491,7 +491,12 @@ public class TopicService implements ITopicService {
     @Override
     public List<QuestionPartResponse> getQuestionOfToTopicPart(UUID topicId, String partName) {
 
-        return questionService.getAllPartQuestions(partName, topicId);
+        TopicEntity topic = topicRepository.findTopicQuestionsFromTopicAndPart(topicId, partName)
+                .orElseThrow(
+                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND)
+                );
+
+        return QuestionMapper.INSTANCE.toQuestionPartResponseList(topic);
     }
 
     @Transactional
