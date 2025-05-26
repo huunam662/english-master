@@ -15,4 +15,5 @@ public class UserLogoutRequest {
 
     UUID refreshToken;
 
+    String accessToken;
 }

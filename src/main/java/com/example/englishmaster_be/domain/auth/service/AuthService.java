@@ -66,12 +66,6 @@ public class AuthService implements IAuthService {
 
     IOtpService otpService;
 
-    UserRepository userRepository;
-
-    SessionActiveRepository sessionActiveRepository;
-
-    RoleRepository roleRepository;
-
 
     @Transactional
     @Override
@@ -86,13 +80,13 @@ public class AuthService implements IAuthService {
         if(!userDetails.isEnabled())
             throw new ErrorHolder(Error.ACCOUNT_DISABLED);
 
-        UserEntity user = userService.getUserByEmail(userDetails.getUsername());
+        UserEntity user = (UserEntity) userDetails;
 
-        String jwtToken = jwtUtil.generateToken(user);
+        String jwtToken = jwtUtil.generateToken(userDetails);
 
         SessionActiveEntity sessionActive = sessionActiveService.saveSessionActive(user, jwtToken);
 
-        return UserMapper.INSTANCE.toUserAuthResponse(sessionActive, jwtToken);
+        return UserMapper.INSTANCE.toUserAuthResponse(sessionActive.getCode(), jwtToken, user);
     }
 
 
@@ -101,29 +95,27 @@ public class AuthService implements IAuthService {
     @Override
     public void registerUser(UserRegisterRequest userRegisterRequest) {
 
-        UserEntity user = userRepository.findByEmail(userRegisterRequest.getEmail()).orElse(null);
+        UserEntity user = userService.getUserByEmail(userRegisterRequest.getEmail(), false);
 
         if(user != null && user.getEnabled())
             throw new ErrorHolder(Error.BAD_REQUEST, "Email is used.");
 
         UserEntity userRegister = UserMapper.INSTANCE.toUserEntity(userRegisterRequest);
 
-        if(user != null)
-            userRegister.setUserId(user.getUserId());
+        if(user != null) userRegister.setUserId(user.getUserId());
 
         userRegister.setPassword(passwordEncoder.encode(userRegisterRequest.getPassword()));
-        userRegister.setRole(roleRepository.findByRoleName(Role.USER));
-        userRegister.setEnabled(Boolean.FALSE);
+        userRegister.setEnabled(false);
 
         if(user != null && user.getConfirmTokens() != null)
-            sessionActiveRepository.deleteByUserAndType(user, SessionActiveType.CONFIRM);
+            sessionActiveService.deleteByUserIdAndType(user.getUserId(), SessionActiveType.CONFIRM);
 
-        userRegister = userRepository.save(userRegister);
+        userRegister = userService.saveUser(userRegister);
 
-        UserConfirmTokenResponse confirmationTokenResponse = this.createConfirmationToken(userRegister);
+        SessionActiveEntity sessionConfirm = sessionActiveService.saveForUser(userRegister, SessionActiveType.CONFIRM);
 
         try {
-            mailerUtil.sendConfirmationEmail(userRegister.getEmail(), confirmationTokenResponse.getCode());
+            mailerUtil.sendConfirmRegister(userRegister.getEmail(), sessionConfirm.getCode().toString());
         } catch (IOException | MessagingException e) {
             throw new ErrorHolder(Error.SEND_EMAIL_FAILURE);
         }
@@ -132,43 +124,18 @@ public class AuthService implements IAuthService {
 
     @Transactional
     @Override
-    public UserConfirmTokenResponse createConfirmationToken(UserEntity user) {
-
-        SessionActiveEntity sessionActive = SessionActiveEntity.builder()
-                .type(SessionActiveType.CONFIRM)
-                .user(user)
-                .code(UUID.randomUUID())
-                .createAt(LocalDateTime.now())
-                .build();
-
-        sessionActive = sessionActiveRepository.save(sessionActive);
-
-        return ConfirmationTokenMapper.INSTANCE.toConfirmationTokenResponse(sessionActive);
-    }
-
-
-    @Transactional
-    @Override
     public void confirmRegister(UUID sessionActiveCode) {
 
-        SessionActiveEntity confirmToken = sessionActiveRepository.findByCodeAndType(sessionActiveCode, SessionActiveType.CONFIRM);
+        SessionActiveEntity sessionConfirm = sessionActiveService.getByCodeAndType(sessionActiveCode, SessionActiveType.CONFIRM);
 
-        if (confirmToken == null)
-            throw new ErrorHolder(Error.RESOURCE_NOT_FOUND);
-
-        if (confirmToken.getUser().getEnabled())
-            throw new ErrorHolder(Error.BAD_REQUEST, "Account had been verified.");
-
-        if ((confirmToken.getCreateAt().plusMinutes(5)).isBefore(LocalDateTime.now()))
+        if ((sessionConfirm.getCreateAt().plusMinutes(5)).isBefore(LocalDateTime.now()))
             throw new ErrorHolder(Error.BAD_REQUEST, "Verification session had been expired, try again.");
 
-        UserEntity user = confirmToken.getUser();
+        UserEntity user = sessionConfirm.getUser();
 
-        user.setEnabled(Boolean.TRUE);
+        userService.enabledUser(user.getUserId());
 
-        userRepository.save(user);
-
-        sessionActiveRepository.deleteByUserAndType(user, SessionActiveType.CONFIRM);
+        sessionActiveService.deleteByUserIdAndType(user.getUserId(), SessionActiveType.CONFIRM);
     }
 
 
@@ -234,39 +201,46 @@ public class AuthService implements IAuthService {
     @Override
     public UserAuthResponse refreshToken(UserRefreshTokenRequest refreshTokenDTO) {
 
-        UUID refresh = refreshTokenDTO.getRequestRefresh();
+        UUID refreshToken = refreshTokenDTO.getRequestRefresh();
 
-        SessionActiveEntity sessionActive = sessionActiveService.getByCode(refresh);
+        SessionActiveEntity sessionActive = sessionActiveService.getByCodeAndType(refreshToken, SessionActiveType.REFRESH_TOKEN);
 
         if (sessionActive == null)
             throw new ErrorHolder(Error.BAD_REQUEST, "Invalid refresh.");
 
-        sessionActiveService.verifyExpiration(sessionActive);
+        if(sessionActiveService.isExpirationToken(sessionActive))
+            throw new ErrorHolder(Error.BAD_REQUEST, "Refresh session was expired.");
 
         String newToken = jwtUtil.generateToken(sessionActive.getUser());
 
         SessionActiveEntity sessionActiveNew = sessionActiveService.saveSessionActive(sessionActive.getUser(), newToken);
 
-        invalidTokenService.insertInvalidToken(sessionActive, InvalidTokenType.REPLACED);
+        invalidTokenService.saveInvalidToken(
+                refreshTokenDTO.getRequestToken(),
+                sessionActive.getUser().getUserId(),
+                InvalidTokenType.EXPIRED
+        );
 
-        sessionActiveRepository.delete(sessionActive);
-
-        return UserMapper.INSTANCE.toUserAuthResponse(sessionActiveNew, newToken);
+        return UserMapper.INSTANCE.toUserAuthResponse(sessionActiveNew.getCode(), newToken, sessionActive.getUser());
     }
 
 
     @Override
     public void logoutOf(UserLogoutRequest userLogoutRequest) {
 
-        authUtil.logoutUser();
+        UserEntity user = userService.currentUser();
 
         SessionActiveEntity sessionActive = sessionActiveService.getByCode(userLogoutRequest.getRefreshToken());
 
         if(sessionActive != null){
 
-            invalidTokenService.insertInvalidToken(sessionActive, InvalidTokenType.LOGOUT);
+            invalidTokenService.saveInvalidToken(userLogoutRequest.getAccessToken(), user.getUserId(), InvalidTokenType.LOGOUT);
 
-            sessionActiveRepository.delete(sessionActive);
+            sessionActiveService.deleteByToken(userLogoutRequest.getAccessToken());
+
+            sessionActiveService.deleteByCode(userLogoutRequest.getRefreshToken());
         }
+
+        authUtil.logoutUser();
     }
 }

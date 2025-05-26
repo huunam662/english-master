@@ -64,7 +64,7 @@ public class AuthHelper {
 
         List<SessionActiveEntity> sessionActiveEntityList = sessionActiveService.getSessionActiveList(user.getUserId(), SessionActiveType.REFRESH_TOKEN);
 
-        invalidTokenService.insertInvalidTokenList(sessionActiveEntityList, InvalidTokenType.PASSWORD_CHANGE);
+        invalidTokenService.saveInvalidTokenList(sessionActiveEntityList, InvalidTokenType.PASSWORD_CHANGE);
 
         sessionActiveRepository.deleteAll(sessionActiveEntityList);
 
@@ -74,7 +74,7 @@ public class AuthHelper {
 
         logoutUser();
 
-        return UserMapper.INSTANCE.toUserAuthResponse(sessionActive, jwtToken);
+        return UserMapper.INSTANCE.toUserAuthResponse(sessionActive.getCode(), jwtToken, null);
     }
 
 

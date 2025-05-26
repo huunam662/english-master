@@ -3,6 +3,8 @@ package com.example.englishmaster_be.shared.service.session_active;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.SessionActiveType;
 import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.domain.auth.dto.response.UserConfirmTokenResponse;
+import com.example.englishmaster_be.mapper.ConfirmationTokenMapper;
 import com.example.englishmaster_be.model.session_active.SessionActiveQueryFactory;
 import com.example.englishmaster_be.model.session_active.SessionActiveRepository;
 import com.example.englishmaster_be.domain.user.service.IUserService;
@@ -38,9 +40,6 @@ public class SessionActiveService implements ISessionActiveService {
 
     SessionActiveRepository sessionActiveRepository;
 
-    UserRepository userRepository;
-
-
 
     @Override
     public SessionActiveEntity getByCode(UUID code) {
@@ -50,7 +49,10 @@ public class SessionActiveService implements ISessionActiveService {
 
     public SessionActiveEntity getByCodeAndType(UUID code, SessionActiveType type) {
 
-        return sessionActiveRepository.findByCodeAndType(code, type);
+        return sessionActiveRepository.findByCodeAndType(code, type)
+                .orElseThrow(
+                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND)
+                );
     }
 
     @Override
@@ -76,9 +78,7 @@ public class SessionActiveService implements ISessionActiveService {
 
         String tokenHash = jwtUtil.hashToHex(jwtToken);
 
-        user.setLastLogin(LocalDateTime.now(ZoneId.systemDefault()));
-
-        user = userRepository.save(user);
+        userService.updateLastLoginTime(user.getUserId(), LocalDateTime.now(ZoneId.systemDefault()));
 
         SessionActiveEntity sessionActiveEntity = SessionActiveEntity.builder()
                 .createAt(LocalDateTime.now(ZoneId.systemDefault()))
@@ -91,12 +91,24 @@ public class SessionActiveService implements ISessionActiveService {
         return sessionActiveRepository.save(sessionActiveEntity);
     }
 
+    @Transactional
     @Override
-    public void verifyExpiration(SessionActiveEntity token) {
+    public SessionActiveEntity saveForUser(UserEntity user, SessionActiveType type) {
 
-        if(token.getCreateAt().plusSeconds(jwtValue.getJwtRefreshExpirationMs()/1000).isBefore(LocalDateTime.now()))
-            throw new ErrorHolder(Error.BAD_REQUEST, "Refresh token was expired. Please make a new sign in request");
+        SessionActiveEntity sessionActive = SessionActiveEntity.builder()
+                .type(type)
+                .user(user)
+                .code(UUID.randomUUID())
+                .createAt(LocalDateTime.now())
+                .build();
 
+        return sessionActiveRepository.save(sessionActive);
+    }
+
+    @Override
+    public boolean isExpirationToken(SessionActiveEntity token) {
+
+        return token.getCreateAt().plusSeconds(jwtValue.getJwtRefreshExpirationMs()/1000).isBefore(LocalDateTime.now());
     }
 
     @Transactional
@@ -132,4 +144,26 @@ public class SessionActiveService implements ISessionActiveService {
         return sessionActiveRepository.findAllByUserAndType(user, sessionActiveType);
     }
 
+    @Transactional
+    @Override
+    public void deleteByUserIdAndType(UUID userId, SessionActiveType type) {
+
+        sessionActiveRepository.deleteByUserIdAndType(userId, type.name());
+    }
+
+    @Transactional
+    @Override
+    public void deleteByToken(String token) {
+
+        String tokenHash = jwtUtil.hashToHex(token);
+
+        sessionActiveRepository.deleteByToken(tokenHash);
+    }
+
+    @Transactional
+    @Override
+    public void deleteByCode(UUID code) {
+
+        sessionActiveRepository.deleteByCode(code);
+    }
 }

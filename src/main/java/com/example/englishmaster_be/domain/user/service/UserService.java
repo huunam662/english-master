@@ -35,6 +35,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -78,7 +79,12 @@ public class UserService implements IUserService, UserDetailsService {
         return userRepository.save(user);
     }
 
+    @Transactional
+    @Override
+    public UserEntity saveUser(UserEntity user) {
 
+        return userRepository.save(user);
+    }
 
     @Override
     public FilterResponse<?> getExamResultsUser(UserFilterRequest filterRequest) {
@@ -195,11 +201,26 @@ public class UserService implements IUserService, UserDetailsService {
     }
 
     @Override
+    public UserEntity getUserByEmail(String email, Boolean throwable) {
+
+        if(throwable) return getUserByEmail(email);
+
+        return userRepository.findByEmail(email).orElse(null);
+    }
+
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
         return userRepository.findUserJoinRoleByEmail(username).orElseThrow(
                 () -> new ErrorHolder(Error.BAD_CREDENTIALS)
         );
+    }
+
+    @Transactional
+    @Override
+    public void enabledUser(UUID userId) {
+
+        userRepository.updateIsEnabled(userId);
     }
 
     @Override
@@ -208,4 +229,14 @@ public class UserService implements IUserService, UserDetailsService {
         return userRepository.existsByEmail(email);
     }
 
+    @Transactional
+    @Override
+    public void updateLastLoginTime(UUID userId, LocalDateTime lastLoginTime) {
+
+        if(userId == null) throw new ErrorHolder(Error.SERVER_ERROR);
+
+        if(lastLoginTime == null) lastLoginTime = LocalDateTime.now();
+
+        userRepository.updateLastLogin(userId, lastLoginTime);
+    }
 }
