@@ -5,10 +5,13 @@ import com.example.englishmaster_be.domain.user.dto.request.*;
 import com.example.englishmaster_be.model.user.UserEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 
 public interface IUserService {
+
+    UserEntity saveUser(UserEntity user);
 
     UserEntity changeProfile(UserChangeProfileRequest changeProfileRequest);
 
@@ -24,6 +27,11 @@ public interface IUserService {
 
     UserEntity getUserByEmail(String email);
 
+    UserEntity getUserByEmail(String email, Boolean throwable);
+
+    void enabledUser(UUID userId);
+
     boolean existsEmail(String email);
 
+    void updateLastLoginTime(UUID userId, LocalDateTime lastLoginTime);
 }

@@ -12,7 +12,6 @@ public class ErrorHolder extends RuntimeException {
 
     Error error;
 
-    @NonFinal
     Boolean toClient;
 
     public ErrorHolder(Error error) {
