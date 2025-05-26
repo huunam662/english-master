@@ -1,9 +1,10 @@
 package com.example.englishmaster_be.domain.question.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonIncludeProperties;
+import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+
 import java.util.List;
 
 @Getter
@@ -12,11 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@JsonIncludeProperties(value = {"contentLeft", "contentRight"})
-public class QuestionMatchingResponse extends QuestionChildResponse{
+public class QuestionChildResponse extends QuestionResponse{
 
-    List<QuestionResponse> contentLeft;
-
-    List<QuestionResponse> contentRight;
+    List<AnswerResponse> answers;
 
 }

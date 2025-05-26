@@ -49,7 +49,5 @@ public class QuestionResponse {
 
     List<ContentBasicResponse> contents;
 
-    List<AnswerResponse> answers;
-
-    List<QuestionResponse> questionsChildren;
+    List<QuestionChildResponse> questionsChildren;
 }

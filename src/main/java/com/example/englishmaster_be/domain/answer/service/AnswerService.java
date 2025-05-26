@@ -123,6 +123,6 @@ public class AnswerService implements IAnswerService {
 
         QuestionEntity question = questionService.getQuestionById(questionId);
 
-        return question.getAnswers();
+        return question.getAnswers().stream().toList();
     }
 }

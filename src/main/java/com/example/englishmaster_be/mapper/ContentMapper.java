@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper(builder = @Builder(disableBuilder = true))
@@ -19,11 +20,11 @@ public interface ContentMapper {
 
     ContentResponse toContentResponse(ContentEntity content);
 
-    List<ContentResponse> toContentResponseList(List<ContentEntity> content);
+    List<ContentResponse> toContentResponseList(Collection<ContentEntity> content);
 
     ContentBasicResponse toContentBasicResponse(ContentEntity content);
 
-    List<ContentBasicResponse> toContentBasicResponseList(List<ContentEntity> contentEntityList);
+    List<ContentBasicResponse> toContentBasicResponseList(Collection<ContentEntity> contentEntityList);
 
     @Mapping(target = "contentId", ignore = true)
     void flowToContentEntity(ContentRequest contentRequest, @MappingTarget ContentEntity content);

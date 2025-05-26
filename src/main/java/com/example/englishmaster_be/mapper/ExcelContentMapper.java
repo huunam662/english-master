@@ -10,6 +10,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper(builder = @Builder(disableBuilder = true))
@@ -24,7 +25,7 @@ public interface ExcelContentMapper {
     @Mapping(target = "questionsChildren", expression = "java(toExcelResponseExcludeChildList(questionEntity.getQuestionGroupChildren()))")
     ExcelQuestionResponse toExcelQuestionResponse(QuestionEntity questionEntity);
 
-    default List<ExcelQuestionResponse> toExcelResponseExcludeChildList(List<QuestionEntity> questionEntityList){
+    default List<ExcelQuestionResponse> toExcelResponseExcludeChildList(Collection<QuestionEntity> questionEntityList){
 
         if(questionEntityList == null) return null;
 
@@ -41,14 +42,14 @@ public interface ExcelContentMapper {
         ).toList();
     }
 
-    List<ExcelQuestionResponse> toExcelQuestionResponseList(List<QuestionEntity> questionEntityList);
+    List<ExcelQuestionResponse> toExcelQuestionResponseList(Collection<QuestionEntity> questionEntityList);
 
-    default ExcelQuestionListResponse toExcelQuestionListResponse(List<ExcelQuestionResponse> excelQuestionResponseList){
+    default ExcelQuestionListResponse toExcelQuestionListResponse(Collection<ExcelQuestionResponse> excelQuestionResponseList){
 
         if(excelQuestionResponseList == null) return null;
 
         return ExcelQuestionListResponse.builder()
-                .questions(excelQuestionResponseList)
+                .questions(excelQuestionResponseList.stream().toList())
                 .build();
     }
 

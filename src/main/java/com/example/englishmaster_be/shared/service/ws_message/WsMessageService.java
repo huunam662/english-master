@@ -33,7 +33,7 @@ public class WsMessageService implements IWsMessageService{
                     @Override
                     public void afterCommit() {
 
-                        List<UserEntity> usersToSend = CommentUtil.getUsersFromCommentList(news.getComments(), usersNotSend);
+                        List<UserEntity> usersToSend = CommentUtil.getUsersFromCommentList(news.getComments().stream().toList(), usersNotSend);
 
                         usersToSend.forEach(
                                 userToSendMs -> simpMessagingTemplate.convertAndSendToUser(

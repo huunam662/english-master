@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper(builder = @Builder(disableBuilder = true))
@@ -24,6 +25,6 @@ public interface MockTestResultMapper {
     @Mapping(target = "mockTestDetails", expression = "java(MockTestDetailMapper.INSTANCE.toMockTestDetailResponseList(mockTestResultEntity.getMockTestDetails()))")
     MockTestResultResponse toMockTestResultResponse(MockTestResultEntity mockTestResultEntity);
 
-    List<MockTestResultResponse> toMockTestResultResponseList(List<MockTestResultEntity> mockTestResultEntityList);
+    List<MockTestResultResponse> toMockTestResultResponseList(Collection<MockTestResultEntity> mockTestResultEntityList);
 
 }

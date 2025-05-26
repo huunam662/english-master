@@ -46,7 +46,7 @@ public class OtpEntity {
     @Column(name = "expiration_time")
     LocalDateTime expirationTime;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     UserEntity user;
 

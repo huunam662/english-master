@@ -2,6 +2,7 @@ package com.example.englishmaster_be.domain.topic.service;
 
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionChildResponse;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 
 import com.example.englishmaster_be.common.constant.Role;
@@ -68,6 +69,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -152,10 +154,10 @@ public class TopicService implements ITopicService {
 
         if(topicRequest.getListPart() != null){
 
-            List<PartEntity> partList = topicRequest.getListPart().stream()
+            Set<PartEntity> partList = topicRequest.getListPart().stream()
                     .filter(Objects::nonNull)
                     .map(partService::getPartToId)
-                    .toList();
+                    .collect(Collectors.toSet());
 
             topic.setParts(partList);
         }
@@ -202,7 +204,7 @@ public class TopicService implements ITopicService {
         topicEntity = topicRepository.save(topicEntity);
 
         if(topicEntity.getParts() == null)
-            topicEntity.setParts(new ArrayList<>());
+            topicEntity.setParts(new HashSet<>());
 
         int partNamesSize = excelTopicContentResponse.getPartNamesList().size();
 
@@ -230,7 +232,7 @@ public class TopicService implements ITopicService {
                         .build();
 
             if(partEntity.getTopics() == null)
-                partEntity.setTopics(List.of(topicEntity));
+                partEntity.setTopics(Set.of(topicEntity));
             else if(!partEntity.getTopics().contains(topicEntity))
                 partEntity.getTopics().add(topicEntity);
 
@@ -345,7 +347,7 @@ public class TopicService implements ITopicService {
         PartEntity part = partService.getPartToId(partId);
 
         if (topic.getParts() == null)
-            topic.setParts(new ArrayList<>());
+            topic.setParts(new HashSet<>());
 
         topic.getParts().add(part);
 
@@ -550,7 +552,7 @@ public class TopicService implements ITopicService {
         if(answerBasicRequestList == null || answerBasicRequestList.isEmpty()) return;
 
         if (question.getAnswers() == null)
-            question.setAnswers(new ArrayList<>());
+            question.setAnswers(new HashSet<>());
 
         answerBasicRequestList.forEach(answerBasicRequest -> {
 
@@ -578,7 +580,7 @@ public class TopicService implements ITopicService {
             content.setUserUpdate(user);
 
             if (question.getContentCollection() == null)
-                question.setContentCollection(new ArrayList<>());
+                question.setContentCollection(new HashSet<>());
 
             content = contentRepository.save(content);
 
@@ -593,7 +595,7 @@ public class TopicService implements ITopicService {
             ContentEntity content = contentService.getContentByContentData(contentAudio);
 
             if (question.getContentCollection() == null)
-                question.setContentCollection(new ArrayList<>());
+                question.setContentCollection(new HashSet<>());
 
             question.getContentCollection().add(content);
 
@@ -717,7 +719,7 @@ public class TopicService implements ITopicService {
 
 
                     if (questionChild.getAnswers() == null)
-                        questionChild.setAnswers(new ArrayList<>());
+                        questionChild.setAnswers(new HashSet<>());
 
                     for (AnswerBasicRequest answerBasicRequest : questionRequestItem.getListAnswer()) {
 
@@ -753,7 +755,7 @@ public class TopicService implements ITopicService {
                         .build();
 
                 if (question.getContentCollection() == null)
-                    question.setContentCollection(new ArrayList<>());
+                    question.setContentCollection(new HashSet<>());
 
                 question.getContentCollection().add(content);
 
@@ -769,7 +771,7 @@ public class TopicService implements ITopicService {
                         .build();
 
                 if (question.getContentCollection() == null)
-                    question.setContentCollection(new ArrayList<>());
+                    question.setContentCollection(new HashSet<>());
 
                 question.getContentCollection().add(content);
 
@@ -811,7 +813,7 @@ public class TopicService implements ITopicService {
         question = questionRepository.saveAndFlush(question);
 
         if (question.getAnswers() == null)
-            question.setAnswers(new ArrayList<>());
+            question.setAnswers(new HashSet<>());
 
         if (questionRequest.getListAnswer() != null && !questionRequest.getListAnswer().isEmpty()) {
             for (AnswerBasicRequest answerBasicRequest : questionRequest.getListAnswer()) {
@@ -845,7 +847,7 @@ public class TopicService implements ITopicService {
                 questionChild = questionRepository.save(questionChild);
 
                 if (questionChild.getAnswers() == null)
-                    questionChild.setAnswers(new ArrayList<>());
+                    questionChild.setAnswers(new HashSet<>());
 
                 for (AnswerBasicRequest answerBasicRequest : questionRequestItem.getListAnswer()) {
 
@@ -868,7 +870,7 @@ public class TopicService implements ITopicService {
         }
 
         if (question.getContentCollection() == null)
-            question.setContentCollection(new ArrayList<>());
+            question.setContentCollection(new HashSet<>());
 
         if (questionRequest.getContentImage() != null && !questionRequest.getContentImage().isEmpty()) {
 
@@ -914,16 +916,16 @@ public class TopicService implements ITopicService {
             topicRepository.save(topic);
 
             QuestionEntity question1 = questionService.getQuestionById(question.getQuestionId());
-            QuestionResponse questionResponse = QuestionMapper.INSTANCE.toQuestionResponse(question1, topic, part, isAdmin);
+            QuestionResponse questionResponse = QuestionMapper.INSTANCE.toQuestionResponse(question1, part);
 
             if (questionService.checkQuestionGroup(question1.getQuestionId())) {
                 List<QuestionEntity> questionGroupList = questionService.listQuestionGroup(question1);
-                List<QuestionResponse> questionGroupResponseList = new ArrayList<>();
+                List<QuestionChildResponse> questionGroupResponseList = new ArrayList<>();
 
                 for (QuestionEntity questionGroup : questionGroupList) {
 
                     AnswerEntity answerCorrect = answerService.correctAnswer(questionGroup);
-                    QuestionResponse questionGroupResponse = QuestionMapper.INSTANCE.toQuestionResponse(questionGroup, topic, part, isAdmin);
+                    QuestionChildResponse questionGroupResponse = QuestionMapper.INSTANCE.toQuestionChildResponse(questionGroup);
                     questionGroupResponse.setAnswerCorrectId(answerCorrect.getAnswerId());
                     questionGroupResponseList.add(questionGroupResponse);
                 }
@@ -1011,14 +1013,11 @@ public class TopicService implements ITopicService {
     @Override
     public List<QuestionPartResponse> getQuestionPartListOfTopic(UUID topicId) {
 
-        Boolean isAdmin = userService.currentUserIsAdmin();
+        TopicEntity topic = topicRepository.findTopicQuestionsFromTopic(topicId)
+                .orElseThrow(
+                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND)
+                );
 
-        TopicEntity topicEntity = getTopicById(topicId);
-
-        List<PartEntity> partEntityList = topicEntity.getParts();
-
-        List<QuestionEntity> questionEntityList = questionQueryFactory.findAllQuestionsParentBy(topicEntity, partEntityList);
-
-        return QuestionMapper.INSTANCE.toQuestionPartResponseList(questionEntityList, partEntityList, topicEntity, isAdmin);
+        return QuestionMapper.INSTANCE.toQuestionPartResponseList(topic);
     }
 }

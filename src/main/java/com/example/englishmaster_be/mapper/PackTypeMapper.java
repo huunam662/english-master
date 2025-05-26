@@ -11,6 +11,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper(builder = @Builder(disableBuilder = true))
@@ -22,7 +23,7 @@ public interface PackTypeMapper {
     @Mapping(target = "packTypeName", source = "name")
     PackTypeResponse toPackTypeResponse(PackTypeEntity packTypeEntity);
 
-    List<PackTypeResponse> toPackTypeResponseList(List<PackTypeEntity> packTypeEntityList);
+    List<PackTypeResponse> toPackTypeResponseList(Collection<PackTypeEntity> packTypeEntityList);
 
     PackTypeEntity toPackTypeEntity(CreatePackTypeRequest createPackTypeRequest);
 

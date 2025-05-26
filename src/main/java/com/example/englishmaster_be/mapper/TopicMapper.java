@@ -26,7 +26,7 @@ public interface TopicMapper {
     @Mapping(target = "partNames", expression = "java(PartMapper.INSTANCE.toPartNameResponseList(topicEntity.getParts()))")
     TopicResponse toTopicResponse(TopicEntity topicEntity);
 
-    List<TopicResponse> toTopicResponseList(List<TopicEntity> topicEntityList);
+    List<TopicResponse> toTopicResponseList(Collection<TopicEntity> topicEntityList);
     TopicBasicResponse toTopicBasicResponse(TopicEntity topicEntity);
 
     @Mapping(target = "topicId", ignore = true)
