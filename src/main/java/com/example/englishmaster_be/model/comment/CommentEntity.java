@@ -10,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,24 +44,24 @@ public class CommentEntity {
     @Column(name = "update_at")
     LocalDateTime updateAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     UserEntity userComment;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_id", referencedColumnName = "id")
     TopicEntity topic;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "news_id", referencedColumnName = "id")
     NewsEntity news;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "comment_parent", referencedColumnName = "id")
     CommentEntity commentParent;
 
-    @OneToMany(mappedBy = "commentParent")
-    List<CommentEntity> commentChildren;
+    @OneToMany(mappedBy = "commentParent", fetch = FetchType.LAZY)
+    Set<CommentEntity> commentChildren;
 
 
     @PrePersist

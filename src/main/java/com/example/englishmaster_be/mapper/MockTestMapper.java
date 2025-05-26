@@ -12,6 +12,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper(builder = @Builder(disableBuilder = true))
@@ -23,7 +24,7 @@ public interface MockTestMapper {
     @Mapping(target = "mockTestResults", expression = "java(MockTestResultMapper.INSTANCE.toMockTestResultResponseList(mockTestEntity.getMockTestResults()))")
     MockTestResponse toMockTestResponse(MockTestEntity mockTestEntity);
 
-    List<MockTestResponse> toMockTestResponseList(List<MockTestEntity> mockTestEntityList);
+    List<MockTestResponse> toMockTestResponseList(Collection<MockTestEntity> mockTestEntityList);
 
     MockTestEntity toMockTestEntity(MockTestRequest mockTestRequest);
 
@@ -33,11 +34,11 @@ public interface MockTestMapper {
 
     MockTestQuestionResponse toMockTestQuestionResponse(QuestionEntity questionEntity);
 
-    List<MockTestQuestionResponse> toMockTestQuestionResponseList(List<QuestionEntity> questionEntityList);
+    List<MockTestQuestionResponse> toMockTestQuestionResponseList(Collection<QuestionEntity> questionEntityList);
 
     MockTestAnswerResponse toMockTestAnswerResponse(AnswerEntity answerEntity);
 
-    List<MockTestAnswerResponse> toMockTestAnswerResponseList(List<AnswerEntity> answerEntityList);
+    List<MockTestAnswerResponse> toMockTestAnswerResponseList(Collection<AnswerEntity> answerEntityList);
 
     @Mapping(target = "mockTestResponse" , expression = "java(toMockTestResponse(mockTestEntity))")
     @Mapping(target = "mockTestResultResponses" , expression = "java(MockTestResultMapper.INSTANCE.toMockTestResultResponseList(mockTestEntity.getMockTestResults()))")

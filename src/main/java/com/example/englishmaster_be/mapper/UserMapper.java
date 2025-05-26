@@ -13,6 +13,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collection;
 import java.util.List;
 
 
@@ -25,7 +26,7 @@ public interface UserMapper {
 
     UserResponse toUserResponse(UserEntity user);
 
-    List<UserResponse> toUserResponseList(List<UserEntity> userEntityList);
+    List<UserResponse> toUserResponseList(Collection<UserEntity> userEntityList);
 
     @Mapping(target = "role", source = "role.roleName")
     @Mapping(target = "user", expression = "java(toUserResponse(userEntity))")

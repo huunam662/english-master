@@ -85,4 +85,5 @@ public interface ITopicService {
 
     List<QuestionPartResponse> getQuestionPartListOfTopic(UUID topicId);
 
+
 }

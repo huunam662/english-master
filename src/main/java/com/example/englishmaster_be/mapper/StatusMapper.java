@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper(builder = @Builder(disableBuilder = true))
@@ -21,5 +22,5 @@ public interface StatusMapper {
 
     StatusResponse toStatusResponse(StatusEntity statusEntity);
 
-    List<StatusResponse> toStatusResponseList(List<StatusEntity> statusEntityList);
+    List<StatusResponse> toStatusResponseList(Collection<StatusEntity> statusEntityList);
 }

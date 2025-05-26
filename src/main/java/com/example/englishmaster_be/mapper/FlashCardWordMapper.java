@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper(builder = @Builder(disableBuilder = true))
@@ -22,7 +23,7 @@ public interface FlashCardWordMapper {
     @Mapping(target = "image", ignore = true)
     FlashCardWordEntity toFlashCardWord(FlashCardWordRequest flashCardWordRequest);
 
-    List<FlashCardWordResponse> toFlashCardWordResponseList(List<FlashCardWordEntity> flashCardWords);
+    List<FlashCardWordResponse> toFlashCardWordResponseList(Collection<FlashCardWordEntity> flashCardWords);
 
     @Mapping(target = "image", ignore = true)
     void flowToFlashCardWordEntity(FlashCardWordRequest flashCardWordRequest, @MappingTarget FlashCardWordEntity flashCardWord);

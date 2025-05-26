@@ -9,7 +9,9 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.core.GrantedAuthority;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -33,8 +35,8 @@ public class RoleEntity implements GrantedAuthority {
     @Enumerated(EnumType.STRING)
     Role roleName;
 
-    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
-    List<UserEntity> users;
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    Set<UserEntity> users;
 
 
     @Override

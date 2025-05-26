@@ -12,6 +12,7 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,13 +26,13 @@ public interface PartMapper {
     PartResponse toPartResponse(PartEntity part);
 
 
-    List<PartResponse> toPartResponseList(List<PartEntity> partList);
+    List<PartResponse> toPartResponseList(Collection<PartEntity> partList);
 
     PartBasicResponse toPartBasicResponse(PartEntity partEntity);
 
-    List<PartBasicResponse> toPartBasicResponseList(List<PartEntity> partList);
+    List<PartBasicResponse> toPartBasicResponseList(Collection<PartEntity> partList);
 
-    default List<String> toPartNameResponseList(List<PartEntity> partEntities) {
+    default List<String> toPartNameResponseList(Collection<PartEntity> partEntities) {
 
         partEntities = new ArrayList<>(
                 partEntities.stream().collect(

@@ -12,6 +12,7 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,24 +49,24 @@ public class MockTestResultEntity {
     @Column(name = "update_at")
     LocalDateTime updateAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by", referencedColumnName = "id")
     UserEntity userCreate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "update_by", referencedColumnName = "id")
     UserEntity userUpdate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "part_id", referencedColumnName = "id")
     PartEntity part;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mock_test_id", referencedColumnName = "id")
     MockTestEntity mockTest;
 
-    @OneToMany(mappedBy = "resultMockTest")
-    List<MockTestDetailEntity> mockTestDetails;
+    @OneToMany(mappedBy = "resultMockTest", fetch = FetchType.LAZY)
+    Set<MockTestDetailEntity> mockTestDetails;
 
     @PrePersist
     void onCreate() {

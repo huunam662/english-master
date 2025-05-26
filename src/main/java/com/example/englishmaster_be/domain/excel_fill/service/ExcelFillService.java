@@ -44,9 +44,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
@@ -157,10 +155,10 @@ public class ExcelFillService implements IExcelFillService {
             topicEntity = topicRepository.save(topicEntity);
 
             if (topicEntity.getContents() == null)
-                topicEntity.setContents(new ArrayList<>());
+                topicEntity.setContents(new HashSet<>());
 
             if (topicEntity.getParts() == null)
-                topicEntity.setParts(new ArrayList<>());
+                topicEntity.setParts(new HashSet<>());
 
             ContentEntity contentImage = contentUtil.makeContentEntity(
                     currentUser,
@@ -250,7 +248,7 @@ public class ExcelFillService implements IExcelFillService {
                 throw new ErrorHolder(Error.BAD_REQUEST, String.format("Part type list is not exist or empty in sheet %d", sheetNumber));
 
             if (topicEntity.getParts() == null)
-                topicEntity.setParts(new ArrayList<>());
+                topicEntity.setParts(new HashSet<>());
 
             int partNamesSize = partNamesList.size();
 
@@ -351,7 +349,7 @@ public class ExcelFillService implements IExcelFillService {
 
             QuestionEntity questionParent = QuestionEntity.builder()
                     .part(partEntity)
-                    .topics(List.of(topicEntity))
+                    .topics(Set.of(topicEntity))
                     .userCreate(currentUser)
                     .userUpdate(currentUser)
                     .questionScore(excelQuestionContentResponse.getTotalScore())
@@ -362,7 +360,7 @@ public class ExcelFillService implements IExcelFillService {
             questionParent = questionRepository.save(questionParent);
 
             if (questionParent.getContentCollection() == null)
-                questionParent.setContentCollection(new ArrayList<>());
+                questionParent.setContentCollection(new HashSet<>());
 
             ContentEntity contentAudio = contentUtil.makeContentEntity(
                     currentUser,
@@ -378,7 +376,7 @@ public class ExcelFillService implements IExcelFillService {
                 questionParent.getContentCollection().add(contentAudio);
 
             if (questionParent.getQuestionGroupChildren() == null)
-                questionParent.setQuestionGroupChildren(new ArrayList<>());
+                questionParent.setQuestionGroupChildren(new HashSet<>());
 
             int iRowHeaderTable = iRowTotalScore + 1;
 
@@ -416,7 +414,7 @@ public class ExcelFillService implements IExcelFillService {
                 if (part == 1) {
 
                     if (questionChildren.getContentCollection() == null)
-                        questionChildren.setContentCollection(new ArrayList<>());
+                        questionChildren.setContentCollection(new HashSet<>());
 
                     int jColQuestionImage = 3;
 
@@ -440,7 +438,7 @@ public class ExcelFillService implements IExcelFillService {
                 questionChildren = questionRepository.save(questionChildren);
                 topicEntity.setNumberQuestion(topicEntity.getNumberQuestion() + 1);
                 if (questionChildren.getAnswers() == null)
-                    questionChildren.setAnswers(new ArrayList<>());
+                    questionChildren.setAnswers(new HashSet<>());
 
                 String[] keys = new String[]{
                         "A", "B", "C", "D"
@@ -544,7 +542,7 @@ public class ExcelFillService implements IExcelFillService {
 
             QuestionEntity questionParent = QuestionEntity.builder()
                     .part(partEntity)
-                    .topics(List.of(topicEntity))
+                    .topics(Set.of(topicEntity))
                     .userCreate(currentUser)
                     .userUpdate(currentUser)
                     .questionScore(excelQuestionContentResponse.getTotalScore())
@@ -555,7 +553,7 @@ public class ExcelFillService implements IExcelFillService {
             questionParent = questionRepository.save(questionParent);
 
             if (questionParent.getQuestionGroupChildren() == null)
-                questionParent.setQuestionGroupChildren(new ArrayList<>());
+                questionParent.setQuestionGroupChildren(new HashSet<>());
 
             int iRowHeaderTable = iRowTotalScore + 1;
 
@@ -596,7 +594,7 @@ public class ExcelFillService implements IExcelFillService {
                 questionChildren = questionRepository.save(questionChildren);
                 topicEntity.setNumberQuestion(topicEntity.getNumberQuestion() + 1);
                 if (questionChildren.getAnswers() == null)
-                    questionChildren.setAnswers(new ArrayList<>());
+                    questionChildren.setAnswers(new HashSet<>());
 
                 int jA_Begin = 2;
                 int jD_Last = 5;
@@ -708,7 +706,7 @@ public class ExcelFillService implements IExcelFillService {
 
                 QuestionEntity questionParent = QuestionEntity.builder()
                         .part(partEntity)
-                        .topics(List.of(topicEntity))
+                        .topics(Set.of(topicEntity))
                         .userCreate(currentUser)
                         .userUpdate(currentUser)
                         .questionScore(excelQuestionContentResponse.getTotalScore())
@@ -719,7 +717,7 @@ public class ExcelFillService implements IExcelFillService {
                 questionParent = questionRepository.save(questionParent);
 
                 if (questionParent.getContentCollection() == null)
-                    questionParent.setContentCollection(new ArrayList<>());
+                    questionParent.setContentCollection(new HashSet<>());
 
                 ContentEntity contentAudio = contentUtil.makeContentEntity(
                         currentUser,
@@ -748,7 +746,7 @@ public class ExcelFillService implements IExcelFillService {
                     questionParent.getContentCollection().add(contentImage);
 
                 if (questionParent.getQuestionGroupChildren() == null)
-                    questionParent.setQuestionGroupChildren(new ArrayList<>());
+                    questionParent.setQuestionGroupChildren(new HashSet<>());
 
                 int iRowHeaderTable = iRowTotalScore + 1;
 
@@ -803,7 +801,7 @@ public class ExcelFillService implements IExcelFillService {
                     questionChildren = questionRepository.save(questionChildren);
                     topicEntity.setNumberQuestion(topicEntity.getNumberQuestion() + 1);
                     if (questionChildren.getAnswers() == null)
-                        questionChildren.setAnswers(new ArrayList<>());
+                        questionChildren.setAnswers(new HashSet<>());
 
                     int jA_Begin = 2;
                     int jD_Last = 5;
@@ -919,7 +917,7 @@ public class ExcelFillService implements IExcelFillService {
 
                 QuestionEntity questionParent = QuestionEntity.builder()
                         .part(partEntity)
-                        .topics(List.of(topicEntity))
+                        .topics(Set.of(topicEntity))
                         .userCreate(currentUser)
                         .userUpdate(currentUser)
                         .questionScore(excelQuestionContentResponse.getTotalScore())
@@ -933,7 +931,7 @@ public class ExcelFillService implements IExcelFillService {
                 if (part == 7) {
 
                     if (questionParent.getContentCollection() == null)
-                        questionParent.setContentCollection(new ArrayList<>());
+                        questionParent.setContentCollection(new HashSet<>());
 
                     ContentEntity contentImage = contentUtil.makeContentEntity(
                             currentUser,
@@ -950,7 +948,7 @@ public class ExcelFillService implements IExcelFillService {
                 }
 
                 if (questionParent.getQuestionGroupChildren() == null)
-                    questionParent.setQuestionGroupChildren(new ArrayList<>());
+                    questionParent.setQuestionGroupChildren(new HashSet<>());
 
                 int iRowHeaderTable = iRowTotalScore + 1;
 
@@ -1005,7 +1003,7 @@ public class ExcelFillService implements IExcelFillService {
                     questionChildren = questionRepository.save(questionChildren);
                     topicEntity.setNumberQuestion(topicEntity.getNumberQuestion() + 1);
                     if (questionChildren.getAnswers() == null)
-                        questionChildren.setAnswers(new ArrayList<>());
+                        questionChildren.setAnswers(new HashSet<>());
 
                     int jA_Begin = 2;
                     int jD_Last = 5;

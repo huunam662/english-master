@@ -10,6 +10,8 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
+
+import java.util.Collection;
 import java.util.List;
 
 
@@ -21,11 +23,11 @@ public interface AnswerMapper {
     @Mapping(target = "questionId", source = "question.questionId")
     AnswerResponse toAnswerResponse(AnswerEntity answer);
 
-    List<AnswerResponse> toAnswerResponseList(List<AnswerEntity> answerList);
+    List<AnswerResponse> toAnswerResponseList(Collection<AnswerEntity> answerList);
 
     AnswerBasicRequest toAnswerBasicRequest(AnswerResponse answerResponse);
 
-    List<AnswerBasicRequest> toAnswerRequestList(List<AnswerResponse> answerResponseList);
+    List<AnswerBasicRequest> toAnswerRequestList(Collection<AnswerResponse> answerResponseList);
 
     @Mapping(target = "answerId", ignore = true)
     void flowToAnswerEntity(AnswerRequest answerRequest, @MappingTarget AnswerEntity answer);

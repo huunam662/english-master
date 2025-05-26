@@ -10,6 +10,7 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.List;
 import java.util.UUID;
 
@@ -49,20 +50,20 @@ public class AnswerEntity {
     @Column(name = "update_at")
     LocalDateTime updateAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by", referencedColumnName = "id")
     UserEntity userCreate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "update_by", referencedColumnName = "id")
     UserEntity userUpdate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_id", referencedColumnName = "id")
     QuestionEntity question;
 
-    @OneToMany(mappedBy = "answerChoice", cascade = CascadeType.ALL)
-    List<MockTestDetailEntity> mockTestDetails;
+    @OneToMany(mappedBy = "answerChoice", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    Set<MockTestDetailEntity> mockTestDetails;
 
     @PrePersist
     void onCreate() {

@@ -360,7 +360,7 @@ public class MockTestService implements IMockTestService {
         }
 
         // Lấy danh sách tất cả các part trong topic của mock test
-        List<PartEntity> topicParts = mockTest.getTopic().getParts();
+        List<PartEntity> topicParts = mockTest.getTopic().getParts().stream().toList();
         // Với các part mà user không làm (không có trong partDetailsMap), tạo MockTestResultEntity với số câu đúng, điểm là 0
         for (PartEntity part : topicParts) {
             if (!partDetailsMap.containsKey(part.getPartId())) {

@@ -4,6 +4,7 @@ import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestion
 import com.example.englishmaster_be.domain.part.dto.response.PartBasicResponse;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionChildResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionMatchingResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
@@ -14,8 +15,7 @@ import com.example.englishmaster_be.model.topic.TopicEntity;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Mapper(builder = @Builder(disableBuilder = true))
@@ -25,22 +25,32 @@ public interface QuestionMapper {
 
     @Mapping(target = "questionGroupChildren" , expression = "java(questionDtoToQuestionEntities(questionDto.getListQuestionChild()))")
     QuestionEntity toQuestionEntity(QuestionRequest questionDto);
-    default List<QuestionEntity> questionDtoToQuestionEntities(List<QuestionRequest> questionDto) {
+    default Set<QuestionEntity> questionDtoToQuestionEntities(Collection<QuestionRequest> questionDto) {
         if(questionDto == null){
-            return Collections.emptyList();
+            return Collections.emptySet();
         }
-        return questionDto.stream().map(this::toQuestionEntity).collect(Collectors.toList());
+        return questionDto.stream().map(this::toQuestionEntity).collect(Collectors.toSet());
     }
 
     QuestionEntity toQuestionEntity(QuestionGroupRequest createGroupQuestionDTO);
+
     @Mapping(target = "partId", source = "part.partId")
     @Mapping(target = "contents", expression = "java(ContentMapper.INSTANCE.toContentBasicResponseList(questionEntity.getContentCollection()))")
-    @Mapping(target = "answers", expression = "java(AnswerMapper.INSTANCE.toAnswerResponseList(questionEntity.getAnswers()))")
     @Mapping(target = "numberOfQuestionsChild", expression = "java(questionEntity.getQuestionGroupChildren() != null ? questionEntity.getQuestionGroupChildren().size() : 0)")
-    @Mapping(target = "questionsChildren" , expression = "java(toQuestionResponseList(questionEntity.getQuestionGroupChildren()))")
+    @Mapping(target = "questionsChildren" , expression = "java(toQuestionChildResponseList(questionEntity.getQuestionGroupChildren()))")
     QuestionResponse toQuestionResponse(QuestionEntity questionEntity);
-    
-    List<QuestionResponse> toQuestionResponseList(List<QuestionEntity> questionEntityList);
+
+    List<QuestionResponse> toQuestionResponseList(Collection<QuestionEntity> questionEntityList);
+
+    @Mapping(target = "partId", expression = "java(questionEntity.getPart() != null ? questionEntity.getPart().getPartId() : null)")
+    @Mapping(target = "contents", expression = "java(ContentMapper.INSTANCE.toContentBasicResponseList(questionEntity.getContentCollection()))")
+    @Mapping(target = "questionsChildren", expression = "java(toQuestionChildResponseList(questionEntity.getQuestionGroupChildren(), partEntity))")
+    QuestionResponse toQuestionResponse(QuestionEntity questionEntity, PartEntity partEntity);
+
+    default List<QuestionResponse> toQuestionResponseList(Collection<QuestionEntity> questionEntityList, PartEntity partEntity){
+
+        return QuestionUtil.parseQuestionResponseList(questionEntityList, partEntity);
+    }
 
     @Mapping(target = "answers", ignore = true)
     @Mapping(target = "questionsChildren", ignore = true)
@@ -48,7 +58,7 @@ public interface QuestionMapper {
     @Mapping(target = "contents", expression = "java(ContentMapper.INSTANCE.toContentBasicResponseList(questionEntity.getContentCollection()))")
     QuestionMatchingResponse toQuestionMatchingResponse(QuestionEntity questionEntity, TopicEntity topicEntity, PartEntity partEntity);
 
-    default List<QuestionMatchingResponse> toQuestionMatchingResponseList(List<QuestionEntity> questionEntityList, TopicEntity topicEntity, PartEntity partEntity){
+    default List<QuestionMatchingResponse> toQuestionMatchingResponseList(Collection<QuestionEntity> questionEntityList, TopicEntity topicEntity, PartEntity partEntity){
 
         if(questionEntityList == null) return null;
 
@@ -57,29 +67,79 @@ public interface QuestionMapper {
         ).toList();
     }
 
-    @Mapping(target = "partId", expression = "java(questionEntity.getPart() != null ? questionEntity.getPart().getPartId() : null)")
+    @Mapping(target = "partId", source = "part.partId")
     @Mapping(target = "contents", expression = "java(ContentMapper.INSTANCE.toContentBasicResponseList(questionEntity.getContentCollection()))")
     @Mapping(target = "answers", expression = "java(AnswerMapper.INSTANCE.toAnswerResponseList(questionEntity.getAnswers()))")
-    @Mapping(target = "questionsChildren", expression = "java(toQuestionResponseList(questionEntity.getQuestionGroupChildren(), topicEntity, partEntity, isAdmin))")
-    QuestionResponse toQuestionResponse(QuestionEntity questionEntity, TopicEntity topicEntity, PartEntity partEntity, Boolean isAdmin);
+    QuestionChildResponse toQuestionChildResponse(QuestionEntity questionEntity);
 
-    default List<QuestionResponse> toQuestionResponseList(List<QuestionEntity> questionEntityList, TopicEntity topicEntity, PartEntity partEntity, Boolean isAdmin){
+    default List<QuestionChildResponse> toQuestionChildResponseList(Collection<QuestionEntity> questionEntityList){
 
-        return QuestionUtil.parseQuestionResponseList(questionEntityList, topicEntity, partEntity, isAdmin);
+        if(questionEntityList == null) return Collections.emptyList();
+
+        return questionEntityList.stream().map(
+                this::toQuestionChildResponse
+        ).toList();
+    }
+
+    @Mapping(target = "partId", expression = "java(questionEntity.getPart() != null ? questionEntity.getPart().getPartId() : null)")
+    @Mapping(target = "contents", expression = "java(ContentMapper.INSTANCE.toContentBasicResponseList(questionEntity.getContentCollection()))")
+    @Mapping(target = "answers", expression = "java(!questionEntity.getIsQuestionParent() ? AnswerMapper.INSTANCE.toAnswerResponseList(questionEntity.getAnswers()) : null)")
+    QuestionChildResponse toQuestionChildResponse(QuestionEntity questionEntity, PartEntity partEntity);
+
+    default List<QuestionChildResponse> toQuestionChildResponseList(Collection<QuestionEntity> questionEntityList, PartEntity partEntity){
+
+        if (questionEntityList == null) return Collections.emptyList();
+
+        return questionEntityList.stream().map(
+                question -> toQuestionChildResponse(question, partEntity)
+        ).toList();
     }
 
     @Mapping(target = "topic", expression = "java(TopicMapper.INSTANCE.toTopicBasicResponse(topicEntity))")
     @Mapping(target = "part", expression = "java(PartMapper.INSTANCE.toPartBasicResponse(partEntity))")
-    @Mapping(target = "questionParents", expression = "java(toQuestionResponseList(questionParents, topicEntity, partEntity, isAdmin))")
-    QuestionPartResponse toQuestionPartResponse(List<QuestionEntity> questionParents, PartEntity partEntity, TopicEntity topicEntity, Boolean isAdmin);
+    @Mapping(target = "questionParents", expression = "java(toQuestionResponseList(questionParents, partEntity))")
+    QuestionPartResponse toQuestionPartResponse(Collection<QuestionEntity> questionParents, TopicEntity topicEntity, PartEntity partEntity);
 
-    default List<QuestionPartResponse> toQuestionPartResponseList(List<QuestionEntity> questionEntityList, List<PartEntity> partEntityList, TopicEntity topicEntity, Boolean isAdmin) {
+    default List<QuestionPartResponse> toQuestionPartResponseList(TopicEntity topic){
 
-        return QuestionUtil.parseQuestionPartResponseList(questionEntityList, partEntityList, topicEntity, isAdmin);
+        if (topic == null) return Collections.emptyList();
+
+        if(topic.getParts() == null || topic.getParts().isEmpty())
+            return Collections.emptyList();
+
+        return topic.getParts().stream()
+                .sorted(Comparator.comparing(PartEntity::getPartName))
+                .map(
+                        part -> toQuestionPartResponse(part.getQuestions(), topic, part)
+                ).collect(Collectors.toList());
+    }
+
+    default List<QuestionPartResponse> toQuestionPartResponseList(Collection<QuestionEntity> questionList, TopicEntity topic){
+
+        if (questionList == null || questionList.isEmpty())
+            return Collections.emptyList();
+
+        List<PartEntity> parts = questionList.stream().map(
+                QuestionEntity::getPart
+        ).distinct().toList();
+
+        return parts.stream()
+                .sorted(Comparator.comparing(PartEntity::getPartName))
+                .map(
+                        part -> {
+                            List<QuestionEntity> questionOfPart = questionList.stream().filter(
+                                    question -> Objects.nonNull(question) && question.getPart().equals(part)
+                            ).toList();
+
+                            questionList.removeAll(questionOfPart);
+
+                            return toQuestionPartResponse(questionOfPart, topic, part);
+                        }
+                ).toList();
     }
 
     @AfterMapping
-    default void setTotalQuestion(@MappingTarget QuestionPartResponse response, List<QuestionEntity> questionParents) {
+    default void setTotalQuestion(@MappingTarget QuestionPartResponse response, Collection<QuestionEntity> questionParents) {
 
         if (response.getPart() == null)
             response.setPart(new PartBasicResponse());
