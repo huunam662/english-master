@@ -1,11 +1,15 @@
 package com.example.englishmaster_be.config.web;
 
+import com.example.englishmaster_be.common.constant.sort.SortByPackTypeFields;
 import com.example.englishmaster_be.config.middleware.interceptor.MiddlewareInterceptorConfig;
 import com.example.englishmaster_be.value.AppValue;
 import lombok.AccessLevel;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.convert.converter.Converter;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
@@ -59,4 +63,18 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 );
     }
 
+    @Override
+    public void addFormatters(FormatterRegistry registry) {
+
+        registry.addConverter(new Converter<String, SortByPackTypeFields>() {
+
+            @Override
+            @NonNull
+            public SortByPackTypeFields convert(@NonNull String source) {
+
+                return SortByPackTypeFields.fromValue(source);
+            }
+
+        });
+    }
 }

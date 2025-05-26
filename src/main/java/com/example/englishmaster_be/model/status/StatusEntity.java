@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.model.status;
 
 import com.example.englishmaster_be.model.topic.TopicEntity;
-import com.example.englishmaster_be.model.type.TypeEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
@@ -33,10 +32,6 @@ public class StatusEntity {
 
     @Column(name = "flag")
     Boolean flag;
-
-    @ManyToOne
-    @JoinColumn(name = "Type", referencedColumnName = "id")
-    TypeEntity type;
 
     @OneToMany(mappedBy = "status")
     @Cascade({CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})

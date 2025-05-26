@@ -43,7 +43,7 @@ public class GlobalExceptionHandler implements AccessDeniedHandler, Authenticati
 
     private void logError(Error error, Exception ex){
 
-        log.error("{} -> code {}", ex, error.getStatusCode().value());
+        log.error("{} -> code {}", ex.getMessage(), error.getStatusCode().value());
     }
 
     public void printError(Error error, HttpServletResponse response) throws IOException {

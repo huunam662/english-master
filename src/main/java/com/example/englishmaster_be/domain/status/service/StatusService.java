@@ -4,10 +4,8 @@ import com.example.englishmaster_be.mapper.StatusMapper;
 import com.example.englishmaster_be.domain.status.dto.request.StatusRequest;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
-import com.example.englishmaster_be.domain.type.service.ITypeService;
 import com.example.englishmaster_be.model.status.QStatusEntity;
 import com.example.englishmaster_be.model.status.StatusEntity;
-import com.example.englishmaster_be.model.type.TypeEntity;
 import com.example.englishmaster_be.model.status.StatusRepository;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -30,8 +28,6 @@ public class StatusService implements IStatusService {
 
     StatusRepository statusRepository;
 
-    ITypeService typeService;
-
 
     @Transactional
     @Override
@@ -39,39 +35,22 @@ public class StatusService implements IStatusService {
 
         StatusEntity status;
 
-        TypeEntity type = typeService.getTypeById(statusRequest.getTypeId());
-
         if(statusRequest.getStatusId() != null)
             status = getStatusById(statusRequest.getStatusId());
         else
             status = StatusEntity.builder().build();
 
-        if(isExistedByStatusNameOfType(statusRequest.getStatusName(), type))
-            throw new ErrorHolder(Error.CONFLICT, String.format("Status name of type %s already exist", type.getTypeName()));
-
         StatusMapper.INSTANCE.flowToStatusEntity(statusRequest, status);
-
-        status.setType(type);
 
         return statusRepository.save(status);
     }
 
     @Override
-    public boolean isExistedByStatusNameOfType(String statusName, TypeEntity type) {
+    public boolean isExistedByStatusNameOfType(String statusName) {
 
-        return statusRepository.isExistedByStatusNameOfType(statusName, type);
+        return statusRepository.isExistedByStatusNameOfType(statusName);
     }
 
-    @Override
-    public List<StatusEntity> getAllStatusByType(UUID typeId) {
-
-        QStatusEntity status = QStatusEntity.statusEntity;
-
-        JPAQuery<StatusEntity> query = queryFactory.selectFrom(status)
-                .where(status.type.typeId.eq(typeId));
-
-        return query.fetch();
-    }
 
     @Override
     public void deleteStatus(UUID statusId) {
