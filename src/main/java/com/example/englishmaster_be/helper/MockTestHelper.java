@@ -59,7 +59,6 @@ public class MockTestHelper {
         );
 
         MockTestResultEntity mockTestResultEntity = MockTestResultEntity.builder()
-                .mockTestResultId(UUID.randomUUID())
                 .mockTest(mockTestEntity)
                 .userCreate(userCurrent)
                 .userUpdate(userCurrent)
@@ -94,7 +93,6 @@ public class MockTestHelper {
 
             boolean isCorrectAnswer = answerChooseEntity.getCorrectAnswer();
 
-            mockTestDetailEntity.setMockTestDetailId(UUID.randomUUID());
             mockTestDetailEntity.setAnswerChoice(answerChooseEntity);
             mockTestDetailEntity.setAnswerContent(answerChooseEntity.getAnswerContent());
             mockTestDetailEntity.setQuestionChild(questionAnswerChoose);
@@ -142,7 +140,6 @@ public class MockTestHelper {
 
             boolean isAnswerCorrectMatching = questionChildren.equals(questionMatching);
 
-            mockTestDetailEntity.setMockTestDetailId(UUID.randomUUID());
             mockTestDetailEntity.setQuestionChild(questionChildren);
             mockTestDetailEntity.setAnswerContent(questionMatching.getQuestionResult());
             mockTestDetailEntity.setAnswerCorrectContent(questionChildren.getQuestionResult());
@@ -201,7 +198,6 @@ public class MockTestHelper {
 
                 boolean isCorrectContentFill = answerFillEntityContent.equals(answerFillRequestContent);
 
-                mockTestDetailEntity.setMockTestDetailId(UUID.randomUUID());
                 mockTestDetailEntity.setQuestionChild(questionFillInBlank);
                 mockTestDetailEntity.setAnswerContent(answerFillRequestContent);
                 mockTestDetailEntity.setAnswerCorrectContent(answerFillEntityContent);

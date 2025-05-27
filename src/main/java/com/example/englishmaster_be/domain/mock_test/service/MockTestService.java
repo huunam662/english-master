@@ -137,7 +137,6 @@ public class MockTestService implements IMockTestService {
 
         // Khởi tạo MockTestEntity (createAt, updateAt được tự động cập nhật bởi Hibernate)
         MockTestEntity mockTest = MockTestEntity.builder()
-                .mockTestId(UUID.randomUUID())
                 .workTime(workTimeTopic)
                 .finishTime(finishTime)
                 .user(currentUser)

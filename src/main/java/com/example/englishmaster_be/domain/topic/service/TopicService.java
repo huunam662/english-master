@@ -188,7 +188,6 @@ public class TopicService implements ITopicService {
         if(packEntity == null) {
 
             packEntity = PackEntity.builder()
-                    .packId(UUID.randomUUID())
                     .userCreate(currentUser)
                     .userUpdate(currentUser)
                     .packName(excelTopicContentResponse.getPackName())
@@ -221,7 +220,6 @@ public class TopicService implements ITopicService {
 
             if (partEntity == null)
                 partEntity = PartEntity.builder()
-                        .partId(UUID.randomUUID())
                         .contentData("")
                         .contentType(fileUtil.mimeTypeFile(""))
                         .partName(partNameAtI)

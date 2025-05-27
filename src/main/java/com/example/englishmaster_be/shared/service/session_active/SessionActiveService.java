@@ -93,7 +93,6 @@ public class SessionActiveService implements ISessionActiveService {
         SessionActiveEntity sessionActiveEntity = SessionActiveEntity.builder()
                 .createAt(LocalDateTime.now(ZoneId.systemDefault()))
                 .user(user)
-                .code(UUID.randomUUID())
                 .token(tokenHash)
                 .type(SessionActiveType.REFRESH_TOKEN)
                 .build();
