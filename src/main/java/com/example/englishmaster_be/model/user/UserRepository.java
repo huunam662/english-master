@@ -29,6 +29,7 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
     """)
     Optional<UserEntity> findUserJoinRoleByEmail(@Param("email") String email);
 
+    @Transactional
     @Modifying
     @Query(value = "UPDATE users SET last_login = :lastLogin WHERE id = :userId", nativeQuery = true)
     void updateLastLogin(@Param("userId") UUID userId, @Param("lastLogin") LocalDateTime lastLogin);
@@ -37,5 +38,12 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
     @Modifying
     @Query(value = "UPDATE users SET is_enabled = TRUE WHERE id = :userId", nativeQuery = true)
     void updateIsEnabled(@Param("userId") UUID userId);
+
+    @Transactional
+    @Modifying
+    @Query(value = """
+        UPDATE users SET password = :newPassword WHERE email = :email
+    """, nativeQuery = true)
+    void updatePassword(@Param("newPassword") String newPassword, @Param("email") String email);
 }
 

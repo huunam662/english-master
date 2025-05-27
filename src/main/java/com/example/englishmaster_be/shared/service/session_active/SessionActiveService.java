@@ -23,7 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
@@ -47,11 +49,19 @@ public class SessionActiveService implements ISessionActiveService {
         return sessionActiveRepository.findByCode(code);
     }
 
-    public SessionActiveEntity getByCodeAndType(UUID code, SessionActiveType type) {
+    public SessionActiveEntity getJoinUserByCodeAndType(UUID code, SessionActiveType type) {
 
-        return sessionActiveRepository.findByCodeAndType(code, type)
+        return sessionActiveRepository.findJoinUserByCodeAndType(code, type)
                 .orElseThrow(
-                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND)
+                        () -> new ErrorHolder(Error.UNAUTHENTICATED)
+                );
+    }
+
+    public SessionActiveEntity getJoinUserRoleByCodeAndType(UUID code, SessionActiveType type) {
+
+        return sessionActiveRepository.findJoinUserRoleByCodeAndType(code, type)
+                .orElseThrow(
+                        () -> new ErrorHolder(Error.UNAUTHENTICATED)
                 );
     }
 
@@ -105,6 +115,20 @@ public class SessionActiveService implements ISessionActiveService {
         return sessionActiveRepository.save(sessionActive);
     }
 
+    @Transactional
+    @Override
+    public void saveSessionActive(UUID userId, String jwtToken) {
+
+        sessionActiveRepository.insertSessionActive(
+                UUID.randomUUID(),
+                UUID.randomUUID(),
+                SessionActiveType.REFRESH_TOKEN.name(),
+                jwtUtil.hashToHex(jwtToken),
+                LocalDateTime.now(),
+                userId
+        );
+    }
+
     @Override
     public boolean isExpirationToken(SessionActiveEntity token) {
 
@@ -137,9 +161,7 @@ public class SessionActiveService implements ISessionActiveService {
         sessionActiveRepository.delete(sessionActiveEntity);
     }
 
-    public List<SessionActiveEntity> getSessionActiveList(UUID userId, SessionActiveType sessionActiveType){
-
-        UserEntity user = userService.getUserById(userId);
+    public List<SessionActiveEntity> getSessionActiveList(UserEntity user, SessionActiveType sessionActiveType){
 
         return sessionActiveRepository.findAllByUserAndType(user, sessionActiveType);
     }
@@ -165,5 +187,16 @@ public class SessionActiveService implements ISessionActiveService {
     public void deleteByCode(UUID code) {
 
         sessionActiveRepository.deleteByCode(code);
+    }
+
+    @Transactional
+    @Override
+    public void deleteAll(List<SessionActiveEntity> sessionActiveEntityList) {
+
+        Set<UUID> ids = sessionActiveEntityList.stream().map(
+                SessionActiveEntity::getSessionId
+        ).collect(Collectors.toSet());
+
+        sessionActiveRepository.deleteAllByIds(ids);
     }
 }

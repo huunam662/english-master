@@ -1,8 +1,14 @@
 package com.example.englishmaster_be.domain.user.service;
 
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.InvalidTokenType;
+import com.example.englishmaster_be.common.constant.OtpStatus;
 import com.example.englishmaster_be.common.constant.Role;
+import com.example.englishmaster_be.common.constant.SessionActiveType;
 import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;
+import com.example.englishmaster_be.model.otp.OtpEntity;
+import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.exam.dto.response.ExamResultResponse;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
@@ -17,6 +23,9 @@ import com.example.englishmaster_be.model.topic.QTopicEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.model.user.UserRepository;
+import com.example.englishmaster_be.shared.service.invalid_token.IInvalidTokenService;
+import com.example.englishmaster_be.shared.service.jwt.JwtService;
+import com.example.englishmaster_be.shared.service.session_active.ISessionActiveService;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -32,6 +41,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +63,13 @@ public class UserService implements IUserService, UserDetailsService {
 
     IUploadService uploadService;
 
+    PasswordEncoder passwordEncoder;
+
+    ISessionActiveService sessionActiveService;
+
+    IInvalidTokenService invalidTokenService;
+
+    JwtService jwtService;
 
 
     @Transactional
@@ -166,7 +183,7 @@ public class UserService implements IUserService, UserDetailsService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
         if (authentication != null && authentication.getPrincipal() instanceof UserDetails userDetails)
-            return getUserByEmail(userDetails.getUsername());
+            return (UserEntity) userDetails;
 
         throw new AuthenticationServiceException("Please authenticate first.");
     }
@@ -238,5 +255,53 @@ public class UserService implements IUserService, UserDetailsService {
         if(lastLoginTime == null) lastLoginTime = LocalDateTime.now();
 
         userRepository.updateLastLogin(userId, lastLoginTime);
+    }
+
+
+    @Transactional
+    @Override
+    public UserAuthResponse updatePassword(UserEntity user, String oldPassword, String newPassword) {
+
+        if(!passwordEncoder.matches(oldPassword, user.getPassword()))
+            throw new ErrorHolder(Error.BAD_CREDENTIALS, "Wrong old password.");
+
+        updatePasswordForgot(user, newPassword);
+
+        String jwtToken = jwtService.generateToken(user);
+
+        SessionActiveEntity sessionActive = sessionActiveService.saveSessionActive(user, jwtToken);
+
+        return UserMapper.INSTANCE.toUserAuthResponse(sessionActive.getCode(), jwtToken, user);
+    }
+
+
+    @Transactional
+    @Override
+    public void updatePasswordForgot(UserEntity user, String newPassword) {
+
+        if (passwordEncoder.matches(newPassword, user.getPassword()))
+            throw new ErrorHolder(Error.BAD_REQUEST, "New password mustn't match with old password.");
+
+        newPassword = passwordEncoder.encode(newPassword);
+
+        userRepository.updatePassword(newPassword, user.getEmail());
+
+        List<SessionActiveEntity> sessionActiveEntityList = sessionActiveService.getSessionActiveList(user, SessionActiveType.REFRESH_TOKEN);
+
+        invalidTokenService.saveInvalidTokenList(sessionActiveEntityList, user, InvalidTokenType.PASSWORD_CHANGE);
+
+        sessionActiveService.deleteAll(sessionActiveEntityList);
+
+        logoutUser();
+    }
+
+    @Override
+    public void logoutUser() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication != null && authentication.getPrincipal() instanceof UserDetails)
+            SecurityContextHolder.getContext().setAuthentication(null);
+
     }
 }

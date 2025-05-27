@@ -30,13 +30,9 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class InvalidTokenService implements IInvalidTokenService {
 
-    JwtValue jwtValue;
-
     JwtService jwtUtil;
 
     InvalidTokenRepository invalidTokenRepository;
-
-    ISessionActiveService sessionActiveService;
 
 
     @Override
@@ -44,63 +40,53 @@ public class InvalidTokenService implements IInvalidTokenService {
 
         String tokenHash = jwtUtil.hashToHex(token);
 
-        Optional<InvalidTokenEntity> tokenExpire = invalidTokenRepository.findById(tokenHash);
-
-        return tokenExpire.isPresent();
+        return invalidTokenRepository.isValidToken(tokenHash);
     }
+
 
     @Transactional
     @Override
-    public void saveInvalidToken(SessionActiveEntity sessionActive, InvalidTokenType typeInvalid) {
+    public void saveInvalidToken(String jwtToken, UUID userId, InvalidTokenType typeInvalid) {
 
-        if(sessionActive == null) return;
-
-        LocalDateTime expireTime = new Date(
-                sessionActive.getCreateAt().toInstant(ZoneOffset.UTC).toEpochMilli() + jwtValue.getJwtExpiration()
-        ).toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
-
-        InvalidTokenEntity invalidToken = InvalidTokenEntity.builder()
-                .expireTime(expireTime)
-                .createAt(LocalDateTime.now(ZoneId.systemDefault()))
-                .token(sessionActive.getToken())
-                .user(sessionActive.getUser())
-                .type(typeInvalid)
-                .build();
-
-        invalidTokenRepository.save(invalidToken);
-
-    }
-
-    @Transactional
-    @Override
-    public void saveInvalidToken(String token, UUID userId, InvalidTokenType typeInvalid) {
-
-        if(token == null) return;
+        if(jwtToken == null) return;
 
         if(userId == null) return;
 
-        String tokenHash = jwtUtil.hashToHex(token);
+        String tokenHash = jwtUtil.hashToHex(jwtToken);
 
-        LocalDateTime expiredTimeToken = jwtUtil.getTokenExpireFromJWT(token);
+        if(invalidTokenRepository.isValidToken(tokenHash))
+            return;
 
         invalidTokenRepository.insertInvalidToken(
-                tokenHash, expiredTimeToken, LocalDateTime.now(), typeInvalid, userId
+                tokenHash, LocalDateTime.now(), LocalDateTime.now(), typeInvalid.name(), userId
         );
+    }
 
-        sessionActiveService.deleteByToken(tokenHash);
+    @Override
+    public void sessionActiveToInvalidToken(String hashToken, UUID userId, InvalidTokenType typeInvalid) {
+
+        if(hashToken == null) return;
+
+        if(userId == null) return;
+
+        if(invalidTokenRepository.isValidToken(hashToken))
+            return;
+
+        invalidTokenRepository.insertInvalidToken(
+                hashToken, LocalDateTime.now(), LocalDateTime.now(), typeInvalid.name(), userId
+        );
     }
 
     @Transactional
     @Override
-    public void saveInvalidTokenList(List<SessionActiveEntity> sessionActiveEntityList, InvalidTokenType typeInvalid) {
+    public void saveInvalidTokenList(List<SessionActiveEntity> sessionActiveEntityList, UserEntity user, InvalidTokenType typeInvalid) {
 
-        sessionActiveEntityList.forEach(sessionActiveEntity -> saveInvalidToken(sessionActiveEntity, typeInvalid));
+        sessionActiveEntityList.forEach(sessionActive -> {
+
+            String tokenHash = sessionActive.getToken();
+
+            sessionActiveToInvalidToken(tokenHash, user.getUserId(), typeInvalid);
+        });
     }
 
-    @Override
-    public void saveInvalidToken(String token, SessionActiveType type) {
-
-    }
 }

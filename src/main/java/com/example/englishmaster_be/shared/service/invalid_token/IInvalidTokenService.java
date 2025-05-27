@@ -12,11 +12,10 @@ public interface IInvalidTokenService {
 
     boolean inValidToken(String token);
 
-    void saveInvalidToken(SessionActiveEntity sessionActive, InvalidTokenType typeInvalid);
-
     void saveInvalidToken(String token, UUID userId, InvalidTokenType typeInvalid);
 
-    void saveInvalidTokenList(List<SessionActiveEntity> sessionActiveEntityList, InvalidTokenType typeInvalid);
+    void saveInvalidTokenList(List<SessionActiveEntity> sessionActiveEntityList, UserEntity user, InvalidTokenType typeInvalid);
 
-    void saveInvalidToken(String token, SessionActiveType type);
+    void sessionActiveToInvalidToken(String tokenHash, UUID userId, InvalidTokenType typeInvalid);
+
 }

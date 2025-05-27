@@ -1,5 +1,7 @@
 package com.example.englishmaster_be.domain.user.service;
 
+import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;
+import com.example.englishmaster_be.model.otp.OtpEntity;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.user.dto.request.*;
 import com.example.englishmaster_be.model.user.UserEntity;
@@ -34,4 +36,10 @@ public interface IUserService {
     boolean existsEmail(String email);
 
     void updateLastLoginTime(UUID userId, LocalDateTime lastLoginTime);
+
+    UserAuthResponse updatePassword(UserEntity user, String oldPassword, String newPassword);
+
+    void updatePasswordForgot(UserEntity user, String newPassword);
+
+    void logoutUser();
 }

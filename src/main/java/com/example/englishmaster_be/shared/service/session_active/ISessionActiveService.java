@@ -13,7 +13,9 @@ public interface ISessionActiveService {
 
     SessionActiveEntity getByCode(UUID code);
 
-    SessionActiveEntity getByCodeAndType(UUID code, SessionActiveType type);
+    SessionActiveEntity getJoinUserByCodeAndType(UUID code, SessionActiveType type);
+
+    SessionActiveEntity getJoinUserRoleByCodeAndType(UUID code, SessionActiveType type);
 
     SessionActiveEntity getByToken(String token);
 
@@ -22,6 +24,8 @@ public interface ISessionActiveService {
     SessionActiveEntity saveSessionActive(UserEntity user, String jwtToken);
 
     SessionActiveEntity saveForUser(UserEntity user, SessionActiveType type);
+
+    void saveSessionActive(UUID userId, String jwtToken);
 
     boolean isExpirationToken(SessionActiveEntity token);
 
@@ -35,6 +39,7 @@ public interface ISessionActiveService {
 
     void deleteByCode(UUID code);
 
-    List<SessionActiveEntity> getSessionActiveList(UUID userId, SessionActiveType sessionActiveType);
+    List<SessionActiveEntity> getSessionActiveList(UserEntity user, SessionActiveType sessionActiveType);
 
+    void deleteAll(List<SessionActiveEntity> sessionActiveEntityList);
 }
