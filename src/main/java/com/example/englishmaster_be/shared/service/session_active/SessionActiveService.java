@@ -93,6 +93,7 @@ public class SessionActiveService implements ISessionActiveService {
         SessionActiveEntity sessionActiveEntity = SessionActiveEntity.builder()
                 .createAt(LocalDateTime.now(ZoneId.systemDefault()))
                 .user(user)
+                .code(UUID.randomUUID())
                 .token(tokenHash)
                 .type(SessionActiveType.REFRESH_TOKEN)
                 .build();
@@ -102,7 +103,7 @@ public class SessionActiveService implements ISessionActiveService {
 
     @Transactional
     @Override
-    public SessionActiveEntity saveForUser(UserEntity user, SessionActiveType type) {
+    public SessionActiveEntity saveForUserRegister(UserEntity user, SessionActiveType type) {
 
         SessionActiveEntity sessionActive = SessionActiveEntity.builder()
                 .type(type)
