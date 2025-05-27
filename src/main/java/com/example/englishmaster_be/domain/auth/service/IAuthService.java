@@ -15,7 +15,7 @@ public interface IAuthService {
 
     void confirmRegister(UUID sessionActiveCode);
 
-    void forgotPassword(String email);
+    void sendOtp(String email);
 
     void verifyOtp(String otp);
 

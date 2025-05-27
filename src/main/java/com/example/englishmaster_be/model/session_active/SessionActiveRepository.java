@@ -8,8 +8,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -25,7 +27,17 @@ public interface SessionActiveRepository extends JpaRepository<SessionActiveEnti
         INNER JOIN FETCH s.user
         WHERE s.code = :code AND s.type = :type
     """)
-    Optional<SessionActiveEntity> findByCodeAndType(@Param("code") UUID code, @Param("type") SessionActiveType type);
+    Optional<SessionActiveEntity> findJoinUserByCodeAndType(@Param("code") UUID code, @Param("type") SessionActiveType type);
+
+    @Query("""
+        SELECT DISTINCT s
+        FROM SessionActiveEntity s
+        INNER JOIN FETCH s.user u
+        INNER JOIN FETCH u.role 
+        WHERE s.code = :code AND s.type = :type
+    """)
+    Optional<SessionActiveEntity> findJoinUserRoleByCodeAndType(@Param("code") UUID code, @Param("type") SessionActiveType type);
+
 
     SessionActiveEntity findByUserAndType(UserEntity user, SessionActiveType type);
 
@@ -53,4 +65,28 @@ public interface SessionActiveRepository extends JpaRepository<SessionActiveEnti
     @Modifying
     @Query(value = "DELETE FROM session_active WHERE code = :code", nativeQuery = true)
     void deleteByCode(@Param("code") UUID code);
+
+
+    @Transactional
+    @Modifying
+    @Query(value = """
+        DELETE FROM session_active WHERE id IN (:ids)
+    """, nativeQuery = true)
+    void deleteAllByIds(@Param("ids") Set<UUID> ids);
+
+
+    @Transactional
+    @Modifying
+    @Query(value = """
+        INSERT INTO session_active(id, code, type, token, create_at, user_id)
+        VALUES (:id, :code, :type, :token, :createAt, :userId)
+    """, nativeQuery = true)
+    void insertSessionActive(
+        @Param("id") UUID id,
+        @Param("code") UUID code,
+        @Param("type") String type,
+        @Param("token") String token,
+        @Param("createAt") LocalDateTime createAt,
+        @Param("userId") UUID userId
+    );
 }
