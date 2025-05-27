@@ -165,7 +165,7 @@ public class AuthService implements IAuthService {
 
         OtpEntity otpEntity = otpService.getOtpAndUserByOtpCode(changePasswordRequest.getOtpCode());
 
-        boolean isValidOtp = otpEntity.getStatus().equals(OtpStatus.UN_VERIFIED);
+        boolean isValidOtp = otpEntity.getStatus().equals(OtpStatus.VERIFIED);
 
         if(!isValidOtp) throw new ErrorHolder(Error.BAD_REQUEST, "OTP invalid.");
 
@@ -179,6 +179,12 @@ public class AuthService implements IAuthService {
     public UserAuthResponse changePassword(UserChangePasswordRequest changePasswordRequest) {
 
         UserEntity user = userService.currentUser();
+
+        OtpEntity otpEntity = otpService.getOtpAndUserByOtpCode(changePasswordRequest.getOtpCode());
+
+        boolean isValidOtp = otpEntity.getStatus().equals(OtpStatus.VERIFIED);
+
+        if(!isValidOtp) throw new ErrorHolder(Error.BAD_REQUEST, "OTP invalid.");
 
         otpService.updateOtpStatus(user.getEmail(), changePasswordRequest.getOtpCode(), OtpStatus.USED);
 
