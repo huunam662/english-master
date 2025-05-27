@@ -51,9 +51,9 @@ public class AuthController {
 
     @GetMapping("/mailer/otp")
     @DefaultMessage("Check verify code at email.")
-    public void forgetPassword(@RequestParam("email") String email) {
+    public void mailerOtp(@RequestParam("email") String email) {
 
-        authService.forgotPassword(email);
+        authService.sendOtp(email);
     }
 
 

@@ -91,7 +91,7 @@ public class MailerService {
     }
 
 
-    public void sendConfirmationEmail(String email, String confirmationToken) throws IOException, MessagingException {
+    public void sendConfirmRegister(String email, String confirmationToken) throws IOException, MessagingException {
 
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);

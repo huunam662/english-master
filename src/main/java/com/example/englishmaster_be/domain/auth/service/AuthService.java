@@ -3,23 +3,16 @@ package com.example.englishmaster_be.domain.auth.service;
 import com.example.englishmaster_be.common.constant.InvalidTokenType;
 import com.example.englishmaster_be.common.constant.SessionActiveType;
 import com.example.englishmaster_be.common.constant.OtpStatus;
-import com.example.englishmaster_be.common.constant.Role;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.auth.dto.request.*;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.model.session_active.SessionActiveRepository;
-import com.example.englishmaster_be.model.role.RoleRepository;
 import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
-import com.example.englishmaster_be.model.user.UserRepository;
 import com.example.englishmaster_be.shared.service.invalid_token.IInvalidTokenService;
 import com.example.englishmaster_be.shared.service.otp.IOtpService;
 import com.example.englishmaster_be.shared.service.session_active.ISessionActiveService;
-import com.example.englishmaster_be.helper.AuthHelper;
 import com.example.englishmaster_be.shared.service.jwt.JwtService;
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;
-import com.example.englishmaster_be.domain.auth.dto.response.UserConfirmTokenResponse;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
-import com.example.englishmaster_be.mapper.ConfirmationTokenMapper;
 import com.example.englishmaster_be.mapper.UserMapper;
 import com.example.englishmaster_be.model.otp.OtpEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
@@ -52,8 +45,6 @@ public class AuthService implements IAuthService {
 
     MailerService mailerUtil;
 
-    AuthHelper authUtil;
-
     AuthenticationManager authenticationManager;
 
     PasswordEncoder passwordEncoder;
@@ -65,12 +56,6 @@ public class AuthService implements IAuthService {
     IInvalidTokenService invalidTokenService;
 
     IOtpService otpService;
-
-    UserRepository userRepository;
-
-    SessionActiveRepository sessionActiveRepository;
-
-    RoleRepository roleRepository;
 
 
     @Transactional
@@ -86,13 +71,13 @@ public class AuthService implements IAuthService {
         if(!userDetails.isEnabled())
             throw new ErrorHolder(Error.ACCOUNT_DISABLED);
 
-        UserEntity user = userService.getUserByEmail(userDetails.getUsername());
+        UserEntity user = (UserEntity) userDetails;
 
-        String jwtToken = jwtUtil.generateToken(user);
+        String jwtToken = jwtUtil.generateToken(userDetails);
 
         SessionActiveEntity sessionActive = sessionActiveService.saveSessionActive(user, jwtToken);
 
-        return UserMapper.INSTANCE.toUserAuthResponse(sessionActive, jwtToken);
+        return UserMapper.INSTANCE.toUserAuthResponse(sessionActive.getCode(), jwtToken, user);
     }
 
 
@@ -101,29 +86,27 @@ public class AuthService implements IAuthService {
     @Override
     public void registerUser(UserRegisterRequest userRegisterRequest) {
 
-        UserEntity user = userRepository.findByEmail(userRegisterRequest.getEmail()).orElse(null);
+        UserEntity user = userService.getUserByEmail(userRegisterRequest.getEmail(), false);
 
         if(user != null && user.getEnabled())
             throw new ErrorHolder(Error.BAD_REQUEST, "Email is used.");
 
         UserEntity userRegister = UserMapper.INSTANCE.toUserEntity(userRegisterRequest);
 
-        if(user != null)
-            userRegister.setUserId(user.getUserId());
+        if(user != null) userRegister.setUserId(user.getUserId());
 
         userRegister.setPassword(passwordEncoder.encode(userRegisterRequest.getPassword()));
-        userRegister.setRole(roleRepository.findByRoleName(Role.USER));
-        userRegister.setEnabled(Boolean.FALSE);
+        userRegister.setEnabled(false);
 
         if(user != null && user.getConfirmTokens() != null)
-            sessionActiveRepository.deleteByUserAndType(user, SessionActiveType.CONFIRM);
+            sessionActiveService.deleteByUserIdAndType(user.getUserId(), SessionActiveType.CONFIRM);
 
-        userRegister = userRepository.save(userRegister);
+        userRegister = userService.saveUser(userRegister);
 
-        UserConfirmTokenResponse confirmationTokenResponse = this.createConfirmationToken(userRegister);
+        SessionActiveEntity sessionConfirm = sessionActiveService.saveForUser(userRegister, SessionActiveType.CONFIRM);
 
         try {
-            mailerUtil.sendConfirmationEmail(userRegister.getEmail(), confirmationTokenResponse.getCode());
+            mailerUtil.sendConfirmRegister(userRegister.getEmail(), sessionConfirm.getCode().toString());
         } catch (IOException | MessagingException e) {
             throw new ErrorHolder(Error.SEND_EMAIL_FAILURE);
         }
@@ -132,63 +115,34 @@ public class AuthService implements IAuthService {
 
     @Transactional
     @Override
-    public UserConfirmTokenResponse createConfirmationToken(UserEntity user) {
-
-        SessionActiveEntity sessionActive = SessionActiveEntity.builder()
-                .type(SessionActiveType.CONFIRM)
-                .user(user)
-                .code(UUID.randomUUID())
-                .createAt(LocalDateTime.now())
-                .build();
-
-        sessionActive = sessionActiveRepository.save(sessionActive);
-
-        return ConfirmationTokenMapper.INSTANCE.toConfirmationTokenResponse(sessionActive);
-    }
-
-
-    @Transactional
-    @Override
     public void confirmRegister(UUID sessionActiveCode) {
 
-        SessionActiveEntity confirmToken = sessionActiveRepository.findByCodeAndType(sessionActiveCode, SessionActiveType.CONFIRM);
+        SessionActiveEntity sessionConfirm = sessionActiveService.getJoinUserByCodeAndType(sessionActiveCode, SessionActiveType.CONFIRM);
 
-        if (confirmToken == null)
-            throw new ErrorHolder(Error.RESOURCE_NOT_FOUND);
-
-        if (confirmToken.getUser().getEnabled())
-            throw new ErrorHolder(Error.BAD_REQUEST, "Account had been verified.");
-
-        if ((confirmToken.getCreateAt().plusMinutes(5)).isBefore(LocalDateTime.now()))
+        if ((sessionConfirm.getCreateAt().plusMinutes(5)).isBefore(LocalDateTime.now()))
             throw new ErrorHolder(Error.BAD_REQUEST, "Verification session had been expired, try again.");
 
-        UserEntity user = confirmToken.getUser();
+        UserEntity user = sessionConfirm.getUser();
 
-        user.setEnabled(Boolean.TRUE);
+        userService.enabledUser(user.getUserId());
 
-        userRepository.save(user);
-
-        sessionActiveRepository.deleteByUserAndType(user, SessionActiveType.CONFIRM);
+        sessionActiveService.deleteByUserIdAndType(user.getUserId(), SessionActiveType.CONFIRM);
     }
 
 
     @Transactional
     @SneakyThrows
     @Override
-    public void forgotPassword(String email) {
+    public void sendOtp(String email) {
 
         if (email == null || email.isEmpty())
             throw new ErrorHolder(Error.BAD_REQUEST, "Email is required.");
 
-        boolean emailExisting = userService.existsEmail(email);
+        UserEntity user = userService.getUserByEmail(email);
 
-        if(!emailExisting)
-            throw new ErrorHolder(Error.BAD_REQUEST, "Your email does not existing.");
-
-        OtpEntity otpEntity = otpService.generateOtp(email);
+        OtpEntity otpEntity = otpService.generateOtp(user);
 
         mailerUtil.sendOtpToEmail(email, otpEntity.getOtp());
-
     }
 
 
@@ -196,12 +150,9 @@ public class AuthService implements IAuthService {
     @Override
     public void verifyOtp(String otp) {
 
-        if (otp == null || otp.isEmpty())
-            throw new ErrorHolder(Error.BAD_REQUEST, "OTP code is required.");
-
         OtpEntity otpEntity = otpService.getByOtp(otp);
 
-        if (!otpService.isValidOtp(otpEntity))
+        if (otpService.isExpiredOtp(otpEntity))
             throw new ErrorHolder(Error.BAD_REQUEST, "OTP is expired.");
 
         otpService.updateOtpStatus(otpEntity.getEmail(), otp, OtpStatus.VERIFIED);
@@ -212,9 +163,15 @@ public class AuthService implements IAuthService {
     @Override
     public void changePasswordForgot(UserChangePwForgotRequest changePasswordRequest) {
 
-        OtpEntity otpEntity = otpService.getByOtp(changePasswordRequest.getOtpCode());
+        OtpEntity otpEntity = otpService.getOtpAndUserByOtpCode(changePasswordRequest.getOtpCode());
 
-        authUtil.saveNewPassword(otpEntity.getUser(), changePasswordRequest.getNewPassword(), changePasswordRequest.getOtpCode());
+        boolean isValidOtp = otpEntity.getStatus().equals(OtpStatus.UN_VERIFIED);
+
+        if(!isValidOtp) throw new ErrorHolder(Error.BAD_REQUEST, "OTP invalid.");
+
+        otpService.updateOtpStatus(otpEntity.getEmail(), otpEntity.getOtp(), OtpStatus.USED);
+
+        userService.updatePasswordForgot(otpEntity.getUser(), changePasswordRequest.getNewPassword());
     }
 
     @Transactional
@@ -223,10 +180,13 @@ public class AuthService implements IAuthService {
 
         UserEntity user = userService.currentUser();
 
-        if (!passwordEncoder.matches(changePasswordRequest.getOldPassword(), user.getPassword()))
-            throw new ErrorHolder(Error.BAD_REQUEST, "Old password invalid.");
+        otpService.updateOtpStatus(user.getEmail(), changePasswordRequest.getOtpCode(), OtpStatus.USED);
 
-        return authUtil.saveNewPassword(user, changePasswordRequest.getNewPassword(), changePasswordRequest.getOtpCode());
+        return userService.updatePassword(
+                user,
+                changePasswordRequest.getOldPassword(),
+                changePasswordRequest.getNewPassword()
+        );
     }
 
 
@@ -234,39 +194,43 @@ public class AuthService implements IAuthService {
     @Override
     public UserAuthResponse refreshToken(UserRefreshTokenRequest refreshTokenDTO) {
 
-        UUID refresh = refreshTokenDTO.getRequestRefresh();
+        UUID refreshToken = refreshTokenDTO.getRequestRefresh();
 
-        SessionActiveEntity sessionActive = sessionActiveService.getByCode(refresh);
+        SessionActiveEntity sessionActive = sessionActiveService.getJoinUserRoleByCodeAndType(refreshToken, SessionActiveType.REFRESH_TOKEN);
 
-        if (sessionActive == null)
-            throw new ErrorHolder(Error.BAD_REQUEST, "Invalid refresh.");
-
-        sessionActiveService.verifyExpiration(sessionActive);
+        if(sessionActiveService.isExpirationToken(sessionActive))
+            throw new ErrorHolder(Error.UNAUTHENTICATED, "Refresh session was expired.");
 
         String newToken = jwtUtil.generateToken(sessionActive.getUser());
 
-        SessionActiveEntity sessionActiveNew = sessionActiveService.saveSessionActive(sessionActive.getUser(), newToken);
+        sessionActiveService.saveSessionActive(sessionActive.getUser().getUserId(), newToken);
 
-        invalidTokenService.insertInvalidToken(sessionActive, InvalidTokenType.REPLACED);
+        invalidTokenService.saveInvalidToken(
+                refreshTokenDTO.getRequestToken(),
+                sessionActive.getUser().getUserId(),
+                InvalidTokenType.EXPIRED
+        );
 
-        sessionActiveRepository.delete(sessionActive);
-
-        return UserMapper.INSTANCE.toUserAuthResponse(sessionActiveNew, newToken);
+        return UserMapper.INSTANCE.toUserAuthResponse(refreshTokenDTO.getRequestRefresh(), newToken, sessionActive.getUser());
     }
 
 
     @Override
     public void logoutOf(UserLogoutRequest userLogoutRequest) {
 
-        authUtil.logoutUser();
+        UserEntity user = userService.currentUser();
 
         SessionActiveEntity sessionActive = sessionActiveService.getByCode(userLogoutRequest.getRefreshToken());
 
         if(sessionActive != null){
 
-            invalidTokenService.insertInvalidToken(sessionActive, InvalidTokenType.LOGOUT);
+            invalidTokenService.saveInvalidToken(userLogoutRequest.getAccessToken(), user.getUserId(), InvalidTokenType.LOGOUT);
 
-            sessionActiveRepository.delete(sessionActive);
+            sessionActiveService.deleteByToken(userLogoutRequest.getAccessToken());
+
+            sessionActiveService.deleteByCode(userLogoutRequest.getRefreshToken());
         }
+
+        userService.logoutUser();
     }
 }

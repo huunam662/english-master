@@ -15,7 +15,7 @@ public interface IAuthService {
 
     void confirmRegister(UUID sessionActiveCode);
 
-    void forgotPassword(String email);
+    void sendOtp(String email);
 
     void verifyOtp(String otp);
 
@@ -26,7 +26,5 @@ public interface IAuthService {
     UserAuthResponse refreshToken(UserRefreshTokenRequest refreshTokenRequest);
 
     void logoutOf(UserLogoutRequest userLogoutRequest);
-
-    UserConfirmTokenResponse createConfirmationToken(UserEntity user);
 
 }

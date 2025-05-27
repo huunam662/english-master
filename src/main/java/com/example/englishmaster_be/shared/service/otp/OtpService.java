@@ -23,8 +23,6 @@ import java.time.LocalDateTime;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class OtpService implements IOtpService {
 
-    IUserService userService;
-
     OtpRepository otpRepository;
 
 
@@ -46,11 +44,9 @@ public class OtpService implements IOtpService {
 
     @Transactional
     @Override
-    public OtpEntity generateOtp(String email) {
+    public OtpEntity generateOtp(UserEntity user) {
 
-        otpRepository.deleteByEmail(email);
-
-        UserEntity user = userService.getUserByEmail(email);
+        otpRepository.deleteByEmail(user.getEmail());
 
         int codeLength = 6;
 
@@ -58,7 +54,7 @@ public class OtpService implements IOtpService {
 
         OtpEntity otp = OtpEntity.builder()
                 .otp(otpCode)
-                .email(email)
+                .email(user.getEmail())
                 .user(user)
                 .status(OtpStatus.UN_VERIFIED)
                 .expirationTime(LocalDateTime.now().plusMinutes(2))
@@ -69,23 +65,25 @@ public class OtpService implements IOtpService {
     }
 
     @Override
-    public boolean isValidOtp(OtpEntity otpEntity) {
+    public boolean isExpiredOtp(OtpEntity otpEntity) {
 
         if(otpEntity == null)
             throw new ErrorHolder(Error.BAD_REQUEST, "OTP invalid.");
 
-        return LocalDateTime.now().isBefore(otpEntity.getExpirationTime());
+        return !LocalDateTime.now().isBefore(otpEntity.getExpirationTime());
     }
 
     @Transactional
     @Override
     public void updateOtpStatus(String email, String otp, OtpStatus status) {
 
-        OtpEntity otpEntity = getByEmailAndOtp(email, otp);
+        if(email == null || email.isEmpty())
+            throw new ErrorHolder(Error.BAD_REQUEST, "Email required.");
 
-        otpEntity.setStatus(status);
+        if(otp == null || otp.isEmpty())
+            throw new ErrorHolder(Error.BAD_REQUEST, "OTP required.");
 
-        otpRepository.save(otpEntity);
+        otpRepository.updateStatus(email, otp, status.name());
     }
 
     @Transactional
@@ -97,4 +95,19 @@ public class OtpService implements IOtpService {
         otpRepository.delete(otpEntity);
     }
 
+    @Override
+    public boolean isVerifiedOtpAndEmail(String otp, String email) {
+
+        return otpRepository.isVerified(otp, email);
+    }
+
+    @Override
+    public OtpEntity getOtpAndUserByOtpCode(String otp) {
+
+        if(otp == null || otp.isEmpty())
+            throw new ErrorHolder(Error.BAD_REQUEST, "OTP required.");
+
+        return otpRepository.findOtpJoinUserByOtpCode(otp)
+                .orElseThrow(() -> new ErrorHolder(Error.BAD_REQUEST, "OTP invalid."));
+    }
 }

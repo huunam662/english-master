@@ -1,10 +1,13 @@
 package com.example.englishmaster_be.shared.service.invalid_token;
 
 import com.example.englishmaster_be.common.constant.InvalidTokenType;
+import com.example.englishmaster_be.common.constant.SessionActiveType;
 import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
+import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.shared.service.jwt.JwtService;
 import com.example.englishmaster_be.model.invalid_token.InvalidTokenEntity;
 import com.example.englishmaster_be.model.invalid_token.InvalidTokenRepository;
+import com.example.englishmaster_be.shared.service.session_active.ISessionActiveService;
 import com.example.englishmaster_be.value.JwtValue;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -20,13 +23,12 @@ import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class InvalidTokenService implements IInvalidTokenService {
-
-    JwtValue jwtValue;
 
     JwtService jwtUtil;
 
@@ -38,42 +40,53 @@ public class InvalidTokenService implements IInvalidTokenService {
 
         String tokenHash = jwtUtil.hashToHex(token);
 
-        Optional<InvalidTokenEntity> tokenExpire = invalidTokenRepository.findById(tokenHash);
+        return invalidTokenRepository.isValidToken(tokenHash);
+    }
 
-        return tokenExpire.isPresent();
+
+    @Transactional
+    @Override
+    public void saveInvalidToken(String jwtToken, UUID userId, InvalidTokenType typeInvalid) {
+
+        if(jwtToken == null) return;
+
+        if(userId == null) return;
+
+        String tokenHash = jwtUtil.hashToHex(jwtToken);
+
+        if(invalidTokenRepository.isValidToken(tokenHash))
+            return;
+
+        invalidTokenRepository.insertInvalidToken(
+                tokenHash, LocalDateTime.now(), LocalDateTime.now(), typeInvalid.name(), userId
+        );
+    }
+
+    @Override
+    public void sessionActiveToInvalidToken(String hashToken, UUID userId, InvalidTokenType typeInvalid) {
+
+        if(hashToken == null) return;
+
+        if(userId == null) return;
+
+        if(invalidTokenRepository.isValidToken(hashToken))
+            return;
+
+        invalidTokenRepository.insertInvalidToken(
+                hashToken, LocalDateTime.now(), LocalDateTime.now(), typeInvalid.name(), userId
+        );
     }
 
     @Transactional
     @Override
-    public void insertInvalidToken(SessionActiveEntity sessionActive, InvalidTokenType typeInvalid) {
+    public void saveInvalidTokenList(List<SessionActiveEntity> sessionActiveEntityList, UserEntity user, InvalidTokenType typeInvalid) {
 
-        if(sessionActive == null) return;
+        sessionActiveEntityList.forEach(sessionActive -> {
 
-        LocalDateTime expireTime = new Date(
-                sessionActive.getCreateAt().toInstant(ZoneOffset.UTC).toEpochMilli() + jwtValue.getJwtExpiration()
-        ).toInstant()
-                .atZone(ZoneId.systemDefault())
-                .toLocalDateTime();
+            String tokenHash = sessionActive.getToken();
 
-        InvalidTokenEntity invalidToken = InvalidTokenEntity.builder()
-                .expireTime(expireTime)
-                .createAt(LocalDateTime.now(ZoneId.systemDefault()))
-                .token(sessionActive.getToken())
-                .user(sessionActive.getUser())
-                .type(typeInvalid)
-                .build();
-
-        invalidTokenRepository.save(invalidToken);
-
-    }
-
-    @Transactional
-    @Override
-    public void insertInvalidTokenList(List<SessionActiveEntity> sessionActiveEntityList, InvalidTokenType typeInvalid) {
-
-        sessionActiveEntityList.forEach(sessionActiveEntity -> {
-
-            this.insertInvalidToken(sessionActiveEntity, typeInvalid);
+            sessionActiveToInvalidToken(tokenHash, user.getUserId(), typeInvalid);
         });
     }
+
 }

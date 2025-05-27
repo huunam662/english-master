@@ -42,24 +42,13 @@ public class JwtService {
 
     SessionActiveService sessionActiveService;
 
-    InvalidTokenService invalidTokenService;
-
     Boolean isTokenExpired(String token) {
 
         Date now = new Date(System.currentTimeMillis());
 
         Boolean isExpired = !now.before(extractExpiration(token));
 
-        if(isExpired) {
-
-            SessionActiveEntity sessionActive = sessionActiveService.getByToken(token);
-
-            if(sessionActive != null) {
-
-                invalidTokenService.insertInvalidToken(sessionActive, InvalidTokenType.EXPIRED);
-                sessionActiveService.deleteBySessionEntity(sessionActive);
-            }
-        }
+        if(isExpired) sessionActiveService.deleteByToken(token);
 
         return isExpired;
     }

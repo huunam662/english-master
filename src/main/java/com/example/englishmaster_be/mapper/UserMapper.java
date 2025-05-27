@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.mapper;
 
+import com.example.englishmaster_be.domain.auth.dto.response.UserAuthProfileResponse;
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;
 import com.example.englishmaster_be.domain.user.dto.request.UserChangeProfileRequest;
 import com.example.englishmaster_be.domain.auth.dto.request.UserRegisterRequest;
@@ -15,6 +16,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 
 @Mapper(builder = @Builder(disableBuilder = true))
@@ -32,14 +34,13 @@ public interface UserMapper {
     @Mapping(target = "user", expression = "java(toUserResponse(userEntity))")
     UserProfileResponse toInformationUserResponse(UserEntity userEntity);
 
-    @Mapping(target = "refreshToken", expression = "java(sessionActiveEntity.getCode())")
-    @Mapping(target = "accessToken", expression = "java(jwtToken)")
-    @Mapping(target = "userAuth.role", expression = "java(sessionActiveEntity.getUser().getRole().getRoleName())")
-    @Mapping(target = "userAuth.userId", expression = "java(sessionActiveEntity.getUser().getUserId())")
-    @Mapping(target = "userAuth.name", expression = "java(sessionActiveEntity.getUser().getName())")
-    @Mapping(target = "userAuth.email", expression = "java(sessionActiveEntity.getUser().getEmail())")
-    @Mapping(target = "userAuth.avatar", expression = "java(sessionActiveEntity.getUser().getAvatar())")
-    UserAuthResponse toUserAuthResponse(SessionActiveEntity sessionActiveEntity, String jwtToken);
+    @Mapping(target = "refreshToken", source = "refreshToken")
+    @Mapping(target = "accessToken", source = "jwtToken")
+    @Mapping(target = "userAuth", expression = "java(toUserAuthProfileResponse(user))")
+    UserAuthResponse toUserAuthResponse(UUID refreshToken, String jwtToken, UserEntity user);
+
+    @Mapping(target = "role", expression = "java(user.getRole().getRoleName())")
+    UserAuthProfileResponse toUserAuthProfileResponse(UserEntity user);
 
     @Mapping(target = "avatar", ignore = true)
     void flowToUserEntity(UserChangeProfileRequest changeProfileRequest, @MappingTarget UserEntity userEntity);

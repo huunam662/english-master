@@ -1,8 +1,11 @@
 package com.example.englishmaster_be.model.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -25,5 +28,22 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
         WHERE u.email = :email
     """)
     Optional<UserEntity> findUserJoinRoleByEmail(@Param("email") String email);
+
+    @Transactional
+    @Modifying
+    @Query(value = "UPDATE users SET last_login = :lastLogin WHERE id = :userId", nativeQuery = true)
+    void updateLastLogin(@Param("userId") UUID userId, @Param("lastLogin") LocalDateTime lastLogin);
+
+    @Transactional
+    @Modifying
+    @Query(value = "UPDATE users SET is_enabled = TRUE WHERE id = :userId", nativeQuery = true)
+    void updateIsEnabled(@Param("userId") UUID userId);
+
+    @Transactional
+    @Modifying
+    @Query(value = """
+        UPDATE users SET password = :newPassword WHERE email = :email
+    """, nativeQuery = true)
+    void updatePassword(@Param("newPassword") String newPassword, @Param("email") String email);
 }
 

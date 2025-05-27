@@ -15,4 +15,6 @@ public class UserRefreshTokenRequest {
 
     UUID requestRefresh;
 
+    String requestToken;
+
 }

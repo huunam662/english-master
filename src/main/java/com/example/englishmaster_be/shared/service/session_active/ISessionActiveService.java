@@ -10,9 +10,12 @@ import java.util.UUID;
 
 public interface ISessionActiveService {
 
+
     SessionActiveEntity getByCode(UUID code);
 
-    SessionActiveEntity getByCodeAndType(UUID code, SessionActiveType type);
+    SessionActiveEntity getJoinUserByCodeAndType(UUID code, SessionActiveType type);
+
+    SessionActiveEntity getJoinUserRoleByCodeAndType(UUID code, SessionActiveType type);
 
     SessionActiveEntity getByToken(String token);
 
@@ -20,12 +23,23 @@ public interface ISessionActiveService {
 
     SessionActiveEntity saveSessionActive(UserEntity user, String jwtToken);
 
-    void verifyExpiration(SessionActiveEntity token);
+    SessionActiveEntity saveForUser(UserEntity user, SessionActiveType type);
+
+    void saveSessionActive(UUID userId, String jwtToken);
+
+    boolean isExpirationToken(SessionActiveEntity token);
 
     void deleteAllTokenExpired(UserEntity user);
 
     void deleteBySessionEntity(SessionActiveEntity sessionActiveEntity);
 
-    List<SessionActiveEntity> getSessionActiveList(UUID userId, SessionActiveType sessionActiveType);
+    void deleteByUserIdAndType(UUID userId, SessionActiveType type);
 
+    void deleteByToken(String token);
+
+    void deleteByCode(UUID code);
+
+    List<SessionActiveEntity> getSessionActiveList(UserEntity user, SessionActiveType sessionActiveType);
+
+    void deleteAll(List<SessionActiveEntity> sessionActiveEntityList);
 }

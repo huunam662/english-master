@@ -3,6 +3,7 @@ package com.example.englishmaster_be.shared.service.otp;
 
 import com.example.englishmaster_be.common.constant.OtpStatus;
 import com.example.englishmaster_be.model.otp.OtpEntity;
+import com.example.englishmaster_be.model.user.UserEntity;
 
 public interface IOtpService {
 
@@ -10,11 +11,15 @@ public interface IOtpService {
 
     OtpEntity getByEmailAndOtp(String email, String otp);
 
-    OtpEntity generateOtp(String email);
+    OtpEntity generateOtp(UserEntity user);
 
-    boolean isValidOtp(OtpEntity otpEntity);
+    boolean isExpiredOtp(OtpEntity otpEntity);
 
     void updateOtpStatus(String email, String otp, OtpStatus status);
 
     void deleteOtp(String otp);
+
+    boolean isVerifiedOtpAndEmail(String otp, String email);
+
+    OtpEntity getOtpAndUserByOtpCode(String otp);
 }

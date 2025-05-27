@@ -162,7 +162,9 @@ public class TaskScheduled {
 
             List<SessionActiveEntity> sessionActiveEntityList = query.fetch();
 
-            invalidTokenService.insertInvalidTokenList(sessionActiveEntityList, InvalidTokenType.EXPIRED);
+            sessionActiveEntityList.forEach(
+                    sessionActiveEntity -> invalidTokenService.sessionActiveToInvalidToken(sessionActiveEntity.getToken(), sessionActiveEntity.getUser().getUserId(), InvalidTokenType.EXPIRED)
+            );
 
             sessionActiveRepository.deleteAll(sessionActiveEntityList);
         }
