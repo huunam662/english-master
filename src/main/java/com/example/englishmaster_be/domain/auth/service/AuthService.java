@@ -103,7 +103,7 @@ public class AuthService implements IAuthService {
 
         userRegister = userService.saveUser(userRegister);
 
-        SessionActiveEntity sessionConfirm = sessionActiveService.saveForUser(userRegister, SessionActiveType.CONFIRM);
+        SessionActiveEntity sessionConfirm = sessionActiveService.saveForUserRegister(userRegister, SessionActiveType.CONFIRM);
 
         try {
             mailerUtil.sendConfirmRegister(userRegister.getEmail(), sessionConfirm.getCode().toString());

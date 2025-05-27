@@ -23,7 +23,7 @@ public interface ISessionActiveService {
 
     SessionActiveEntity saveSessionActive(UserEntity user, String jwtToken);
 
-    SessionActiveEntity saveForUser(UserEntity user, SessionActiveType type);
+    SessionActiveEntity saveForUserRegister(UserEntity user, SessionActiveType type);
 
     void saveSessionActive(UUID userId, String jwtToken);
 
