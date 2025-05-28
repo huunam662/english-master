@@ -13,7 +13,6 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PartBasicResponse {
 
-
     UUID partId;
 
     String partName;

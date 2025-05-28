@@ -13,6 +13,7 @@ import org.mapstruct.factory.Mappers;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,7 +26,6 @@ public interface PartMapper {
 
     PartResponse toPartResponse(PartEntity part);
 
-
     List<PartResponse> toPartResponseList(Collection<PartEntity> partList);
 
     PartBasicResponse toPartBasicResponse(PartEntity partEntity);
@@ -34,16 +34,9 @@ public interface PartMapper {
 
     default List<String> toPartNameResponseList(Collection<PartEntity> partEntities) {
 
-        partEntities = new ArrayList<>(
-                partEntities.stream().collect(
-                        Collectors.toMap(
-                                PartEntity::getPartName,
-                                part -> part,
-                                (part1, part2) -> part1
-                        )
-                ).values());
-
-        return partEntities.stream().map(PartEntity::getPartName).sorted(String::compareTo).toList();
+        return partEntities.stream().map(
+                PartEntity::getPartName
+        ).distinct().sorted().toList();
     }
 
     @Mapping(target = "partId", ignore = true)

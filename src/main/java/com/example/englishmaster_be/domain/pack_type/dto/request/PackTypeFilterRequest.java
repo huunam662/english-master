@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.pack_type.dto.request;
 
-import com.example.englishmaster_be.common.constant.sort.SortByPackTypeFields;
+import com.example.englishmaster_be.common.constant.sort.PackTypeSortBy;
 import com.example.englishmaster_be.shared.dto.request.FilterRequest;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.*;
@@ -22,7 +22,7 @@ public class PackTypeFilterRequest extends FilterRequest {
     String search = "";
 
     @Parameter(description = "Sort by field.", name = "sort-by")
-    SortByPackTypeFields sortBy = SortByPackTypeFields.DEFAULT;
+    PackTypeSortBy sortBy = PackTypeSortBy.DEFAULT;
 
     @Parameter(description = "Sort direction.")
     Sort.Direction direction = Sort.Direction.DESC;

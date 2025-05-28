@@ -61,7 +61,21 @@ public class TopicController {
             @RequestBody TopicRequest topicRequest
     ) {
         
-        TopicEntity topic = topicService.saveTopic(topicRequest);
+        TopicEntity topic = topicService.createTopic(topicRequest);
+
+        return TopicMapper.INSTANCE.toTopicResponse(topic);
+    }
+
+
+    @PutMapping(value = "/{topicId:.+}/updateTopic")
+    @PreAuthorize("hasRole('ADMIN')")
+    @DefaultMessage("Update topic successfully")
+    public TopicResponse updateTopic(
+            @PathVariable("topicId") UUID topicId,
+            @RequestBody TopicRequest topicRequest
+    ) {
+
+        TopicEntity topic = topicService.updateTopic(topicId, topicRequest);
 
         return TopicMapper.INSTANCE.toTopicResponse(topic);
     }
@@ -88,21 +102,6 @@ public class TopicController {
     }
 
 
-    @PutMapping(value = "/{topicId:.+}/updateTopic")
-    @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Update topic successfully")
-    public TopicResponse updateTopic(
-            @PathVariable("topicId") UUID topicId,
-            @RequestBody TopicRequest topicRequest
-    ) {
-
-        topicRequest.setTopicId(topicId);
-
-        TopicEntity topic = topicService.saveTopic(topicRequest);
-
-        return TopicMapper.INSTANCE.toTopicResponse(topic);
-    }
-
     @PutMapping(value = "/{topicId:.+}/uploadImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Upload Topic file storage successfully")
@@ -126,25 +125,7 @@ public class TopicController {
 
     @GetMapping(value = "/listTopic")
     @DefaultMessage("Show list Topic successfully")
-    public FilterResponse<?> getAllTopic(
-            @RequestParam(value = "page", defaultValue = "1") @Min(1) int page,
-            @RequestParam(value = "size", defaultValue = "12") @Min(1) @Max(100) int size,
-            @RequestParam(value = "sortBy", defaultValue = "updateAt") String sortBy,
-            @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction sortDirection,
-            @RequestParam(value = "pack", required = false) UUID packId,
-            @RequestParam(value = "search", required = false) String search,
-            @RequestParam(value = "type", required = false) String type
-    ) {
-
-        TopicFilterRequest filterRequest = TopicFilterRequest.builder()
-                .page(page)
-                .search(search)
-                .pageSize(size)
-                .sortBy(sortBy)
-                .packId(packId)
-                .type(type)
-                .sortDirection(sortDirection)
-                .build();
+    public FilterResponse<?> getAllTopic(@ModelAttribute TopicFilterRequest filterRequest) {
 
         return topicService.getAllTopic(filterRequest);
     }

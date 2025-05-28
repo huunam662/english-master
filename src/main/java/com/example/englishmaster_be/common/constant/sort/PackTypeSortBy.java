@@ -7,25 +7,25 @@ import java.util.Arrays;
 
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public enum SortByPackTypeFields {
+public enum PackTypeSortBy {
 
     UPDATED_AT("latest"),
     TYPE_NAME("type_name");
 
     String value;
 
-    SortByPackTypeFields(final String value) {
+    PackTypeSortBy(final String value) {
         this.value = value;
     }
 
-    public static final SortByPackTypeFields DEFAULT = UPDATED_AT;
+    public static final PackTypeSortBy DEFAULT = UPDATED_AT;
 
-    public static SortByPackTypeFields fromValue(final String value) {
+    public static PackTypeSortBy fromValue(final String value) {
 
         if(value == null || value.isEmpty())
             return DEFAULT;
 
-        return Arrays.stream(SortByPackTypeFields.values()).filter(
+        return Arrays.stream(PackTypeSortBy.values()).filter(
                 v -> v.value.equalsIgnoreCase(value)
         ).findFirst()
         .orElse(DEFAULT);

@@ -54,7 +54,12 @@ public class QuestionUtil {
 
         Collections.shuffle(questionParentsShuffle);
 
-        List<PartType> partTypesNotShuffle = List.of(PartType.PART_1_TOEIC, PartType.PART_2_TOEIC);
+        List<PartType> partTypesNotShuffle = List.of(
+                PartType.PART_1_TOEIC,
+                PartType.PART_2_TOEIC,
+                PartType.PART_1_IELTS,
+                PartType.PART_2_IELTS
+        );
 
         boolean notShuffleAnswer = partTypesNotShuffle.stream().anyMatch(
                 partType -> partType.getType().equalsIgnoreCase(partEntity.getPartType())

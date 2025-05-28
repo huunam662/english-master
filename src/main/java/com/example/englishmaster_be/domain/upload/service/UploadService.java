@@ -178,6 +178,25 @@ public class UploadService implements IUploadService {
         contentRepository.deleteByContentData(dto.getFilepath());
     }
 
+    @Transactional
+    @Override
+    public void delete(String filepath) {
+
+        String path = extractPathFromFilepath(filepath);
+
+        if(path == null) return;
+
+        String encodedPath = Base64.getEncoder().encodeToString(path.getBytes(StandardCharsets.UTF_8));
+        String url = uploadValue.getDeleteApiUrl() + encodedPath;
+        HttpHeaders headers = createHttpHeaders(MediaType.APPLICATION_JSON);
+        ResponseEntity<String> response = sendHttpRequest(url, HttpMethod.DELETE, headers, null);
+
+        if (response.getStatusCode() != HttpStatus.OK)
+            throw new RuntimeException("Failed to delete image: " + response.getBody());
+
+        contentRepository.deleteByContentData(filepath);
+    }
+
     private String extractPathFromFilepath(String filepath) {
 
         return Optional.ofNullable(filepath)
