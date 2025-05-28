@@ -7,7 +7,7 @@ import lombok.experimental.FieldDefaults;
 
 @Getter
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public enum SortByTypeFields {
+public enum TypeSortBy {
 
     None,
 

@@ -1,13 +1,13 @@
 package com.example.englishmaster_be.util;
 
-import com.example.englishmaster_be.common.constant.sort.SortByPackTypeFields;
+import com.example.englishmaster_be.common.constant.sort.PackTypeSortBy;
 import com.example.englishmaster_be.model.pack_type.QPackTypeEntity;
 import com.querydsl.core.types.OrderSpecifier;
 import org.springframework.data.domain.Sort;
 
 public class PackTypeUtil {
 
-    public static OrderSpecifier<?> buildPackTypeOrderSpecifier(SortByPackTypeFields sortBy, Sort.Direction direction){
+    public static OrderSpecifier<?> buildPackTypeOrderSpecifier(PackTypeSortBy sortBy, Sort.Direction direction){
 
         boolean isAscending = direction.isAscending();
 

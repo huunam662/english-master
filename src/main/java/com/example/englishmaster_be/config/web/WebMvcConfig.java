@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.config.web;
 
-import com.example.englishmaster_be.common.constant.sort.SortByPackTypeFields;
+import com.example.englishmaster_be.common.constant.sort.PackTypeSortBy;
+import com.example.englishmaster_be.common.constant.sort.TopicSortBy;
 import com.example.englishmaster_be.config.middleware.interceptor.MiddlewareInterceptorConfig;
 import com.example.englishmaster_be.value.AppValue;
 import lombok.AccessLevel;
@@ -66,15 +67,25 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addFormatters(FormatterRegistry registry) {
 
-        registry.addConverter(new Converter<String, SortByPackTypeFields>() {
+        registry.addConverter(new Converter<String, PackTypeSortBy>() {
 
             @Override
             @NonNull
-            public SortByPackTypeFields convert(@NonNull String source) {
+            public PackTypeSortBy convert(@NonNull String source) {
 
-                return SortByPackTypeFields.fromValue(source);
+                return PackTypeSortBy.fromValue(source);
             }
 
+        });
+
+        registry.addConverter(new Converter<String, TopicSortBy>() {
+
+            @Override
+            @NonNull
+            public TopicSortBy convert(@NonNull String source) {
+
+                return TopicSortBy.fromCode(source);
+            }
         });
     }
 }

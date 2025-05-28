@@ -3,6 +3,7 @@ package com.example.englishmaster_be.model.topic;
 import com.example.englishmaster_be.model.pack.PackEntity;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
@@ -10,7 +11,7 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import java.time.LocalDateTime;
 import java.util.*;
 
-public interface TopicRepository extends JpaRepository<TopicEntity, UUID> {
+public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, JpaSpecificationExecutor<TopicEntity> {
 
     Page<TopicEntity> findAll(Pageable pageable);
 
@@ -58,5 +59,6 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID> {
             AND qgc.isQuestionParent = FALSE
     """)
     Optional<TopicEntity> findTopicQuestionsFromTopic(@Param("topicId") UUID topicId);
+
 }
 

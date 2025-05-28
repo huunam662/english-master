@@ -25,7 +25,9 @@ import java.util.UUID;
 
 public interface ITopicService {
 
-    TopicEntity saveTopic(TopicRequest topicRequest);
+    TopicEntity createTopic(TopicRequest topicRequest);
+
+    TopicEntity updateTopic(UUID topicId, TopicRequest topicRequest);
 
     ExcelTopicResponse saveTopicByExcelFile(MultipartFile file);
 

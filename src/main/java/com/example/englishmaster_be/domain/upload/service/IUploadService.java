@@ -17,4 +17,5 @@ public interface IUploadService {
 
     void delete(FileDeleteRequest dto) throws FileNotFoundException;
 
+    void delete(String filepath) throws FileNotFoundException;
 }

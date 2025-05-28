@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.feedback.dto.request;
 
 import com.example.englishmaster_be.shared.dto.request.FilterRequest;
-import com.example.englishmaster_be.common.constant.sort.SortByFeedbackFields;
+import com.example.englishmaster_be.common.constant.sort.FeedbackSortBy;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
@@ -17,7 +17,7 @@ public class FeedbackFilterRequest extends FilterRequest {
 
         String search;
 
-        SortByFeedbackFields sortBy;
+        FeedbackSortBy sortBy;
 
         Sort.Direction direction;
 
