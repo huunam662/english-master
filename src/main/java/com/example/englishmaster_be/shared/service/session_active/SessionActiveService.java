@@ -103,7 +103,7 @@ public class SessionActiveService implements ISessionActiveService {
 
     @Transactional
     @Override
-    public SessionActiveEntity saveForUser(UserEntity user, SessionActiveType type) {
+    public SessionActiveEntity saveForUserRegister(UserEntity user, SessionActiveType type) {
 
         SessionActiveEntity sessionActive = SessionActiveEntity.builder()
                 .type(type)

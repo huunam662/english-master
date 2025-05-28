@@ -73,7 +73,7 @@ public class MockTestEntity {
     @JoinColumn(name = "topic_id", referencedColumnName = "id")
     TopicEntity topic;
 
-    @OneToMany(mappedBy = "mockTest",cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "mockTest", fetch = FetchType.LAZY, orphanRemoval = true)
     Set<MockTestResultEntity> mockTestResults;
 
     @PrePersist

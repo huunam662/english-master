@@ -262,7 +262,6 @@ public class ExcelFillService implements IExcelFillService {
                 if (partEntity == null) {
 
                     partEntity = PartEntity.builder()
-                            .partId(UUID.randomUUID())
                             .partName(partName)
                             .partType(partType)
                             .partDescription(String.join(": ", List.of(partName, partType)))
