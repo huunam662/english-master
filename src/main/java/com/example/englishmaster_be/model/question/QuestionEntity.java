@@ -103,7 +103,7 @@ public class QuestionEntity {
     @OneToMany(mappedBy = "questionGroupParent", fetch = FetchType.LAZY)
     Set<QuestionEntity> questionGroupChildren;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     Set<AnswerEntity> answers;
 
     @OneToMany(mappedBy = "questionChild", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

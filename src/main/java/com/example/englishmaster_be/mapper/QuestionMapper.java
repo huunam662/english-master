@@ -1,13 +1,15 @@
 package com.example.englishmaster_be.mapper;
 
+import com.example.englishmaster_be.domain.answer.dto.request.Answer1Request;
+import com.example.englishmaster_be.domain.answer.dto.request.AnswerRequest;
+import com.example.englishmaster_be.domain.answer.dto.response.CreateAnswerResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
 import com.example.englishmaster_be.domain.part.dto.response.PartBasicResponse;
+import com.example.englishmaster_be.domain.question.dto.request.QuestionChildRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
+import com.example.englishmaster_be.domain.question.dto.request.QuestionParentRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
-import com.example.englishmaster_be.domain.question.dto.response.QuestionChildResponse;
-import com.example.englishmaster_be.domain.question.dto.response.QuestionMatchingResponse;
-import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
-import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
+import com.example.englishmaster_be.domain.question.dto.response.*;
 import com.example.englishmaster_be.util.QuestionUtil;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
@@ -157,4 +159,7 @@ public interface QuestionMapper {
     @Mapping(target = "questionId", ignore = true)
     void flowToQuestionEntity(ExcelQuestionResponse questionByExcelFileResponse, @MappingTarget QuestionEntity questionEntity);
 
+    QuestionEntity toQuestionEntity(QuestionParentRequest request);
+
+    QuestionEntity toQuestionEntity(QuestionChildRequest request);
 }

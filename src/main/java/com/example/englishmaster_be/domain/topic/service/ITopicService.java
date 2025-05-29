@@ -47,7 +47,7 @@ public interface ITopicService {
 
     List<QuestionEntity> getQuestionOfPartToTopic(UUID topicId, UUID partId);
 
-    FilterResponse<?> getAllTopic(TopicFilterRequest filterRequest);
+    FilterResponse<?> filterTopics(TopicFilterRequest filterRequest);
 
     void addPartToTopic(UUID topicId, UUID partId);
 

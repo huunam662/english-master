@@ -1005,13 +1005,13 @@ public class TopicService implements ITopicService {
     }
 
     @Override
-    public FilterResponse<?> getAllTopic(TopicFilterRequest filterRequest) {
+    public FilterResponse<?> filterTopics(TopicFilterRequest filterRequest) {
 
         int page = filterRequest.getPage() - 1;
 
         Pageable pageable = PageRequest.of(page, filterRequest.getPageSize());
 
-        Specification<TopicEntity> spec = TopicSpecification.filterExpression(filterRequest);
+        Specification<TopicEntity> spec = TopicSpecification.filterTopics(filterRequest);
 
         Page<TopicEntity> pageResult = topicRepository.findAll(spec, pageable);
 

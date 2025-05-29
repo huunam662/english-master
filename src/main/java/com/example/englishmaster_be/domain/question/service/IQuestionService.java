@@ -2,8 +2,10 @@ package com.example.englishmaster_be.domain.question.service;
 
 import com.example.englishmaster_be.domain.part.dto.response.PartQuestionResponse;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
+import com.example.englishmaster_be.domain.question.dto.request.QuestionParentRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionUpdateRequest;
+import com.example.englishmaster_be.domain.question.dto.response.CreateQuestionParentResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionDto;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.model.part.PartEntity;
@@ -12,6 +14,7 @@ import com.example.englishmaster_be.model.topic.TopicEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 
@@ -44,4 +47,6 @@ public interface IQuestionService {
     List<QuestionEntity> getQuestionGroupListByQuestionId(UUID questionId);
 
     List<QuestionPartResponse> getAllPartQuestions(String partName, UUID topicId);
+
+    List<CreateQuestionParentResponse> createListQuestionsParentOfPart(UUID partId, List<QuestionParentRequest> questionParentsRequest);
 }

@@ -85,7 +85,7 @@ public class TopicSpecification {
         };
     }
 
-    public static Specification<TopicEntity> filterExpression(TopicFilterRequest filter){
+    public static Specification<TopicEntity> filterTopics(TopicFilterRequest filter){
 
         return innerJoinPackExam(filter.getPackId())
                 .and(leftJoinParts())
