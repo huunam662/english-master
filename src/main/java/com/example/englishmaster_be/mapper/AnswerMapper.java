@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.mapper;
 
+import com.example.englishmaster_be.domain.answer.dto.request.Answer1Request;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerRequest;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerCorrectResponse;
@@ -37,4 +38,5 @@ public interface AnswerMapper {
     @Mapping(target = "scoreAnswer", source = "question.questionScore")
     AnswerCorrectResponse toCheckCorrectAnswerResponse(AnswerEntity answer);
 
+    AnswerEntity toAnswerEntity(Answer1Request answer1Request);
 }

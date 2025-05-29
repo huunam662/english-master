@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileAlreadyExistsException;
 import java.rmi.ServerException;
@@ -145,7 +146,7 @@ public class GlobalExceptionHandler implements AccessDeniedHandler, Authenticati
 
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResultApiResponse.ErrorResponse handleValidationExceptions(MethodArgumentNotValidException exception){
+    public ResultApiResponse.ErrorResponse handleValidationExceptions(MethodArgumentNotValidException exception) throws NoSuchFieldException {
 
         Error error = Error.BAD_REQUEST;
 
@@ -163,7 +164,13 @@ public class GlobalExceptionHandler implements AccessDeniedHandler, Authenticati
 
             errors = new HashMap<>();
 
-            errors.put(fieldErrors.get(lastIndex).getField(), fieldErrors.get(lastIndex).getDefaultMessage());
+            Object target = bindingResult.getTarget();
+
+            String fieldName = fieldErrors.get(lastIndex).getField();
+
+            Field field = target.getClass().getDeclaredField(fieldName);
+
+            errors.put(fieldName, "Must be type: "+field.getType().getSimpleName());
         }
         return ResultApiResponse.ErrorResponse.build(error, errors);
     }

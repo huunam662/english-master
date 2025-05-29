@@ -127,11 +127,12 @@ public class TopicController {
     @DefaultMessage("Show list Topic successfully")
     public FilterResponse<?> getAllTopic(@ModelAttribute TopicFilterRequest filterRequest) {
 
-        return topicService.getAllTopic(filterRequest);
+        return topicService.filterTopics(filterRequest);
     }
 
+    @GetMapping("/{topicId}")
     @DefaultMessage("Get Topic successfully")
-    public TopicResponse getTopic(@RequestParam("id") UUID id) {
+    public TopicResponse getTopic(@RequestParam("topicId") UUID id) {
 
         TopicEntity topic = topicService.getTopicById(id);
 

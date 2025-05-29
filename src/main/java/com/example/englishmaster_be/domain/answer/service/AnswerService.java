@@ -125,4 +125,11 @@ public class AnswerService implements IAnswerService {
 
         return question.getAnswers().stream().toList();
     }
+
+    @Transactional
+    @Override
+    public AnswerEntity save(AnswerEntity answer) {
+
+        return answerRepository.save(answer);
+    }
 }

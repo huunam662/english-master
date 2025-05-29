@@ -24,4 +24,6 @@ public interface IAnswerService {
     AnswerEntity choiceAnswer(QuestionEntity question, MockTestEntity mockTest);
 
     List<AnswerEntity> getListAnswerByQuestionId(UUID questionId);
+
+    AnswerEntity save(AnswerEntity answer);
 }

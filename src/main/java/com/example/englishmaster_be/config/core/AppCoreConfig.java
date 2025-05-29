@@ -18,10 +18,14 @@ import org.springframework.web.client.RestTemplate;
 public class AppCoreConfig {
 
     @Bean
-    public RestTemplate restTemplate() {
-        CloseableHttpClient httpClient = HttpClients.createDefault();
+    public RestTemplate restTemplate(CloseableHttpClient httpClient) {
         HttpComponentsClientHttpRequestFactory requestFactory = new HttpComponentsClientHttpRequestFactory(httpClient);
         return new RestTemplate(requestFactory);
+    }
+
+    @Bean
+    public CloseableHttpClient httpClient() {
+        return HttpClients.createDefault();
     }
 
     @Bean
