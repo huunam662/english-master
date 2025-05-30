@@ -100,7 +100,7 @@ public class QuestionEntity {
     @JoinColumn(name = "question_group", referencedColumnName = "id")
     QuestionEntity questionGroupParent;
 
-    @OneToMany(mappedBy = "questionGroupParent", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "questionGroupParent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     Set<QuestionEntity> questionGroupChildren;
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
@@ -109,7 +109,7 @@ public class QuestionEntity {
     @OneToMany(mappedBy = "questionChild", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Set<MockTestDetailEntity> detailMockTests;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
             name = "question_content",
             joinColumns = @JoinColumn(name = "question_id"),

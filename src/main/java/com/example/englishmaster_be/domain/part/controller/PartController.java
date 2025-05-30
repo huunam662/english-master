@@ -3,7 +3,6 @@ package com.example.englishmaster_be.domain.part.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.part.dto.request.PartQuestionsAnswersRequest;
-import com.example.englishmaster_be.domain.part.dto.response.CreatePartQuestionAnswerResponse;
 import com.example.englishmaster_be.domain.part.dto.response.PartKeyResponse;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.mapper.PartMapper;
@@ -42,7 +41,7 @@ public class PartController {
             summary = "Create questions and answers for part.",
             description = "Create questions and answers for part."
     )
-    public CreatePartQuestionAnswerResponse partQuestionsAnswersCreate(
+    public PartKeyResponse partQuestionsAnswersCreate(
             @RequestBody @Valid PartQuestionsAnswersRequest request
     ){
 

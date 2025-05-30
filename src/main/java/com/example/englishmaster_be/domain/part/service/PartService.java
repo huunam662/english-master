@@ -4,9 +4,8 @@ import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestPartRequest;
 import com.example.englishmaster_be.domain.part.dto.request.PartQuestionsAnswersRequest;
-import com.example.englishmaster_be.domain.part.dto.response.CreatePartQuestionAnswerResponse;
+import com.example.englishmaster_be.domain.part.dto.response.PartKeyResponse;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionParentRequest;
-import com.example.englishmaster_be.domain.question.dto.response.CreateQuestionParentResponse;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
@@ -206,7 +205,7 @@ public class PartService implements IPartService {
 
     @Transactional
     @Override
-    public CreatePartQuestionAnswerResponse createPartAndQuestionsAnswers(PartQuestionsAnswersRequest request) {
+    public PartKeyResponse createPartAndQuestionsAnswers(PartQuestionsAnswersRequest request) {
 
         UserEntity userPost = userService.currentUser();
 
@@ -231,17 +230,10 @@ public class PartService implements IPartService {
                         .build()
         );
 
-        List<QuestionParentRequest> questionParentRequestList = request.getQuestionParents();
+        questionService.createListQuestionsParentOfPart(part, request.getQuestionParents());
 
-        boolean isError = questionParentRequestList == null || questionParentRequestList.isEmpty();
-
-        List<CreateQuestionParentResponse> resultCreateQuestionsOfPart = questionService.createListQuestionsParentOfPart(part.getPartId(), request.getQuestionParents());
-
-        return CreatePartQuestionAnswerResponse.builder()
+        return PartKeyResponse.builder()
                 .partId(part.getPartId())
-                .error(isError)
-                .errorMessage(isError ? "Please fill questions data for this part." : null)
-                .createQParentErrors(resultCreateQuestionsOfPart)
                 .build();
     }
 }

@@ -7,6 +7,7 @@ import com.example.englishmaster_be.model.mock_test.MockTestEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public interface IAnswerService {
@@ -26,4 +27,6 @@ public interface IAnswerService {
     List<AnswerEntity> getListAnswerByQuestionId(UUID questionId);
 
     AnswerEntity save(AnswerEntity answer);
+
+    List<AnswerEntity> saveAll(Set<AnswerEntity> answers);
 }
