@@ -1,11 +1,11 @@
 package com.example.englishmaster_be.domain.question.service;
 
+import com.example.englishmaster_be.domain.part.dto.response.PartKeyResponse;
 import com.example.englishmaster_be.domain.part.dto.response.PartQuestionResponse;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionParentRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionUpdateRequest;
-import com.example.englishmaster_be.domain.question.dto.response.CreateQuestionParentResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionDto;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.model.part.PartEntity;
@@ -48,5 +48,5 @@ public interface IQuestionService {
 
     List<QuestionPartResponse> getAllPartQuestions(String partName, UUID topicId);
 
-    List<CreateQuestionParentResponse> createListQuestionsParentOfPart(UUID partId, List<QuestionParentRequest> questionParentsRequest);
+    void createListQuestionsParentOfPart(PartEntity part, List<QuestionParentRequest> questionParentsRequest);
 }

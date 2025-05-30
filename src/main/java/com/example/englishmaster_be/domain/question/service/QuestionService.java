@@ -5,6 +5,7 @@ import com.example.englishmaster_be.domain.answer.dto.request.Answer1Request;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.content.service.IContentService;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
+import com.example.englishmaster_be.domain.part.dto.response.PartKeyResponse;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.domain.question.dto.request.*;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
@@ -48,6 +49,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j(topic = "QUESTION-SERVICE")
 @Service
@@ -433,200 +435,19 @@ public class QuestionService implements IQuestionService {
 
     @Transactional
     @Override
-    public List<CreateQuestionParentResponse> createListQuestionsParentOfPart(UUID partId, List<QuestionParentRequest> questionParentsRequest) {
+    public void createListQuestionsParentOfPart(PartEntity part, List<QuestionParentRequest> questionParentsRequest) {
 
         UserEntity userCurrent = userService.currentUser();
 
         if(questionParentsRequest == null || questionParentsRequest.isEmpty())
-            return null;
+            return;
 
-        PartEntity part = partService.getPartToId(partId);
+        if(part == null)
+            throw new ErrorHolder(Error.BAD_REQUEST, "Part is null.");
 
-        List<CreateQuestionParentResponse> questionParentResponses = new ArrayList<>();
+        Set<QuestionEntity> questionParents = QuestionMapper.INSTANCE.toQuestionParentSet(part, questionParentsRequest, userCurrent);
 
-        Map<QuestionEntity, Map.Entry<Integer, List<QuestionChildRequest>>> questionParentSave = new HashMap<>();
-
-        int questionParentsSize = questionParentsRequest.size();
-
-        for(int i = 0; i < questionParentsSize; i++){
-
-            QuestionParentRequest questionParentRequest = questionParentsRequest.get(i);
-
-            try{
-
-                QuestionEntity questionParent = QuestionMapper.INSTANCE.toQuestionEntity(questionParentRequest);
-                questionParent.setPart(part);
-                questionParent.setIsQuestionParent(true);
-                questionParent.setUserCreate(userCurrent);
-                questionParent.setUserUpdate(userCurrent);
-
-                questionParent = questionRepository.save(questionParent);
-
-                if(questionParentRequest.getQuestionChilds() == null || questionParentRequest.getQuestionChilds().isEmpty())
-                    questionParentResponses.add(
-                        CreateQuestionParentResponse.builder()
-                            .error(true)
-                            .errorMessage("Please fill questions for this.")
-                            .parentIndex(i)
-                            .build()
-                    );
-                else {
-                    questionParentSave.put(questionParent, Map.entry(i, questionParentRequest.getQuestionChilds()));
-                }
-            }
-            catch (Exception e){
-
-                log.error(e.getMessage());
-
-                questionParentResponses.add(
-                        CreateQuestionParentResponse.builder()
-                                .error(true)
-                                .errorMessage("Create group question failed, please try again or remove it.")
-                                .parentIndex(i)
-                                .build()
-                );
-            }
-        }
-
-        Map<Map.Entry<QuestionEntity, List<Answer1Request>>, Map.Entry<Integer, QuestionEntity>> questionChildSave = new HashMap<>();
-
-        for(QuestionEntity questionParent : questionParentSave.keySet()){
-
-            List<QuestionChildRequest> questionChildRequests = questionParentSave.get(questionParent).getValue();
-
-            if(questionChildRequests == null || questionChildRequests.isEmpty())
-                continue;
-
-            CreateQuestionParentResponse questionParentResponse = CreateQuestionParentResponse.builder()
-                    .error(true)
-                    .errorMessage("Some question group of this has error.")
-                    .parentIndex(questionParentSave.get(questionParent).getKey())
-                    .createQChildErrors(new ArrayList<>())
-                    .build();
-
-            int totalScoreQuestionChild = 0;
-
-            int questionChildSize = questionChildRequests.size();
-
-            for(int i = 0; i < questionChildSize; i++){
-
-                QuestionChildRequest questionChildRequest = questionChildRequests.get(i);
-
-                try{
-
-                    QuestionEntity questionChild = QuestionMapper.INSTANCE.toQuestionEntity(questionChildRequest);
-                    questionChild.setPart(part);
-                    questionChild.setIsQuestionParent(false);
-                    questionChild.setQuestionGroupParent(questionParent);
-                    questionChild.setUserCreate(userCurrent);
-                    questionChild.setUserUpdate(userCurrent);
-
-                    questionChild = questionRepository.save(questionChild);
-
-                    if(questionChildRequest.getAnswers() == null || questionChild.getAnswers().isEmpty())
-                        questionParentResponse.getCreateQChildErrors().add(
-                                CreateQuestionChildResponse.builder()
-                                        .error(true)
-                                        .errorMessage("Please fill answers for this.")
-                                        .childIndex(i)
-                                        .build()
-                        );
-                    else {
-                        questionChildSave.put(
-                                Map.entry(questionChild, questionChildRequest.getAnswers()),
-                                Map.entry(i, questionParent)
-                        );
-                    }
-
-                    totalScoreQuestionChild += questionChild.getQuestionScore();
-                }
-                catch (Exception e){
-
-                    log.error(e.getMessage());
-
-                    questionParentResponse.getCreateQChildErrors().add(
-                            CreateQuestionChildResponse.builder()
-                                    .error(true)
-                                    .errorMessage("Create question failed, please try again or remove it.")
-                                    .childIndex(i)
-                                    .build()
-                    );
-                }
-            }
-
-            questionParent.setQuestionScore(totalScoreQuestionChild);
-
-            questionRepository.save(questionParent);
-
-            if(questionParentResponse.getCreateQChildErrors() != null && !questionParentResponse.getCreateQChildErrors().isEmpty())
-                questionParentResponses.add(questionParentResponse);
-        }
-
-        Set<Map.Entry<QuestionEntity, List<Answer1Request>>> questionChildKetSet = questionChildSave.keySet();
-
-        CreateQuestionParentResponse questionParentResponse = null;
-
-        for(var questionChildAnswers : questionChildKetSet){
-
-            QuestionEntity questionChild = questionChildAnswers.getKey();
-
-            List<Answer1Request> answer1RequestList = questionChildAnswers.getValue();
-
-            Map.Entry<Integer, QuestionEntity> indexChildAndQuestionParentMap = questionChildSave.get(questionChildAnswers);
-
-            QuestionEntity questionParent = indexChildAndQuestionParentMap.getValue();
-
-            int questionParentIndex = questionParentSave.get(questionParent).getKey();
-
-            int questionChildIndex = indexChildAndQuestionParentMap.getKey();
-
-            if(questionParentResponse == null || questionParentResponse.getParentIndex() != questionParentIndex) {
-
-                if(questionParentResponse != null && !questionParentResponse.getCreateQChildErrors().isEmpty())
-                    questionParentResponses.add(questionParentResponse);
-
-                questionParentResponse = CreateQuestionParentResponse.builder()
-                        .error(true)
-                        .errorMessage("Some answers at some question group of this has error.")
-                        .parentIndex(questionParentIndex)
-                        .createQChildErrors(new ArrayList<>())
-                        .build();
-            }
-
-            List<String> answerErrors = new ArrayList<>();
-
-            for(Answer1Request answer1Request : answer1RequestList){
-
-                try {
-
-                    AnswerEntity answer = AnswerMapper.INSTANCE.toAnswerEntity(answer1Request);
-                    answer.setQuestion(questionChild);
-                    answer.setUserCreate(userCurrent);
-                    answer.setUserUpdate(userCurrent);
-
-                    answerRepository.save(answer);
-                }
-                catch (Exception e){
-
-                    log.error(e.getMessage());
-
-                    answerErrors.add(answer1Request.getAnswerContent());
-                }
-            }
-
-            if(!answerErrors.isEmpty()){
-                questionParentResponse.getCreateQChildErrors().add(
-                        CreateQuestionChildResponse.builder()
-                                .error(true)
-                                .errorMessage("Some answers has error.")
-                                .childIndex(questionChildIndex)
-                                .answerContentErrors(answerErrors)
-                                .build()
-                );
-            }
-        }
-
-        return questionParentResponses;
+        questionRepository.saveAll(questionParents);
     }
 
 }
