@@ -100,16 +100,16 @@ public class QuestionEntity {
     @JoinColumn(name = "question_group", referencedColumnName = "id")
     QuestionEntity questionGroupParent;
 
-    @OneToMany(mappedBy = "questionGroupParent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "questionGroupParent", fetch = FetchType.LAZY)
     Set<QuestionEntity> questionGroupChildren;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "question", orphanRemoval = true, fetch = FetchType.LAZY)
     Set<AnswerEntity> answers;
 
-    @OneToMany(mappedBy = "questionChild", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "questionChild", fetch = FetchType.LAZY)
     Set<MockTestDetailEntity> detailMockTests;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "question_content",
             joinColumns = @JoinColumn(name = "question_id"),

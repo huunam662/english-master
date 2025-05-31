@@ -149,6 +149,9 @@ public class TopicService implements ITopicService {
             topic.setWorkTime(LocalTime.parse(topicRequest.getWorkTime(), formatter));
         }
         catch (Exception e){
+
+            log.error(e.getMessage());
+
             throw new ErrorHolder(Error.BAD_REQUEST, "Work time must be pattern HH:mm:ss");
         }
 

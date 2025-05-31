@@ -1,11 +1,9 @@
 package com.example.englishmaster_be.domain.question.service;
 
 import com.example.englishmaster_be.common.constant.QuestionType;
-import com.example.englishmaster_be.domain.answer.dto.request.Answer1Request;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.content.service.IContentService;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
-import com.example.englishmaster_be.domain.part.dto.response.PartKeyResponse;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.domain.question.dto.request.*;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
@@ -16,11 +14,9 @@ import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
-import com.example.englishmaster_be.mapper.AnswerMapper;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.content.ContentEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
-import com.example.englishmaster_be.model.part.PartQueryFactory;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.question.QuestionQueryFactory;
 import com.example.englishmaster_be.model.topic.TopicEntity;
@@ -31,6 +27,7 @@ import com.example.englishmaster_be.model.content.ContentRepository;
 import com.example.englishmaster_be.model.part.PartRepository;
 import com.example.englishmaster_be.model.question.QuestionRepository;
 import com.example.englishmaster_be.helper.FileHelper;
+import com.example.englishmaster_be.shared.batch.JpaBatchPersistor;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -50,6 +47,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j(topic = "QUESTION-SERVICE")
 @Service
@@ -60,6 +58,8 @@ public class QuestionService implements IQuestionService {
     FileHelper fileUtil;
 
     QuestionQueryFactory questionQueryFactory;
+
+    JpaBatchPersistor jpaBatchPersistor;
 
     QuestionRepository questionRepository;
 
@@ -447,7 +447,35 @@ public class QuestionService implements IQuestionService {
 
         Set<QuestionEntity> questionParents = QuestionMapper.INSTANCE.toQuestionParentSet(part, questionParentsRequest, userCurrent);
 
-        questionRepository.saveAll(questionParents);
+        Set<QuestionEntity> questionChilds = questionParents.stream().flatMap(
+                question -> question.getQuestionGroupChildren() != null ? question.getQuestionGroupChildren().stream() : Stream.empty()
+        ).collect(Collectors.toSet());
+
+        Set<ContentEntity> contents = questionParents.stream().flatMap(
+                question -> {
+
+                    Stream<ContentEntity> streamContent = question.getContentCollection() != null ? question.getContentCollection().stream() : Stream.empty();
+
+                    if(question.getQuestionGroupChildren() == null) return streamContent;
+
+                    return Stream.concat(streamContent, question.getQuestionGroupChildren().stream().flatMap(
+                            questionChild -> questionChild.getContentCollection() != null ? questionChild.getContentCollection().stream() : Stream.empty()
+                    ));
+                }
+        ).collect(Collectors.toSet());
+
+        Set<AnswerEntity> answers = questionChilds.stream().flatMap(
+                question -> question.getAnswers() != null ? question.getAnswers().stream() : Stream.empty()
+        ).collect(Collectors.toSet());
+
+
+        jpaBatchPersistor.saveAll(contents);
+
+        jpaBatchPersistor.saveAll(questionParents);
+
+        jpaBatchPersistor.saveAll(questionChilds);
+
+        jpaBatchPersistor.saveAll(answers);
     }
 
 }
