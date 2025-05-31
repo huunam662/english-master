@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.question.service;
 
+import com.example.englishmaster_be.batch.*;
 import com.example.englishmaster_be.common.constant.QuestionType;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.content.service.IContentService;
@@ -27,7 +28,7 @@ import com.example.englishmaster_be.model.content.ContentRepository;
 import com.example.englishmaster_be.model.part.PartRepository;
 import com.example.englishmaster_be.model.question.QuestionRepository;
 import com.example.englishmaster_be.helper.FileHelper;
-import com.example.englishmaster_be.shared.batch.JpaBatchPersistor;
+import com.example.englishmaster_be.util.QuestionUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -46,8 +47,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j(topic = "QUESTION-SERVICE")
 @Service
@@ -59,7 +58,7 @@ public class QuestionService implements IQuestionService {
 
     QuestionQueryFactory questionQueryFactory;
 
-    JpaBatchPersistor jpaBatchPersistor;
+    JpaBatchProcessor jpaBatchProcessor;
 
     QuestionRepository questionRepository;
 
@@ -80,6 +79,14 @@ public class QuestionService implements IQuestionService {
     IAnswerService answerService;
 
     IUploadService uploadService;
+
+    JdbcQuestionBatchProcessor jdbcQuestionBatchProcessor;
+
+    JdbcContentBatchProcessor jdbcContentBatchProcessor;
+
+    JdbcAnswerBatchProcessor jdbcAnswerBatchProcessor;
+
+    JdbcQuestionContentBatchProcessor jdbcQuestionContentBatchProcessor;
 
     @Transactional
     @SneakyThrows
@@ -445,37 +452,30 @@ public class QuestionService implements IQuestionService {
         if(part == null)
             throw new ErrorHolder(Error.BAD_REQUEST, "Part is null.");
 
-        Set<QuestionEntity> questionParents = QuestionMapper.INSTANCE.toQuestionParentSet(part, questionParentsRequest, userCurrent);
+        List<QuestionEntity> questionParentToSave = new ArrayList<>();
 
-        Set<QuestionEntity> questionChilds = questionParents.stream().flatMap(
-                question -> question.getQuestionGroupChildren() != null ? question.getQuestionGroupChildren().stream() : Stream.empty()
-        ).collect(Collectors.toSet());
+        List<QuestionEntity> questionChildToSave = new ArrayList<>();
 
-        Set<ContentEntity> contents = questionParents.stream().flatMap(
-                question -> {
+        List<AnswerEntity> answerChildToSave = new ArrayList<>();
 
-                    Stream<ContentEntity> streamContent = question.getContentCollection() != null ? question.getContentCollection().stream() : Stream.empty();
+        List<ContentEntity> contentToSave  = new ArrayList<>();
 
-                    if(question.getQuestionGroupChildren() == null) return streamContent;
+        QuestionUtil.fillToCreateQuestionAnswerForPart(
+                questionParentsRequest,
+                part,
+                userCurrent,
+                contentToSave,
+                questionParentToSave,
+                questionChildToSave,
+                answerChildToSave
+        );
 
-                    return Stream.concat(streamContent, question.getQuestionGroupChildren().stream().flatMap(
-                            questionChild -> questionChild.getContentCollection() != null ? questionChild.getContentCollection().stream() : Stream.empty()
-                    ));
-                }
-        ).collect(Collectors.toSet());
-
-        Set<AnswerEntity> answers = questionChilds.stream().flatMap(
-                question -> question.getAnswers() != null ? question.getAnswers().stream() : Stream.empty()
-        ).collect(Collectors.toSet());
-
-
-        jpaBatchPersistor.saveAll(contents);
-
-        jpaBatchPersistor.saveAll(questionParents);
-
-        jpaBatchPersistor.saveAll(questionChilds);
-
-        jpaBatchPersistor.saveAll(answers);
+        jdbcContentBatchProcessor.batchInsert(contentToSave);
+        jdbcQuestionBatchProcessor.batchInsert(questionParentToSave);
+        jdbcQuestionBatchProcessor.batchInsert(questionChildToSave);
+        jdbcAnswerBatchProcessor.batchInsert(answerChildToSave);
+        jdbcQuestionContentBatchProcessor.batchInsert(questionParentToSave);
+        jdbcQuestionContentBatchProcessor.batchInsert(questionChildToSave);
     }
 
 }

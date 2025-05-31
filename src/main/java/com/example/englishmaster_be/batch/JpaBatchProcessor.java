@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.shared.batch;
+package com.example.englishmaster_be.batch;
 
 import com.example.englishmaster_be.value.AppValue;
 import jakarta.persistence.EntityManager;
@@ -8,13 +8,12 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class JpaBatchPersistor {
+public class JpaBatchProcessor {
 
     EntityManager entityManager;
 
@@ -26,26 +25,23 @@ public class JpaBatchPersistor {
         if(entitySet == null) return;
 
         int batchSize = appValue.getBatchSize();
-        int startIndex = 0;
         int entitySetSize = entitySet.size();
+        int next = 0;
 
-        List<T> questionList = entitySet.stream().toList();
+        if(batchSize > entitySetSize)
+            batchSize = entitySetSize;
 
-        while (startIndex < entitySetSize){
+        for (T entity : entitySet) {
 
-            int endIndex = startIndex + batchSize;
-            if(endIndex > entitySetSize)
-                endIndex = entitySetSize;
+            next++;
+            entityManager.persist(entity);
 
-            List<T> entityListSub = questionList.subList(startIndex, endIndex);
-            for(T entity : entityListSub)
-                entityManager.persist(entity);
-
-            entityManager.flush();
-            entityManager.clear();
-
-            startIndex = endIndex;
+            if (next % batchSize == 0 || next == entitySetSize) {
+                entityManager.flush();
+                entityManager.clear();
+            }
         }
     }
+
 
 }

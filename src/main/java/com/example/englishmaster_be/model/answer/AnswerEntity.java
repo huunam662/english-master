@@ -67,6 +67,7 @@ public class AnswerEntity {
 
     @PrePersist
     void onCreate() {
+
         createAt = LocalDateTime.now();
         updateAt = LocalDateTime.now();
     }

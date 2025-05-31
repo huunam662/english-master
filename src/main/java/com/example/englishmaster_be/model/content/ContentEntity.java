@@ -73,6 +73,7 @@ public class ContentEntity {
 
     @PrePersist
     void onCreate() {
+
         createAt = LocalDateTime.now();
         updateAt = LocalDateTime.now();
     }
