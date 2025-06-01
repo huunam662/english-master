@@ -44,7 +44,9 @@ public interface IMockTestService {
 
     List<MockTestDetailEntity> getListCorrectAnswer(int index, boolean isCorrect, UUID mockTestId);
 
-    void sendEmailToMock(@PathVariable UUID mockTestId);
+    void sendEmailToMock(UUID mockTestId);
+
+    void sendEmailToMock(MockTestEntity mockTest);
 
     MockTestPartResponse getPartToMockTest(UUID mockTestId);
 

@@ -15,6 +15,10 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
+import org.thymeleaf.spring6.SpringTemplateEngine;
+import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
+
+import java.util.HashSet;
 
 @Configuration
 @RequiredArgsConstructor
@@ -41,6 +45,27 @@ public class AppCoreConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
+    }
+
+    @Bean
+    public SpringTemplateEngine templateEngine(SpringResourceTemplateResolver templateResolver){
+
+        SpringTemplateEngine templateEngine = new SpringTemplateEngine();
+
+        templateEngine.setTemplateResolver(templateResolver);
+
+        return templateEngine;
+    }
+
+    @Bean
+    public SpringResourceTemplateResolver templateResolver() {
+
+        SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
+        templateResolver.setPrefix("classpath:/templates/");
+        templateResolver.setSuffix(".html");
+        templateResolver.setTemplateMode("HTML");
+
+        return templateResolver;
     }
 
 }

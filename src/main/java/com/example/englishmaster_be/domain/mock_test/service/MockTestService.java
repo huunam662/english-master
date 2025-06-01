@@ -30,6 +30,7 @@ import com.example.englishmaster_be.model.mock_test_result.MockTestResultReposit
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.helper.MockTestHelper;
+import com.example.englishmaster_be.shared.service.mailer.MailerService;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -88,6 +89,7 @@ public class MockTestService implements IMockTestService {
     JdbcMockTestResultBatchProcessor jdbcMockTestResultBatchProcessor;
 
     JdbcMockTestDetailBatchProcessor jdbcMockTestDetailBatchProcessor;
+    private final MailerService mailerService;
 
 
     @Override
@@ -388,56 +390,6 @@ public class MockTestService implements IMockTestService {
     }
 
 
-    protected String readTemplateContent(String templateFileName) throws IOException {
-        Resource templateResource = resourceLoader.getResource("classpath:templates/" + templateFileName);
-        byte[] templateBytes = FileCopyUtils.copyToByteArray(templateResource.getInputStream());
-        return new String(templateBytes, StandardCharsets.UTF_8);
-    }
-
-
-    protected void sendResultEmail(String email, MockTestEntity mockTest, int correctAnswer,
-                                   Map<UUID, Integer> partCorrectMap,
-                                   Map<UUID, Integer> partScoreMap) throws IOException, MessagingException {
-        // Tạo đối tượng MimeMessage
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
-        // Đọc nội dung mẫu email từ file (ví dụ: test_email.html)
-        String templateContent = readTemplateContent("test_email.html");
-
-        // Thay thế các placeholder trong template
-        templateContent = templateContent.replace("{{nameToeic}}", mockTest.getTopic().getTopicName());
-        templateContent = templateContent.replace("{{userName}}", mockTest.getUser().getName());
-        templateContent = templateContent.replace("{{correctAnswer}}", String.valueOf(correctAnswer));
-        templateContent = templateContent.replace("{{score}}", mockTest.getTotalScore() + "");
-        templateContent = templateContent.replace("{{timeAnswer}}", mockTest.getFinishTime()  + "");
-        // Nếu cần, bạn có thể thay thế thêm các placeholder khác như tổng điểm, thời gian trả lời,...
-
-        // Xây dựng nội dung hiển thị kết quả của từng phần dựa trên Map
-        StringBuilder partsHtml = new StringBuilder();
-        // Nếu hệ thống có nhiều Part, bạn có thể duyệt qua các entry của Map
-        for (Map.Entry<UUID, Integer> entry : partCorrectMap.entrySet()) {
-            UUID partId = entry.getKey();
-            int correctCount = entry.getValue();
-            int score = partScoreMap.getOrDefault(partId, 0);
-
-            // Ở đây hiển thị theo mẫu: "Part {ID} - Số câu đúng: {correctCount} - Số điểm: {score}"
-            // Nếu có tên Part hoặc thứ tự Part, bạn có thể thay thế phần hiển thị này.
-            String partHtml = "<p>Part " + partService.getPartToId(partId).getPartName() + ": Số câu đúng: " + correctCount
-                    + " - Số điểm: " + score + "</p>";
-            partsHtml.append(partHtml);
-        }
-        templateContent = templateContent.replace("{{parts}}", partsHtml.toString());
-
-        // Cấu hình thông tin email
-        helper.setTo(email);
-        helper.setSubject("Thông tin bài thi");
-        helper.setText(templateContent, true);
-
-        // Gửi email
-        mailSender.send(message);
-    }
-
 
 //    protected void saveResultMockTest(MockTestEntity mockTest, UUID partUUID, int correctAnswers, int score, UserEntity user) {
 //
@@ -498,25 +450,22 @@ public class MockTestService implements IMockTestService {
     @Override
     public void sendEmailToMock(UUID mockTestId) {
 
-//        UserEntity user = userService.currentUser();
-//
-//        MockTestEntity mockTest = findMockTestToId(mockTestId);
-//
-//        int correctAnswer = countCorrectAnswer(mockTestId);
-//        int[] corrects = new int[7];
-//        int[] scores = new int[7];
-//        List<UUID> listPartId = new ArrayList<>();
-//
-//        List<MockTestResultEntity> resultMockTestList = resultMockTestRepository.findByMockTest_MockTestId(mockTest.getMockTestId());
-//
-//        for (MockTestResultEntity resultMockTest : resultMockTestList) {
-//            int partIndex = getPartIndex(resultMockTest.getPart().getPartId());
-//            corrects[partIndex] = correctAnswer;
-//            scores[partIndex] = resultMockTest.getScore();
-//            listPartId.add(resultMockTest.getPart().getPartId());
-//        }
-//
-//        sendResultEmail(user.getEmail(), mockTest, correctAnswer, corrects, scores, listPartId);
+        MockTestEntity mockTest = getMockTestById(mockTestId);
+
+        UserEntity userOfMockTest = mockTest.getUser();
+
+        mailerService.sendResultEmail(userOfMockTest.getEmail(), mockTest);
+    }
+
+    @SneakyThrows
+    @Override
+    public void sendEmailToMock(MockTestEntity mockTest) {
+
+        if(mockTest == null) return;
+
+        UserEntity userOfMockTest = mockTest.getUser();
+
+        mailerService.sendResultEmail(userOfMockTest.getEmail(), mockTest);
     }
 
     @Override

@@ -111,7 +111,7 @@ public class MockTestController {
     }
 
     @GetMapping(value = "/{mockTestId:.+}/sendEmail")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Send email successfully")
     public void sendEmailToMock(@PathVariable("mockTestId") UUID mockTestId) {
 
