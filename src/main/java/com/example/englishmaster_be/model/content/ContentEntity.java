@@ -28,7 +28,6 @@ import java.util.UUID;
 public class ContentEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
     UUID contentId;
 
@@ -73,6 +72,9 @@ public class ContentEntity {
 
     @PrePersist
     void onCreate() {
+
+        if(contentId == null)
+            contentId = UUID.randomUUID();
 
         createAt = LocalDateTime.now();
         updateAt = LocalDateTime.now();

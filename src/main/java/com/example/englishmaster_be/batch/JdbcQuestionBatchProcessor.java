@@ -26,8 +26,12 @@ public class JdbcQuestionBatchProcessor {
 
     AppValue appValue;
 
+    JdbcQuestionContentBatchProcessor jdbcQuestionContentBatchProcessor;
+
     @Transactional
     public void batchInsert(List<QuestionEntity> questions){
+
+        if(questions == null || questions.isEmpty()) return;
 
         String sql = """
                 INSERT INTO question(
@@ -61,7 +65,7 @@ public class JdbcQuestionBatchProcessor {
                     ps.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
                     ps.setTimestamp(5, Timestamp.valueOf(LocalDateTime.now()));
                     ps.setObject(6, question.getUserCreate().getUserId());
-                    ps.setObject(7, question.getUserUpdate().getUserId());
+                    ps.setObject(7, question.getUserCreate().getUserId());
                     ps.setString(8, question.getQuestionTitle());
                     ps.setString(9, question.getQuestionContent());
                     ps.setString(10, question.getContentAudio());
@@ -81,6 +85,8 @@ public class JdbcQuestionBatchProcessor {
 
             startIndex = endIndex;
         }
+
+        jdbcQuestionContentBatchProcessor.batchInsert(questions);
     }
 
 }

@@ -236,4 +236,10 @@ public class PartService implements IPartService {
                 .partId(part.getPartId())
                 .build();
     }
+
+    @Override
+    public List<PartEntity> getPartsFinishExam(UUID topicId, List<UUID> answerIds) {
+
+        return partRepository.findPartJoinQuestionsAndAnswers(topicId, answerIds);
+    }
 }

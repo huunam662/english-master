@@ -246,7 +246,7 @@ public class QuestionUtil {
                     contentToSave.add(contentImage);
                 }
                 if(!contentCs.isEmpty())
-                    questionParent.setContentCollection(contentCs);
+                    questionChild.setContentCollection(contentCs);
 
                 questionParent.getQuestionGroupChildren().add(questionChild);
                 questionChildToSave.add(questionChild);

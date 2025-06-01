@@ -27,6 +27,8 @@ public class JdbcQuestionContentBatchProcessor {
     @Transactional
     public void batchInsert(List<QuestionEntity> questions){
 
+        if(questions == null || questions.isEmpty()) return;
+
         String sql = """
                 INSERT INTO question_content(
                     question_id, content_id

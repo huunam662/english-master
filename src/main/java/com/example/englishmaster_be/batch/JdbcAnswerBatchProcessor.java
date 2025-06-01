@@ -9,6 +9,7 @@ import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -28,6 +29,8 @@ public class JdbcAnswerBatchProcessor {
 
     @Transactional
     public void batchInsert(List<AnswerEntity> answers) {
+
+        if(answers == null || answers.isEmpty()) return;
 
         String sql = """
                 INSERT INTO answer(
@@ -59,7 +62,7 @@ public class JdbcAnswerBatchProcessor {
                     ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
                     ps.setTimestamp(4, Timestamp.valueOf(LocalDateTime.now()));
                     ps.setObject(5, answer.getUserCreate().getUserId());
-                    ps.setObject(6, answer.getUserUpdate().getUserId());
+                    ps.setObject(6, answer.getUserCreate().getUserId());
                     ps.setString(7, answer.getAnswerContent());
                     ps.setString(8, answer.getExplainDetails());
                     ps.setObject(9, answer.getQuestion().getQuestionId());

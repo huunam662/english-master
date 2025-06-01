@@ -474,8 +474,6 @@ public class QuestionService implements IQuestionService {
         jdbcQuestionBatchProcessor.batchInsert(questionParentToSave);
         jdbcQuestionBatchProcessor.batchInsert(questionChildToSave);
         jdbcAnswerBatchProcessor.batchInsert(answerChildToSave);
-        jdbcQuestionContentBatchProcessor.batchInsert(questionParentToSave);
-        jdbcQuestionContentBatchProcessor.batchInsert(questionChildToSave);
     }
 
 }

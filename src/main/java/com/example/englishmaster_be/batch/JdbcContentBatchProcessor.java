@@ -27,6 +27,8 @@ public class JdbcContentBatchProcessor {
     @Transactional
     public void batchInsert(List<ContentEntity> contents){
 
+        if(contents == null || contents.isEmpty()) return;
+
         String sql = """
                     INSERT INTO content(
                         id, create_at, update_at, create_by, update_by,
@@ -55,7 +57,7 @@ public class JdbcContentBatchProcessor {
                     ps.setTimestamp(2, Timestamp.valueOf(LocalDateTime.now()));
                     ps.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
                     ps.setObject(4, content.getUserCreate().getUserId());
-                    ps.setObject(5, content.getUserUpdate().getUserId());
+                    ps.setObject(5, content.getUserCreate().getUserId());
                     ps.setString(6, content.getCode());
                     ps.setString(7, content.getContentData());
                     ps.setString(8, content.getContentType());

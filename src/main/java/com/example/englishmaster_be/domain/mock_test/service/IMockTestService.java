@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.mock_test.service;
 
+import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestKeyResponse;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestFilterRequest;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestRequest;
@@ -25,7 +26,7 @@ public interface IMockTestService {
 
     MockTestEntity findMockTestToId(UUID mockTestId);
 
-    MockTestEntity findMockTestById(UUID mockTestId);
+    MockTestEntity getMockTestById(UUID mockTestId);
 
     List<MockTestDetailEntity> getTop10DetailToCorrect(int index, boolean isCorrect , MockTestEntity mockTest);
 
@@ -39,7 +40,7 @@ public interface IMockTestService {
 
     List<IMockTestToUserResponse> getListMockTestToUser();
 
-    List<MockTestDetailEntity> addAnswerToMockTest(UUID mockTestId, List<UUID> listAnswerId);
+    MockTestKeyResponse addAnswerToMockTest(UUID mockTestId, List<UUID> listAnswerId);
 
     List<MockTestDetailEntity> getListCorrectAnswer(int index, boolean isCorrect, UUID mockTestId);
 

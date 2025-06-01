@@ -1,12 +1,12 @@
 package com.example.englishmaster_be.model.topic;
 
+import com.example.englishmaster_be.domain.topic.dto.projection.INumberAndScoreQuestionTopic;
 import com.example.englishmaster_be.model.pack.PackEntity;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -59,6 +59,16 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, JpaSp
             AND qgc.isQuestionParent = FALSE
     """)
     Optional<TopicEntity> findTopicQuestionsFromTopic(@Param("topicId") UUID topicId);
+
+    @Query(value = """
+        SELECT COUNT(qc.id) as numberQuestions, COALESCE(SUM(qc.question_score), 0) as scoreQuestions
+        FROM topics t
+                 INNER JOIN topic_part tp ON tp.topic_id = t.id
+                 INNER JOIN part p ON tp.part_id = p.id
+                 INNER JOIN question qc ON p.id = qc.part_id
+        WHERE qc.is_question_parent = FALSE AND t.id = :topicId
+    """, nativeQuery = true)
+    INumberAndScoreQuestionTopic findNumberAndScoreQuestions(@Param("topicId") UUID topicId);
 
 }
 

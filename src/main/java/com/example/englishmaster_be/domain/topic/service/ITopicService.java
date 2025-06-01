@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.topic.service;
 
+import com.example.englishmaster_be.domain.topic.dto.projection.INumberAndScoreQuestionTopic;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionListResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
@@ -87,5 +88,6 @@ public interface ITopicService {
 
     List<QuestionPartResponse> getQuestionPartListOfTopic(UUID topicId);
 
+    INumberAndScoreQuestionTopic getNumberAndScoreQuestionTopic(UUID topicId);
 
 }
