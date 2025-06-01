@@ -49,4 +49,5 @@ public interface IQuestionService {
     List<QuestionPartResponse> getAllPartQuestions(String partName, UUID topicId);
 
     void createListQuestionsParentOfPart(PartEntity part, List<QuestionParentRequest> questionParentsRequest);
+
 }

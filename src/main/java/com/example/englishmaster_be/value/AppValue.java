@@ -14,4 +14,7 @@ public class AppValue {
     @Value("${app.api.endpoint.prefix}")
     String endpoint_prefix;
 
+    @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
+    Integer batchSize;
+
 }

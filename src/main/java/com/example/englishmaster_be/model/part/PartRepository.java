@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -36,4 +37,15 @@ public interface PartRepository extends JpaRepository<PartEntity, UUID>, JpaSpec
         SELECT EXISTS(SELECT p.id FROM part p WHERE p.id = :partId)
     """, nativeQuery = true)
     boolean isExistedByPartId(@Param("partId") UUID partId);
+
+    @Query("""
+        SELECT DISTINCT p FROM PartEntity p
+        LEFT JOIN FETCH p.topics t
+        LEFT JOIN FETCH p.questions qgc
+        LEFT JOIN FETCH qgc.answers aqc
+        WHERE t.topicId = :topicId
+        AND qgc.isQuestionParent = FALSE
+        AND aqc.answerId IN :answerIds
+    """)
+    List<PartEntity> findPartJoinQuestionsAndAnswers(@Param("topicId") UUID topicId, @Param("answerIds") List<UUID> answerIds);
 }

@@ -29,12 +29,11 @@ import java.util.UUID;
 public class MockTestResultEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
     UUID mockTestResultId;
 
     @Column(name = "total_score")
-    Integer totalScoreParts;
+    Integer totalScoreResult;
 
     @Column(name = "total_correct")
     Integer totalCorrect;
@@ -70,6 +69,10 @@ public class MockTestResultEntity {
 
     @PrePersist
     void onCreate() {
+
+        if(mockTestResultId == null)
+            mockTestResultId = UUID.randomUUID();
+
         createAt = LocalDateTime.now();
         updateAt = LocalDateTime.now();
     }

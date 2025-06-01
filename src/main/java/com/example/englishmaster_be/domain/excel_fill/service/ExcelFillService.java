@@ -467,6 +467,8 @@ public class ExcelFillService implements IExcelFillService {
 
             }
 
+            topicRepository.save(topicEntity);
+
             ExcelQuestionResponse excelQuestionResponse = ExcelContentMapper.INSTANCE.toExcelQuestionResponse(questionParent);
 
             excelQuestionResponse.setTopicId(topicId);
@@ -620,6 +622,8 @@ public class ExcelFillService implements IExcelFillService {
                 countRowWillFetch--;
 
             }
+
+            topicRepository.save(topicEntity);
 
             ExcelQuestionResponse excelQuestionResponse = ExcelContentMapper.INSTANCE.toExcelQuestionResponse(questionParent);
 
@@ -829,6 +833,8 @@ public class ExcelFillService implements IExcelFillService {
                     iRowBodyTable++;
                 }
 
+                topicRepository.save(topicEntity);
+
                 ExcelQuestionResponse excelQuestionResponse = ExcelContentMapper.INSTANCE.toExcelQuestionResponse(questionParent);
 
                 excelQuestionResponse.setTopicId(topicId);
@@ -1030,6 +1036,8 @@ public class ExcelFillService implements IExcelFillService {
 
                     iRowBodyTable++;
                 }
+
+                topicRepository.save(topicEntity);
 
                 ExcelQuestionResponse excelQuestionResponse = ExcelContentMapper.INSTANCE.toExcelQuestionResponse(questionParent);
 

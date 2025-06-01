@@ -27,7 +27,6 @@ import java.util.UUID;
 public class MockTestEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
     UUID mockTestId;
 
@@ -78,6 +77,10 @@ public class MockTestEntity {
 
     @PrePersist
     void onCreate() {
+
+        if(mockTestId == null)
+            mockTestId = UUID.randomUUID();
+
         createAt = LocalDateTime.now();
         updateAt = LocalDateTime.now();
     }

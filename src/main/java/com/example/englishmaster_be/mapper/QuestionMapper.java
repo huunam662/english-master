@@ -184,14 +184,12 @@ public interface QuestionMapper {
                         contentParent.add(
                                 ContentEntity.builder()
                                         .contentData(contentImage)
-                                        .questions(Set.of(questionParent))
                                         .build()
                         );
                     if(contentAudio != null && !contentAudio.isEmpty())
                         contentParent.add(
                                 ContentEntity.builder()
                                         .contentData(contentAudio)
-                                        .questions(Set.of(questionParent))
                                         .build()
                         );
 
@@ -229,14 +227,12 @@ public interface QuestionMapper {
                         contentChild.add(
                                 ContentEntity.builder()
                                         .contentData(contentImage)
-                                        .questions(Set.of(questionChild))
                                         .build()
                         );
                     if(contentAudio != null && !contentAudio.isEmpty())
                         contentChild.add(
                                 ContentEntity.builder()
                                         .contentData(contentAudio)
-                                        .questions(Set.of(questionChild))
                                         .build()
                         );
 

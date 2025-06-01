@@ -4,6 +4,7 @@ import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.Status;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionChildResponse;
+import com.example.englishmaster_be.domain.topic.dto.projection.INumberAndScoreQuestionTopic;
 import com.example.englishmaster_be.model.topic.TopicSpecification;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 
@@ -19,7 +20,6 @@ import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.status.service.IStatusService;
-import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.mapper.*;
@@ -48,16 +48,12 @@ import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.question.QuestionQueryFactory;
 import com.example.englishmaster_be.model.question.QuestionRepository;
 import com.example.englishmaster_be.model.status.StatusEntity;
-import com.example.englishmaster_be.model.topic.QTopicEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.topic.TopicRepository;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.helper.FileHelper;
 import com.example.englishmaster_be.util.QuestionUtil;
 import com.example.englishmaster_be.value.LinkValue;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -139,6 +135,7 @@ public class TopicService implements ITopicService {
                 .userUpdate(user)
                 .pack(pack)
                 .enable(true)
+                .numberQuestion(0)
                 .status(statusService.getStatusByName(Status.ACTIVE.name()))
                 .build();
 
@@ -149,6 +146,9 @@ public class TopicService implements ITopicService {
             topic.setWorkTime(LocalTime.parse(topicRequest.getWorkTime(), formatter));
         }
         catch (Exception e){
+
+            log.error(e.getMessage());
+
             throw new ErrorHolder(Error.BAD_REQUEST, "Work time must be pattern HH:mm:ss");
         }
 
@@ -1036,5 +1036,14 @@ public class TopicService implements ITopicService {
                 );
 
         return QuestionMapper.INSTANCE.toQuestionPartResponseList(topic);
+    }
+
+    @Override
+    public INumberAndScoreQuestionTopic getNumberAndScoreQuestionTopic(UUID topicId) {
+
+        if(topicId == null)
+            throw new ErrorHolder(Error.BAD_REQUEST, "Id of topic is required.");
+
+        return topicRepository.findNumberAndScoreQuestions(topicId);
     }
 }

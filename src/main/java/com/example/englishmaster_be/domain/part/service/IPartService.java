@@ -37,4 +37,5 @@ public interface IPartService {
 
     PartKeyResponse createPartAndQuestionsAnswers(PartQuestionsAnswersRequest request);
 
+    List<PartEntity> getPartsFinishExam(UUID topicId, List<UUID> answerIds);
 }

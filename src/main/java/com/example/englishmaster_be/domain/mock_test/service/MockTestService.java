@@ -1,5 +1,11 @@
 package com.example.englishmaster_be.domain.mock_test.service;
 
+import com.example.englishmaster_be.batch.JdbcMockTestDetailBatchProcessor;
+import com.example.englishmaster_be.batch.JdbcMockTestResultBatchProcessor;
+import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestKeyResponse;
+import com.example.englishmaster_be.domain.topic.dto.projection.INumberAndScoreQuestionTopic;
+import com.example.englishmaster_be.model.mock_test_result.MockTestResultEntity;
+import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
@@ -19,13 +25,12 @@ import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailEntity;
 import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailRepository;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;
 import com.example.englishmaster_be.model.mock_test.MockTestRepository;
-import com.example.englishmaster_be.model.mock_test_result.MockTestResultEntity;
-import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.mock_test_result.MockTestResultRepository;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.helper.MockTestHelper;
+import com.example.englishmaster_be.shared.service.mailer.MailerService;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -54,7 +59,6 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import com.example.englishmaster_be.model.mock_test.QMockTestEntity;
 
@@ -70,13 +74,7 @@ public class MockTestService implements IMockTestService {
 
     ResourceLoader resourceLoader;
 
-    MockTestHelper mockTestUtil;
-
     MockTestRepository mockTestRepository;
-
-    MockTestDetailRepository mockTestDetailRepository;
-
-    MockTestResultRepository mockTestResultRepository;
 
     IUserService userService;
 
@@ -88,11 +86,16 @@ public class MockTestService implements IMockTestService {
 
     IQuestionService questionService;
 
+    JdbcMockTestResultBatchProcessor jdbcMockTestResultBatchProcessor;
+
+    JdbcMockTestDetailBatchProcessor jdbcMockTestDetailBatchProcessor;
+    private final MailerService mailerService;
+
 
     @Override
-    public MockTestEntity findMockTestById(UUID mockTestId) {
+    public MockTestEntity getMockTestById(UUID mockTestId) {
 
-        return mockTestRepository.findByMockTestId(mockTestId)
+        return mockTestRepository.findMockTestById(mockTestId)
                 .orElseThrow(
                         () -> new ErrorHolder(Error.MOCK_TEST_NOT_FOUND)
                 );
@@ -278,181 +281,114 @@ public class MockTestService implements IMockTestService {
 
     @Transactional
     @Override
-    public List<MockTestDetailEntity> addAnswerToMockTest(UUID mockTestId, List<UUID> listAnswerId) {
-        // Lấy thông tin người dùng hiện hành và bài thi tương ứng
-        UserEntity currentUser = userService.currentUser();
-        MockTestEntity mockTest = findMockTestToId(mockTestId);
+    public MockTestKeyResponse addAnswerToMockTest(UUID mockTestId, List<UUID> listAnswerId) {
 
-        // Map để nhóm các MockTestDetail theo partId, đồng thời lưu số câu đúng và điểm của mỗi phần
-        Map<UUID, List<MockTestDetailEntity>> partDetailsMap = new HashMap<>();
-        Map<UUID, Integer> partCorrectCountMap = new HashMap<>();
-        Map<UUID, Integer> partScoreMap = new HashMap<>();
+        if(mockTestId == null)
+            throw new ErrorHolder(Error.BAD_REQUEST, "Mock test id is required.");
 
-        int totalCorrect = 0;
-        int totalScore = 0;
+        if(listAnswerId == null)
+            throw new ErrorHolder(Error.BAD_REQUEST, "Answers to submit is required.");
 
-        // Duyệt qua từng id đáp án mà user chọn
-        for (UUID answerId : listAnswerId) {
-            // Lấy đối tượng Answer; nếu không tìm thấy sẽ ném exception
-            AnswerEntity answer = answerService.getAnswerById(answerId);
-            if (answer == null) {
-                throw new ErrorHolder(Error.BAD_REQUEST, "Answer not found for id: " + answerId);
-            }
+        UserEntity userSubmitAnswers = userService.currentUser();
+        MockTestEntity mockTest = getMockTestById(mockTestId);
+        UserEntity userOfMockTest = mockTest.getUser();
+        TopicEntity topicOfMockTest = mockTest.getTopic();
 
-            // Lấy id của part mà câu hỏi của đáp án này thuộc về
-            UUID partId = answer.getQuestion().getPart().getPartId();
+        if(topicOfMockTest == null)
+            throw new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Unknown topic of mock test");
 
-            // Tính điểm đạt được: nếu đáp án đúng thì bằng điểm của câu hỏi, ngược lại là 0
-            int scoreAchieved = Boolean.TRUE.equals(answer.getCorrectAnswer())
-                    ? answer.getQuestion().getQuestionScore()
-                    : 0;
+        if(userOfMockTest == null)
+            throw new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Unknown user of mock test");
 
-            // Tạo đối tượng MockTestDetailEntity với thông tin đáp án và câu hỏi
-            MockTestDetailEntity detail = MockTestDetailEntity.builder()
-                    .answerChoice(answer)
-                    .answerContent(answer.getAnswerContent())
-                    // Có thể set thêm các thông tin khác như answerCorrectContent nếu cần
-                    .isCorrectAnswer(answer.getCorrectAnswer())
-                    .scoreAchieved(scoreAchieved)
-                    .questionChild(answer.getQuestion())
-                    .userCreate(currentUser)
-                    .userUpdate(currentUser)
-                    .build();
-            // Lưu để có id (nếu cần cho quan hệ)
-            detail = mockTestDetailRepository.save(detail);
+        if(!userSubmitAnswers.getUserId().equals(userOfMockTest.getUserId()))
+            throw new ErrorHolder(Error.UNAUTHORIZED, "User current mustn't owner of mock test");
 
-            // Nhóm detail theo partId
-            partDetailsMap.computeIfAbsent(partId, k -> new ArrayList<>()).add(detail);
+        INumberAndScoreQuestionTopic numberAndScoreQuestionTopic = topicService.getNumberAndScoreQuestionTopic(topicOfMockTest.getTopicId());
 
-            // Nếu đáp án đúng, cập nhật số câu đúng và điểm tổng
-            if (Boolean.TRUE.equals(answer.getCorrectAnswer())) {
-                totalCorrect++;
-                totalScore += answer.getQuestion().getQuestionScore();
-                partCorrectCountMap.put(partId, partCorrectCountMap.getOrDefault(partId, 0) + 1);
-                partScoreMap.put(partId, partScoreMap.getOrDefault(partId, 0) + answer.getQuestion().getQuestionScore());
-            }
-        }
+        List<PartEntity> partsFinishExam = partService.getPartsFinishExam(topicOfMockTest.getTopicId(), listAnswerId);
 
-        // Với mỗi part mà user đã trả lời, tạo MockTestResultEntity
-        for (Map.Entry<UUID, List<MockTestDetailEntity>> entry : partDetailsMap.entrySet()) {
-            UUID partId = entry.getKey();
-            List<MockTestDetailEntity> detailsForPart = entry.getValue();
-            int partCorrect = partCorrectCountMap.getOrDefault(partId, 0);
-            int partScore = partScoreMap.getOrDefault(partId, 0);
+        int totalQuestionsFinish = listAnswerId.size();
+        int totalQuestionsSkip = numberAndScoreQuestionTopic.getNumberQuestions() - totalQuestionsFinish;
+        int totalAnswersCorrect = 0;
+        int totalAnswersWrong = 0;
+        int totalScoreMockTest = 0;
 
-            // Khởi tạo đối tượng kết quả cho phần (ở đây sử dụng PartEntity với partId)
-            MockTestResultEntity result = MockTestResultEntity.builder()
+        List<MockTestResultEntity> mockTestResults = new ArrayList<>();
+        List<MockTestDetailEntity> mockTestDetails = new ArrayList<>();
+
+        for(PartEntity part : partsFinishExam){
+
+            int totalCorrectOfPart = 0;
+            int totalScoreOfPart = 0;
+
+            MockTestResultEntity mockTestResult = MockTestResultEntity.builder()
+                    .mockTestResultId(UUID.randomUUID())
+                    .part(part)
                     .mockTest(mockTest)
-                    .part(PartEntity.builder().partId(partId).build())
-                    .totalScoreParts(partScore)
-                    .totalCorrect(partCorrect)
-                    .userCreate(currentUser)
-                    .userUpdate(currentUser)
+                    .userCreate(userSubmitAnswers)
+                    .userUpdate(userSubmitAnswers)
                     .build();
-            result = mockTestResultRepository.save(result);
 
-            // Liên kết các chi tiết trong phần đó với đối tượng kết quả vừa tạo
-            for (MockTestDetailEntity detail : detailsForPart) {
-                detail.setResultMockTest(result);
-                mockTestDetailRepository.save(detail);
+            Set<QuestionEntity> questionChildsSet = part.getQuestions();
+            for(QuestionEntity questionChild : questionChildsSet){
+                Set<AnswerEntity> answersSet = questionChild.getAnswers();
+                for(AnswerEntity answerChoice : answersSet){
+                    boolean isCorrectAnswer = answerChoice.getCorrectAnswer();
+                    int scoreAchieved = questionChild.getQuestionScore();
+                    if(isCorrectAnswer){
+                        totalCorrectOfPart++;
+                        totalScoreOfPart += scoreAchieved;
+                    }
+                    else{
+                        totalAnswersWrong++;
+                    }
+                    mockTestDetails.add(
+                            MockTestDetailEntity.builder()
+                                    .mockTestDetailId(UUID.randomUUID())
+                                    .resultMockTest(mockTestResult)
+                                    .questionChild(questionChild)
+                                    .answerChoice(answerChoice)
+                                    .userCreate(userSubmitAnswers)
+                                    .userUpdate(userSubmitAnswers)
+                                    .answerContent(answerChoice.getAnswerContent())
+                                    .isCorrectAnswer(isCorrectAnswer)
+                                    .scoreAchieved(isCorrectAnswer ? scoreAchieved : 0)
+                                    .build()
+                    );
+                }
             }
+
+            mockTestResult.setTotalCorrect(totalCorrectOfPart);
+            mockTestResult.setTotalScoreResult(totalScoreOfPart);
+
+            mockTestResults.add(mockTestResult);
+
+            totalAnswersCorrect += totalCorrectOfPart;
+            totalScoreMockTest += totalScoreOfPart;
         }
 
-        // Lấy danh sách tất cả các part trong topic của mock test
-        List<PartEntity> topicParts = mockTest.getTopic().getParts().stream().toList();
-        // Với các part mà user không làm (không có trong partDetailsMap), tạo MockTestResultEntity với số câu đúng, điểm là 0
-        for (PartEntity part : topicParts) {
-            if (!partDetailsMap.containsKey(part.getPartId())) {
-                MockTestResultEntity emptyResult = MockTestResultEntity.builder()
-                        .mockTest(mockTest)
-                        .part(part)
-                        .totalScoreParts(0)
-                        .totalCorrect(0)
-                        .userCreate(currentUser)
-                        .userUpdate(currentUser)
-                        .build();
-                mockTestResultRepository.save(emptyResult);
-            }
-        }
+        float answersCorrectPercent = (float) totalAnswersCorrect / numberAndScoreQuestionTopic.getNumberQuestions();
+        answersCorrectPercent = Math.round(answersCorrectPercent * 100f) / 100f;
 
-        // Cập nhật tổng điểm và số câu đúng vào MockTestEntity.
-        int totalQuestions = mockTest.getTopic().getNumberQuestion();
-        int totalAttempted = listAnswerId.size();
-        mockTest.setTotalScore(totalScore);
-        mockTest.setTotalAnswersCorrect(totalCorrect);
-        mockTest.setTotalQuestionsSkip(totalQuestions - totalAttempted);
-        mockTest.setTotalQuestionsFinish(listAnswerId.size());
-        mockTest.setTotalAnswersWrong(totalAttempted - totalCorrect);
-        if (totalAttempted > 0) {
-            float percent = ((float) totalCorrect / totalQuestions) * 100;
-            mockTest.setAnswersCorrectPercent(percent);
-        }
-        mockTestRepository.save(mockTest);
+        mockTest.setAnswersCorrectPercent(answersCorrectPercent);
+        mockTest.setTotalAnswersCorrect(totalAnswersCorrect);
+        mockTest.setTotalAnswersWrong(totalAnswersWrong);
+        mockTest.setTotalQuestionsFinish(totalQuestionsFinish);
+        mockTest.setTotalQuestionsSkip(totalQuestionsSkip);
+        mockTest.setTotalScore(totalScoreMockTest);
 
-        // Gửi email kết quả cho user (nếu cần)
-        try {
-            sendResultEmail(currentUser.getEmail(), mockTest, totalCorrect, partCorrectCountMap, partScoreMap);
-        } catch (IOException | MessagingException e) {
-            e.printStackTrace();
-        }
+        mockTestRepository.updateMockTest(
+                mockTestId, answersCorrectPercent, totalAnswersCorrect, totalAnswersWrong,
+                totalQuestionsFinish, totalQuestionsSkip, totalScoreMockTest
+        );
+        jdbcMockTestResultBatchProcessor.batchInsert(mockTestResults);
+        jdbcMockTestDetailBatchProcessor.batchInsert(mockTestDetails);
 
-        // Trả về danh sách tất cả các MockTestDetailEntity đã lưu
-        return partDetailsMap.values()
-                .stream()
-                .flatMap(List::stream)
-                .collect(Collectors.toList());
+        return MockTestKeyResponse.builder()
+                .mockTestId(mockTestId)
+                .build();
     }
 
-
-    protected String readTemplateContent(String templateFileName) throws IOException {
-        Resource templateResource = resourceLoader.getResource("classpath:templates/" + templateFileName);
-        byte[] templateBytes = FileCopyUtils.copyToByteArray(templateResource.getInputStream());
-        return new String(templateBytes, StandardCharsets.UTF_8);
-    }
-
-
-    protected void sendResultEmail(String email, MockTestEntity mockTest, int correctAnswer,
-                                   Map<UUID, Integer> partCorrectMap,
-                                   Map<UUID, Integer> partScoreMap) throws IOException, MessagingException {
-        // Tạo đối tượng MimeMessage
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
-        // Đọc nội dung mẫu email từ file (ví dụ: test_email.html)
-        String templateContent = readTemplateContent("test_email.html");
-
-        // Thay thế các placeholder trong template
-        templateContent = templateContent.replace("{{nameToeic}}", mockTest.getTopic().getTopicName());
-        templateContent = templateContent.replace("{{userName}}", mockTest.getUser().getName());
-        templateContent = templateContent.replace("{{correctAnswer}}", String.valueOf(correctAnswer));
-        templateContent = templateContent.replace("{{score}}", mockTest.getTotalScore() + "");
-        templateContent = templateContent.replace("{{timeAnswer}}", mockTest.getFinishTime()  + "");
-        // Nếu cần, bạn có thể thay thế thêm các placeholder khác như tổng điểm, thời gian trả lời,...
-
-        // Xây dựng nội dung hiển thị kết quả của từng phần dựa trên Map
-        StringBuilder partsHtml = new StringBuilder();
-        // Nếu hệ thống có nhiều Part, bạn có thể duyệt qua các entry của Map
-        for (Map.Entry<UUID, Integer> entry : partCorrectMap.entrySet()) {
-            UUID partId = entry.getKey();
-            int correctCount = entry.getValue();
-            int score = partScoreMap.getOrDefault(partId, 0);
-
-            // Ở đây hiển thị theo mẫu: "Part {ID} - Số câu đúng: {correctCount} - Số điểm: {score}"
-            // Nếu có tên Part hoặc thứ tự Part, bạn có thể thay thế phần hiển thị này.
-            String partHtml = "<p>Part " + partService.getPartToId(partId).getPartName() + ": Số câu đúng: " + correctCount
-                    + " - Số điểm: " + score + "</p>";
-            partsHtml.append(partHtml);
-        }
-        templateContent = templateContent.replace("{{parts}}", partsHtml.toString());
-
-        // Cấu hình thông tin email
-        helper.setTo(email);
-        helper.setSubject("Thông tin bài thi");
-        helper.setText(templateContent, true);
-
-        // Gửi email
-        mailSender.send(message);
-    }
 
 
 //    protected void saveResultMockTest(MockTestEntity mockTest, UUID partUUID, int correctAnswers, int score, UserEntity user) {
@@ -514,25 +450,22 @@ public class MockTestService implements IMockTestService {
     @Override
     public void sendEmailToMock(UUID mockTestId) {
 
-//        UserEntity user = userService.currentUser();
-//
-//        MockTestEntity mockTest = findMockTestToId(mockTestId);
-//
-//        int correctAnswer = countCorrectAnswer(mockTestId);
-//        int[] corrects = new int[7];
-//        int[] scores = new int[7];
-//        List<UUID> listPartId = new ArrayList<>();
-//
-//        List<MockTestResultEntity> resultMockTestList = resultMockTestRepository.findByMockTest_MockTestId(mockTest.getMockTestId());
-//
-//        for (MockTestResultEntity resultMockTest : resultMockTestList) {
-//            int partIndex = getPartIndex(resultMockTest.getPart().getPartId());
-//            corrects[partIndex] = correctAnswer;
-//            scores[partIndex] = resultMockTest.getScore();
-//            listPartId.add(resultMockTest.getPart().getPartId());
-//        }
-//
-//        sendResultEmail(user.getEmail(), mockTest, correctAnswer, corrects, scores, listPartId);
+        MockTestEntity mockTest = getMockTestById(mockTestId);
+
+        UserEntity userOfMockTest = mockTest.getUser();
+
+        mailerService.sendResultEmail(userOfMockTest.getEmail(), mockTest);
+    }
+
+    @SneakyThrows
+    @Override
+    public void sendEmailToMock(MockTestEntity mockTest) {
+
+        if(mockTest == null) return;
+
+        UserEntity userOfMockTest = mockTest.getUser();
+
+        mailerService.sendResultEmail(userOfMockTest.getEmail(), mockTest);
     }
 
     @Override
