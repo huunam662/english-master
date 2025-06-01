@@ -5,9 +5,12 @@ import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -61,4 +64,35 @@ public interface MockTestRepository extends JpaRepository<MockTestEntity, UUID> 
             where mt.user_id = :userId
             """, nativeQuery = true)
     List<IMockTestToUserResponse> findExamResultForUser(@Param("userId") UUID userId);
+
+    @Query("""
+        SELECT DISTINCT mockTest FROM MockTestEntity mockTest
+        LEFT JOIN FETCH mockTest.user userCreate
+        LEFT JOIN FETCH mockTest.topic topicTest
+        WHERE mockTest.mockTestId = :mockTestId
+    """)
+    Optional<MockTestEntity> findMockTestById(@Param("mockTestId") UUID mockTestId);
+
+    @Transactional
+    @Modifying
+    @Query(value = """
+        UPDATE mock_test
+        SET answers_correct_percent = :answersCorrectPercent,
+            total_answers_correct = :totalAnswersCorrect,
+            total_answers_wrong = :totalAnswersWrong,
+            total_questions_finish = :totalQuestionsFinish,
+            total_questions_skip = :totalQuestionsSkip,
+            total_score = :totalScore,
+            update_at = now()
+        WHERE id = :mockTestId
+    """, nativeQuery = true)
+    void updateMockTest(
+        @Param("mockTestId") UUID mockTestId,
+        @Param("answersCorrectPercent") float answersCorrectPercent,
+        @Param("totalAnswersCorrect") int totalAnswersCorrect,
+        @Param("totalAnswersWrong") int totalAnswersWrong,
+        @Param("totalQuestionsFinish") int totalQuestionsFinish,
+        @Param("totalQuestionsSkip") int totalQuestionsSkip,
+        @Param("totalScore") int totalScore
+    );
 }

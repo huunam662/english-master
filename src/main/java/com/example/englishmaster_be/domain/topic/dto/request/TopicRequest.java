@@ -26,9 +26,6 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class TopicRequest {
 
-	@Hidden
-	UUID topicId;
-
 	UUID packId;
 
 	String topicName;

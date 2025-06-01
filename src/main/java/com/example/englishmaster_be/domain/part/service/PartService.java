@@ -3,6 +3,10 @@ package com.example.englishmaster_be.domain.part.service;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestPartRequest;
+import com.example.englishmaster_be.domain.part.dto.request.PartQuestionsAnswersRequest;
+import com.example.englishmaster_be.domain.part.dto.response.PartKeyResponse;
+import com.example.englishmaster_be.domain.question.dto.request.QuestionParentRequest;
+import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
@@ -44,6 +48,8 @@ public class PartService implements IPartService {
     IUserService userService;
 
     IUploadService uploadService;
+
+    IQuestionService questionService;
 
 
     @Transactional
@@ -195,5 +201,45 @@ public class PartService implements IPartService {
         partEntity.setUpdateAt(LocalDateTime.now());
 
         return partRepository.save(partEntity);
+    }
+
+    @Transactional
+    @Override
+    public PartKeyResponse createPartAndQuestionsAnswers(PartQuestionsAnswersRequest request) {
+
+        UserEntity userPost = userService.currentUser();
+
+        if(request == null)
+            throw new ErrorHolder(Error.BAD_REQUEST, "Body object request must not be null.");
+
+        boolean isExistedPart = partRepository.isExistedByPartNameAndPartType(request.getPartName(), request.getPartType());
+
+        if(isExistedPart)
+            throw new ErrorHolder(
+                Error.BAD_REQUEST,
+                String.format("Already existed part with name %s and type %s", request.getPartName(), request.getPartType())
+            );
+
+        PartEntity part = partRepository.saveAndFlush(
+                PartEntity.builder()
+                        .partName(request.getPartName())
+                        .partType(request.getPartType())
+                        .partDescription(String.format("%s: %s", request.getPartName(), request.getPartType()))
+                        .userCreate(userPost)
+                        .userUpdate(userPost)
+                        .build()
+        );
+
+        questionService.createListQuestionsParentOfPart(part, request.getQuestionParents());
+
+        return PartKeyResponse.builder()
+                .partId(part.getPartId())
+                .build();
+    }
+
+    @Override
+    public List<PartEntity> getPartsFinishExam(UUID topicId, List<UUID> answerIds) {
+
+        return partRepository.findPartJoinQuestionsAndAnswers(topicId, answerIds);
     }
 }

@@ -31,7 +31,7 @@ public interface TopicMapper {
 
     @Mapping(target = "topicId", ignore = true)
     @Mapping(target = "topicImage", ignore = true)
-    @Mapping(target = "workTime", expression = "java(LocalTime.parse(topicRequest.getWorkTime()))")
+    @Mapping(target = "workTime", ignore = true)
     void flowToTopicEntity(TopicRequest topicRequest, @MappingTarget TopicEntity topicEntity);
 
 

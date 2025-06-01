@@ -2,13 +2,17 @@ package com.example.englishmaster_be.domain.part.controller;
 
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.domain.part.dto.request.PartQuestionsAnswersRequest;
+import com.example.englishmaster_be.domain.part.dto.response.PartKeyResponse;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.mapper.PartMapper;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
 import com.example.englishmaster_be.domain.part.dto.request.PartSaveContentRequest;
 import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
 import com.example.englishmaster_be.model.part.PartEntity;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -30,6 +34,19 @@ public class PartController {
 
     IPartService partService;
 
+    @PostMapping("/questions-answers/create")
+    @PreAuthorize("hasRole('ADMIN')")
+    @DefaultMessage("Successful.")
+    @Operation(
+            summary = "Create questions and answers for part.",
+            description = "Create questions and answers for part."
+    )
+    public PartKeyResponse partQuestionsAnswersCreate(
+            @RequestBody @Valid PartQuestionsAnswersRequest request
+    ){
+
+        return partService.createPartAndQuestionsAnswers(request);
+    }
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")

@@ -2,12 +2,13 @@ package com.example.englishmaster_be.mapper;
 
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
 import com.example.englishmaster_be.domain.part.dto.response.PartBasicResponse;
+import com.example.englishmaster_be.domain.question.dto.request.QuestionChildRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
+import com.example.englishmaster_be.domain.question.dto.request.QuestionParentRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
-import com.example.englishmaster_be.domain.question.dto.response.QuestionChildResponse;
-import com.example.englishmaster_be.domain.question.dto.response.QuestionMatchingResponse;
-import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
-import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
+import com.example.englishmaster_be.domain.question.dto.response.*;
+import com.example.englishmaster_be.model.content.ContentEntity;
+import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.util.QuestionUtil;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
@@ -157,4 +158,88 @@ public interface QuestionMapper {
     @Mapping(target = "questionId", ignore = true)
     void flowToQuestionEntity(ExcelQuestionResponse questionByExcelFileResponse, @MappingTarget QuestionEntity questionEntity);
 
+    QuestionEntity toQuestionParent(QuestionParentRequest request);
+
+    default Set<QuestionEntity> toQuestionParentSet(PartEntity part, List<QuestionParentRequest> questionParentRequestList, UserEntity userUpdate){
+
+        if(part == null) return Collections.emptySet();
+
+        if(questionParentRequestList == null) return Collections.emptySet();
+
+        return questionParentRequestList.stream().map(
+                questionParentRequest -> {
+                    QuestionEntity questionParent = toQuestionParent(questionParentRequest);
+                    questionParent.setPart(part);
+                    questionParent.setUserCreate(userUpdate);
+                    questionParent.setUserUpdate(userUpdate);
+                    Set<QuestionEntity> questionChildSet = toQuestionChildSet(part, questionParent, questionParentRequest.getQuestionChilds(), userUpdate);
+                    questionParent.setQuestionGroupChildren(questionChildSet);
+
+                    Set<ContentEntity> contentParent = new HashSet<>();
+
+                    String contentImage = questionParentRequest.getContentImage();
+                    String contentAudio = questionParentRequest.getContentAudio();
+
+                    if(contentImage != null && !contentImage.isEmpty())
+                        contentParent.add(
+                                ContentEntity.builder()
+                                        .contentData(contentImage)
+                                        .build()
+                        );
+                    if(contentAudio != null && !contentAudio.isEmpty())
+                        contentParent.add(
+                                ContentEntity.builder()
+                                        .contentData(contentAudio)
+                                        .build()
+                        );
+
+                    questionParent.setContentCollection(contentParent);
+                    return questionParent;
+                }
+        ).collect(Collectors.toSet());
+    }
+
+    QuestionEntity toQuestionChild(QuestionChildRequest request);
+
+    default Set<QuestionEntity> toQuestionChildSet(PartEntity part, QuestionEntity questionParent, List<QuestionChildRequest> questionChildRequestList, UserEntity userUpdate){
+
+        if(part == null) return Collections.emptySet();
+
+        if(questionParent == null) return Collections.emptySet();
+
+        if(questionChildRequestList == null) return Collections.emptySet();
+
+        return questionChildRequestList.stream().map(
+                questionChildRequest -> {
+                    QuestionEntity questionChild = toQuestionChild(questionChildRequest);
+                    questionChild.setPart(part);
+                    questionChild.setQuestionGroupParent(questionParent);
+                    questionChild.setUserCreate(userUpdate);
+                    questionChild.setUserUpdate(userUpdate);
+                    questionChild.setAnswers(AnswerMapper.INSTANCE.toAnswerOfChildSet(questionChild, questionChildRequest.getAnswers(), userUpdate));
+
+                    Set<ContentEntity> contentChild = new HashSet<>();
+
+                    String contentImage = questionChildRequest.getContentImage();
+                    String contentAudio = questionChildRequest.getContentAudio();
+
+                    if(contentImage != null && !contentImage.isEmpty())
+                        contentChild.add(
+                                ContentEntity.builder()
+                                        .contentData(contentImage)
+                                        .build()
+                        );
+                    if(contentAudio != null && !contentAudio.isEmpty())
+                        contentChild.add(
+                                ContentEntity.builder()
+                                        .contentData(contentAudio)
+                                        .build()
+                        );
+
+                    questionParent.setContentCollection(contentChild);
+
+                    return questionChild;
+                }
+        ).collect(Collectors.toSet());
+    }
 }

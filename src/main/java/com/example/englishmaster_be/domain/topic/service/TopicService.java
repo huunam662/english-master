@@ -1,8 +1,11 @@
 package com.example.englishmaster_be.domain.topic.service;
 
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.Status;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionChildResponse;
+import com.example.englishmaster_be.domain.topic.dto.projection.INumberAndScoreQuestionTopic;
+import com.example.englishmaster_be.model.topic.TopicSpecification;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 
 import com.example.englishmaster_be.common.constant.Role;
@@ -17,7 +20,6 @@ import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.status.service.IStatusService;
-import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.mapper.*;
@@ -46,15 +48,12 @@ import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.question.QuestionQueryFactory;
 import com.example.englishmaster_be.model.question.QuestionRepository;
 import com.example.englishmaster_be.model.status.StatusEntity;
-import com.example.englishmaster_be.model.topic.QTopicEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.topic.TopicRepository;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.helper.FileHelper;
+import com.example.englishmaster_be.util.QuestionUtil;
 import com.example.englishmaster_be.value.LinkValue;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -63,11 +62,14 @@ import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -122,32 +124,42 @@ public class TopicService implements ITopicService {
     @Transactional
     @Override
     @SneakyThrows
-    public TopicEntity saveTopic(TopicRequest topicRequest) {
+    public TopicEntity createTopic(TopicRequest topicRequest) {
 
         UserEntity user = userService.currentUser();
 
         PackEntity pack = packService.getPackById(topicRequest.getPackId());
 
-        TopicEntity topic;
-
-        if(topicRequest.getTopicId() != null)
-            topic = getTopicById(topicRequest.getTopicId());
-        else{
-            topic = TopicEntity.builder()
-                    .userCreate(user)
-                    .build();
-        }
+        TopicEntity topic = TopicEntity.builder()
+                .userCreate(user)
+                .userUpdate(user)
+                .pack(pack)
+                .enable(true)
+                .numberQuestion(0)
+                .status(statusService.getStatusByName(Status.ACTIVE.name()))
+                .build();
 
         TopicMapper.INSTANCE.flowToTopicEntity(topicRequest, topic);
+
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            topic.setWorkTime(LocalTime.parse(topicRequest.getWorkTime(), formatter));
+        }
+        catch (Exception e){
+
+            log.error(e.getMessage());
+
+            throw new ErrorHolder(Error.BAD_REQUEST, "Work time must be pattern HH:mm:ss");
+        }
 
         if(topicRequest.getTopicImage() != null && !topicRequest.getTopicImage().isEmpty()){
 
             if(topic.getTopicImage() != null && !topic.getTopicImage().isEmpty())
-                uploadService.delete(
-                        FileDeleteRequest.builder()
-                                .filepath(topic.getTopicImage())
-                                .build()
-                );
+                try {
+                    uploadService.delete(topic.getTopicImage());
+                } catch (Exception e){
+                    log.error("{} -> code {}", e.getMessage(), Error.CONFLICT.getStatusCode());
+                }
 
             topic.setTopicImage(topicRequest.getTopicImage());
         }
@@ -160,13 +172,62 @@ public class TopicService implements ITopicService {
                     .collect(Collectors.toSet());
 
             topic.setParts(partList);
+
+            topic.setNumberQuestion(
+                    QuestionUtil.totalQuestionChildOf(partList, topic)
+            );
         }
 
-        topic.setStatus(statusService.getStatusByName("ACTIVE"));
+        return topicRepository.save(topic);
+    }
+
+    @Transactional
+    @Override
+    public TopicEntity updateTopic(UUID topicId, TopicRequest topicRequest) {
+
+        UserEntity user = userService.currentUser();
+
+        PackEntity pack = packService.getPackById(topicRequest.getPackId());
+
+        TopicEntity topic = getTopicById(topicId);
+
+        TopicMapper.INSTANCE.flowToTopicEntity(topicRequest, topic);
         topic.setUserUpdate(user);
         topic.setPack(pack);
-        topic.setEnable(Boolean.TRUE);
-        topic.setNumberQuestion(0);
+
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            topic.setWorkTime(LocalTime.parse(topicRequest.getWorkTime(), formatter));
+        }
+        catch (Exception e){
+            throw new ErrorHolder(Error.BAD_REQUEST, "Work time must be pattern HH:mm:ss");
+        }
+
+        if(topicRequest.getTopicImage() != null && !topicRequest.getTopicImage().isEmpty()){
+
+            if(topic.getTopicImage() != null && !topic.getTopicImage().isEmpty())
+                try {
+                    uploadService.delete(topic.getTopicImage());
+                } catch (Exception e){
+                    log.error("{} -> code {}", e.getMessage(), Error.CONFLICT.getStatusCode());
+                }
+
+            topic.setTopicImage(topicRequest.getTopicImage());
+        }
+
+        if(topicRequest.getListPart() != null){
+
+            Set<PartEntity> partList = topicRequest.getListPart().stream()
+                    .filter(Objects::nonNull)
+                    .map(partService::getPartToId)
+                    .collect(Collectors.toSet());
+
+            topic.setParts(partList);
+
+            topic.setNumberQuestion(
+                    QuestionUtil.totalQuestionChildOf(partList, topic)
+            );
+        }
 
         return topicRepository.save(topic);
     }
@@ -267,26 +328,26 @@ public class TopicService implements ITopicService {
 
         topic.setTopicImage(fileResponse.getUrl());
         topic.setUserUpdate(user);
-        topic.setUpdateAt(LocalDateTime.now());
 
         return topicRepository.save(topic);
     }
 
     @Override
-    public TopicEntity getTopicById(UUID topicId) {
+    public TopicEntity  getTopicById(UUID topicId) {
 
         return topicRepository.findByTopicId(topicId)
                 .orElseThrow(
-                        () -> new IllegalArgumentException("Topic not found with ID: " + topicId)
+                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Topic not found with ID: " + topicId, false)
                 );
     }
 
     @Override
     public TopicEntity getTopicByName(String topicName) {
 
-        return topicRepository.findByTopicName(topicName).orElseThrow(
-                () -> new IllegalArgumentException("Topic not found with name: " + topicName)
-        );
+        return topicRepository.findByTopicName(topicName)
+                .orElseThrow(
+                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Topic not found with name: " + topicName, false)
+                );
     }
 
     @Override
@@ -944,73 +1005,26 @@ public class TopicService implements ITopicService {
     }
 
     @Override
-    public FilterResponse<?> getAllTopic(TopicFilterRequest filterRequest) {
+    public FilterResponse<?> filterTopics(TopicFilterRequest filterRequest) {
 
-        FilterResponse<TopicResponse> filterResponse = FilterResponse.<TopicResponse>builder()
-                .pageNumber(filterRequest.getPage())
-                .pageSize(filterRequest.getPageSize())
-                .offset((long) (filterRequest.getPage() - 1) * filterRequest.getPageSize())
+        int page = filterRequest.getPage() - 1;
+
+        Pageable pageable = PageRequest.of(page, filterRequest.getPageSize());
+
+        Specification<TopicEntity> spec = TopicSpecification.filterTopics(filterRequest);
+
+        Page<TopicEntity> pageResult = topicRepository.findAll(spec, pageable);
+
+        List<TopicEntity> topicResult = pageResult.getContent().stream().distinct().toList();
+
+        return FilterResponse.<TopicResponse>builder()
+                .pageNumber(pageResult.getNumber() + 1)
+                .pageSize(pageResult.getSize())
+                .totalPages((long) pageResult.getTotalPages())
+                .offset(pageable.getOffset())
+                .contentLength(topicResult.size())
+                .content(TopicMapper.INSTANCE.toTopicResponseList(topicResult))
                 .build();
-
-        BooleanExpression wherePattern = QTopicEntity.topicEntity.isNotNull();
-
-        UserEntity currentUser = userService.currentUser();
-
-        boolean isUser = currentUser.getRole().getRoleName().equals(Role.USER);
-
-        if(isUser) wherePattern = wherePattern.and(QTopicEntity.topicEntity.enable.eq(Boolean.TRUE));
-
-        if (filterRequest.getPackId() != null)
-            wherePattern = wherePattern.and(QTopicEntity.topicEntity.pack.packId.eq(filterRequest.getPackId()));
-
-        if (filterRequest.getSearch() != null && !filterRequest.getSearch().isEmpty())
-            wherePattern = wherePattern.and(QTopicEntity.topicEntity.topicName.lower().like("%" + filterRequest.getSearch().toLowerCase() + "%"));
-
-        if (filterRequest.getType() != null && !filterRequest.getType().isEmpty())
-            wherePattern = wherePattern.and(QTopicEntity.topicEntity.topicType.lower().like(filterRequest.getType().toLowerCase()));
-
-        long totalElements = Optional.ofNullable(
-                            jpaQueryFactory
-                                    .select(QTopicEntity.topicEntity.count())
-                                    .from(QTopicEntity.topicEntity)
-                                    .where(wherePattern)
-                                    .fetchOne()
-                ).orElse(0L);
-        long totalPages = (long) Math.ceil((double) totalElements / filterRequest.getPageSize());
-        filterResponse.setTotalPages(totalPages);
-
-        OrderSpecifier<?> orderSpecifier;
-
-        if ("name".equalsIgnoreCase(filterRequest.getSortBy())) {
-            if (Sort.Direction.DESC.equals(filterRequest.getSortDirection()))
-                orderSpecifier = QTopicEntity.topicEntity.topicName.lower().desc();
-            else
-                orderSpecifier = QTopicEntity.topicEntity.topicName.lower().asc();
-
-        } else if ("updateAt".equalsIgnoreCase(filterRequest.getSortBy())) {
-            if (Sort.Direction.DESC.equals(filterRequest.getSortDirection()))
-                orderSpecifier = QTopicEntity.topicEntity.updateAt.desc();
-            else
-                orderSpecifier = QTopicEntity.topicEntity.updateAt.asc();
-
-        } else {
-            if (Sort.Direction.DESC.equals(filterRequest.getSortDirection()))
-                orderSpecifier = QTopicEntity.topicEntity.updateAt.desc();
-            else
-                orderSpecifier = QTopicEntity.topicEntity.updateAt.asc();
-        }
-
-        JPAQuery<TopicEntity> query = jpaQueryFactory.selectFrom(QTopicEntity.topicEntity)
-                                            .where(wherePattern)
-                                            .orderBy(orderSpecifier)
-                                            .offset(filterResponse.getOffset())
-                                            .limit(filterResponse.getPageSize());
-
-        filterResponse.setContent(
-                TopicMapper.INSTANCE.toTopicResponseList(query.fetch())
-        );
-
-        return filterResponse;
     }
 
     @Override
@@ -1022,5 +1036,14 @@ public class TopicService implements ITopicService {
                 );
 
         return QuestionMapper.INSTANCE.toQuestionPartResponseList(topic);
+    }
+
+    @Override
+    public INumberAndScoreQuestionTopic getNumberAndScoreQuestionTopic(UUID topicId) {
+
+        if(topicId == null)
+            throw new ErrorHolder(Error.BAD_REQUEST, "Id of topic is required.");
+
+        return topicRepository.findNumberAndScoreQuestions(topicId);
     }
 }

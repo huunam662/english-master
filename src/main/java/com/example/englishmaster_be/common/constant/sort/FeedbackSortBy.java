@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.common.constant.sort;
 
 
-public enum SortByFeedbackFields {
+public enum FeedbackSortBy {
 
     None,
     Name,

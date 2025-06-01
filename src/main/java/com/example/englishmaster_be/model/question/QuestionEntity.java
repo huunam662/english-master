@@ -31,7 +31,6 @@ import java.util.UUID;
 public class QuestionEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
     UUID questionId;
 
@@ -103,10 +102,10 @@ public class QuestionEntity {
     @OneToMany(mappedBy = "questionGroupParent", fetch = FetchType.LAZY)
     Set<QuestionEntity> questionGroupChildren;
 
-    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "question", orphanRemoval = true, fetch = FetchType.LAZY)
     Set<AnswerEntity> answers;
 
-    @OneToMany(mappedBy = "questionChild", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "questionChild", fetch = FetchType.LAZY)
     Set<MockTestDetailEntity> detailMockTests;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -134,6 +133,10 @@ public class QuestionEntity {
 
     @PrePersist
     void onCreate() {
+
+        if(questionId == null)
+            questionId = UUID.randomUUID();
+
         createAt = LocalDateTime.now();
         updateAt = LocalDateTime.now();
 

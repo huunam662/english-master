@@ -1,11 +1,12 @@
 package com.example.englishmaster_be.domain.question.service;
 
+import com.example.englishmaster_be.batch.*;
 import com.example.englishmaster_be.common.constant.QuestionType;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.content.service.IContentService;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.part.service.IPartService;
-import com.example.englishmaster_be.domain.question.dto.request.QuestionUpdateRequest;
+import com.example.englishmaster_be.domain.question.dto.request.*;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
@@ -14,12 +15,9 @@ import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
-import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
-import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.content.ContentEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
-import com.example.englishmaster_be.model.part.PartQueryFactory;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.question.QuestionQueryFactory;
 import com.example.englishmaster_be.model.topic.TopicEntity;
@@ -30,10 +28,12 @@ import com.example.englishmaster_be.model.content.ContentRepository;
 import com.example.englishmaster_be.model.part.PartRepository;
 import com.example.englishmaster_be.model.question.QuestionRepository;
 import com.example.englishmaster_be.helper.FileHelper;
+import com.example.englishmaster_be.util.QuestionUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -48,6 +48,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
+@Slf4j(topic = "QUESTION-SERVICE")
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -55,9 +56,9 @@ public class QuestionService implements IQuestionService {
 
     FileHelper fileUtil;
 
-    PartQueryFactory partQueryFactory;
-
     QuestionQueryFactory questionQueryFactory;
+
+    JpaBatchProcessor jpaBatchProcessor;
 
     QuestionRepository questionRepository;
 
@@ -78,6 +79,14 @@ public class QuestionService implements IQuestionService {
     IAnswerService answerService;
 
     IUploadService uploadService;
+
+    JdbcQuestionBatchProcessor jdbcQuestionBatchProcessor;
+
+    JdbcContentBatchProcessor jdbcContentBatchProcessor;
+
+    JdbcAnswerBatchProcessor jdbcAnswerBatchProcessor;
+
+    JdbcQuestionContentBatchProcessor jdbcQuestionContentBatchProcessor;
 
     @Transactional
     @SneakyThrows
@@ -430,4 +439,41 @@ public class QuestionService implements IQuestionService {
         }
         return filteredQuestionEntities;
     }
+
+    @Transactional
+    @Override
+    public void createListQuestionsParentOfPart(PartEntity part, List<QuestionParentRequest> questionParentsRequest) {
+
+        UserEntity userCurrent = userService.currentUser();
+
+        if(questionParentsRequest == null || questionParentsRequest.isEmpty())
+            return;
+
+        if(part == null)
+            throw new ErrorHolder(Error.BAD_REQUEST, "Part is null.");
+
+        List<QuestionEntity> questionParentToSave = new ArrayList<>();
+
+        List<QuestionEntity> questionChildToSave = new ArrayList<>();
+
+        List<AnswerEntity> answerChildToSave = new ArrayList<>();
+
+        List<ContentEntity> contentToSave  = new ArrayList<>();
+
+        QuestionUtil.fillToCreateQuestionAnswerForPart(
+                questionParentsRequest,
+                part,
+                userCurrent,
+                contentToSave,
+                questionParentToSave,
+                questionChildToSave,
+                answerChildToSave
+        );
+
+        jdbcContentBatchProcessor.batchInsert(contentToSave);
+        jdbcQuestionBatchProcessor.batchInsert(questionParentToSave);
+        jdbcQuestionBatchProcessor.batchInsert(questionChildToSave);
+        jdbcAnswerBatchProcessor.batchInsert(answerChildToSave);
+    }
+
 }

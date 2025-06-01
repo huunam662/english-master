@@ -7,20 +7,12 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PartBasicResponse {
+public class PartKeyResponse {
 
     UUID partId;
-
-    String partName;
-
-    String partType;
-
-    String partDescription;
-
-    Integer totalQuestion;
 
 }

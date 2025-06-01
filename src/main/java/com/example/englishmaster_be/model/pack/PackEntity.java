@@ -54,7 +54,6 @@ public class PackEntity {
     Set<TopicEntity> topics;
 
 
-
     @PrePersist
     void onCreate() {
         createAt = LocalDateTime.now();

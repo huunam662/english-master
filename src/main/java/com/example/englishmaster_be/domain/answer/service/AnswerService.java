@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.englishmaster_be.common.constant.error.Error;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -124,5 +125,18 @@ public class AnswerService implements IAnswerService {
         QuestionEntity question = questionService.getQuestionById(questionId);
 
         return question.getAnswers().stream().toList();
+    }
+
+    @Transactional
+    @Override
+    public AnswerEntity save(AnswerEntity answer) {
+
+        return answerRepository.save(answer);
+    }
+
+    @Transactional
+    @Override
+    public List<AnswerEntity> saveAll(Set<AnswerEntity> answers) {
+        return answerRepository.saveAll(answers);
     }
 }

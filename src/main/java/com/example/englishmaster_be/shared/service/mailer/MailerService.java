@@ -1,5 +1,8 @@
 package com.example.englishmaster_be.shared.service.mailer;
 
+import com.example.englishmaster_be.model.mock_test.MockTestEntity;
+import com.example.englishmaster_be.model.mock_test_result.MockTestResultEntity;
+import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.value.LinkValue;
 import jakarta.mail.MessagingException;
@@ -17,9 +20,14 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.util.FileCopyUtils;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -30,6 +38,8 @@ public class MailerService {
     JavaMailSender mailSender;
 
     ResourceLoader resourceLoader;
+
+    SpringTemplateEngine templateEngine;
 
     LinkValue linkValue;
 
@@ -133,5 +143,50 @@ public class MailerService {
         byte[] templateBytes = FileCopyUtils.copyToByteArray(templateResource.getInputStream());
 
         return new String(templateBytes, StandardCharsets.UTF_8);
+    }
+
+    public void sendResultEmail(String email, MockTestEntity mockTest) throws IOException, MessagingException {
+        // Tạo đối tượng MimeMessage
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        // Đọc nội dung mẫu email từ file (ví dụ: test_email.html)
+        String templateContent = readTemplateContent("test_email.html");
+
+        // Thay thế các placeholder trong template
+        templateContent = templateContent.replace("{{nameToeic}}", mockTest.getTopic().getTopicName());
+        templateContent = templateContent.replace("{{userName}}", mockTest.getUser().getName());
+        templateContent = templateContent.replace("{{correctAnswer}}", String.valueOf(mockTest.getTotalAnswersCorrect()));
+        templateContent = templateContent.replace("{{score}}", mockTest.getTotalScore() + "");
+        templateContent = templateContent.replace("{{timeAnswer}}", mockTest.getFinishTime()  + "");
+        // Nếu cần, bạn có thể thay thế thêm các placeholder khác như tổng điểm, thời gian trả lời,...
+
+        Set<MockTestResultEntity> mockTestResults = mockTest.getMockTestResults()
+                .stream().sorted(Comparator.comparing(mockTestResult -> mockTestResult.getPart().getPartName()))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        // Xây dựng nội dung hiển thị kết quả của từng phần dựa trên Map
+        StringBuilder partsHtml = new StringBuilder();
+        // Nếu hệ thống có nhiều Part, bạn có thể duyệt qua các entry của Map
+        for (MockTestResultEntity mockTestResult : mockTestResults) {
+            PartEntity part = mockTestResult.getPart();
+            int correctCount = mockTestResult.getTotalCorrect();
+            int score = mockTestResult.getTotalScoreResult();
+
+            // Ở đây hiển thị theo mẫu: "Part {ID} - Số câu đúng: {correctCount} - Số điểm: {score}"
+            // Nếu có tên Part hoặc thứ tự Part, bạn có thể thay thế phần hiển thị này.
+            String partHtml = "<p>Part " + part.getPartName() + ": Số câu đúng: " + correctCount
+                    + " - Số điểm: " + score + "</p>";
+            partsHtml.append(partHtml);
+        }
+        templateContent = templateContent.replace("{{parts}}", partsHtml.toString());
+
+        // Cấu hình thông tin email
+        helper.setTo(email);
+        helper.setSubject("Thông tin bài thi");
+        helper.setText(templateContent, true);
+
+        // Gửi email
+        mailSender.send(message);
     }
 }

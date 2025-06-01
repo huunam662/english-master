@@ -21,11 +21,11 @@ public class FilterRequest {
 
     @Parameter(description = "Trang", example = "1")
     @Min(value = 1, message = "Min value of page is 1.")
-    Integer page;
+    Integer page = 1;
 
     @Parameter(description = "Kích thước (số phần tử) của trang", example = "8")
     @Min(value = 1, message = "Min value of page size is 1.")
     @Max(value = 100, message = "Max value of page size is 100.")
-    Integer pageSize;
+    Integer pageSize = 8;
 
 }
