@@ -17,7 +17,7 @@ public interface MockTestDetailMapper {
 
     @Mapping(target = "questionChild", expression = "java(MockTestMapper.INSTANCE.toMockTestQuestionResponse(mockTestDetailEntity.getQuestionChild()))")
     @Mapping(target = "answerChoice", expression = "java(MockTestMapper.INSTANCE.toMockTestAnswerResponse(mockTestDetailEntity.getAnswerChoice()))")
-    @Mapping(target = "question" , expression = "java(QuestionMapper.INSTANCE.toQuestionResponse(mockTestDetailEntity.getQuestionChild()))")
+    @Mapping(target = "question" , expression = "java(MockTestMapper.INSTANCE.toMockTestQuestionResponse(mockTestDetailEntity.getQuestionChild().getQuestionGroupParent()))")
     MockTestDetailResponse toMockTestDetailResponse(MockTestDetailEntity mockTestDetailEntity);
 
     List<MockTestDetailResponse> toMockTestDetailResponseList(Collection<MockTestDetailEntity> mockTestDetailEntityList);

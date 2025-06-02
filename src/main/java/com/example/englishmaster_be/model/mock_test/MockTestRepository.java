@@ -71,7 +71,7 @@ public interface MockTestRepository extends JpaRepository<MockTestEntity, UUID> 
         LEFT JOIN FETCH mockTest.topic topicTest
         WHERE mockTest.mockTestId = :mockTestId
     """)
-    Optional<MockTestEntity> findMockTestById(@Param("mockTestId") UUID mockTestId);
+    Optional<MockTestEntity> findMockTestJoinUserAndTopic(@Param("mockTestId") UUID mockTestId);
 
     @Transactional
     @Modifying
@@ -95,4 +95,31 @@ public interface MockTestRepository extends JpaRepository<MockTestEntity, UUID> 
         @Param("totalQuestionsSkip") int totalQuestionsSkip,
         @Param("totalScore") int totalScore
     );
+
+    @Query("""
+        SELECT mt FROM MockTestEntity mt
+        INNER JOIN FETCH mt.topic t
+        INNER JOIN FETCH mt.user u
+        LEFT JOIN FETCH mt.mockTestResults mtr
+        LEFT JOIN FETCH mtr.part
+        WHERE mt.mockTestId = :mockTestId
+    """)
+    MockTestEntity findMockTestJoinTopicAndUserAndResultAndPart(@Param("mockTestId") UUID mockTestId);
+
+
+    @Query("""
+        SELECT mt FROM MockTestEntity mt
+        INNER JOIN FETCH mt.topic t
+        INNER JOIN FETCH mt.user u
+        LEFT JOIN FETCH mt.mockTestResults mtr
+        LEFT JOIN FETCH mtr.part p
+        LEFT JOIN FETCH mtr.mockTestDetails mtd
+        LEFT JOIN FETCH mtd.questionChild qc
+        LEFT JOIN FETCH qc.questionGroupParent qp
+        LEFT JOIN FETCH mtd.answerChoice ac
+        WHERE mt.mockTestId = :mockTestId
+        ORDER BY p.partName
+    """)
+    Optional<MockTestEntity> findInfoMockTestById(@Param("mockTestId") UUID mockTestId);
+
 }

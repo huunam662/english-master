@@ -16,17 +16,17 @@ import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
+import com.example.englishmaster_be.model.answer.AnswerJdbcRepository;
 import com.example.englishmaster_be.model.content.ContentEntity;
+import com.example.englishmaster_be.model.content.ContentJdbcRepository;
 import com.example.englishmaster_be.model.part.PartEntity;
-import com.example.englishmaster_be.model.question.QuestionEntity;
-import com.example.englishmaster_be.model.question.QuestionQueryFactory;
+import com.example.englishmaster_be.model.question.*;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.mapper.QuestionMapper;
 import com.example.englishmaster_be.model.answer.AnswerRepository;
 import com.example.englishmaster_be.model.content.ContentRepository;
 import com.example.englishmaster_be.model.part.PartRepository;
-import com.example.englishmaster_be.model.question.QuestionRepository;
 import com.example.englishmaster_be.helper.FileHelper;
 import com.example.englishmaster_be.util.QuestionUtil;
 import lombok.AccessLevel;
@@ -80,13 +80,11 @@ public class QuestionService implements IQuestionService {
 
     IUploadService uploadService;
 
-    JdbcQuestionBatchProcessor jdbcQuestionBatchProcessor;
+    QuestionJdbcRepository questionJdbcRepository;
 
-    JdbcContentBatchProcessor jdbcContentBatchProcessor;
+    ContentJdbcRepository contentJdbcRepository;
 
-    JdbcAnswerBatchProcessor jdbcAnswerBatchProcessor;
-
-    JdbcQuestionContentBatchProcessor jdbcQuestionContentBatchProcessor;
+    AnswerJdbcRepository answerJdbcRepository;
 
     @Transactional
     @SneakyThrows
@@ -470,10 +468,10 @@ public class QuestionService implements IQuestionService {
                 answerChildToSave
         );
 
-        jdbcContentBatchProcessor.batchInsert(contentToSave);
-        jdbcQuestionBatchProcessor.batchInsert(questionParentToSave);
-        jdbcQuestionBatchProcessor.batchInsert(questionChildToSave);
-        jdbcAnswerBatchProcessor.batchInsert(answerChildToSave);
+        contentJdbcRepository.batchInsertContent(contentToSave);
+        questionJdbcRepository.batchInsertQuestion(questionParentToSave);
+        questionJdbcRepository.batchInsertQuestion(questionChildToSave);
+        answerJdbcRepository.batchInsertAnswer(answerChildToSave);
     }
 
 }

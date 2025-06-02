@@ -197,7 +197,7 @@ public class AdminService implements IAdminService {
         List<UserEntity> inactiveUsers = query.fetch();
 
         for (UserEntity user : inactiveUsers)
-            mailerUtil.sendNotificationEmail(user);
+            mailerUtil.sendNotificationEmail(user.getUserId());
 
         return inactiveUsers;
     }
