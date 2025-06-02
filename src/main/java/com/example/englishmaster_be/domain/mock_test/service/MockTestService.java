@@ -1,7 +1,9 @@
 package com.example.englishmaster_be.domain.mock_test.service;
 
-import com.example.englishmaster_be.batch.JdbcMockTestDetailBatchProcessor;
-import com.example.englishmaster_be.batch.JdbcMockTestResultBatchProcessor;
+import com.example.englishmaster_be.domain.mock_test_result.service.IResultMockTestService;
+import com.example.englishmaster_be.model.mock_test.MockTestJdbcRepository;
+import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailJdbcRepository;
+import com.example.englishmaster_be.model.mock_test_result.MockTestResultJdbcRepository;
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestKeyResponse;
 import com.example.englishmaster_be.domain.topic.dto.projection.INumberAndScoreQuestionTopic;
 import com.example.englishmaster_be.model.mock_test_result.MockTestResultEntity;
@@ -22,57 +24,43 @@ import com.example.englishmaster_be.mapper.MockTestMapper;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailEntity;
-import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailRepository;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;
 import com.example.englishmaster_be.model.mock_test.MockTestRepository;
 import com.example.englishmaster_be.model.question.QuestionEntity;
-import com.example.englishmaster_be.model.mock_test_result.MockTestResultRepository;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.helper.MockTestHelper;
 import com.example.englishmaster_be.shared.service.mailer.MailerService;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.*;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import com.example.englishmaster_be.common.constant.error.Error;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.FileCopyUtils;
+import org.springframework.util.Assert;
 
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 import com.example.englishmaster_be.model.mock_test.QMockTestEntity;
 
-@Slf4j
+@Slf4j(topic = "MOCK-TEST-SERVICE")
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MockTestService implements IMockTestService {
 
     JPAQueryFactory queryFactory;
-
-    JavaMailSender mailSender;
-
-    ResourceLoader resourceLoader;
 
     MockTestRepository mockTestRepository;
 
@@ -86,16 +74,21 @@ public class MockTestService implements IMockTestService {
 
     IQuestionService questionService;
 
-    JdbcMockTestResultBatchProcessor jdbcMockTestResultBatchProcessor;
+    IResultMockTestService resultMockTestService;
 
-    JdbcMockTestDetailBatchProcessor jdbcMockTestDetailBatchProcessor;
-    private final MailerService mailerService;
+    MockTestResultJdbcRepository mockTestResultJdbcRepository;
+
+    MockTestDetailJdbcRepository mockTestDetailJdbcRepository;
+
+    MockTestJdbcRepository mockTestJdbcRepository;
+
+    MailerService mailerService;
 
 
     @Override
     public MockTestEntity getMockTestById(UUID mockTestId) {
 
-        return mockTestRepository.findMockTestById(mockTestId)
+        return mockTestRepository.findMockTestJoinUserAndTopic(mockTestId)
                 .orElseThrow(
                         () -> new ErrorHolder(Error.MOCK_TEST_NOT_FOUND)
                 );
@@ -103,7 +96,7 @@ public class MockTestService implements IMockTestService {
 
     @Transactional
     @Override
-    public MockTestEntity saveMockTest(MockTestRequest mockTestRequest) {
+    public MockTestKeyResponse saveMockTest(MockTestRequest mockTestRequest) {
         // Kiểm tra dữ liệu đầu vào
         if (mockTestRequest == null) {
             throw new ErrorHolder(Error.BAD_REQUEST, "Mock test request is null");
@@ -139,15 +132,12 @@ public class MockTestService implements IMockTestService {
         LocalTime finishTime = LocalTime.MIN.plus(duration);
 
         // Khởi tạo MockTestEntity (createAt, updateAt được tự động cập nhật bởi Hibernate)
-        MockTestEntity mockTest = MockTestEntity.builder()
-                .workTime(workTimeTopic)
-                .finishTime(finishTime)
-                .user(currentUser)
-                .topic(topicEntity)
-                .build();
+        UUID mockTestId = mockTestJdbcRepository.insertMockTest(workTimeTopic, finishTime, currentUser.getUserId(), topicEntity.getTopicId());
 
-        // Lưu và trả về đối tượng MockTestEntity vừa tạo
-        return mockTestRepository.save(mockTest);
+        // Lưu và trả về key đối tượng MockTestEntity vừa tạo
+        return MockTestKeyResponse.builder()
+                .mockTestId(mockTestId)
+                .build();
     }
 
 
@@ -283,11 +273,8 @@ public class MockTestService implements IMockTestService {
     @Override
     public MockTestKeyResponse addAnswerToMockTest(UUID mockTestId, List<UUID> listAnswerId) {
 
-        if(mockTestId == null)
-            throw new ErrorHolder(Error.BAD_REQUEST, "Mock test id is required.");
-
-        if(listAnswerId == null)
-            throw new ErrorHolder(Error.BAD_REQUEST, "Answers to submit is required.");
+        Assert.notNull(mockTestId, "Mock test id is required.");
+        Assert.notNull(listAnswerId, "Answers to submit is required.");
 
         UserEntity userSubmitAnswers = userService.currentUser();
         MockTestEntity mockTest = getMockTestById(mockTestId);
@@ -330,8 +317,14 @@ public class MockTestService implements IMockTestService {
                     .build();
 
             Set<QuestionEntity> questionChildsSet = part.getQuestions();
+            if(questionChildsSet == null || questionChildsSet.isEmpty())
+                continue;
+
             for(QuestionEntity questionChild : questionChildsSet){
                 Set<AnswerEntity> answersSet = questionChild.getAnswers();
+                if(answersSet == null || answersSet.isEmpty())
+                    continue;
+
                 for(AnswerEntity answerChoice : answersSet){
                     boolean isCorrectAnswer = answerChoice.getCorrectAnswer();
                     int scoreAchieved = questionChild.getQuestionScore();
@@ -370,19 +363,19 @@ public class MockTestService implements IMockTestService {
         float answersCorrectPercent = (float) totalAnswersCorrect / numberAndScoreQuestionTopic.getNumberQuestions();
         answersCorrectPercent = Math.round(answersCorrectPercent * 100f) / 100f;
 
-        mockTest.setAnswersCorrectPercent(answersCorrectPercent);
-        mockTest.setTotalAnswersCorrect(totalAnswersCorrect);
-        mockTest.setTotalAnswersWrong(totalAnswersWrong);
-        mockTest.setTotalQuestionsFinish(totalQuestionsFinish);
-        mockTest.setTotalQuestionsSkip(totalQuestionsSkip);
-        mockTest.setTotalScore(totalScoreMockTest);
-
         mockTestRepository.updateMockTest(
                 mockTestId, answersCorrectPercent, totalAnswersCorrect, totalAnswersWrong,
                 totalQuestionsFinish, totalQuestionsSkip, totalScoreMockTest
         );
-        jdbcMockTestResultBatchProcessor.batchInsert(mockTestResults);
-        jdbcMockTestDetailBatchProcessor.batchInsert(mockTestDetails);
+        mockTestResultJdbcRepository.batchInsertMockTestResult(mockTestResults);
+        mockTestDetailJdbcRepository.batchInsertMockTestDetail(mockTestDetails);
+
+        try{
+            sendEmailToMock(mockTestId);
+        }
+        catch (Exception e){
+            log.error(e.getMessage());
+        }
 
         return MockTestKeyResponse.builder()
                 .mockTestId(mockTestId)
@@ -450,22 +443,7 @@ public class MockTestService implements IMockTestService {
     @Override
     public void sendEmailToMock(UUID mockTestId) {
 
-        MockTestEntity mockTest = getMockTestById(mockTestId);
-
-        UserEntity userOfMockTest = mockTest.getUser();
-
-        mailerService.sendResultEmail(userOfMockTest.getEmail(), mockTest);
-    }
-
-    @SneakyThrows
-    @Override
-    public void sendEmailToMock(MockTestEntity mockTest) {
-
-        if(mockTest == null) return;
-
-        UserEntity userOfMockTest = mockTest.getUser();
-
-        mailerService.sendResultEmail(userOfMockTest.getEmail(), mockTest);
+        mailerService.sendResultEmail(mockTestId);
     }
 
     @Override
@@ -542,7 +520,27 @@ public class MockTestService implements IMockTestService {
 
         return questionMockTestResponseList;
     }
+
+
+    @Override
     public MockTestEntity getInformationMockTest(UUID mockTestId){
-        return findMockTestToId(mockTestId);
+
+        UserEntity currentUser = userService.currentUser();
+
+        MockTestEntity mockTest = getMockTestById(mockTestId);
+
+        UserEntity ownerOfMockTest = mockTest.getUser();
+
+        if(!currentUser.getUserId().equals(ownerOfMockTest.getUserId()))
+            throw new ErrorHolder(Error.UNAUTHORIZED, "User current mustn't owner of mock test");
+
+        Set<MockTestResultEntity> mockTestResultsSortPartAsc = resultMockTestService.getAllMockTestResults(mockTestId)
+                .stream().sorted(Comparator.comparing(mockTestResult -> mockTestResult.getPart().getPartName()))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+
+        mockTest.setMockTestResults(mockTestResultsSortPartAsc);
+
+        return mockTest;
     }
+
 }

@@ -7,12 +7,14 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.SortComparator;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Set;
 import java.util.List;
+import java.util.SortedSet;
 import java.util.UUID;
 
 

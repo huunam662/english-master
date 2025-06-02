@@ -1,6 +1,5 @@
-package com.example.englishmaster_be.batch;
+package com.example.englishmaster_be.model.answer;
 
-import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.value.AppValue;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -8,27 +7,26 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
-@Component
+@Repository
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class JdbcAnswerBatchProcessor {
+public class AnswerJdbcRepository {
 
     JdbcTemplate jdbcTemplate;
 
     AppValue appValue;
 
     @Transactional
-    public void batchInsert(List<AnswerEntity> answers) {
+    public void batchInsertAnswer(List<AnswerEntity> answers) {
 
         if(answers == null || answers.isEmpty()) return;
 

@@ -37,11 +37,9 @@ public class MockTestController {
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Create mock test successfully")
-    public MockTestResponse createMockTest(@RequestBody MockTestRequest saveMockTestRequest) {
+    public MockTestKeyResponse createMockTest(@RequestBody MockTestRequest saveMockTestRequest) {
 
-        MockTestEntity mockTest = mockTestService.saveMockTest(saveMockTestRequest);
-
-        return MockTestMapper.INSTANCE.toMockTestResponse(mockTest);
+        return mockTestService.saveMockTest(saveMockTestRequest);
     }
 
     @GetMapping(value = "/getMockTestById")
@@ -111,7 +109,7 @@ public class MockTestController {
     }
 
     @GetMapping(value = "/{mockTestId:.+}/sendEmail")
-//    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Send email successfully")
     public void sendEmailToMock(@PathVariable("mockTestId") UUID mockTestId) {
 
@@ -138,7 +136,9 @@ public class MockTestController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Show all info of mocktest")
     public MockTestInforResponse getMockTestInfor(@PathVariable("mockTestId") UUID mockTestId) {
+
         MockTestEntity mockTestEntity = mockTestService.getInformationMockTest(mockTestId);
+
         return MockTestMapper.INSTANCE.toMockTestInforResponse(mockTestEntity);
     }
 }

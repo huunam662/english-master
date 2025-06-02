@@ -27,6 +27,6 @@ public class MockTestDetailResponse {
 
     MockTestAnswerResponse answerChoice;
 
-    QuestionResponse question;
+    MockTestQuestionResponse question;
 
 }

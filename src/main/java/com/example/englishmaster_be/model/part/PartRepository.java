@@ -40,7 +40,7 @@ public interface PartRepository extends JpaRepository<PartEntity, UUID>, JpaSpec
 
     @Query("""
         SELECT DISTINCT p FROM PartEntity p
-        LEFT JOIN FETCH p.topics t
+        INNER JOIN FETCH p.topics t
         LEFT JOIN FETCH p.questions qgc
         LEFT JOIN FETCH qgc.answers aqc
         WHERE t.topicId = :topicId
