@@ -1,9 +1,12 @@
 package com.example.englishmaster_be.shared.service.mailer;
 
+import com.example.englishmaster_be.domain.mock_test_result.service.IResultMockTestService;
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;
+import com.example.englishmaster_be.model.mock_test.MockTestRepository;
 import com.example.englishmaster_be.model.mock_test_result.MockTestResultEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
+import com.example.englishmaster_be.model.user.UserRepository;
 import com.example.englishmaster_be.value.LinkValue;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -17,8 +20,10 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileCopyUtils;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -39,12 +44,13 @@ public class MailerService {
 
     ResourceLoader resourceLoader;
 
-    SpringTemplateEngine templateEngine;
-
     LinkValue linkValue;
 
+    UserRepository userRepository;
 
+    MockTestRepository mockTestRepository;
 
+    @Async
     public void sendMail(String recipientEmail) throws MessagingException {
 
         MimeMessage message = mailSender.createMimeMessage();
@@ -58,6 +64,7 @@ public class MailerService {
         mailSender.send(message);
     }
 
+    @Async
     public void sendMail(String to, String subject, String body) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
@@ -66,7 +73,14 @@ public class MailerService {
         mailSender.send(message);
     }
 
-    public void sendNotificationEmail(UserEntity user){
+    @Async
+    @Transactional
+    public void sendNotificationEmail(UUID userId){
+
+        UserEntity user = userRepository.findById(userId).orElse(null);
+
+        if(user == null) return;
+
         String subject = "Đã lâu bạn không truy cập rồi!";
         String body = String.format(
                 "Hello %s, We from MEU-English." +
@@ -79,6 +93,7 @@ public class MailerService {
         sendMail(user.getEmail(),subject,body);
     }
 
+    @Async
     public void sendOtpToEmail(String email, String otp)
             throws MessagingException, IOException
     {
@@ -100,7 +115,7 @@ public class MailerService {
         mailSender.send(message);
     }
 
-
+    @Async
     public void sendConfirmRegister(String email, String confirmationToken) throws IOException, MessagingException {
 
         MimeMessage message = mailSender.createMimeMessage();
@@ -120,7 +135,7 @@ public class MailerService {
         mailSender.send(message);
     }
 
-
+    @Async
     public void sendForgetPassEmail(String email, String confirmationToken) throws MessagingException, IOException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -145,7 +160,12 @@ public class MailerService {
         return new String(templateBytes, StandardCharsets.UTF_8);
     }
 
-    public void sendResultEmail(String email, MockTestEntity mockTest) throws IOException, MessagingException {
+    @Async
+    @Transactional
+    public void sendResultEmail(UUID mockTestId) throws IOException, MessagingException {
+
+        MockTestEntity mockTest = mockTestRepository.findMockTestJoinTopicAndUserAndResultAndPart(mockTestId);
+
         // Tạo đối tượng MimeMessage
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -182,7 +202,7 @@ public class MailerService {
         templateContent = templateContent.replace("{{parts}}", partsHtml.toString());
 
         // Cấu hình thông tin email
-        helper.setTo(email);
+        helper.setTo(mockTest.getUser().getEmail());
         helper.setSubject("Thông tin bài thi");
         helper.setText(templateContent, true);
 

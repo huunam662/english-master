@@ -26,6 +26,11 @@ public interface MockTestMapper {
 
     List<MockTestResponse> toMockTestResponseList(Collection<MockTestEntity> mockTestEntityList);
 
+    @Mapping(target = "topic", expression = "java(toMockTestTopicResponse(mockTest.getTopic()))")
+    MockTest1Response toMockTest1Response(MockTestEntity mockTest);
+
+    List<MockTest1Response> toMockTest1ResponseList(Collection<MockTestEntity> mockTestEntityList);
+
     MockTestEntity toMockTestEntity(MockTestRequest mockTestRequest);
 
     MockTestPartResponse toMockTestPartResponse(PartEntity partEntity);
@@ -40,7 +45,7 @@ public interface MockTestMapper {
 
     List<MockTestAnswerResponse> toMockTestAnswerResponseList(Collection<AnswerEntity> answerEntityList);
 
-    @Mapping(target = "mockTestResponse" , expression = "java(toMockTestResponse(mockTestEntity))")
+    @Mapping(target = "mockTestResponse" , expression = "java(toMockTest1Response(mockTestEntity))")
     @Mapping(target = "mockTestResultResponses" , expression = "java(MockTestResultMapper.INSTANCE.toMockTestResultResponseList(mockTestEntity.getMockTestResults()))")
     MockTestInforResponse toMockTestInforResponse(MockTestEntity mockTestEntity);
 }

@@ -13,6 +13,6 @@ import java.util.List;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class MockTestInforResponse {
-    MockTestResponse mockTestResponse;
+    MockTest1Response mockTestResponse;
     List<MockTestResultResponse> mockTestResultResponses;
 }

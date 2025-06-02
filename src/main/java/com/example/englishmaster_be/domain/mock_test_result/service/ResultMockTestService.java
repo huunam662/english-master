@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -109,5 +111,13 @@ public class ResultMockTestService implements IResultMockTestService {
         MockTestResultEntity resultMockTest = getResultMockTestById(id);
 
         resultMockTestRepository.delete(resultMockTest);
+    }
+
+    @Override
+    public List<MockTestResultEntity> getAllMockTestResults(UUID mockTestId) {
+
+        Assert.notNull(mockTestId, "Mock test id is required.");
+
+        return resultMockTestRepository.findResultJoinPartQuestionAnswer(mockTestId);
     }
 }

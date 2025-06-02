@@ -18,7 +18,7 @@ import java.util.UUID;
 
 public interface IMockTestService {
 
-    MockTestEntity saveMockTest(MockTestRequest mockTestRequest);
+    MockTestKeyResponse saveMockTest(MockTestRequest mockTestRequest);
 
     List<MockTestEntity> getTop10MockTest(int index);
 
@@ -45,8 +45,6 @@ public interface IMockTestService {
     List<MockTestDetailEntity> getListCorrectAnswer(int index, boolean isCorrect, UUID mockTestId);
 
     void sendEmailToMock(UUID mockTestId);
-
-    void sendEmailToMock(MockTestEntity mockTest);
 
     MockTestPartResponse getPartToMockTest(UUID mockTestId);
 

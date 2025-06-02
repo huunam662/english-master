@@ -19,5 +19,9 @@ public class MockTestResultResponse {
 
     MockTestPartResponse part;
 
+    Integer totalScoreResult;
+
+    Integer totalCorrect;
+
     List<MockTestDetailResponse> mockTestDetails;
 }
