@@ -26,11 +26,29 @@ public interface PartRepository extends JpaRepository<PartEntity, UUID>, JpaSpec
     boolean isExistedPartNameWithDiff(@Param("part") PartEntity part, @Param("partName") String partName);
 
     @Query(value = """
-        SELECT EXISTS(SELECT p.id FROM part p WHERE p.part_name = :partName AND p.part_type = :partType)
+        SELECT EXISTS(
+            SELECT p.id FROM part p
+            WHERE p.part_name = :partName
+            AND p.part_type = :partType
+        )
     """, nativeQuery = true)
     boolean isExistedByPartNameAndPartType(
             @Param("partName") String partName,
             @Param("partType") String partType
+    );
+
+    @Query(value = """
+        SELECT EXISTS(
+                    SELECT p.id FROM part p 
+                    WHERE p.part_name = :partName 
+                    AND p.part_type = :partType
+                    AND p.id != :partId
+        )
+    """, nativeQuery = true)
+    boolean isExistedByPartNameAndPartTypeAndIdNot(
+            @Param("partName") String partName,
+            @Param("partType") String partType,
+            @Param("partId") UUID partId
     );
 
     @Query(value = """

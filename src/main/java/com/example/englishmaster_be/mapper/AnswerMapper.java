@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.mapper;
 
-import com.example.englishmaster_be.domain.answer.dto.request.Answer1Request;
+import com.example.englishmaster_be.domain.answer.dto.request.CreateAnswer1Request;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerRequest;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerCorrectResponse;
@@ -43,9 +43,9 @@ public interface AnswerMapper {
     @Mapping(target = "scoreAnswer", source = "question.questionScore")
     AnswerCorrectResponse toCheckCorrectAnswerResponse(AnswerEntity answer);
 
-    AnswerEntity toAnswerEntity(Answer1Request answer1Request);
+    AnswerEntity toAnswerEntity(CreateAnswer1Request answer1Request);
 
-    default Set<AnswerEntity> toAnswerOfChildSet(QuestionEntity questionChild, List<Answer1Request> answer1RequestSet, UserEntity userUpdate){
+    default Set<AnswerEntity> toAnswerOfChildSet(QuestionEntity questionChild, List<CreateAnswer1Request> answer1RequestSet, UserEntity userUpdate){
 
         if(questionChild == null) return Collections.emptySet();
 
