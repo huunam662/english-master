@@ -48,4 +48,33 @@ public interface PartRepository extends JpaRepository<PartEntity, UUID>, JpaSpec
         AND aqc.answerId IN :answerIds
     """)
     List<PartEntity> findPartJoinQuestionsAndAnswers(@Param("topicId") UUID topicId, @Param("answerIds") List<UUID> answerIds);
+
+    @Query("""
+        SELECT p FROM PartEntity p
+        INNER JOIN FETCH p.topics t
+        LEFT JOIN FETCH p.questions qp
+        LEFT JOIN FETCH qp.questionGroupChildren qc
+        LEFT JOIN FETCH qc.answers ac
+        LEFT JOIN FETCH qp.contentCollection cqp
+        LEFT JOIN FETCH qc.contentCollection cqc
+        WHERE t.topicId = :topicId AND LOWER(p.partName) = LOWER(:partName)
+        AND qp.isQuestionParent = TRUE AND qc.isQuestionParent = FALSE
+    """)
+    List<PartEntity> findPartJoinTopicQuestionAnswerContent(@Param("topicId") UUID topicId, @Param("partName") String partName);
+
+    @Query("""
+        SELECT DISTINCT p FROM PartEntity p
+        INNER JOIN FETCH p.topics t
+        WHERE t.topicId = :topicId
+    """)
+    List<PartEntity> findPartJoinTopic(@Param("topicId") UUID topicId);
+
+    @Query("""
+        SELECT p FROM PartEntity p
+        INNER JOIN p.topics t
+        WHERE LOWER(p.partName) = LOWER(:partName)
+        AND t.topicId = :topicId
+    """)
+    Optional<PartEntity> findPartByPartNameTopicId(@Param("partName") String partName, @Param("topicId") UUID topicId);
+
 }

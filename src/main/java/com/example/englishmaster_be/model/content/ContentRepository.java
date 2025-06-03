@@ -3,6 +3,7 @@ package com.example.englishmaster_be.model.content;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
@@ -26,5 +27,6 @@ public interface ContentRepository extends JpaRepository<ContentEntity, UUID> {
     @Modifying
     @Query("delete from ContentEntity c where c.contentData = :contentData")
     int deleteByContentData(String contentData);
+
 
 }

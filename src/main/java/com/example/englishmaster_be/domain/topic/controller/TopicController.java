@@ -18,6 +18,7 @@ import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicResponse;
 import com.example.englishmaster_be.model.comment.CommentEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.*;
@@ -132,7 +133,7 @@ public class TopicController {
 
     @GetMapping("/{topicId}")
     @DefaultMessage("Get Topic successfully")
-    public TopicResponse getTopic(@RequestParam("topicId") UUID id) {
+    public TopicResponse getTopic(@PathVariable("topicId") UUID id) {
 
         TopicEntity topic = topicService.getTopicById(id);
 
@@ -243,12 +244,31 @@ public class TopicController {
     @GetMapping(value = "/{topicId:.+}/listQuestionToPart")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Show Question of Part to Topic successfully")
+    @Operation(
+            summary = "Get all question of part at topic by topic id and part name",
+            description = "Get all question of part at topic by topicId and partId"
+    )
     public List<QuestionPartResponse> getQuestionOfToTopicPart(
             @PathVariable("topicId") UUID topicId,
             @RequestParam("partName") String partName
     ) {
 
         return topicService.getQuestionOfToTopicPart(topicId, partName);
+    }
+
+    @GetMapping(value = "/{topicId:.+}/part-infor")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @DefaultMessage("Show Question of Part to Topic successfully")
+    @Operation(
+            summary = "Get all question of part at topic by topic id and part id",
+            description = "Get all question of part at topic by topic id and part id"
+    )
+    public List<QuestionPartResponse> getInforOfToTopicPart(
+            @PathVariable("topicId") UUID topicId,
+            @RequestParam("partId") UUID partId
+    ) {
+
+        return topicService.getQuestionOfToTopicPart(topicId, partId);
     }
 
 

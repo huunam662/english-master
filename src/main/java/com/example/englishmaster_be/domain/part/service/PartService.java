@@ -28,6 +28,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,6 +52,17 @@ public class PartService implements IPartService {
 
     IQuestionService questionService;
 
+
+
+    @Override
+    public PartEntity getPartByPartNameTopicId(String partName, UUID topicId) {
+
+        Assert.notNull(partName, "Part name is required.");
+        Assert.notNull(topicId, "Topic id is required.");
+
+        return partRepository.findPartByPartNameTopicId(partName, topicId)
+                .orElseThrow(() -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Part " +partName+" not found."));
+    }
 
     @Transactional
     @Override
