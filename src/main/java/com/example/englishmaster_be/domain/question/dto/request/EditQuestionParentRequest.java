@@ -1,19 +1,20 @@
 package com.example.englishmaster_be.domain.question.dto.request;
 
-import com.example.englishmaster_be.domain.answer.dto.request.Answer1Request;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.SuperBuilder;
 
 import java.util.List;
+import java.util.UUID;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class QuestionChildRequest {
+public class EditQuestionParentRequest {
+
+    UUID questionParentId;
 
     String questionTitle;
 
@@ -23,9 +24,6 @@ public class QuestionChildRequest {
 
     String contentImage;
 
-    Integer numberChoice;
+    List<EditQuestionChildRequest> questionChilds;
 
-    Integer questionScore;
-
-    List<Answer1Request> answers;
 }

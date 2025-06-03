@@ -2,15 +2,12 @@ package com.example.englishmaster_be.util;
 
 import com.example.englishmaster_be.common.constant.PartType;
 import com.example.englishmaster_be.common.constant.QuestionType;
-import com.example.englishmaster_be.domain.answer.dto.request.Answer1Request;
-import com.example.englishmaster_be.domain.question.dto.request.QuestionChildRequest;
-import com.example.englishmaster_be.domain.question.dto.request.QuestionParentRequest;
+import com.example.englishmaster_be.domain.answer.dto.request.CreateAnswer1Request;
+import com.example.englishmaster_be.domain.question.dto.request.CreateQuestionChildRequest;
+import com.example.englishmaster_be.domain.question.dto.request.CreateQuestionParentRequest;
 import com.example.englishmaster_be.mapper.AnswerMapper;
 import com.example.englishmaster_be.mapper.QuestionMapper;
-import com.example.englishmaster_be.domain.question.dto.response.QuestionMatchingResponse;
-import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
-import com.example.englishmaster_be.mapper.QuestionMapper;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.content.ContentEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
@@ -152,7 +149,7 @@ public class QuestionUtil {
     }
 
     public static void fillToCreateQuestionAnswerForPart(
-            List<QuestionParentRequest> questionParentsRequest,
+            List<CreateQuestionParentRequest> questionParentsRequest,
             PartEntity part,
             UserEntity userCurrent,
             List<ContentEntity> contentToSave,
@@ -161,7 +158,7 @@ public class QuestionUtil {
             List<AnswerEntity> answerChildToSave
     ){
 
-        for(QuestionParentRequest parentRequest : questionParentsRequest){
+        for(CreateQuestionParentRequest parentRequest : questionParentsRequest){
 
             if(parentRequest == null) continue;
 
@@ -205,9 +202,9 @@ public class QuestionUtil {
             if(parentRequest.getQuestionChilds() == null || parentRequest.getQuestionChilds().isEmpty())
                 continue;
 
-            List<QuestionChildRequest> childRequestList = parentRequest.getQuestionChilds();
+            List<CreateQuestionChildRequest> childRequestList = parentRequest.getQuestionChilds();
 
-            for(QuestionChildRequest childRequest : childRequestList){
+            for(CreateQuestionChildRequest childRequest : childRequestList){
 
                 if(childRequest == null) continue;
 
@@ -254,9 +251,9 @@ public class QuestionUtil {
                 if(childRequest.getAnswers() == null || childRequest.getAnswers().isEmpty())
                     continue;
 
-                List<Answer1Request> answerChildList = childRequest.getAnswers();
+                List<CreateAnswer1Request> answerChildList = childRequest.getAnswers();
 
-                for(Answer1Request answer1Request : answerChildList){
+                for(CreateAnswer1Request answer1Request : answerChildList){
 
                     if(answer1Request == null) continue;
 

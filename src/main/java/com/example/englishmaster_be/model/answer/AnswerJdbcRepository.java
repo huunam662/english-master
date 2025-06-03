@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +24,8 @@ import java.util.List;
 public class AnswerJdbcRepository {
 
     JdbcTemplate jdbcTemplate;
+
+    NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     AppValue appValue;
 
@@ -75,5 +79,29 @@ public class AnswerJdbcRepository {
 
             startIndex = endIndex;
         }
+    }
+
+
+    @Transactional
+    public void batchUpdateAnswer(List<AnswerEntity> answers){
+
+        if(answers == null || answers.isEmpty()) return;
+
+        String sql = """
+                        UPDATE answer
+                        SET content = :answerContent,
+                            explain_details = :explainDetails,
+                            correct_answer = :correctAnswer,
+                        WHERE id = :answerId
+                    """;
+
+        namedParameterJdbcTemplate.batchUpdate(sql, answers.stream().map(
+                answer -> new MapSqlParameterSource()
+                        .addValue("answerContent", answer.getAnswerContent())
+                        .addValue("explainDetails", answer.getExplainDetails())
+                        .addValue("correctAnswer", answer.getCorrectAnswer())
+                        .addValue("answerId", answer.getAnswerId())
+                ).toArray(MapSqlParameterSource[]::new)
+        );
     }
 }
