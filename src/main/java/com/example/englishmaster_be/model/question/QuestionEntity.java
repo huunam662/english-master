@@ -75,6 +75,12 @@ public class QuestionEntity {
     @Column(name = "update_at")
     LocalDateTime updateAt;
 
+    @Column(name = "part_id", insertable = false, updatable = false)
+    UUID partId;
+
+    @Column(name = "question_group", insertable = false, updatable = false)
+    UUID questionGroupId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by", referencedColumnName = "id")
     UserEntity userCreate;

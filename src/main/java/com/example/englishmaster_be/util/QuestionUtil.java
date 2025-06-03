@@ -85,7 +85,7 @@ public class QuestionUtil {
                 questionsList4Shuffle.forEach(
                         questionGroupChildEntity -> {
 
-                            if (questionGroupChildEntity.getQuestionGroupChildren() != null)
+                            if (!questionGroupChildEntity.getIsQuestionParent() && questionGroupChildEntity.getQuestionGroupChildren() != null)
                                 questionGroupChildEntity.setQuestionGroupChildren(null);
 
                             if(!notShuffleAnswer && !questionGroupChildEntity.getIsQuestionParent()){

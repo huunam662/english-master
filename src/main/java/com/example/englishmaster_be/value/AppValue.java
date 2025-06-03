@@ -17,4 +17,7 @@ public class AppValue {
     @Value("${spring.jpa.properties.hibernate.jdbc.batch_size}")
     Integer batchSize;
 
+    @Value("${spring.jpa.properties.hibernate.default_batch_fetch_size}")
+    Integer fetchBatchSize;
+
 }

@@ -49,6 +49,9 @@ public class AnswerEntity {
     @Column(name = "update_at")
     LocalDateTime updateAt;
 
+    @Column(name = "question_id", insertable = false, updatable = false)
+    UUID questionChildId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by", referencedColumnName = "id")
     UserEntity userCreate;

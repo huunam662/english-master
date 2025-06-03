@@ -72,6 +72,8 @@ public interface ITopicService {
 
     List<QuestionPartResponse> getQuestionOfToTopicPart(UUID topicId, String partName);
 
+    List<QuestionPartResponse> getQuestionOfToTopicPart(UUID topicId, UUID partId);
+
     List<String> get5SuggestTopic(String query);
 
     void deleteQuestionToTopic(UUID topicId, UUID questionId);

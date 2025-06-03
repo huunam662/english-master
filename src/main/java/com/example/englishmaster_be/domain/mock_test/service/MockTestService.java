@@ -1,8 +1,10 @@
 package com.example.englishmaster_be.domain.mock_test.service;
 
 import com.example.englishmaster_be.domain.mock_test_result.service.IResultMockTestService;
+import com.example.englishmaster_be.model.answer.AnswerRepository;
 import com.example.englishmaster_be.model.mock_test.MockTestJdbcRepository;
 import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailJdbcRepository;
+import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailRepository;
 import com.example.englishmaster_be.model.mock_test_result.MockTestResultJdbcRepository;
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestKeyResponse;
 import com.example.englishmaster_be.domain.topic.dto.projection.INumberAndScoreQuestionTopic;
@@ -70,11 +72,11 @@ public class MockTestService implements IMockTestService {
 
     IAnswerService answerService;
 
-    IPartService partService;
+    AnswerRepository answerRepository;
 
     IQuestionService questionService;
 
-    IResultMockTestService resultMockTestService;
+    MockTestDetailRepository mockTestDetailRepository;
 
     MockTestResultJdbcRepository mockTestResultJdbcRepository;
 
@@ -292,7 +294,7 @@ public class MockTestService implements IMockTestService {
 
         INumberAndScoreQuestionTopic numberAndScoreQuestionTopic = topicService.getNumberAndScoreQuestionTopic(topicOfMockTest.getTopicId());
 
-        List<PartEntity> partsFinishExam = partService.getPartsFinishExam(topicOfMockTest.getTopicId(), listAnswerId);
+        List<AnswerEntity> answersSubmit = answerRepository.findAnswersInAnswerIds(topicOfMockTest.getTopicId(), listAnswerId);
 
         int totalQuestionsFinish = listAnswerId.size();
         int totalQuestionsSkip = numberAndScoreQuestionTopic.getNumberQuestions() - totalQuestionsFinish;
@@ -303,7 +305,17 @@ public class MockTestService implements IMockTestService {
         List<MockTestResultEntity> mockTestResults = new ArrayList<>();
         List<MockTestDetailEntity> mockTestDetails = new ArrayList<>();
 
-        for(PartEntity part : partsFinishExam){
+        Map<QuestionEntity, AnswerEntity> questionChildAnswerGroup = answersSubmit.stream()
+                .collect(Collectors.toMap(
+                        AnswerEntity::getQuestion,
+                        answer -> answer
+                ));
+
+        Map<PartEntity, List<QuestionEntity>> partQuestionChildsGroup = questionChildAnswerGroup.keySet().stream()
+                .collect(Collectors.groupingBy(QuestionEntity::getPart));
+
+        Set<PartEntity> partsSubmit = partQuestionChildsGroup.keySet();
+        for(PartEntity part: partsSubmit) {
 
             int totalCorrectOfPart = 0;
             int totalScoreOfPart = 0;
@@ -316,39 +328,34 @@ public class MockTestService implements IMockTestService {
                     .userUpdate(userSubmitAnswers)
                     .build();
 
-            Set<QuestionEntity> questionChildsSet = part.getQuestions();
-            if(questionChildsSet == null || questionChildsSet.isEmpty())
-                continue;
+            List<QuestionEntity> questionChildsOfPart = partQuestionChildsGroup.getOrDefault(part, Collections.emptyList());
+            for(QuestionEntity questionChild : questionChildsOfPart) {
+                AnswerEntity answerChoice = questionChildAnswerGroup.getOrDefault(questionChild, null);
 
-            for(QuestionEntity questionChild : questionChildsSet){
-                Set<AnswerEntity> answersSet = questionChild.getAnswers();
-                if(answersSet == null || answersSet.isEmpty())
-                    continue;
+                if(answerChoice == null) continue;
 
-                for(AnswerEntity answerChoice : answersSet){
-                    boolean isCorrectAnswer = answerChoice.getCorrectAnswer();
-                    int scoreAchieved = questionChild.getQuestionScore();
-                    if(isCorrectAnswer){
-                        totalCorrectOfPart++;
-                        totalScoreOfPart += scoreAchieved;
-                    }
-                    else{
-                        totalAnswersWrong++;
-                    }
-                    mockTestDetails.add(
-                            MockTestDetailEntity.builder()
-                                    .mockTestDetailId(UUID.randomUUID())
-                                    .resultMockTest(mockTestResult)
-                                    .questionChild(questionChild)
-                                    .answerChoice(answerChoice)
-                                    .userCreate(userSubmitAnswers)
-                                    .userUpdate(userSubmitAnswers)
-                                    .answerContent(answerChoice.getAnswerContent())
-                                    .isCorrectAnswer(isCorrectAnswer)
-                                    .scoreAchieved(isCorrectAnswer ? scoreAchieved : 0)
-                                    .build()
-                    );
+                boolean isCorrectAnswer = answerChoice.getCorrectAnswer();
+                int scoreAchieved = questionChild.getQuestionScore();
+                if(isCorrectAnswer){
+                    totalCorrectOfPart++;
+                    totalScoreOfPart+=scoreAchieved;
                 }
+                else {
+                    totalAnswersWrong++;
+                }
+                mockTestDetails.add(
+                        MockTestDetailEntity.builder()
+                                .mockTestDetailId(UUID.randomUUID())
+                                .resultMockTest(mockTestResult)
+                                .questionChild(questionChild)
+                                .answerChoice(answerChoice)
+                                .userCreate(userSubmitAnswers)
+                                .userUpdate(userSubmitAnswers)
+                                .answerContent(answerChoice.getAnswerContent())
+                                .isCorrectAnswer(isCorrectAnswer)
+                                .scoreAchieved(isCorrectAnswer ? scoreAchieved : 0)
+                                .build()
+                );
             }
 
             mockTestResult.setTotalCorrect(totalCorrectOfPart);
@@ -525,20 +532,32 @@ public class MockTestService implements IMockTestService {
     @Override
     public MockTestEntity getInformationMockTest(UUID mockTestId){
 
+        Assert.notNull(mockTestId, "Mock test id is required.");
+
         UserEntity currentUser = userService.currentUser();
 
         MockTestEntity mockTest = getMockTestById(mockTestId);
 
         UserEntity ownerOfMockTest = mockTest.getUser();
 
+        if(ownerOfMockTest == null)
+            throw new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Unknown owner of mock test.");
+
         if(!currentUser.getUserId().equals(ownerOfMockTest.getUserId()))
             throw new ErrorHolder(Error.UNAUTHORIZED, "User current mustn't owner of mock test");
 
-        Set<MockTestResultEntity> mockTestResultsSortPartAsc = resultMockTestService.getAllMockTestResults(mockTestId)
-                .stream().sorted(Comparator.comparing(mockTestResult -> mockTestResult.getPart().getPartName()))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
+        List<MockTestDetailEntity> mockTestDetails = mockTestDetailRepository.findMockDetailJoinQuestionAnswerMockResultPartByMockId(mockTestId);
 
-        mockTest.setMockTestResults(mockTestResultsSortPartAsc);
+        Map<MockTestResultEntity, List<MockTestDetailEntity>> mockResultDetailsGroup = mockTestDetails.stream()
+                .collect(Collectors.groupingBy(MockTestDetailEntity::getResultMockTest));
+
+        Set<MockTestResultEntity> mockResultSet = mockResultDetailsGroup.keySet();
+        for(MockTestResultEntity mockResult : mockResultSet){
+            mockResult.setMockTestDetails(new HashSet<>(mockResultDetailsGroup.getOrDefault(mockResult, Collections.emptyList())));
+            mockResult.setMockTest(mockTest);
+        }
+
+        mockTest.setMockTestResults(mockResultSet);
 
         return mockTest;
     }
