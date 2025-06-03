@@ -53,6 +53,8 @@ import com.example.englishmaster_be.model.topic.TopicRepository;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.helper.FileHelper;
 import com.example.englishmaster_be.util.QuestionUtil;
+import com.example.englishmaster_be.util.TopicUtil;
+import com.example.englishmaster_be.value.AppValue;
 import com.example.englishmaster_be.value.LinkValue;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
@@ -60,11 +62,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -82,11 +86,11 @@ public class TopicService implements ITopicService {
 
     LinkValue linkValue;
 
+    AppValue appValue;
+
     FileHelper fileUtil;
 
     JPAQueryFactory jpaQueryFactory;
-
-    QuestionQueryFactory questionQueryFactory;
 
     TopicRepository topicRepository;
 
@@ -546,14 +550,32 @@ public class TopicService implements ITopicService {
         topicRepository.save(topic);
     }
 
+    @Override
+    public List<QuestionPartResponse> getQuestionOfToTopicPart(UUID topicId, UUID partId) {
+
+        Assert.notNull(topicId, "Topic id is required.");
+        Assert.notNull(partId, "Part id is required.");
+
+        TopicEntity topic = getTopicById(topicId);
+
+        List<AnswerEntity> answersQuestionChild = answerRepository.findAnswersJoinQuestionPartTopic(topicId, partId);
+
+        TopicUtil.fillAnswerToTopic(topic, answersQuestionChild, questionRepository);
+
+        return QuestionMapper.INSTANCE.toQuestionPartResponseList(topic);
+    }
 
     @Override
     public List<QuestionPartResponse> getQuestionOfToTopicPart(UUID topicId, String partName) {
 
-        TopicEntity topic = topicRepository.findTopicQuestionsFromTopicAndPart(topicId, partName)
-                .orElseThrow(
-                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND)
-                );
+        Assert.notNull(topicId, "Topic id is required.");
+        Assert.notNull(partName, "Part name is required.");
+
+        TopicEntity topic = getTopicById(topicId);
+
+        List<AnswerEntity> answersQuestionChild = answerRepository.findAnswersJoinQuestionPartTopic(topicId, partName);
+
+        TopicUtil.fillAnswerToTopic(topic, answersQuestionChild, questionRepository);
 
         return QuestionMapper.INSTANCE.toQuestionPartResponseList(topic);
     }
@@ -1030,10 +1052,13 @@ public class TopicService implements ITopicService {
     @Override
     public List<QuestionPartResponse> getQuestionPartListOfTopic(UUID topicId) {
 
-        TopicEntity topic = topicRepository.findTopicQuestionsFromTopic(topicId)
-                .orElseThrow(
-                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND)
-                );
+        Assert.notNull(topicId, "Topic id is required.");
+
+        TopicEntity topic = getTopicById(topicId);
+
+        List<AnswerEntity> answersQuestionChild = answerRepository.findAnswersJoinQuestionPartTopic(topicId);
+
+        TopicUtil.fillAnswerToTopic(topic, answersQuestionChild, questionRepository);
 
         return QuestionMapper.INSTANCE.toQuestionPartResponseList(topic);
     }
@@ -1041,9 +1066,9 @@ public class TopicService implements ITopicService {
     @Override
     public INumberAndScoreQuestionTopic getNumberAndScoreQuestionTopic(UUID topicId) {
 
-        if(topicId == null)
-            throw new ErrorHolder(Error.BAD_REQUEST, "Id of topic is required.");
+        Assert.notNull(topicId, "Id of topic is required.");
 
         return topicRepository.findNumberAndScoreQuestions(topicId);
     }
+
 }

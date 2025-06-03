@@ -32,7 +32,7 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, JpaSp
     List<String> findAllTopicImages();
 
     @Query(value = """
-       SELECT DISTINCT t FROM TopicEntity t
+        SELECT DISTINCT t FROM TopicEntity t
         LEFT JOIN FETCH t.parts p
         LEFT JOIN FETCH p.questions qp
         LEFT JOIN FETCH qp.questionGroupChildren qgc
@@ -69,6 +69,7 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, JpaSp
         WHERE qc.is_question_parent = FALSE AND t.id = :topicId
     """, nativeQuery = true)
     INumberAndScoreQuestionTopic findNumberAndScoreQuestions(@Param("topicId") UUID topicId);
+
 
 }
 

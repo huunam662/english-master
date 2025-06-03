@@ -48,6 +48,9 @@ public class MockTestResultEntity {
     @Column(name = "update_at")
     LocalDateTime updateAt;
 
+    @Column(name = "mock_test_id", insertable = false, updatable = false)
+    UUID mockTestId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by", referencedColumnName = "id")
     UserEntity userCreate;

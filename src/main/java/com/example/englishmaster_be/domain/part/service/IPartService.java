@@ -15,6 +15,8 @@ import java.util.UUID;
 public interface IPartService {
 
 
+    PartEntity getPartByPartNameTopicId(String partName, UUID topicId);
+
     PartEntity savePart(PartRequest partRequest);
 
     PartEntity getPartToId(UUID partId);
