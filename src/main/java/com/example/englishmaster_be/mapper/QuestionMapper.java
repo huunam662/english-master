@@ -2,10 +2,7 @@ package com.example.englishmaster_be.mapper;
 
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
 import com.example.englishmaster_be.domain.part.dto.response.PartBasicResponse;
-import com.example.englishmaster_be.domain.question.dto.request.CreateQuestionChildRequest;
-import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
-import com.example.englishmaster_be.domain.question.dto.request.CreateQuestionParentRequest;
-import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
+import com.example.englishmaster_be.domain.question.dto.request.*;
 import com.example.englishmaster_be.domain.question.dto.response.*;
 import com.example.englishmaster_be.model.content.ContentEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
@@ -35,17 +32,16 @@ public interface QuestionMapper {
 
     QuestionEntity toQuestionEntity(QuestionGroupRequest createGroupQuestionDTO);
 
-    @Mapping(target = "partId", source = "part.partId")
-    @Mapping(target = "contents", expression = "java(ContentMapper.INSTANCE.toContentBasicResponseList(questionEntity.getContentCollection()))")
     @Mapping(target = "numberOfQuestionsChild", expression = "java(questionEntity.getQuestionGroupChildren() != null ? questionEntity.getQuestionGroupChildren().size() : 0)")
     @Mapping(target = "questionsChildren" , expression = "java(toQuestionChildResponseList(questionEntity.getQuestionGroupChildren()))")
+    @Mapping(target = "contents", ignore = true)
     QuestionResponse toQuestionResponse(QuestionEntity questionEntity);
 
     List<QuestionResponse> toQuestionResponseList(Collection<QuestionEntity> questionEntityList);
 
-    @Mapping(target = "partId", expression = "java(questionEntity.getPart() != null ? questionEntity.getPart().getPartId() : null)")
-    @Mapping(target = "contents", expression = "java(ContentMapper.INSTANCE.toContentBasicResponseList(questionEntity.getContentCollection()))")
     @Mapping(target = "questionsChildren", expression = "java(toQuestionChildResponseList(questionEntity.getQuestionGroupChildren(), partEntity))")
+    @Mapping(target = "contents", ignore = true)
+    @Mapping(target = "partId", source = "questionEntity.partId")
     QuestionResponse toQuestionResponse(QuestionEntity questionEntity, PartEntity partEntity);
 
     default List<QuestionResponse> toQuestionResponseList(Collection<QuestionEntity> questionEntityList, PartEntity partEntity){
@@ -55,8 +51,8 @@ public interface QuestionMapper {
 
     @Mapping(target = "answers", ignore = true)
     @Mapping(target = "questionsChildren", ignore = true)
-    @Mapping(target = "partId", expression = "java(questionEntity.getPart() != null ? questionEntity.getPart().getPartId() : null)")
-    @Mapping(target = "contents", expression = "java(ContentMapper.INSTANCE.toContentBasicResponseList(questionEntity.getContentCollection()))")
+    @Mapping(target = "contents", ignore = true)
+    @Mapping(target = "partId", source = "questionEntity.partId")
     QuestionMatchingResponse toQuestionMatchingResponse(QuestionEntity questionEntity, TopicEntity topicEntity, PartEntity partEntity);
 
     default List<QuestionMatchingResponse> toQuestionMatchingResponseList(Collection<QuestionEntity> questionEntityList, TopicEntity topicEntity, PartEntity partEntity){
@@ -68,9 +64,9 @@ public interface QuestionMapper {
         ).toList();
     }
 
-    @Mapping(target = "partId", source = "part.partId")
-    @Mapping(target = "contents", expression = "java(ContentMapper.INSTANCE.toContentBasicResponseList(questionEntity.getContentCollection()))")
     @Mapping(target = "answers", expression = "java(AnswerMapper.INSTANCE.toAnswerResponseList(questionEntity.getAnswers()))")
+    @Mapping(target = "questionsChildren", ignore = true)
+    @Mapping(target = "contents", ignore = true)
     QuestionChildResponse toQuestionChildResponse(QuestionEntity questionEntity);
 
     default List<QuestionChildResponse> toQuestionChildResponseList(Collection<QuestionEntity> questionEntityList){
@@ -82,9 +78,10 @@ public interface QuestionMapper {
         ).toList();
     }
 
-    @Mapping(target = "partId", expression = "java(questionEntity.getPart() != null ? questionEntity.getPart().getPartId() : null)")
-    @Mapping(target = "contents", expression = "java(ContentMapper.INSTANCE.toContentBasicResponseList(questionEntity.getContentCollection()))")
     @Mapping(target = "answers", expression = "java(!questionEntity.getIsQuestionParent() ? AnswerMapper.INSTANCE.toAnswerResponseList(questionEntity.getAnswers()) : null)")
+    @Mapping(target = "questionsChildren", ignore = true)
+    @Mapping(target = "contents", ignore = true)
+    @Mapping(target = "partId", source = "questionEntity.partId")
     QuestionChildResponse toQuestionChildResponse(QuestionEntity questionEntity, PartEntity partEntity);
 
     default List<QuestionChildResponse> toQuestionChildResponseList(Collection<QuestionEntity> questionEntityList, PartEntity partEntity){
@@ -242,4 +239,8 @@ public interface QuestionMapper {
                 }
         ).collect(Collectors.toSet());
     }
+
+    QuestionEntity toQuestionEntity(EditQuestionParentRequest questionParentRequest);
+
+    QuestionEntity toQuestionEntity(EditQuestionChildRequest questionChildRequest);
 }

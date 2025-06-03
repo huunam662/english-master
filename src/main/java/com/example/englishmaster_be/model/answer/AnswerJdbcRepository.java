@@ -92,6 +92,7 @@ public class AnswerJdbcRepository {
                         SET content = :answerContent,
                             explain_details = :explainDetails,
                             correct_answer = :correctAnswer,
+                            update_at = now()
                         WHERE id = :answerId
                     """;
 

@@ -19,7 +19,6 @@ import java.util.UUID;
 public class EditPartQuestionsAnswersRequest {
 
     @NotNull(message = "Part id is required.")
-    @NotBlank(message = "Part id is required.")
     UUID partId;
 
     @NotNull(message = "Part name is required.")

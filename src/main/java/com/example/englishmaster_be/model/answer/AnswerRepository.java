@@ -71,4 +71,11 @@ public interface AnswerRepository extends JpaRepository<AnswerEntity, UUID> {
     """)
     List<AnswerEntity> findAnswersJoinQuestionPartTopic(@Param("topicId") UUID topicId, @Param("partId") UUID partId);
 
+    @Query("""
+        SELECT DISTINCT ac FROM AnswerEntity ac
+        INNER JOIN FETCH ac.question qc
+        INNER JOIN FETCH qc.questionGroupParent qp
+        WHERE qp.partId = :partId
+    """)
+    List<AnswerEntity> findAnswersJoinQuestionPartByPartId(@Param("partId") UUID partId);
 }

@@ -156,8 +156,4 @@ public class QuestionEntity {
         if(questionScore == null) questionScore = 0;
     }
 
-    public int getNumberOfQuestionsChild() {
-        return questionGroupChildren != null ? questionGroupChildren.size() : 0;
-    }
-
 }

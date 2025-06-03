@@ -3,6 +3,7 @@ package com.example.englishmaster_be.mapper;
 import com.example.englishmaster_be.domain.answer.dto.request.CreateAnswer1Request;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerRequest;
+import com.example.englishmaster_be.domain.answer.dto.request.EditAnswer1Request;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerCorrectResponse;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
@@ -61,4 +62,6 @@ public interface AnswerMapper {
                 }
         ).collect(Collectors.toSet());
     }
+
+    AnswerEntity toAnswerEntity(EditAnswer1Request answer1Request);
 }

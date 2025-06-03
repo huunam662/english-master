@@ -10,6 +10,8 @@ import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
+import com.example.englishmaster_be.model.answer.AnswerEntity;
+import com.example.englishmaster_be.model.answer.AnswerRepository;
 import com.example.englishmaster_be.model.part.PartRepository;
 import com.example.englishmaster_be.domain.part.dto.request.PartSaveContentRequest;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
@@ -51,7 +53,6 @@ public class PartService implements IPartService {
     IUploadService uploadService;
 
     IQuestionService questionService;
-
 
 
     @Override
@@ -266,5 +267,14 @@ public class PartService implements IPartService {
     public List<PartEntity> getPartsFinishExam(UUID topicId, List<UUID> answerIds) {
 
         return partRepository.findPartJoinQuestionsAndAnswers(topicId, answerIds);
+    }
+
+    @Override
+    public PartEntity getPartQuestionsAnswers(UUID partId) {
+
+        Assert.notNull(partId, "Part id is required.");
+
+        return partRepository.findPartJoinQuestionAnswer(partId)
+                .orElseThrow(() -> new ErrorHolder(Error.PART_NOT_FOUND));
     }
 }

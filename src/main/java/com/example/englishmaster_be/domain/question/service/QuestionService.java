@@ -17,6 +17,7 @@ import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
+import com.example.englishmaster_be.mapper.AnswerMapper;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.answer.AnswerJdbcRepository;
 import com.example.englishmaster_be.model.content.ContentEntity;
@@ -458,19 +459,15 @@ public class QuestionService implements IQuestionService {
 
         List<AnswerEntity> answerChildToSave = new ArrayList<>();
 
-        List<ContentEntity> contentToSave  = new ArrayList<>();
-
         QuestionUtil.fillToCreateQuestionAnswerForPart(
                 questionParentsRequest,
                 part,
                 userCurrent,
-                contentToSave,
                 questionParentToSave,
                 questionChildToSave,
                 answerChildToSave
         );
 
-        contentJdbcRepository.batchInsertContent(contentToSave);
         questionJdbcRepository.batchInsertQuestion(questionParentToSave);
         questionJdbcRepository.batchInsertQuestion(questionChildToSave);
         answerJdbcRepository.batchInsertAnswer(answerChildToSave);
@@ -493,80 +490,29 @@ public class QuestionService implements IQuestionService {
 
         List<AnswerEntity> answerChildToCreate = new ArrayList<>();
 
-        List<ContentEntity> contentToCreate  = new ArrayList<>();
-
         List<QuestionEntity> questionParentToUpdate = new ArrayList<>();
 
         List<QuestionEntity> questionChildToUpdate = new ArrayList<>();
 
         List<AnswerEntity> answerChildToUpdate = new ArrayList<>();
 
-        for(EditQuestionParentRequest questionParentRequest : questionParentsRequest){
+        QuestionUtil.fillToUpdateQuestionAnswerForPart(
+                questionParentsRequest,
+                part,
+                userCurrent,
+                questionParentToCreate,
+                questionParentToUpdate,
+                questionChildToCreate,
+                questionChildToUpdate,
+                answerChildToCreate,
+                answerChildToUpdate
+        );
 
-            QuestionEntity questionParent = QuestionEntity.builder()
-                    .questionTitle(questionParentRequest.getQuestionTitle())
-                    .questionContent(questionParentRequest.getQuestionContent())
-                    .contentAudio(questionParentRequest.getContentAudio())
-                    .contentImage(questionParentRequest.getContentImage())
-                    .isQuestionParent(true)
-                    .userCreate(userCurrent)
-                    .userUpdate(userCurrent)
-                    .questionGroupChildren(new HashSet<>())
-                    .build();
-
-            if(questionParentRequest.getQuestionParentId() == null){
-                questionParent.setQuestionId(UUID.randomUUID());
-                questionParentToCreate.add(questionParent);
-            }
-            else{
-                questionParent.setQuestionId(questionParentRequest.getQuestionParentId());
-                questionParentToUpdate.add(questionParent);
-            }
-
-            List<EditQuestionChildRequest> questionChilds = questionParentRequest.getQuestionChilds();
-            if(questionChilds == null || questionChilds.isEmpty()) continue;
-            for(EditQuestionChildRequest questionChildRequest : questionChilds){
-                QuestionEntity questionChild = QuestionEntity.builder()
-                        .questionTitle(questionChildRequest.getQuestionTitle())
-                        .questionContent(questionChildRequest.getQuestionContent())
-                        .contentAudio(questionChildRequest.getContentAudio())
-                        .contentImage(questionChildRequest.getContentImage())
-                        .isQuestionParent(true)
-                        .userCreate(userCurrent)
-                        .userUpdate(userCurrent)
-                        .build();
-                if(questionChildRequest.getQuestionChildId() == null){
-                    questionChild.setQuestionId(UUID.randomUUID());
-                    questionChildToCreate.add(questionChild);
-                }
-                else{
-                    questionChild.setQuestionId(questionChildRequest.getQuestionChildId());
-                    questionChildToUpdate.add(questionChild);
-                }
-
-                List<EditAnswer1Request> answersChild = questionChildRequest.getAnswers();
-                if(answersChild == null || answersChild.isEmpty()) continue;
-
-                int numberOfCorrectAnswer = answersChild.stream().filter(
-                        EditAnswer1Request::getCorrectAnswer
-                ).toList().size();
-
-                if(numberOfCorrectAnswer == 0 || numberOfCorrectAnswer == 1)
-
-
-                for (EditAnswer1Request answerChild : answersChild){
-                    AnswerEntity answer = AnswerEntity.builder()
-                            .answerContent(answerChild.getAnswerContent())
-                            .correctAnswer(answerChild.getCorrectAnswer())
-
-                            .build();
-
-
-                    questionChild.getAnswers().add(answer);
-                }
-
-                questionParent.getQuestionGroupChildren().add(questionChild);
-            }
-        }
+        questionJdbcRepository.batchInsertQuestion(questionParentToCreate);
+        questionJdbcRepository.batchUpdateQuestion(questionParentToUpdate);
+        questionJdbcRepository.batchInsertQuestion(questionChildToCreate);
+        questionJdbcRepository.batchUpdateQuestion(questionChildToUpdate);
+        answerJdbcRepository.batchInsertAnswer(answerChildToCreate);
+        answerJdbcRepository.batchUpdateAnswer(answerChildToUpdate);
     }
 }

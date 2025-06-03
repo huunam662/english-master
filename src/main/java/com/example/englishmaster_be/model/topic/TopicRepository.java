@@ -37,8 +37,6 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, JpaSp
         LEFT JOIN FETCH p.questions qp
         LEFT JOIN FETCH qp.questionGroupChildren qgc
         LEFT JOIN FETCH qgc.answers a
-        LEFT JOIN FETCH qp.contentCollection ctqp
-        LEFT JOIN FETCH qgc.contentCollection ctqgc
         WHERE t.topicId = :topicId
             AND LOWER(p.partName) = LOWER(:partName)
             AND qp.isQuestionParent = TRUE
@@ -52,8 +50,6 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, JpaSp
         LEFT JOIN FETCH p.questions qp
         LEFT JOIN FETCH qp.questionGroupChildren qgc
         LEFT JOIN FETCH qgc.answers a
-        LEFT JOIN FETCH qp.contentCollection ctqp
-        LEFT JOIN FETCH qgc.contentCollection ctqgc
         WHERE t.topicId = :topicId
             AND qp.isQuestionParent = TRUE
             AND qgc.isQuestionParent = FALSE
