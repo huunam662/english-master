@@ -43,4 +43,6 @@ public interface IPartService {
     PartKeyResponse editPartAndQuestionsAnswers(EditPartQuestionsAnswersRequest request);
 
     List<PartEntity> getPartsFinishExam(UUID topicId, List<UUID> answerIds);
+
+    PartEntity getPartQuestionsAnswers(UUID partId);
 }

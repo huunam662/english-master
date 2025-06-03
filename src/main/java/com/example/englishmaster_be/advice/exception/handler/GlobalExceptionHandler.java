@@ -30,6 +30,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -101,6 +102,21 @@ public class GlobalExceptionHandler implements AccessDeniedHandler, Authenticati
         return ResultApiResponse.ErrorResponse.build(error);
     }
 
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResultApiResponse.ErrorResponse handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException e){
+
+        Error error = Error.BAD_REQUEST;
+
+        logError(error, e);
+
+        Map<String, Object> errors = new HashMap<>();
+
+        errors.put("param", e.getName());
+        errors.put("invalid", e.getValue());
+        errors.put("expected", e.getRequiredType().getSimpleName());
+
+        return ResultApiResponse.ErrorResponse.build(error, errors);
+    }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResultApiResponse.ErrorResponse handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {

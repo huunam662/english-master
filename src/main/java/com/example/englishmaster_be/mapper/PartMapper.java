@@ -3,6 +3,7 @@ package com.example.englishmaster_be.mapper;
 
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
 import com.example.englishmaster_be.domain.part.dto.response.PartBasicResponse;
+import com.example.englishmaster_be.domain.part.dto.response.PartQuestionResponse;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
 import org.mapstruct.Builder;
@@ -41,5 +42,7 @@ public interface PartMapper {
 
     @Mapping(target = "partId", ignore = true)
     void flowToPartEntity(PartRequest partRequest, @MappingTarget PartEntity partEntity);
-    
+
+    @Mapping(target = "questions", expression = "java(QuestionMapper.INSTANCE.toQuestionResponseList(part.getQuestions()))")
+    PartQuestionResponse toPartQuestionResponse(PartEntity part);
 }

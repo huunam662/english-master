@@ -11,16 +11,24 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.core5.http.ClassicHttpRequest;
+import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
 import org.apache.http.Header;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
+
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.NoSuchElementException;
@@ -33,13 +41,13 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DictionaryService implements IDictionaryService {
 
-    CloseableHttpClient httpClient;
-
     ObjectMapper objectMapper;
 
     DictionaryValue dictionaryValue;
 
     EnglishWordDictionaryHelper englishWordDictionaryHelper;
+
+    RestTemplate restTemplate;
 
 
 
@@ -52,13 +60,9 @@ public class DictionaryService implements IDictionaryService {
 
         String apiUrl = String.format("%s/%s", dictionaryValue.getDictionaryApi(), encodedWord);
 
-        HttpGet httpGet = new HttpGet(apiUrl);
+        ResponseEntity<String> response = restTemplate.getForEntity(apiUrl, String.class);
 
-        CloseableHttpResponse response = httpClient.execute(httpGet);
-
-        String responseBody = EntityUtils.toString(response.getEntity());
-
-        return objectMapper.readTree(responseBody);
+        return objectMapper.readTree(response.getBody());
     }
 
     @Override
@@ -86,21 +90,13 @@ public class DictionaryService implements IDictionaryService {
 
         headers.set("Authorization", "Client-ID " + dictionaryValue.getUnsplashApiKey());
 
-        Header[] httpHeaders = headers
-                .entrySet()
-                .stream()
-                .flatMap(entry -> entry.getValue().stream().map(value -> new BasicHeader(entry.getKey(), value)))
-                .toArray(Header[]::new);
+        HttpEntity<Void> httpEntity = new HttpEntity<>(headers);
 
-        HttpGet httpGet = new HttpGet(apiUrl);
+        ResponseEntity<String> response = restTemplate.exchange(
+                apiUrl, HttpMethod.GET, httpEntity, String.class
+        );
 
-        httpGet.setHeaders(httpHeaders);
-
-        CloseableHttpResponse response = httpClient.execute(httpGet);
-
-        String responseBody = EntityUtils.toString(response.getEntity());
-
-        JsonNode jsonResponse = objectMapper.readTree(responseBody);
+        JsonNode jsonResponse = objectMapper.readTree( response.getBody());
 
         JsonNode results = jsonResponse.get("results");
 

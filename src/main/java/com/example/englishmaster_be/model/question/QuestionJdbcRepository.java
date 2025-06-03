@@ -1,15 +1,20 @@
 package com.example.englishmaster_be.model.question;
 
+
 import com.example.englishmaster_be.model.mock_test.MockTestEntity;
 import com.example.englishmaster_be.value.AppValue;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,6 +29,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j(topic = "QUESTION-JDBC-REPOSITORY")
 @Repository
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -92,10 +98,9 @@ public class QuestionJdbcRepository {
 
             startIndex = endIndex;
         }
-
-        batchInsertQuestionContent(questions);
     }
 
+    @Async
     @Transactional
     public void batchInsertQuestionContent(List<QuestionEntity> questions){
 
@@ -157,6 +162,7 @@ public class QuestionJdbcRepository {
                             question_content = :questionContent,
                             content_audio = :contentAudio,
                             content_image = :contentImage,
+                            update_at = now()
                         WHERE id = :questionId
                     """;
 

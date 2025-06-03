@@ -27,28 +27,6 @@ public class TopicUtil {
         Map<PartEntity, List<QuestionEntity>> partQuestionParentsGroup = questionParentChildsGroup.keySet().stream()
                 .collect(Collectors.groupingBy(QuestionEntity::getPart));
 
-        List<UUID> questionParentIds = questionParentChildsGroup.keySet().stream()
-                .map(QuestionEntity::getQuestionId).toList();
-
-        List<UUID> questionChildIds = questionChildAnswersGroup.keySet().stream()
-                .map(QuestionEntity::getQuestionId).toList();
-
-        List<QuestionEntity> questionParentContents = questionRepository.findContentInQuestionIds(questionParentIds);
-
-        List<QuestionEntity> questionChildContents = questionRepository.findContentInQuestionIds(questionChildIds);
-
-        Map<QuestionEntity, Set<ContentEntity>> questionParentContentsGroup = questionParentContents.stream()
-                .collect(Collectors.toMap(
-                        question -> question,
-                        QuestionEntity::getContentCollection
-                ));
-
-        Map<QuestionEntity, Set<ContentEntity>> questionChildContentsGroup = questionChildContents.stream()
-                .collect(Collectors.toMap(
-                        question -> question,
-                        QuestionEntity::getContentCollection
-                ));
-
         Set<PartEntity> partsOfTopic = partQuestionParentsGroup.keySet();
         for(PartEntity part: partsOfTopic){
             if(part == null) continue;
@@ -60,10 +38,8 @@ public class TopicUtil {
                     if(questionChild == null) continue;
                     List<AnswerEntity> answersChild = questionChildAnswersGroup.getOrDefault(questionChild, Collections.emptyList());
                     questionChild.setAnswers(new HashSet<>(answersChild));
-                    questionChild.setContentCollection(questionChildContentsGroup.getOrDefault(questionChild, Collections.emptySet()));
                 }
                 questionParent.setQuestionGroupChildren(new HashSet<>(questionChilds));
-                questionParent.setContentCollection(questionParentContentsGroup.getOrDefault(questionParent, Collections.emptySet()));
             }
             part.setQuestions(new HashSet<>(questionParents));
             part.setTopics(Set.of(topic));
