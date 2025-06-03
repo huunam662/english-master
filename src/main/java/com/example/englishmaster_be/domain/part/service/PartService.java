@@ -3,9 +3,9 @@ package com.example.englishmaster_be.domain.part.service;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestPartRequest;
-import com.example.englishmaster_be.domain.part.dto.request.PartQuestionsAnswersRequest;
+import com.example.englishmaster_be.domain.part.dto.request.CreatePartQuestionsAnswersRequest;
+import com.example.englishmaster_be.domain.part.dto.request.EditPartQuestionsAnswersRequest;
 import com.example.englishmaster_be.domain.part.dto.response.PartKeyResponse;
-import com.example.englishmaster_be.domain.question.dto.request.QuestionParentRequest;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
@@ -217,20 +217,11 @@ public class PartService implements IPartService {
 
     @Transactional
     @Override
-    public PartKeyResponse createPartAndQuestionsAnswers(PartQuestionsAnswersRequest request) {
+    public PartKeyResponse createPartAndQuestionsAnswers(CreatePartQuestionsAnswersRequest request) {
 
         UserEntity userPost = userService.currentUser();
 
-        if(request == null)
-            throw new ErrorHolder(Error.BAD_REQUEST, "Body object request must not be null.");
-
-        boolean isExistedPart = partRepository.isExistedByPartNameAndPartType(request.getPartName(), request.getPartType());
-
-        if(isExistedPart)
-            throw new ErrorHolder(
-                Error.BAD_REQUEST,
-                String.format("Already existed part with name %s and type %s", request.getPartName(), request.getPartType())
-            );
+        Assert.notNull(request, "Body object request must not be null.");
 
         PartEntity part = partRepository.saveAndFlush(
                 PartEntity.builder()
@@ -243,6 +234,28 @@ public class PartService implements IPartService {
         );
 
         questionService.createListQuestionsParentOfPart(part, request.getQuestionParents());
+
+        return PartKeyResponse.builder()
+                .partId(part.getPartId())
+                .build();
+    }
+
+    @Transactional
+    @Override
+    public PartKeyResponse editPartAndQuestionsAnswers(EditPartQuestionsAnswersRequest request) {
+
+        UserEntity userPut = userService.currentUser();
+
+        Assert.notNull(request, "Body object request must not be null.");
+
+        PartEntity part = getPartToId(request.getPartId());
+        part.setPartName(request.getPartName());
+        part.setPartType(request.getPartType());
+        part.setPartDescription(String.format("%s: %s", request.getPartName(), request.getPartType()));
+        part.setUserUpdate(userPut);
+        part = partRepository.saveAndFlush(part);
+
+        questionService.editListQuestionsParentOfPart(part, request.getQuestionParents());
 
         return PartKeyResponse.builder()
                 .partId(part.getPartId())

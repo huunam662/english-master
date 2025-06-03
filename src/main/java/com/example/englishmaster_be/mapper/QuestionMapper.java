@@ -2,9 +2,9 @@ package com.example.englishmaster_be.mapper;
 
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
 import com.example.englishmaster_be.domain.part.dto.response.PartBasicResponse;
-import com.example.englishmaster_be.domain.question.dto.request.QuestionChildRequest;
+import com.example.englishmaster_be.domain.question.dto.request.CreateQuestionChildRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
-import com.example.englishmaster_be.domain.question.dto.request.QuestionParentRequest;
+import com.example.englishmaster_be.domain.question.dto.request.CreateQuestionParentRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.domain.question.dto.response.*;
 import com.example.englishmaster_be.model.content.ContentEntity;
@@ -158,9 +158,9 @@ public interface QuestionMapper {
     @Mapping(target = "questionId", ignore = true)
     void flowToQuestionEntity(ExcelQuestionResponse questionByExcelFileResponse, @MappingTarget QuestionEntity questionEntity);
 
-    QuestionEntity toQuestionParent(QuestionParentRequest request);
+    QuestionEntity toQuestionParent(CreateQuestionParentRequest request);
 
-    default Set<QuestionEntity> toQuestionParentSet(PartEntity part, List<QuestionParentRequest> questionParentRequestList, UserEntity userUpdate){
+    default Set<QuestionEntity> toQuestionParentSet(PartEntity part, List<CreateQuestionParentRequest> questionParentRequestList, UserEntity userUpdate){
 
         if(part == null) return Collections.emptySet();
 
@@ -199,9 +199,9 @@ public interface QuestionMapper {
         ).collect(Collectors.toSet());
     }
 
-    QuestionEntity toQuestionChild(QuestionChildRequest request);
+    QuestionEntity toQuestionChild(CreateQuestionChildRequest request);
 
-    default Set<QuestionEntity> toQuestionChildSet(PartEntity part, QuestionEntity questionParent, List<QuestionChildRequest> questionChildRequestList, UserEntity userUpdate){
+    default Set<QuestionEntity> toQuestionChildSet(PartEntity part, QuestionEntity questionParent, List<CreateQuestionChildRequest> questionChildRequestList, UserEntity userUpdate){
 
         if(part == null) return Collections.emptySet();
 

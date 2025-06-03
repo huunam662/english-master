@@ -28,5 +28,11 @@ public interface ContentRepository extends JpaRepository<ContentEntity, UUID> {
     @Query("delete from ContentEntity c where c.contentData = :contentData")
     int deleteByContentData(String contentData);
 
-
+    @Query(value = """
+        SELECT EXISTS(
+            SELECT c.id FROM content c
+            WHERE c.content_data = :contentData
+        )
+    """, nativeQuery = true)
+    boolean isExistsByContentData(@Param("contentData") String contentData);
 }

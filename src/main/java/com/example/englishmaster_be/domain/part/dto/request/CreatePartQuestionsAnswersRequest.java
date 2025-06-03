@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.part.dto.request;
 
-import com.example.englishmaster_be.domain.question.dto.request.QuestionParentRequest;
+import com.example.englishmaster_be.domain.question.dto.request.CreateQuestionParentRequest;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class PartQuestionsAnswersRequest {
+public class CreatePartQuestionsAnswersRequest {
 
     @NotNull(message = "Part name is required.")
     @NotBlank(message = "Part name is required.")
@@ -24,6 +24,6 @@ public class PartQuestionsAnswersRequest {
     @NotBlank(message = "Part type is required.")
     String partType;
 
-    List<QuestionParentRequest> questionParents;
+    List<CreateQuestionParentRequest> questionParents;
 
 }

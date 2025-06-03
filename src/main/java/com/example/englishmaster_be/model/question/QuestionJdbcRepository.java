@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +30,8 @@ import java.util.UUID;
 public class QuestionJdbcRepository {
 
     JdbcTemplate jdbcTemplate;
+
+    NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     AppValue appValue;
 
@@ -139,6 +144,31 @@ public class QuestionJdbcRepository {
 
             startIndex = endIndex;
         }
+    }
+
+    @Transactional
+    public void batchUpdateQuestion(List<QuestionEntity> questions){
+
+        if(questions == null || questions.isEmpty()) return;
+
+        String sql = """
+                        UPDATE question
+                        SET question_title = :questionTitle,
+                            question_content = :questionContent,
+                            content_audio = :contentAudio,
+                            content_image = :contentImage,
+                        WHERE id = :questionId
+                    """;
+
+        namedParameterJdbcTemplate.batchUpdate(sql, questions.stream().map(
+                question -> new MapSqlParameterSource()
+                        .addValue("questionTitle", question.getQuestionTitle())
+                        .addValue("questionContent", question.getQuestionContent())
+                        .addValue("contentAudio", question.getContentAudio())
+                        .addValue("contentImage", question.getContentImage())
+                        .addValue("questionId", question.getQuestionId())
+                ).toArray(MapSqlParameterSource[]::new)
+        );
     }
 
 }

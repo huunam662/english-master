@@ -2,9 +2,11 @@ package com.example.englishmaster_be.domain.question.service;
 
 import com.example.englishmaster_be.batch.*;
 import com.example.englishmaster_be.common.constant.QuestionType;
+import com.example.englishmaster_be.domain.answer.dto.request.EditAnswer1Request;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.content.service.IContentService;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
+import com.example.englishmaster_be.domain.part.dto.request.EditPartQuestionsAnswersRequest;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.domain.question.dto.request.*;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
@@ -440,15 +442,15 @@ public class QuestionService implements IQuestionService {
 
     @Transactional
     @Override
-    public void createListQuestionsParentOfPart(PartEntity part, List<QuestionParentRequest> questionParentsRequest) {
+    public void createListQuestionsParentOfPart(PartEntity part, List<CreateQuestionParentRequest> questionParentsRequest) {
 
         UserEntity userCurrent = userService.currentUser();
 
-        if(questionParentsRequest == null || questionParentsRequest.isEmpty())
-            return;
-
         if(part == null)
             throw new ErrorHolder(Error.BAD_REQUEST, "Part is null.");
+
+        if(questionParentsRequest == null || questionParentsRequest.isEmpty())
+            return;
 
         List<QuestionEntity> questionParentToSave = new ArrayList<>();
 
@@ -474,4 +476,97 @@ public class QuestionService implements IQuestionService {
         answerJdbcRepository.batchInsertAnswer(answerChildToSave);
     }
 
+    @Override
+    public void editListQuestionsParentOfPart(PartEntity part, List<EditQuestionParentRequest> questionParentsRequest) {
+
+        UserEntity userCurrent = userService.currentUser();
+
+        if(part == null)
+            throw new ErrorHolder(Error.BAD_REQUEST, "Part is null.");
+
+        if(questionParentsRequest == null || questionParentsRequest.isEmpty())
+            return;
+
+        List<QuestionEntity> questionParentToCreate = new ArrayList<>();
+
+        List<QuestionEntity> questionChildToCreate = new ArrayList<>();
+
+        List<AnswerEntity> answerChildToCreate = new ArrayList<>();
+
+        List<ContentEntity> contentToCreate  = new ArrayList<>();
+
+        List<QuestionEntity> questionParentToUpdate = new ArrayList<>();
+
+        List<QuestionEntity> questionChildToUpdate = new ArrayList<>();
+
+        List<AnswerEntity> answerChildToUpdate = new ArrayList<>();
+
+        for(EditQuestionParentRequest questionParentRequest : questionParentsRequest){
+
+            QuestionEntity questionParent = QuestionEntity.builder()
+                    .questionTitle(questionParentRequest.getQuestionTitle())
+                    .questionContent(questionParentRequest.getQuestionContent())
+                    .contentAudio(questionParentRequest.getContentAudio())
+                    .contentImage(questionParentRequest.getContentImage())
+                    .isQuestionParent(true)
+                    .userCreate(userCurrent)
+                    .userUpdate(userCurrent)
+                    .questionGroupChildren(new HashSet<>())
+                    .build();
+
+            if(questionParentRequest.getQuestionParentId() == null){
+                questionParent.setQuestionId(UUID.randomUUID());
+                questionParentToCreate.add(questionParent);
+            }
+            else{
+                questionParent.setQuestionId(questionParentRequest.getQuestionParentId());
+                questionParentToUpdate.add(questionParent);
+            }
+
+            List<EditQuestionChildRequest> questionChilds = questionParentRequest.getQuestionChilds();
+            if(questionChilds == null || questionChilds.isEmpty()) continue;
+            for(EditQuestionChildRequest questionChildRequest : questionChilds){
+                QuestionEntity questionChild = QuestionEntity.builder()
+                        .questionTitle(questionChildRequest.getQuestionTitle())
+                        .questionContent(questionChildRequest.getQuestionContent())
+                        .contentAudio(questionChildRequest.getContentAudio())
+                        .contentImage(questionChildRequest.getContentImage())
+                        .isQuestionParent(true)
+                        .userCreate(userCurrent)
+                        .userUpdate(userCurrent)
+                        .build();
+                if(questionChildRequest.getQuestionChildId() == null){
+                    questionChild.setQuestionId(UUID.randomUUID());
+                    questionChildToCreate.add(questionChild);
+                }
+                else{
+                    questionChild.setQuestionId(questionChildRequest.getQuestionChildId());
+                    questionChildToUpdate.add(questionChild);
+                }
+
+                List<EditAnswer1Request> answersChild = questionChildRequest.getAnswers();
+                if(answersChild == null || answersChild.isEmpty()) continue;
+
+                int numberOfCorrectAnswer = answersChild.stream().filter(
+                        EditAnswer1Request::getCorrectAnswer
+                ).toList().size();
+
+                if(numberOfCorrectAnswer == 0 || numberOfCorrectAnswer == 1)
+
+
+                for (EditAnswer1Request answerChild : answersChild){
+                    AnswerEntity answer = AnswerEntity.builder()
+                            .answerContent(answerChild.getAnswerContent())
+                            .correctAnswer(answerChild.getCorrectAnswer())
+
+                            .build();
+
+
+                    questionChild.getAnswers().add(answer);
+                }
+
+                questionParent.getQuestionGroupChildren().add(questionChild);
+            }
+        }
+    }
 }
