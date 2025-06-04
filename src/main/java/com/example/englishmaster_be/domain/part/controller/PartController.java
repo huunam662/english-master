@@ -5,6 +5,7 @@ import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.part.dto.request.CreatePartQuestionsAnswersRequest;
 import com.example.englishmaster_be.domain.part.dto.request.EditPartQuestionsAnswersRequest;
 import com.example.englishmaster_be.domain.part.dto.response.PartKeyResponse;
+import com.example.englishmaster_be.domain.part.dto.response.PartQuestionResponse;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.mapper.PartMapper;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
@@ -59,7 +60,7 @@ public class PartController {
     public PartKeyResponse partQuestionsAnswersEdit(
             @RequestBody @Valid EditPartQuestionsAnswersRequest request
     ){
-        return null;
+        return partService.editPartAndQuestionsAnswers(request);
     }
 
 
@@ -89,6 +90,22 @@ public class PartController {
         PartEntity part = partService.savePart(partRequest);
 
         return PartMapper.INSTANCE.toPartResponse(part);
+    }
+
+    @GetMapping(value = "/{partId:.+}/questions-answers")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @DefaultMessage("Get part successfully")
+    @Operation(
+            summary = "Get question answers of part by partId",
+            description = "Get question answers of part by partId"
+    )
+    public PartQuestionResponse getPartQuestionsAnswers(
+            @PathVariable("partId") UUID partId
+    ) {
+
+        PartEntity part = partService.getPartQuestionsAnswers(partId);
+
+        return PartMapper.INSTANCE.toPartQuestionResponse(part);
     }
 
     @PutMapping(value = "/{partId:.+}/uploadfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

@@ -73,8 +73,6 @@ public interface PartRepository extends JpaRepository<PartEntity, UUID>, JpaSpec
         LEFT JOIN FETCH p.questions qp
         LEFT JOIN FETCH qp.questionGroupChildren qc
         LEFT JOIN FETCH qc.answers ac
-        LEFT JOIN FETCH qp.contentCollection cqp
-        LEFT JOIN FETCH qc.contentCollection cqc
         WHERE t.topicId = :topicId AND LOWER(p.partName) = LOWER(:partName)
         AND qp.isQuestionParent = TRUE AND qc.isQuestionParent = FALSE
     """)
@@ -95,4 +93,14 @@ public interface PartRepository extends JpaRepository<PartEntity, UUID>, JpaSpec
     """)
     Optional<PartEntity> findPartByPartNameTopicId(@Param("partName") String partName, @Param("topicId") UUID topicId);
 
+    @Query("""
+        SELECT DISTINCT p FROM PartEntity p
+        LEFT JOIN FETCH p.questions qp
+        LEFT JOIN FETCH qp.questionGroupChildren qc
+        LEFT JOIN FETCH qc.answers ac
+        WHERE p.partId = :partId
+        AND qp.isQuestionParent = TRUE
+        AND qc.isQuestionParent = FALSE
+    """)
+    Optional<PartEntity> findPartJoinQuestionAnswer(@Param("partId") UUID partId);
 }

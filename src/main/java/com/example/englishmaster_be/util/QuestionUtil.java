@@ -3,8 +3,11 @@ package com.example.englishmaster_be.util;
 import com.example.englishmaster_be.common.constant.PartType;
 import com.example.englishmaster_be.common.constant.QuestionType;
 import com.example.englishmaster_be.domain.answer.dto.request.CreateAnswer1Request;
+import com.example.englishmaster_be.domain.answer.dto.request.EditAnswer1Request;
 import com.example.englishmaster_be.domain.question.dto.request.CreateQuestionChildRequest;
 import com.example.englishmaster_be.domain.question.dto.request.CreateQuestionParentRequest;
+import com.example.englishmaster_be.domain.question.dto.request.EditQuestionChildRequest;
+import com.example.englishmaster_be.domain.question.dto.request.EditQuestionParentRequest;
 import com.example.englishmaster_be.mapper.AnswerMapper;
 import com.example.englishmaster_be.mapper.QuestionMapper;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
@@ -152,11 +155,11 @@ public class QuestionUtil {
             List<CreateQuestionParentRequest> questionParentsRequest,
             PartEntity part,
             UserEntity userCurrent,
-            List<ContentEntity> contentToSave,
             List<QuestionEntity> questionParentToSave,
             List<QuestionEntity> questionChildToSave,
             List<AnswerEntity> answerChildToSave
     ){
+        if(questionParentsRequest == null) return;
 
         for(CreateQuestionParentRequest parentRequest : questionParentsRequest){
 
@@ -171,31 +174,6 @@ public class QuestionUtil {
             questionParent.setQuestionType(QuestionType.Question_Parent);
             questionParent.setQuestionScore(0);
             questionParent.setQuestionGroupChildren(new HashSet<>());
-
-            Set<ContentEntity> contentPs = new HashSet<>();
-
-            if(parentRequest.getContentAudio() != null && !parentRequest.getContentAudio().isEmpty()){
-                ContentEntity contentAudio = ContentEntity.builder()
-                        .contentId(UUID.randomUUID())
-                        .contentData(parentRequest.getContentAudio())
-                        .userCreate(userCurrent)
-                        .userUpdate(userCurrent)
-                        .build();
-                contentPs.add(contentAudio);
-                contentToSave.add(contentAudio);
-            }
-            if(parentRequest.getContentImage() != null && !parentRequest.getContentImage().isEmpty()){
-                ContentEntity contentImage = ContentEntity.builder()
-                        .contentId(UUID.randomUUID())
-                        .contentData(parentRequest.getContentImage())
-                        .userCreate(userCurrent)
-                        .userUpdate(userCurrent)
-                        .build();
-                contentPs.add(contentImage);
-                contentToSave.add(contentImage);
-            }
-            if(!contentPs.isEmpty())
-                questionParent.setContentCollection(contentPs);
 
             questionParentToSave.add(questionParent);
 
@@ -218,33 +196,8 @@ public class QuestionUtil {
                 questionChild.setQuestionType(QuestionType.Question_Child);
                 questionChild.setQuestionScore(childRequest.getQuestionScore());
                 questionChild.setAnswers(new HashSet<>());
+
                 questionParent.setQuestionScore(questionParent.getQuestionScore() + childRequest.getQuestionScore());
-
-                Set<ContentEntity> contentCs = new HashSet<>();
-
-                if(childRequest.getContentAudio() != null && !childRequest.getContentAudio().isEmpty()){
-                    ContentEntity contentAudio = ContentEntity.builder()
-                            .contentId(UUID.randomUUID())
-                            .contentData(parentRequest.getContentAudio())
-                            .userCreate(userCurrent)
-                            .userUpdate(userCurrent)
-                            .build();
-                    contentCs.add(contentAudio);
-                    contentToSave.add(contentAudio);
-                }
-                if(parentRequest.getContentImage() != null && !parentRequest.getContentImage().isEmpty()){
-                    ContentEntity contentImage = ContentEntity.builder()
-                            .contentId(UUID.randomUUID())
-                            .contentData(parentRequest.getContentImage())
-                            .userCreate(userCurrent)
-                            .userUpdate(userCurrent)
-                            .build();
-                    contentCs.add(contentImage);
-                    contentToSave.add(contentImage);
-                }
-                if(!contentCs.isEmpty())
-                    questionChild.setContentCollection(contentCs);
-
                 questionParent.getQuestionGroupChildren().add(questionChild);
                 questionChildToSave.add(questionChild);
 
@@ -266,6 +219,94 @@ public class QuestionUtil {
                     questionChild.getAnswers().add(answer);
                     answerChildToSave.add(answer);
                 }
+            }
+        }
+    }
+
+    public static void fillToUpdateQuestionAnswerForPart(
+            List<EditQuestionParentRequest> questionParentsRequest,
+            PartEntity part,
+            UserEntity userCurrent,
+            List<QuestionEntity> questionParentToCreate,
+            List<QuestionEntity> questionParentToUpdate,
+            List<QuestionEntity> questionChildToCreate,
+            List<QuestionEntity> questionChildToUpdate,
+            List<AnswerEntity> answerChildToCreate,
+            List<AnswerEntity> answerChildToUpdate
+    ){
+
+        if(questionParentsRequest == null) return;
+
+        for(EditQuestionParentRequest questionParentRequest : questionParentsRequest){
+            if(questionParentRequest == null) continue;
+
+            QuestionEntity questionParent = QuestionMapper.INSTANCE.toQuestionEntity(questionParentRequest);
+            questionParent.setIsQuestionParent(true);
+            questionParent.setQuestionType(QuestionType.Question_Parent);
+            questionParent.setQuestionScore(0);
+            questionParent.setPart(part);
+            questionParent.setQuestionGroupChildren(new HashSet<>());
+
+            if(questionParentRequest.getQuestionParentId() == null){
+                questionParent.setQuestionId(UUID.randomUUID());
+                questionParent.setUserCreate(userCurrent);
+                questionParentToCreate.add(questionParent);
+            }
+            else{
+                questionParent.setQuestionId(questionParentRequest.getQuestionParentId());
+                questionParent.setUserUpdate(userCurrent);
+                questionParentToUpdate.add(questionParent);
+            }
+
+            List<EditQuestionChildRequest> questionChilds = questionParentRequest.getQuestionChilds();
+            if(questionChilds == null || questionChilds.isEmpty()) continue;
+
+            for(EditQuestionChildRequest questionChildRequest : questionChilds){
+                if(questionChildRequest == null) continue;
+
+                QuestionEntity questionChild = QuestionMapper.INSTANCE.toQuestionEntity(questionChildRequest);
+                questionChild.setIsQuestionParent(false);
+                questionChild.setQuestionType(QuestionType.Question_Child);
+                questionChild.setPart(part);
+                questionChild.setQuestionGroupParent(questionParent);
+                questionChild.setAnswers(new HashSet<>());
+                questionParent.setQuestionScore(questionParent.getQuestionScore() + questionChild.getQuestionScore());
+
+                if(questionChildRequest.getQuestionChildId() == null){
+                    questionChild.setQuestionId(UUID.randomUUID());
+                    questionChild.setUserCreate(userCurrent);
+                    questionChildToCreate.add(questionChild);
+                }
+                else{
+                    questionChild.setQuestionId(questionChildRequest.getQuestionChildId());
+                    questionChild.setUserUpdate(userCurrent);
+                    questionChildToUpdate.add(questionChild);
+                }
+
+                List<EditAnswer1Request> answersChild = questionChildRequest.getAnswers();
+                if(answersChild == null || answersChild.isEmpty()) continue;
+
+                for (EditAnswer1Request answerChildRequest : answersChild){
+                    if(answerChildRequest == null) continue;
+
+                    AnswerEntity answer = AnswerMapper.INSTANCE.toAnswerEntity(answerChildRequest);
+                    answer.setQuestion(questionChild);
+
+                    if(answer.getAnswerId() == null){
+                        answer.setAnswerId(UUID.randomUUID());
+                        answer.setUserCreate(userCurrent);
+                        answerChildToCreate.add(answer);
+                    }
+                    else{
+                        answer.setAnswerId(answerChildRequest.getAnswerId());
+                        answer.setUserUpdate(userCurrent);
+                        answerChildToUpdate.add(answer);
+                    }
+
+                    questionChild.getAnswers().add(answer);
+                }
+
+                questionParent.getQuestionGroupChildren().add(questionChild);
             }
         }
     }
