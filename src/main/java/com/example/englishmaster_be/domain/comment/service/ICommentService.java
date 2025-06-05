@@ -1,28 +1,38 @@
 package com.example.englishmaster_be.domain.comment.service;
 
-import com.example.englishmaster_be.domain.comment.dto.request.CommentRequest;
+
+import com.example.englishmaster_be.domain.comment.dto.request.CreateCmToCommentRequest;
+import com.example.englishmaster_be.domain.comment.dto.request.CreateNewsCommentRequest;
+import com.example.englishmaster_be.domain.comment.dto.request.UpdateCommentRequest;
+import com.example.englishmaster_be.domain.comment.dto.response.CmToCommentNewsKeyResponse;
+import com.example.englishmaster_be.domain.comment.dto.response.CommentChildResponse;
+import com.example.englishmaster_be.domain.comment.dto.response.CommentKeyResponse;
+import com.example.englishmaster_be.domain.comment.dto.response.CommentNewsKeyResponse;
 import com.example.englishmaster_be.model.comment.CommentEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface ICommentService {
 
-    boolean checkCommentParent(CommentEntity comment);
+    CommentEntity getCommentById(UUID id);
 
-    CommentEntity getCommentById(UUID commentID);
+    CommentEntity getCommentInfoById(UUID id);
 
-    List<CommentEntity> findAllByCommentParent(CommentEntity commentParent);
+    List<CommentEntity> getNewsComments(UUID newsId, Integer stepLoad, Integer sizeLoad);
 
-    List<CommentEntity> getListCommentByCommentId(UUID commentId);
+    CommentNewsKeyResponse commentToNews(CreateNewsCommentRequest request);
 
-    CommentEntity saveCommentToTopic(UUID topicId, CommentRequest commentRequest);
+    CommentKeyResponse updateComment(UpdateCommentRequest request);
 
-    CommentEntity saveCommentToNews(UUID newsId, CommentRequest commentRequest);
+    void deleteComment(UUID id);
 
-    CommentEntity saveCommentToComment(UUID commentId, CommentRequest createCommentDTO);
+    CmToCommentNewsKeyResponse commentToAnyComment(CreateCmToCommentRequest request);
 
-    CommentEntity saveComment(UUID updateCommentId, CommentRequest commentRequest);
+    List<CommentEntity> getCommentsChild(UUID commentParentId, Integer stepLoad, Integer sizeLoad);
 
-    void deleteComment(UUID commentId);
+    CommentKeyResponse votesToComment(UUID commentId);
+
+    CommentKeyResponse unVotesToComment(UUID commentId);
 }

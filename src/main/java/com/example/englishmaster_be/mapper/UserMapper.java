@@ -2,11 +2,11 @@ package com.example.englishmaster_be.mapper;
 
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthProfileResponse;
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;
+import com.example.englishmaster_be.domain.news.dto.response.AuthorCommentResponse;
 import com.example.englishmaster_be.domain.user.dto.request.UserChangeProfileRequest;
 import com.example.englishmaster_be.domain.auth.dto.request.UserRegisterRequest;
 import com.example.englishmaster_be.domain.user.dto.response.UserProfileResponse;
 import com.example.englishmaster_be.domain.user.dto.response.UserResponse;
-import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
@@ -45,5 +45,6 @@ public interface UserMapper {
     @Mapping(target = "avatar", ignore = true)
     void flowToUserEntity(UserChangeProfileRequest changeProfileRequest, @MappingTarget UserEntity userEntity);
 
+    AuthorCommentResponse toAuthorCommentResponse(UserEntity user);
 }
 

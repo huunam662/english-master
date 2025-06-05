@@ -44,4 +44,5 @@ public class PackController {
 
         return PackMapper.INSTANCE.toPackResponseList(packEntityList);
     }
+
 }

@@ -3,6 +3,7 @@ package com.example.englishmaster_be.advice.exception.handler;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.shared.dto.response.ResultApiResponse;
+import com.example.englishmaster_be.value.AppValue;
 import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
@@ -11,6 +12,9 @@ import jakarta.mail.MessagingException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -26,11 +30,14 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -88,6 +95,23 @@ public class GlobalExceptionHandler implements AccessDeniedHandler, Authenticati
         logError(error, e);
 
         return ResultApiResponse.ErrorResponse.build(e);
+    }
+
+    @ExceptionHandler({
+            NoResourceFoundException.class,
+            HttpRequestMethodNotSupportedException.class
+    })
+    public ModelAndView noResourceFoundHandler(Exception ex) {
+
+        Error error = Error.RESOURCE_NOT_FOUND;
+
+        logError(error, ex);
+
+        ModelAndView mav = new ModelAndView("404/endpoint.404");
+
+        mav.setStatus(error.getStatusCode());
+
+        return mav;
     }
 
     @ExceptionHandler({

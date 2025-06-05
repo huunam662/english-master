@@ -1,5 +1,7 @@
 package com.example.englishmaster_be.mapper;
 
+import com.example.englishmaster_be.domain.comment.dto.response.CommentChildResponse;
+import com.example.englishmaster_be.domain.comment.dto.response.CommentNewsResponse;
 import com.example.englishmaster_be.model.comment.CommentEntity;
 import com.example.englishmaster_be.domain.comment.dto.response.CommentResponse;
 import org.mapstruct.Builder;
@@ -26,4 +28,20 @@ public interface CommentMapper {
 
     List<CommentResponse> toCommentResponseList(Collection<CommentEntity> commentList);
 
+    @Mapping(target = "timeOfComment", source = "createAt")
+    @Mapping(target = "commentContent", source = "content")
+    @Mapping(target = "numberOfVotes", expression = "java(comment.getUsersVotes().size())")
+    @Mapping(target = "numberOfCommentsChild", expression = "java(comment.getCommentChildren().size())")
+    @Mapping(target = "authorComment", expression = "java(UserMapper.INSTANCE.toAuthorCommentResponse(comment.getUserComment()))")
+    CommentNewsResponse toCommentNewsResponse(CommentEntity comment);
+
+    List<CommentNewsResponse> toCommentNewsResponseList(Collection<CommentEntity> commentList);
+
+    @Mapping(target = "timeOfComment", source = "createAt")
+    @Mapping(target = "commentContent", source = "content")
+    @Mapping(target = "commentToOwnerTag", source = "toOwnerComment.name")
+    @Mapping(target = "authorComment", expression = "java(UserMapper.INSTANCE.toAuthorCommentResponse(comment.getUserComment()))")
+    CommentChildResponse toCommentChildResponse(CommentEntity comment);
+
+    List<CommentChildResponse> toCommentChildResponseList(Collection<CommentEntity> commentList);
 }

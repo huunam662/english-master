@@ -48,4 +48,7 @@ public interface MockTestMapper {
     @Mapping(target = "mockTestResponse" , expression = "java(toMockTest1Response(mockTestEntity))")
     @Mapping(target = "mockTestResultResponses" , expression = "java(MockTestResultMapper.INSTANCE.toMockTestResultResponseList(mockTestEntity.getMockTestResults()))")
     MockTestInforResponse toMockTestInforResponse(MockTestEntity mockTestEntity);
+
+    @Mapping(target = "answers", expression = "java(AnswerMapper.INSTANCE.toAnswerResponseList(questionChild.getAnswers()))")
+    MockTestQuestionAnswersResponse toMockTestQuestionAnswersResponse(QuestionEntity questionChild);
 }

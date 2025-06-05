@@ -1,4 +1,5 @@
-package com.example.englishmaster_be.domain.comment.dto.response;
+package com.example.englishmaster_be.domain.news.dto.response;
+
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -7,11 +8,11 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CommentAuthorResponse {
+public class AuthorCommentResponse {
 
     UUID userId;
 
