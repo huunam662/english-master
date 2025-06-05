@@ -1029,6 +1029,9 @@ public class TopicService implements ITopicService {
     @Override
     public FilterResponse<?> filterTopics(TopicFilterRequest filterRequest) {
 
+        if(filterRequest.getPage() < 1)
+            throw new ErrorHolder(Error.BAD_REQUEST, "Page must be begin at 1.");
+
         int page = filterRequest.getPage() - 1;
 
         Pageable pageable = PageRequest.of(page, filterRequest.getPageSize());

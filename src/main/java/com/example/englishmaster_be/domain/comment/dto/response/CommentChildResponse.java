@@ -8,32 +8,28 @@ import lombok.experimental.FieldDefaults;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-
 @Getter
 @Setter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CommentResponse {
+public class CommentChildResponse {
 
     UUID commentId;
 
-    UUID topicId;
+    UUID commentParentId;
 
-    UUID newsId;
+    Boolean isCommentParent;
 
-    String contentComment;
+    Integer numberOfVotes;
 
-    String tagAuthorParent;
+    String commentContent;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
-    LocalDateTime updateAt;
+    LocalDateTime timeOfComment;
+
+    String commentToOwnerTag;
 
     AuthorCommentResponse authorComment;
-
-    Boolean hasCommentParent;
-
-    Boolean hasCommentChildren;
-
 }

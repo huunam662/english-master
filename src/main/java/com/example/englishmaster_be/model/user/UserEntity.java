@@ -83,15 +83,25 @@ public class UserEntity implements UserDetails {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Set<SessionActiveEntity> confirmTokens;
 
-    @OneToMany(mappedBy = "userComment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    Set<CommentEntity> comments;
-
     @OneToMany(mappedBy = "userCreate", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Set<NewsEntity> news;
 
     @OneToMany(mappedBy = "userCreate", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Set<FlashCardEntity> flashCards;
 
+    @OneToMany(mappedBy = "userComment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    Set<CommentEntity> comments;
+
+    @OneToMany(mappedBy = "toOwnerComment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    Set<CommentEntity> commentsToOwner;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "comments_votes",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "comment_id")
+    )
+    Set<CommentEntity> commentsVotes;
 
     @PrePersist
     void onCreate() {

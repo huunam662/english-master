@@ -18,4 +18,5 @@ public interface IPackService {
 
     List<PackEntity> getListPack();
 
+    List<PackEntity> getListPackByPackTypeId(UUID packTypeId);
 }

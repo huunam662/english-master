@@ -12,7 +12,7 @@ public class TopicSpecification {
 
     public static Specification<TopicEntity> isEnable(Boolean isEnable){
 
-        return (root, query, cb) -> cb.equal(root.get("enable"), isEnable);
+        return (root, query, cb) -> isEnable != null ? cb.equal(root.get("enable"), isEnable) : cb.conjunction();
     }
 
     public static Specification<TopicEntity> innerJoinPackExam(UUID packExamId){

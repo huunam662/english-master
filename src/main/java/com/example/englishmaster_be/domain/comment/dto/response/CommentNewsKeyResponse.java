@@ -1,17 +1,21 @@
-package com.example.englishmaster_be.domain.comment.dto.request;
+package com.example.englishmaster_be.domain.comment.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class CommentRequest {
+public class CommentNewsKeyResponse {
 
-    String commentContent;
+    UUID newsId;
+
+    UUID commentId;
 
 }

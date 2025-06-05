@@ -27,4 +27,5 @@ public interface INewsService {
     void deleteNews(UUID newsId);
 
     List<NewsEntity> searchByTitle(String title);
+
 }
