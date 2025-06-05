@@ -41,7 +41,7 @@ public interface CommentRepository extends JpaRepository<CommentEntity, UUID> {
         LEFT JOIN FETCH c.userComment author
         LEFT JOIN FETCH c.toOwnerComment tonc
         LEFT JOIN FETCH c.usersVotes uv
-        WHERE c.commentParentId = :commentId
+        WHERE c.commentParentId = :commentParentId
         AND c.isCommentParent = FALSE
         ORDER BY c.createAt DESC
     """)

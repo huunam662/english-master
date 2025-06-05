@@ -22,6 +22,8 @@ public class CommentChildResponse {
 
     Boolean isCommentParent;
 
+    Integer numberOfVotes;
+
     String commentContent;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")

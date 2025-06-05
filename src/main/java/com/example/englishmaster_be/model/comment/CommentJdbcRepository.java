@@ -55,8 +55,8 @@ public class CommentJdbcRepository {
 
         namedParameterJdbcTemplate.update(
                 sql, new MapSqlParameterSource()
-                        .addValue(":commentContent", comment.getContent())
-                        .addValue(":commentId", comment.getCommentId())
+                        .addValue("commentContent", comment.getContent())
+                        .addValue("commentId", comment.getCommentId())
         );
     }
 
