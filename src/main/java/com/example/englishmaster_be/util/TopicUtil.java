@@ -1,12 +1,16 @@
 package com.example.englishmaster_be.util;
 
+import com.example.englishmaster_be.domain.pack.dto.IPackKeyProjection;
 import com.example.englishmaster_be.model.answer.AnswerEntity;
 import com.example.englishmaster_be.model.content.ContentEntity;
 import com.example.englishmaster_be.model.part.PartEntity;
 import com.example.englishmaster_be.model.question.QuestionEntity;
 import com.example.englishmaster_be.model.question.QuestionRepository;
 import com.example.englishmaster_be.model.topic.TopicEntity;
+import com.example.englishmaster_be.model.topic.TopicJdbcRepository;
+import com.example.englishmaster_be.model.user.UserEntity;
 
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -14,8 +18,7 @@ public class TopicUtil {
 
     public static void fillAnswerToTopic(
             TopicEntity topic,
-            List<AnswerEntity> answersQuestionChild,
-            QuestionRepository questionRepository
+            List<AnswerEntity> answersQuestionChild
     ) {
 
         Map<QuestionEntity, List<AnswerEntity>> questionChildAnswersGroup = answersQuestionChild.stream()

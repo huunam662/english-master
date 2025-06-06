@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.model.topic;
 
 import com.example.englishmaster_be.domain.topic.dto.projection.INumberAndScoreQuestionTopic;
+import com.example.englishmaster_be.domain.topic.dto.projection.ITopicKeyProjection;
 import com.example.englishmaster_be.model.pack.PackEntity;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -66,6 +67,12 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, JpaSp
     """, nativeQuery = true)
     INumberAndScoreQuestionTopic findNumberAndScoreQuestions(@Param("topicId") UUID topicId);
 
+    @Query("""
+        SELECT DISTINCT t.topicId as topicId, t.packId as packId
+        FROM TopicEntity t
+        WHERE LOWER(t.topicName) = LOWER(:topicName)
+    """)
+    ITopicKeyProjection findTopicIdByName(@Param("topicName") String topicName);
 
 }
 

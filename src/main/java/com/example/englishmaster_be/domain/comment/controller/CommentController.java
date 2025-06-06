@@ -56,9 +56,7 @@ public class CommentController {
             @RequestParam("sizeLoad") Integer sizeLoad
     ){
 
-        List<CommentEntity> comments = commentService.getNewsComments(newsId, stepLoad, sizeLoad);
-
-        return CommentMapper.INSTANCE.toCommentNewsResponseList(comments);
+        return commentService.getNewsComments(newsId, stepLoad, sizeLoad);
     }
 
     @GetMapping("/{commentParentId:.+}/comments-child")
@@ -73,9 +71,7 @@ public class CommentController {
             @RequestParam("sizeLoad") Integer sizeLoad
     ){
 
-        List<CommentEntity> comments = commentService.getCommentsChild(commentParentId, stepLoad, sizeLoad);
-
-        return CommentMapper.INSTANCE.toCommentChildResponseList(comments);
+        return commentService.getCommentsChild(commentParentId, stepLoad, sizeLoad);
     }
 
     @PostMapping("/to-news")

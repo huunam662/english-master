@@ -6,6 +6,7 @@ import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestion
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
 import com.example.englishmaster_be.domain.excel_fill.service.IExcelFillService;
+import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyResponse;
 import com.example.englishmaster_be.mapper.ExcelContentMapper;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -71,5 +72,15 @@ public class ExcelFillController {
     ) {
 
         return excelService.importQuestionAllPartsExcel(topicId, file);
+    }
+
+    @PostMapping(value = "/import/exam/funny-intern-test", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @DefaultMessage("File processes successful.")
+    @SneakyThrows
+    public TopicKeyResponse importTopicPartsQuestionsAnswersFunnyTest(
+            @RequestPart("file") MultipartFile file
+    ){
+
+        return excelService.importTopicPartsQuestionsAnswersFunnyTest(file);
     }
 }

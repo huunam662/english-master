@@ -1,5 +1,7 @@
 package com.example.englishmaster_be.model.comment;
 
+import com.example.englishmaster_be.domain.comment.dto.projection.ICountReplyCommentProjection;
+import com.example.englishmaster_be.domain.comment.dto.projection.IVotesCommentProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -23,12 +25,10 @@ public interface CommentRepository extends JpaRepository<CommentEntity, UUID> {
     List<CommentEntity> findAllByCommentParent(CommentEntity comment);
 
     @Query(value = """
-        SELECT DISTINCT c FROM CommentEntity c
+        SELECT c FROM CommentEntity c
         LEFT JOIN FETCH c.userComment author
-        LEFT JOIN FETCH c.usersVotes uv
-        LEFT JOIN FETCH c.commentChildren cmc
         WHERE c.newsId = :newsId
-        AND c.isCommentParent = TRUE
+        AND c.commentParent IS NULL
         ORDER BY c.createAt DESC
     """)
     Page<CommentEntity> findAllCommentsByNewsId(
@@ -37,12 +37,9 @@ public interface CommentRepository extends JpaRepository<CommentEntity, UUID> {
     );
 
     @Query(value = """
-        SELECT DISTINCT c FROM CommentEntity c
+        SELECT c FROM CommentEntity c
         LEFT JOIN FETCH c.userComment author
-        LEFT JOIN FETCH c.toOwnerComment tonc
-        LEFT JOIN FETCH c.usersVotes uv
         WHERE c.commentParentId = :commentParentId
-        AND c.isCommentParent = FALSE
         ORDER BY c.createAt DESC
     """)
     Page<CommentEntity> findAllCommentsChildByCommentParentId(
@@ -51,11 +48,9 @@ public interface CommentRepository extends JpaRepository<CommentEntity, UUID> {
     );
 
     @Query(value = """
-        SELECT DISTINCT c FROM CommentEntity c
+        SELECT c FROM CommentEntity c
         INNER JOIN FETCH c.userComment author
         LEFT JOIN FETCH c.toOwnerComment tonc
-        LEFT JOIN FETCH c.usersVotes uv
-        LEFT JOIN FETCH c.commentChildren cmc
         WHERE c.commentId = :commentId
     """)
     Optional<CommentEntity> findCommentInfoByCommentId(@Param("commentId") UUID commentId);
@@ -64,7 +59,26 @@ public interface CommentRepository extends JpaRepository<CommentEntity, UUID> {
     @Query("""
         SELECT c FROM CommentEntity c
         WHERE c.commentParentId = :commentParentId
-        AND c.isCommentParent = FALSE
     """)
     Page<CommentEntity> findAllCommentChildByParentId(@Param("commentParentId") UUID commentParentId, Pageable pageable);
+
+    @Query(value = """
+        SELECT cv.comment_id as commentId, COALESCE(COUNT(cv.user_id), 0) as countVotes
+        FROM comments_votes cv
+        WHERE cv.comment_id IN :commentIds
+        GROUP BY cv.comment_id
+    """, nativeQuery = true)
+    List<IVotesCommentProjection> countVotesCommentIn(
+            @Param("commentIds") List<UUID> commentIds
+    );
+
+    @Query(value = """
+        SELECT cmc.comment_parent as commentId, COALESCE(COUNT(cmc.id), 0) as countReplies
+        FROM comment cmc
+        WHERE cmc.comment_parent IN :commentIds
+        GROUP BY cmc.comment_parent
+    """, nativeQuery = true)
+    List<ICountReplyCommentProjection> countReplyCommentIn(
+            @Param("commentIds") List<UUID> commentIds
+    );
 }
