@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.content.service;
 
 import com.example.englishmaster_be.domain.content.dto.request.ContentRequest;
-import com.example.englishmaster_be.model.content.ContentEntity;
+import com.example.englishmaster_be.domain.content.model.ContentEntity;
 
 import java.util.List;
 import java.util.UUID;

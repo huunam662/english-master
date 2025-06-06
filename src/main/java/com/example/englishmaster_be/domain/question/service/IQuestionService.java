@@ -1,11 +1,10 @@
 package com.example.englishmaster_be.domain.question.service;
 
-import com.example.englishmaster_be.domain.part.dto.request.EditPartQuestionsAnswersRequest;
 import com.example.englishmaster_be.domain.question.dto.request.*;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
-import com.example.englishmaster_be.model.part.PartEntity;
-import com.example.englishmaster_be.model.question.QuestionEntity;
-import com.example.englishmaster_be.model.topic.TopicEntity;
+import com.example.englishmaster_be.domain.part.model.PartEntity;
+import com.example.englishmaster_be.domain.question.model.QuestionEntity;
+import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -46,4 +45,5 @@ public interface IQuestionService {
 
     void editListQuestionsParentOfPart(PartEntity part, List<EditQuestionParentRequest> questionParentsRequest);
 
+    void deleteAllQuestions(List<UUID> questionIds);
 }

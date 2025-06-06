@@ -9,10 +9,10 @@ import com.example.englishmaster_be.domain.pack_type.dto.request.UpdatePackTypeR
 import com.example.englishmaster_be.domain.pack_type.dto.response.PackTypeKeyResponse;
 import com.example.englishmaster_be.domain.pack_type.dto.response.PackTypeResponse;
 import com.example.englishmaster_be.domain.pack_type.service.IPackTypeService;
-import com.example.englishmaster_be.mapper.PackMapper;
-import com.example.englishmaster_be.mapper.PackTypeMapper;
-import com.example.englishmaster_be.model.pack.PackEntity;
-import com.example.englishmaster_be.model.pack_type.PackTypeEntity;
+import com.example.englishmaster_be.domain.pack.mapper.PackMapper;
+import com.example.englishmaster_be.domain.pack_type.mapper.PackTypeMapper;
+import com.example.englishmaster_be.domain.pack.model.PackEntity;
+import com.example.englishmaster_be.domain.pack_type.model.PackTypeEntity;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -20,7 +20,6 @@ import jakarta.validation.Valid;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

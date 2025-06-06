@@ -7,11 +7,10 @@ import com.example.englishmaster_be.domain.pack_type.dto.request.PackTypeFilterR
 import com.example.englishmaster_be.domain.pack_type.dto.request.UpdatePackTypeRequest;
 import com.example.englishmaster_be.domain.pack_type.dto.response.PackTypeKeyResponse;
 import com.example.englishmaster_be.domain.pack_type.dto.response.PackTypeResponse;
-import com.example.englishmaster_be.mapper.PackTypeMapper;
-import com.example.englishmaster_be.model.pack_type.PackTypeEntity;
-import com.example.englishmaster_be.model.pack_type.PackTypeQueryFactory;
-import com.example.englishmaster_be.model.pack_type.PackTypeRepository;
-import com.example.englishmaster_be.shared.dto.request.FilterRequest;
+import com.example.englishmaster_be.domain.pack_type.mapper.PackTypeMapper;
+import com.example.englishmaster_be.domain.pack_type.model.PackTypeEntity;
+import com.example.englishmaster_be.domain.pack_type.repository.factory.PackTypeQueryFactory;
+import com.example.englishmaster_be.domain.pack_type.repository.jpa.PackTypeRepository;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

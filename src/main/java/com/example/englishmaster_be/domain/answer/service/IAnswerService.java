@@ -2,9 +2,9 @@ package com.example.englishmaster_be.domain.answer.service;
 
 
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerRequest;
-import com.example.englishmaster_be.model.answer.AnswerEntity;
-import com.example.englishmaster_be.model.mock_test.MockTestEntity;
-import com.example.englishmaster_be.model.question.QuestionEntity;
+import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
+import com.example.englishmaster_be.domain.mock_test.model.MockTestEntity;
+import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 
 import java.util.List;
 import java.util.Set;

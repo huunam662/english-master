@@ -7,7 +7,7 @@ import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestion
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
 import com.example.englishmaster_be.domain.excel_fill.service.IExcelFillService;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyResponse;
-import com.example.englishmaster_be.mapper.ExcelContentMapper;
+import com.example.englishmaster_be.domain.excel_fill.mapper.ExcelContentMapper;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;

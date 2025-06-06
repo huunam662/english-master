@@ -5,9 +5,9 @@ import com.example.englishmaster_be.domain.part.dto.request.CreatePartQuestionsA
 import com.example.englishmaster_be.domain.part.dto.request.EditPartQuestionsAnswersRequest;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
 import com.example.englishmaster_be.domain.part.dto.response.PartKeyResponse;
-import com.example.englishmaster_be.model.topic.TopicEntity;
+import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.part.dto.request.PartSaveContentRequest;
-import com.example.englishmaster_be.model.part.PartEntity;
+import com.example.englishmaster_be.domain.part.model.PartEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;

@@ -7,11 +7,11 @@ import com.example.englishmaster_be.domain.part.dto.request.EditPartQuestionsAns
 import com.example.englishmaster_be.domain.part.dto.response.PartKeyResponse;
 import com.example.englishmaster_be.domain.part.dto.response.PartQuestionResponse;
 import com.example.englishmaster_be.domain.part.service.IPartService;
-import com.example.englishmaster_be.mapper.PartMapper;
+import com.example.englishmaster_be.domain.part.mapper.PartMapper;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
 import com.example.englishmaster_be.domain.part.dto.request.PartSaveContentRequest;
 import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
-import com.example.englishmaster_be.model.part.PartEntity;
+import com.example.englishmaster_be.domain.part.model.PartEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

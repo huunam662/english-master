@@ -5,8 +5,7 @@ import com.example.englishmaster_be.domain.comment.dto.request.CreateCmToComment
 import com.example.englishmaster_be.domain.comment.dto.request.CreateNewsCommentRequest;
 import com.example.englishmaster_be.domain.comment.dto.request.UpdateCommentRequest;
 import com.example.englishmaster_be.domain.comment.dto.response.*;
-import com.example.englishmaster_be.model.comment.CommentEntity;
-import org.springframework.web.bind.annotation.PathVariable;
+import com.example.englishmaster_be.domain.comment.model.CommentEntity;
 
 import java.util.List;
 import java.util.UUID;

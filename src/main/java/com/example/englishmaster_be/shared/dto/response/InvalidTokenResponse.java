@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.shared.dto.response;
 
-import com.example.englishmaster_be.model.invalid_token.InvalidTokenEntity;
+import com.example.englishmaster_be.domain.auth.model.InvalidTokenEntity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

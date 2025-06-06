@@ -7,11 +7,10 @@ import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestRequest
 import com.example.englishmaster_be.domain.mock_test.dto.response.IMockTestToUserResponse;
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestPartResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionMockTestResponse;
-import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailEntity;
-import com.example.englishmaster_be.model.mock_test.MockTestEntity;
-import com.example.englishmaster_be.model.topic.TopicEntity;
-import com.example.englishmaster_be.model.user.UserEntity;
-import org.springframework.web.bind.annotation.PathVariable;
+import com.example.englishmaster_be.domain.mock_test_result.model.MockTestDetailEntity;
+import com.example.englishmaster_be.domain.mock_test.model.MockTestEntity;
+import com.example.englishmaster_be.domain.topic.model.TopicEntity;
+import com.example.englishmaster_be.domain.user.model.UserEntity;
 
 import java.util.List;
 import java.util.UUID;

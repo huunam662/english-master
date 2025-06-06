@@ -1,9 +1,8 @@
 package com.example.englishmaster_be.domain.status.service;
 
 import com.example.englishmaster_be.domain.status.dto.request.StatusRequest;
-import com.example.englishmaster_be.model.status.StatusEntity;
+import com.example.englishmaster_be.domain.status.model.StatusEntity;
 
-import java.util.List;
 import java.util.UUID;
 
 public interface IStatusService {

@@ -4,7 +4,7 @@ import com.example.englishmaster_be.domain.news.dto.request.UpdateNewsRequest;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.news.dto.request.CreateNewsRequest;
 import com.example.englishmaster_be.domain.news.dto.request.NewsFilterRequest;
-import com.example.englishmaster_be.model.news.NewsEntity;
+import com.example.englishmaster_be.domain.news.model.NewsEntity;
 import com.example.englishmaster_be.shared.dto.response.ResourceKeyResponse;
 
 import java.util.List;

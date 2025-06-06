@@ -2,7 +2,7 @@ package com.example.englishmaster_be.domain.dictionary.service;
 
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
-import com.example.englishmaster_be.helper.EnglishWordDictionaryHelper;
+import com.example.englishmaster_be.domain.dictionary.helper.EnglishWordDictionaryHelper;
 import com.example.englishmaster_be.domain.dictionary.dto.response.DictionarySuggestionResponse;
 import com.example.englishmaster_be.value.DictionaryValue;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -11,15 +11,6 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.core5.http.ClassicHttpRequest;
-import org.apache.hc.core5.http.message.BasicClassicHttpRequest;
-import org.apache.http.Header;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.util.EntityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -27,11 +18,9 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.stream.Collectors;
 
