@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Time;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -24,11 +25,11 @@ public class TopicJdbcRepository {
 
         String sql = """
                     INSERT INTO topics(
-                        id, topic_name, topic_description, create_at, update_at, enable
+                        id, topic_name, topic_description, create_at, update_at, enable,
                         create_by, update_by, topic_image, work_time, number_question, pack_id
                     )
                     VALUES(
-                        :id, :topicName, :topicDescription, now(), now(), :enable
+                        :id, :topicName, :topicDescription, now(), now(), :enable,
                         :createBy, :updateBy, :topicImage, :workTime, :numberQuestion, :packId
                     )
                     """;
@@ -44,6 +45,25 @@ public class TopicJdbcRepository {
                 .addValue("workTime", Time.valueOf(topic.getWorkTime()))
                 .addValue("numberQuestion", topic.getNumberQuestion())
                 .addValue("packId", topic.getPack() != null ? topic.getPack().getPackId() : topic.getPackId());
+
+        namedParameterJdbcTemplate.update(sql, params);
+    }
+
+    @Transactional
+    public void updateTopic(UUID topicId, int numberQuestion){
+
+        if(topicId == null) return;
+        if(numberQuestion < 0) return;
+
+        String sql = """
+                UPDATE topics
+                SET number_question = :numberQuestion
+                WHERE id = :id
+                """;
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("id", topicId)
+                .addValue("numberQuestion", numberQuestion);
 
         namedParameterJdbcTemplate.update(sql, params);
     }

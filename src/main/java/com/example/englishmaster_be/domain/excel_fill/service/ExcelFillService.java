@@ -1236,6 +1236,8 @@ public class ExcelFillService implements IExcelFillService {
             List<QuestionEntity> questionsChildOfParent = new ArrayList<>();
             List<AnswerEntity> answersOfQuestionChild = new ArrayList<>();
 
+            int countOfQuestionsTopic = 0;
+
             int sheetPartStep = 1;
             // Thêm part, question, answer cho topic
             while(sheetPartStep < numberOfSheet){
@@ -1278,10 +1280,9 @@ public class ExcelFillService implements IExcelFillService {
                             .build();
                     questionsParentOfPart.add(questionParent);
 
-                    int nextRow = iRowImageQuestionParent + 1;
-
                     // Bỏ qua header table
-                    Row rowQuestionChild = sheetPart.getRow(nextRow++);
+                    int nextRow = iRowImageQuestionParent + 2;
+                    Row rowQuestionChild = sheetPart.getRow(nextRow);
                     while (rowQuestionChild != null){
 
                         if(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(0)).equalsIgnoreCase("audio"))
@@ -1311,6 +1312,7 @@ public class ExcelFillService implements IExcelFillService {
                                 .build();
                         questionParent.setQuestionScore(questionParent.getQuestionScore() + questionChild.getQuestionScore());
                         questionsChildOfParent.add(questionChild);
+                        countOfQuestionsTopic++;
 
                         for(int i = jStartAnswer; i < jQuestionResult; i++){
                             String answerChildContent = ExcelUtil.getStringCellValue(rowQuestionChild.getCell(i));
@@ -1325,8 +1327,8 @@ public class ExcelFillService implements IExcelFillService {
                                             .build()
                             );
                         }
-
-                        rowQuestionChild = sheetPart.getRow(nextRow++);
+                        nextRow++;
+                        rowQuestionChild = sheetPart.getRow(nextRow);
                     }
 
                     rowAudio = sheetPart.getRow(nextRow);
@@ -1340,6 +1342,7 @@ public class ExcelFillService implements IExcelFillService {
             questionJdbcRepository.batchInsertQuestion(questionsParentOfPart);
             questionJdbcRepository.batchInsertQuestion(questionsChildOfParent);
             answerJdbcRepository.batchInsertAnswer(answersOfQuestionChild);
+            topicJdbcRepository.updateTopic(topicId, countOfQuestionsTopic);
 
             return TopicKeyResponse.builder()
                     .topicId(topicId)
