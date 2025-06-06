@@ -1,5 +1,7 @@
 package com.example.englishmaster_be.model.pack_type;
 
+import com.example.englishmaster_be.model.pack.PackEntity;
+import com.example.englishmaster_be.model.user.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
@@ -8,6 +10,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -29,6 +32,9 @@ public class PackTypeEntity {
     @Column(name = "name")
     String name;
 
+    @Column(name = "description")
+    String description;
+
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
     @Column(name = "created_at")
@@ -38,6 +44,17 @@ public class PackTypeEntity {
     @UpdateTimestamp
     @Column(name = "updated_at")
     LocalDateTime updatedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "created_by", referencedColumnName = "id")
+    UserEntity createdBy;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "updated_by", referencedColumnName = "id")
+    UserEntity updatedBy;
+
+    @OneToMany(mappedBy = "packType", fetch = FetchType.LAZY)
+    Set<PackEntity> packs;
 
     @PrePersist
     private void prePersist() {

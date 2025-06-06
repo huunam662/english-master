@@ -1,9 +1,15 @@
 package com.example.englishmaster_be.util;
 
 import com.example.englishmaster_be.common.constant.sort.PackTypeSortBy;
+import com.example.englishmaster_be.domain.pack_type.dto.projection.IPackTypeKeyProjection;
+import com.example.englishmaster_be.model.pack_type.PackTypeEntity;
+import com.example.englishmaster_be.model.pack_type.PackTypeJdbcRepository;
 import com.example.englishmaster_be.model.pack_type.QPackTypeEntity;
+import com.example.englishmaster_be.model.user.UserEntity;
 import com.querydsl.core.types.OrderSpecifier;
 import org.springframework.data.domain.Sort;
+
+import java.util.UUID;
 
 public class PackTypeUtil {
 

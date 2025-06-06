@@ -350,7 +350,12 @@ public class ExcelUtil {
 
         return switch (cell.getCellType()) {
             case STRING -> cell.getStringCellValue();
-            case NUMERIC -> String.valueOf(cell.getNumericCellValue());
+            case NUMERIC -> {
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    yield cell.getLocalDateTimeCellValue().toString();
+                }
+                yield String.valueOf(cell.getNumericCellValue());
+            }
             default -> "";
         };
     }

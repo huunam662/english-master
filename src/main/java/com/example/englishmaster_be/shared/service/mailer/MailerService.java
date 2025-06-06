@@ -74,7 +74,7 @@ public class MailerService {
     }
 
     @Async
-    @Transactional
+    @Transactional(readOnly = true)
     public void sendNotificationEmail(UUID userId){
 
         UserEntity user = userRepository.findById(userId).orElse(null);
@@ -161,7 +161,7 @@ public class MailerService {
     }
 
     @Async
-    @Transactional
+    @Transactional(readOnly = true)
     public void sendResultEmail(UUID mockTestId) throws IOException, MessagingException {
 
         MockTestEntity mockTest = mockTestRepository.findMockTestJoinTopicAndUserAndResultAndPart(mockTestId);

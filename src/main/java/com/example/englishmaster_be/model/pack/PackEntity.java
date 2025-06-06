@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.model.pack;
 
+import com.example.englishmaster_be.model.pack_type.PackTypeEntity;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -55,6 +56,10 @@ public class PackEntity {
 
     @OneToMany(mappedBy = "pack", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Set<TopicEntity> topics;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "pack_type_id", referencedColumnName = "id")
+    PackTypeEntity packType;
 
 
     @PrePersist

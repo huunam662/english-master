@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.model.pack;
 
+import com.example.englishmaster_be.domain.pack.dto.IPackKeyProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -20,4 +21,12 @@ public interface PackRepository extends JpaRepository<PackEntity, UUID> {
         WHERE p.packTypeId = :packTypeId
     """)
     List<PackEntity> getAllByPackTypeId(@Param("packTypeId") UUID packTypeId);
+
+    @Query("""
+        SELECT DISTINCT p.packId as packId, p.packTypeId as packTypeId
+        FROM PackEntity p
+        WHERE LOWER(p.packName) = LOWER(:packName)
+    """)
+    IPackKeyProjection findPackIdByName(@Param("packName") String packName);
+
 }

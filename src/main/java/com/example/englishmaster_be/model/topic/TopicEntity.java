@@ -83,6 +83,9 @@ public class TopicEntity {
     @Column(name = "update_time")
     LocalDateTime updateTime;
 
+    @Column(name = "pack_id", insertable = false, updatable = false)
+    UUID packId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by", referencedColumnName = "id")
     UserEntity userCreate;

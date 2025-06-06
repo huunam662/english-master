@@ -4,6 +4,7 @@ import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestion
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicContentResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
+import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyResponse;
 import com.example.englishmaster_be.model.topic.TopicEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,4 +32,5 @@ public interface IExcelFillService {
 
     ExcelQuestionListResponse importQuestionAllPartsExcel(UUID topicId, MultipartFile file);
 
+    TopicKeyResponse importTopicPartsQuestionsAnswersFunnyTest(MultipartFile file);
 }

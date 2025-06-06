@@ -560,7 +560,7 @@ public class TopicService implements ITopicService {
 
         List<AnswerEntity> answersQuestionChild = answerRepository.findAnswersJoinQuestionPartTopic(topicId, partId);
 
-        TopicUtil.fillAnswerToTopic(topic, answersQuestionChild, questionRepository);
+        TopicUtil.fillAnswerToTopic(topic, answersQuestionChild);
 
         return QuestionMapper.INSTANCE.toQuestionPartResponseList(topic);
     }
@@ -575,7 +575,7 @@ public class TopicService implements ITopicService {
 
         List<AnswerEntity> answersQuestionChild = answerRepository.findAnswersJoinQuestionPartTopic(topicId, partName);
 
-        TopicUtil.fillAnswerToTopic(topic, answersQuestionChild, questionRepository);
+        TopicUtil.fillAnswerToTopic(topic, answersQuestionChild);
 
         return QuestionMapper.INSTANCE.toQuestionPartResponseList(topic);
     }
@@ -1061,7 +1061,7 @@ public class TopicService implements ITopicService {
 
         List<AnswerEntity> answersQuestionChild = answerRepository.findAnswersJoinQuestionPartTopic(topicId);
 
-        TopicUtil.fillAnswerToTopic(topic, answersQuestionChild, questionRepository);
+        TopicUtil.fillAnswerToTopic(topic, answersQuestionChild);
 
         return QuestionMapper.INSTANCE.toQuestionPartResponseList(topic);
     }
