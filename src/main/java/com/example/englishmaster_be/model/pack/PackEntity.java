@@ -42,6 +42,9 @@ public class PackEntity {
     @Column(name = "update_at")
     LocalDateTime updateAt;
 
+    @Column(name = "pack_type_id", insertable = false, updatable = false)
+    UUID packTypeId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by", referencedColumnName = "id")
     UserEntity userCreate;

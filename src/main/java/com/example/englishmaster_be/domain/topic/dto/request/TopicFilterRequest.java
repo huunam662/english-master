@@ -25,7 +25,7 @@ public class TopicFilterRequest extends FilterRequest {
 
     String search = "";
 
-    Boolean enabled = true;
+    Boolean enabled = null;
 
     TopicSortBy sortBy = TopicSortBy.DEFAULT;
 

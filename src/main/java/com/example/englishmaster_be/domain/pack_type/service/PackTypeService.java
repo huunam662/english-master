@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -30,6 +31,12 @@ public class PackTypeService implements IPackTypeService{
     PackTypeRepository packTypeRepository;
 
     PackTypeQueryFactory queryFactory;
+
+    @Override
+    public List<PackTypeEntity> getAllPackTypes() {
+
+        return packTypeRepository.findAll();
+    }
 
     @Override
     public PackTypeEntity getPackTypeById(UUID id) {
@@ -45,6 +52,7 @@ public class PackTypeService implements IPackTypeService{
 
         return queryFactory.filterToResponse(filterRequest);
     }
+
 
     @Transactional
     @Override

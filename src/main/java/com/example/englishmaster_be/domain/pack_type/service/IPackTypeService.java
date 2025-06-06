@@ -8,6 +8,7 @@ import com.example.englishmaster_be.domain.pack_type.dto.response.PackTypeRespon
 import com.example.englishmaster_be.model.pack_type.PackTypeEntity;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface IPackTypeService {
@@ -15,6 +16,8 @@ public interface IPackTypeService {
     PackTypeEntity getPackTypeById(UUID id);
 
     FilterResponse<PackTypeResponse> filterPackTypes(PackTypeFilterRequest filterRequest);
+
+    List<PackTypeEntity> getAllPackTypes();
 
     PackTypeKeyResponse createPackType(CreatePackTypeRequest createPackTypeRequest);
 

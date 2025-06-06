@@ -44,9 +44,22 @@ public class CommentEntity {
     @Column(name = "update_at")
     LocalDateTime updateAt;
 
+    @Column(name = "is_comment_parent")
+    Boolean isCommentParent;
+
+    @Column(name = "news_id", insertable = false, updatable = false)
+    UUID newsId;
+
+    @Column(name = "comment_parent", insertable = false, updatable = false)
+    UUID commentParentId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     UserEntity userComment;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "to_owner_comment", referencedColumnName = "id")
+    UserEntity toOwnerComment;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_id", referencedColumnName = "id")
@@ -63,6 +76,13 @@ public class CommentEntity {
     @OneToMany(mappedBy = "commentParent", fetch = FetchType.LAZY)
     Set<CommentEntity> commentChildren;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "comments_votes",
+            joinColumns = @JoinColumn(name = "comment_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    Set<UserEntity> usersVotes;
 
     @PrePersist
     void onCreate() {

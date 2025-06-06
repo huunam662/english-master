@@ -4,10 +4,11 @@ import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.news.dto.request.UpdateNewsRequest;
 import com.example.englishmaster_be.domain.user.service.IUserService;
+import com.example.englishmaster_be.model.comment.CommentJdbcRepository;
+import com.example.englishmaster_be.model.comment.CommentRepository;
 import com.example.englishmaster_be.model.user.UserEntity;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 
-import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.mapper.NewsMapper;
 import com.example.englishmaster_be.domain.news.dto.request.CreateNewsRequest;
 import com.example.englishmaster_be.domain.news.dto.request.NewsFilterRequest;
@@ -26,7 +27,6 @@ import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,7 +46,9 @@ public class NewsService implements INewsService {
 
     NewsRepository newsRepository;
 
-    IUploadService uploadService;
+    CommentRepository commentRepository;
+
+    CommentJdbcRepository commentJdbcRepository;
 
     IUserService userService;
 
@@ -203,5 +205,6 @@ public class NewsService implements INewsService {
 
         return query.fetch();
     }
+
 }
 

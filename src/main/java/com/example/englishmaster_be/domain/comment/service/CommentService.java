@@ -2,174 +2,240 @@ package com.example.englishmaster_be.domain.comment.service;
 
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
-import com.example.englishmaster_be.domain.comment.dto.request.CommentRequest;
+import com.example.englishmaster_be.domain.comment.dto.request.CreateCmToCommentRequest;
+import com.example.englishmaster_be.domain.comment.dto.request.CreateNewsCommentRequest;
+import com.example.englishmaster_be.domain.comment.dto.request.UpdateCommentRequest;
+import com.example.englishmaster_be.domain.comment.dto.response.CmToCommentNewsKeyResponse;
+import com.example.englishmaster_be.domain.comment.dto.response.CommentChildResponse;
+import com.example.englishmaster_be.domain.comment.dto.response.CommentKeyResponse;
+import com.example.englishmaster_be.domain.comment.dto.response.CommentNewsKeyResponse;
 import com.example.englishmaster_be.domain.news.service.INewsService;
-import com.example.englishmaster_be.mapper.CommentMapper;
 import com.example.englishmaster_be.model.comment.CommentEntity;
+import com.example.englishmaster_be.model.comment.CommentJdbcRepository;
 import com.example.englishmaster_be.model.comment.CommentRepository;
 import com.example.englishmaster_be.model.news.NewsEntity;
-import com.example.englishmaster_be.model.topic.TopicEntity;
 import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.shared.service.ws_message.IWsMessageService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.ArrayList;
+import org.springframework.util.Assert;
+
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j(topic = "COMMENT-SERVICE")
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class CommentService implements ICommentService {
 
-    SimpMessagingTemplate messagingTemplate;
-
-    CommentRepository commentRepository;
-
     IUserService userService;
-
-    ITopicService topicService;
 
     INewsService newsService;
 
-    IWsMessageService wsMessageService;
+    CommentRepository commentRepository;
 
-
-    @Override
-    public boolean checkCommentParent(CommentEntity comment) {
-
-        return commentRepository.existsByCommentParent(comment);
-    }
+    CommentJdbcRepository commentJdbcRepository;
 
     @Override
-    public List<CommentEntity> findAllByCommentParent(CommentEntity commentParent) {
-        if(!commentRepository.existsByCommentParent(commentParent))
-            return new ArrayList<>();
+    public CommentEntity getCommentById(UUID id) {
 
-        return commentRepository.findAllByCommentParent(commentParent);
-    }
+        Assert.notNull(id, "Comment id is required.");
 
-    @Override
-    public CommentEntity getCommentById(UUID commentID) {
-        return commentRepository.findByCommentId(commentID)
+        return commentRepository.findByCommentId(id)
                 .orElseThrow(
-                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Comment not found: " + commentID)
+                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND)
                 );
     }
 
     @Override
-    public List<CommentEntity> getListCommentByCommentId(UUID commentId) {
+    public CommentEntity getCommentInfoById(UUID id) {
 
-        CommentEntity comment = getCommentById(commentId);
+        Assert.notNull(id, "Comment id is required.");
 
-        return findAllByCommentParent(comment);
+        return commentRepository.findCommentInfoByCommentId(id)
+                .orElseThrow(
+                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND)
+                );
+    }
+
+    @Override
+    public List<CommentEntity> getNewsComments(UUID newsId, Integer stepLoad, Integer sizeLoad) {
+
+        Assert.notNull(newsId, "News id is required.");
+
+        if(stepLoad < 1)
+            throw new ErrorHolder(Error.BAD_REQUEST, "Step must greater than or equals 1.");
+
+        if(sizeLoad < 1)
+            throw new ErrorHolder(Error.BAD_REQUEST, "Size must greater than or equals 1.");
+
+        Pageable pageable = PageRequest.of(stepLoad - 1, sizeLoad);
+
+        Page<CommentEntity> pageResult = commentRepository.findAllCommentsByNewsId(newsId, pageable);
+
+        return pageResult.getContent();
     }
 
     @Transactional
     @Override
-    public CommentEntity saveCommentToTopic(UUID topicId, CommentRequest commentRequest) {
+    public CommentNewsKeyResponse commentToNews(CreateNewsCommentRequest request) {
 
-        UserEntity user = userService.currentUser();
+        UserEntity userComment = null;
 
-        TopicEntity topic = topicService.getTopicById(topicId);
+        try{
+            userComment = userService.currentUser();
+        }
+        catch (Exception e){
+            log.error(e.getMessage());
+        }
 
-        CommentEntity comment = CommentEntity.builder()
-                .userComment(user)
-                .topic(topic)
-                .content(commentRequest.getCommentContent())
-                .build();
+        NewsEntity news = newsService.getNewsById(request.getNewsId());
 
-        comment = commentRepository.save(comment);
-
-        return comment;
-    }
-
-    @Transactional
-    @Override
-    public CommentEntity saveCommentToNews(UUID newsId, CommentRequest commentRequest) {
-
-        UserEntity user = userService.currentUser();
-
-        NewsEntity news = newsService.getNewsById(newsId);
-
-        CommentEntity comment = CommentEntity.builder()
-                .userComment(user)
+        CommentEntity commentToNews = CommentEntity.builder()
+                .commentId(UUID.randomUUID())
+                .isCommentParent(true)
+                .content(request.getCommentContent())
+                .userComment(userComment)
                 .news(news)
-                .content(commentRequest.getCommentContent())
                 .build();
 
-        comment = commentRepository.save(comment);
+        commentJdbcRepository.insertComment(commentToNews);
 
-        return comment;
-    }
-
-    @Transactional
-    @Override
-    public CommentEntity saveCommentToComment(UUID commentId, CommentRequest commentRequest) {
-
-        UserEntity user = userService.currentUser();
-
-        CommentEntity commentParent = getCommentById(commentId);
-
-        CommentEntity comment = CommentEntity.builder()
-                .userComment(user)
-                .commentParent(commentParent)
-                .content(commentRequest.getCommentContent())
+        return CommentNewsKeyResponse.builder()
+                .newsId(news.getNewsId())
+                .commentId(commentToNews.getCommentId())
                 .build();
-
-        if(commentParent.getTopic() != null)
-            comment.setTopic(commentParent.getTopic());
-
-        comment = commentRepository.save(comment);
-
-        UserEntity userTag = commentParent.getUserComment();
-
-        wsMessageService.sendToUsers(userTag, comment);
-
-        return comment;
     }
 
     @Transactional
     @Override
-    public CommentEntity saveComment(UUID updateCommentId, CommentRequest commentRequest) {
+    public CommentKeyResponse updateComment(UpdateCommentRequest request) {
 
-        UserEntity user = userService.currentUser();
+        UserEntity userUpdate = userService.currentUser();
 
-        CommentEntity comment = getCommentById(updateCommentId);
+        CommentEntity comment = getCommentById(request.getCommentId());
 
-        if(!comment.getUserComment().getUserId().equals(user.getUserId()))
-            throw new ErrorHolder(Error.BAD_REQUEST, "Don't update Comment");
+        UserEntity userComment = comment.getUserComment();
 
-        comment.setContent(commentRequest.getCommentContent());
+        if(userComment == null || !userComment.getUserId().equals(userUpdate.getUserId()))
+            throw new ErrorHolder(Error.UNAUTHORIZED, "User current is not owner of this comment.");
 
-        comment  = commentRepository.save(comment);
+        comment.setContent(request.getCommentContent());
 
-        messagingTemplate.convertAndSend("/CommentEntity/updateComment/" + updateCommentId.toString(), CommentMapper.INSTANCE.toCommentResponse(comment));
+        commentJdbcRepository.updateComment(comment);
 
-        return comment;
+        return CommentKeyResponse.builder()
+                .commentId(comment.getCommentId())
+                .build();
     }
 
     @Transactional
     @Override
-    public void deleteComment(UUID commentId) {
+    public void deleteComment(UUID id) {
 
-        UserEntity user = userService.currentUser();
+        Assert.notNull(id, "Comment id is required.");
 
-        CommentEntity comment = getCommentById(commentId);
+        UserEntity userDelete = userService.currentUser();
 
-        if(!comment.getUserComment().getUserId().equals(user.getUserId()))
-            throw new ErrorHolder(Error.BAD_REQUEST, "Don't delete Comment");
+        CommentEntity comment = getCommentById(id);
+
+        UserEntity userComment = comment.getUserComment();
+
+        if(userComment == null || !userComment.getUserId().equals(userDelete.getUserId()))
+            throw new ErrorHolder(Error.BAD_REQUEST, "User current is not owner of this comment.");
 
         commentRepository.delete(comment);
+    }
 
-        messagingTemplate.convertAndSend("/CommentEntity/deleteComment/"+commentId, commentId);
+    @Transactional
+    @Override
+    public CmToCommentNewsKeyResponse commentToAnyComment(CreateCmToCommentRequest request) {
 
+        UserEntity userComment = null;
+
+        try {
+            userComment = userService.currentUser();
+        }
+        catch (Exception e){
+            log.error(e.getMessage());
+        }
+
+        CommentEntity commentOwner = getCommentById(request.getCommentOwnerId());
+
+        CommentEntity commentParent = commentOwner.getIsCommentParent() ? commentOwner : commentOwner.getCommentParent();
+
+        CommentEntity comment = CommentEntity.builder()
+                .commentId(UUID.randomUUID())
+                .isCommentParent(false)
+                .content(request.getCommentContent())
+                .commentParent(commentParent)
+                .userComment(userComment)
+                .toOwnerComment(commentOwner.getIsCommentParent() ? null : commentOwner.getUserComment())
+                .build();
+
+        commentJdbcRepository.insertComment(comment);
+
+        return CmToCommentNewsKeyResponse.builder()
+                .commentId(comment.getCommentId())
+                .commentParentId(commentParent.getCommentId())
+                .toOwnerCommentId(comment.getToOwnerComment() != null ? comment.getToOwnerComment().getUserId() : null)
+                .build();
+    }
+
+    @Override
+    public List<CommentEntity> getCommentsChild(UUID commentParentId, Integer stepLoad, Integer sizeLoad) {
+
+        Assert.notNull(commentParentId, "Comment parent id is required.");
+
+        if(stepLoad < 1)
+            throw new ErrorHolder(Error.BAD_REQUEST, "Step must greater than or equals 1.");
+
+        if(sizeLoad < 1)
+            throw new ErrorHolder(Error.BAD_REQUEST, "Size must greater than or equals 1.");
+
+        Pageable pageable = PageRequest.of(stepLoad - 1, sizeLoad);
+
+        Page<CommentEntity> pageResult = commentRepository.findAllCommentsChildByCommentParentId(commentParentId, pageable);
+
+        return pageResult.getContent();
+    }
+
+    @Transactional
+    @Override
+    public CommentKeyResponse votesToComment(UUID commentId) {
+
+        UserEntity userVote = userService.currentUser();
+
+        CommentEntity comment = getCommentById(commentId);
+
+        commentJdbcRepository.insertCommentsVotes(comment, userVote);
+
+        return CommentKeyResponse.builder()
+                .commentId(comment.getCommentId())
+                .build();
+    }
+
+    @Transactional
+    @Override
+    public CommentKeyResponse unVotesToComment(UUID commentId) {
+
+        UserEntity userVote = userService.currentUser();
+
+        CommentEntity comment = getCommentById(commentId);
+
+        commentJdbcRepository.deleteCommentsVotes(comment, userVote);
+
+        return CommentKeyResponse.builder()
+                .commentId(comment.getCommentId())
+                .build();
     }
 }

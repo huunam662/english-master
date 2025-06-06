@@ -1,6 +1,5 @@
 package com.example.englishmaster_be.domain.mock_test.dto.response;
 
-import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.util.UUID;
@@ -23,7 +22,7 @@ public class MockTestDetailResponse {
 
     Integer scoreAchieved;
 
-    MockTestQuestionResponse questionChild;
+    MockTestQuestionAnswersResponse questionChild;
 
     MockTestAnswerResponse answerChoice;
 

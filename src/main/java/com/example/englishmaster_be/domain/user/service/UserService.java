@@ -279,8 +279,8 @@ public class UserService implements IUserService, UserDetailsService {
     @Override
     public void updatePasswordForgot(UserEntity user, String newPassword) {
 
-        if (passwordEncoder.matches(newPassword, user.getPassword()))
-            throw new ErrorHolder(Error.BAD_REQUEST, "New password mustn't match with old password.");
+//        if (passwordEncoder.matches(newPassword, user.getPassword()))
+//            throw new ErrorHolder(Error.BAD_REQUEST, "New password mustn't match with old password.");
 
         newPassword = passwordEncoder.encode(newPassword);
 

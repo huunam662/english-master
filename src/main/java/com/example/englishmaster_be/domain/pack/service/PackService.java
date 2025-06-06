@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.UUID;
@@ -76,5 +77,13 @@ public class PackService implements IPackService {
     public List<PackEntity> getListPack() {
 
         return packRepository.findAll();
+    }
+
+    @Override
+    public List<PackEntity> getListPackByPackTypeId(UUID packTypeId) {
+
+        Assert.notNull(packTypeId, "Pack type id is required.");
+
+        return packRepository.getAllByPackTypeId(packTypeId);
     }
 }
