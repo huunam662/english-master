@@ -30,8 +30,6 @@ public interface CommentMapper {
 
     @Mapping(target = "timeOfComment", source = "createAt")
     @Mapping(target = "commentContent", source = "content")
-    @Mapping(target = "numberOfVotes", expression = "java(comment.getUsersVotes().size())")
-    @Mapping(target = "numberOfCommentsChild", expression = "java(comment.getCommentChildren().size())")
     @Mapping(target = "authorComment", expression = "java(UserMapper.INSTANCE.toAuthorCommentResponse(comment.getUserComment()))")
     CommentNewsResponse toCommentNewsResponse(CommentEntity comment);
 
@@ -39,7 +37,6 @@ public interface CommentMapper {
 
     @Mapping(target = "timeOfComment", source = "createAt")
     @Mapping(target = "commentContent", source = "content")
-    @Mapping(target = "numberOfVotes", expression = "java(comment.getUsersVotes().size())")
     @Mapping(target = "commentToOwnerTag", source = "toOwnerComment.name")
     @Mapping(target = "authorComment", expression = "java(UserMapper.INSTANCE.toAuthorCommentResponse(comment.getUserComment()))")
     CommentChildResponse toCommentChildResponse(CommentEntity comment);
