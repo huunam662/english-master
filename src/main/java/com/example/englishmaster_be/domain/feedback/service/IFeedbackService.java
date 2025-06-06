@@ -3,7 +3,7 @@ package com.example.englishmaster_be.domain.feedback.service;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackRequest;
 import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackFilterRequest;
-import com.example.englishmaster_be.model.feedback.FeedbackEntity;
+import com.example.englishmaster_be.domain.feedback.model.FeedbackEntity;
 
 import java.util.UUID;
 

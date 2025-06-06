@@ -1,28 +1,19 @@
 package com.example.englishmaster_be.shared.service.invalid_token;
 
 import com.example.englishmaster_be.common.constant.InvalidTokenType;
-import com.example.englishmaster_be.common.constant.SessionActiveType;
-import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
-import com.example.englishmaster_be.model.user.UserEntity;
+import com.example.englishmaster_be.domain.auth.model.SessionActiveEntity;
+import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.shared.service.jwt.JwtService;
-import com.example.englishmaster_be.model.invalid_token.InvalidTokenEntity;
-import com.example.englishmaster_be.model.invalid_token.InvalidTokenRepository;
-import com.example.englishmaster_be.shared.service.session_active.ISessionActiveService;
-import com.example.englishmaster_be.value.JwtValue;
+import com.example.englishmaster_be.domain.auth.repository.jpa.InvalidTokenRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service

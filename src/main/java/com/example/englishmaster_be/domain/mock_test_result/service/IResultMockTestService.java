@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.mock_test_result.service;
 
 import com.example.englishmaster_be.domain.mock_test_result.dto.request.ResultMockTestRequest;
-import com.example.englishmaster_be.model.mock_test_result.MockTestResultEntity;
+import com.example.englishmaster_be.domain.mock_test_result.model.MockTestResultEntity;
 
 import java.util.List;
 import java.util.UUID;

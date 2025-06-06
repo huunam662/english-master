@@ -1,19 +1,17 @@
 package com.example.englishmaster_be.shared.service.mailer;
 
-import com.example.englishmaster_be.domain.mock_test_result.service.IResultMockTestService;
-import com.example.englishmaster_be.model.mock_test.MockTestEntity;
-import com.example.englishmaster_be.model.mock_test.MockTestRepository;
-import com.example.englishmaster_be.model.mock_test_result.MockTestResultEntity;
-import com.example.englishmaster_be.model.part.PartEntity;
-import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.model.user.UserRepository;
+import com.example.englishmaster_be.domain.mock_test.model.MockTestEntity;
+import com.example.englishmaster_be.domain.mock_test.repository.jpa.MockTestRepository;
+import com.example.englishmaster_be.domain.mock_test_result.model.MockTestResultEntity;
+import com.example.englishmaster_be.domain.part.model.PartEntity;
+import com.example.englishmaster_be.domain.user.model.UserEntity;
+import com.example.englishmaster_be.domain.user.repository.UserRepository;
 import com.example.englishmaster_be.value.LinkValue;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -21,12 +19,9 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.FileCopyUtils;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

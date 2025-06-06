@@ -5,13 +5,13 @@ import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 
 import com.example.englishmaster_be.domain.mock_test.dto.response.*;
 import com.example.englishmaster_be.domain.mock_test.service.IMockTestService;
-import com.example.englishmaster_be.mapper.MockTestDetailMapper;
-import com.example.englishmaster_be.mapper.MockTestMapper;
+import com.example.englishmaster_be.domain.mock_test_result.mapper.MockTestDetailMapper;
+import com.example.englishmaster_be.domain.mock_test.mapper.MockTestMapper;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestFilterRequest;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestRequest;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionMockTestResponse;
-import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailEntity;
-import com.example.englishmaster_be.model.mock_test.MockTestEntity;
+import com.example.englishmaster_be.domain.mock_test_result.model.MockTestDetailEntity;
+import com.example.englishmaster_be.domain.mock_test.model.MockTestEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;

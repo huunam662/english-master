@@ -11,11 +11,11 @@ import com.example.englishmaster_be.domain.topic.dto.request.TopicQuestionListRe
 import com.example.englishmaster_be.domain.topic.dto.request.TopicRequest;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicFilterRequest;
 import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
-import com.example.englishmaster_be.model.comment.CommentEntity;
-import com.example.englishmaster_be.model.pack.PackEntity;
-import com.example.englishmaster_be.model.part.PartEntity;
-import com.example.englishmaster_be.model.question.QuestionEntity;
-import com.example.englishmaster_be.model.topic.TopicEntity;
+import com.example.englishmaster_be.domain.comment.model.CommentEntity;
+import com.example.englishmaster_be.domain.pack.model.PackEntity;
+import com.example.englishmaster_be.domain.part.model.PartEntity;
+import com.example.englishmaster_be.domain.question.model.QuestionEntity;
+import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 

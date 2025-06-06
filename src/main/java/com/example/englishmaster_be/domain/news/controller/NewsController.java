@@ -5,11 +5,11 @@ import com.example.englishmaster_be.domain.news.dto.request.UpdateNewsRequest;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 
 import com.example.englishmaster_be.domain.news.service.INewsService;
-import com.example.englishmaster_be.mapper.NewsMapper;
+import com.example.englishmaster_be.domain.news.mapper.NewsMapper;
 import com.example.englishmaster_be.domain.news.dto.request.NewsFilterRequest;
 import com.example.englishmaster_be.domain.news.dto.request.CreateNewsRequest;
 import com.example.englishmaster_be.domain.news.dto.response.NewsResponse;
-import com.example.englishmaster_be.model.news.NewsEntity;
+import com.example.englishmaster_be.domain.news.model.NewsEntity;
 import com.example.englishmaster_be.shared.dto.response.ResourceKeyResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;

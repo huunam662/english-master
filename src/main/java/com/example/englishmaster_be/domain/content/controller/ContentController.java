@@ -3,8 +3,8 @@ package com.example.englishmaster_be.domain.content.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.content.dto.request.ContentRequest;
-import com.example.englishmaster_be.mapper.ContentMapper;
-import com.example.englishmaster_be.model.content.ContentEntity;
+import com.example.englishmaster_be.domain.content.mapper.ContentMapper;
+import com.example.englishmaster_be.domain.content.model.ContentEntity;
 import com.example.englishmaster_be.domain.content.dto.response.ContentResponse;
 import com.example.englishmaster_be.domain.content.service.IContentService;
 import io.swagger.v3.oas.annotations.tags.Tag;

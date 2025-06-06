@@ -7,8 +7,8 @@ import com.example.englishmaster_be.domain.comment.dto.request.UpdateCommentRequ
 import com.example.englishmaster_be.domain.comment.dto.response.*;
 import com.example.englishmaster_be.domain.comment.service.ICommentService;
 import com.example.englishmaster_be.domain.comment.dto.request.CreateNewsCommentRequest;
-import com.example.englishmaster_be.mapper.CommentMapper;
-import com.example.englishmaster_be.model.comment.CommentEntity;
+import com.example.englishmaster_be.domain.comment.mapper.CommentMapper;
+import com.example.englishmaster_be.domain.comment.model.CommentEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

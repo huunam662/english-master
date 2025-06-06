@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.shared.service.session_active;
 
 import com.example.englishmaster_be.common.constant.SessionActiveType;
-import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
-import com.example.englishmaster_be.model.user.UserEntity;
+import com.example.englishmaster_be.domain.auth.model.SessionActiveEntity;
+import com.example.englishmaster_be.domain.user.model.UserEntity;
 
 import java.util.List;
 import java.util.UUID;

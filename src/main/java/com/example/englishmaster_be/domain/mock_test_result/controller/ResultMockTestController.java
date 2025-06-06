@@ -3,8 +3,8 @@ package com.example.englishmaster_be.domain.mock_test_result.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.mock_test_result.dto.response.MockTestResultResponse;
-import com.example.englishmaster_be.mapper.MockTestResultMapper;
-import com.example.englishmaster_be.model.mock_test_result.MockTestResultEntity;
+import com.example.englishmaster_be.domain.mock_test_result.mapper.MockTestResultMapper;
+import com.example.englishmaster_be.domain.mock_test_result.model.MockTestResultEntity;
 import com.example.englishmaster_be.domain.mock_test_result.dto.request.ResultMockTestRequest;
 import com.example.englishmaster_be.domain.mock_test_result.service.IResultMockTestService;
 import io.swagger.v3.oas.annotations.tags.Tag;

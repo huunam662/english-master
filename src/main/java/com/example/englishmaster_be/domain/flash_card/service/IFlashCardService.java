@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.domain.flash_card.service;
 
 import com.example.englishmaster_be.domain.flash_card.dto.request.FlashCardRequest;
-import com.example.englishmaster_be.model.flash_card.FlashCardEntity;
-import com.example.englishmaster_be.model.user.UserEntity;
+import com.example.englishmaster_be.domain.flash_card.model.FlashCardEntity;
+import com.example.englishmaster_be.domain.user.model.UserEntity;
 
 import java.util.List;
 import java.util.UUID;

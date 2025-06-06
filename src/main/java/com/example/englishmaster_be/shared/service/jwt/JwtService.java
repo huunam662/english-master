@@ -1,8 +1,5 @@
 package com.example.englishmaster_be.shared.service.jwt;
 
-import com.example.englishmaster_be.common.constant.InvalidTokenType;
-import com.example.englishmaster_be.model.session_active.SessionActiveEntity;
-import com.example.englishmaster_be.shared.service.invalid_token.InvalidTokenService;
 import com.example.englishmaster_be.shared.service.session_active.SessionActiveService;
 import com.example.englishmaster_be.value.JwtValue;
 import io.jsonwebtoken.*;
@@ -13,11 +10,9 @@ import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.bouncycastle.util.encoders.Hex;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Mac;
