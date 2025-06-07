@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.shared.service.jwt;
 
-import com.example.englishmaster_be.shared.service.session_active.SessionActiveService;
+import com.example.englishmaster_be.domain.auth.service.session_active.SessionActiveService;
 import com.example.englishmaster_be.value.JwtValue;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;

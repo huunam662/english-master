@@ -2,6 +2,7 @@ package com.example.englishmaster_be.domain.topic.mapper;
 
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicContentResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
+import com.example.englishmaster_be.domain.part.mapper.PartMapper;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicRequest;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicBasicResponse;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicResponse;
@@ -12,7 +13,7 @@ import org.mapstruct.factory.Mappers;
 import java.time.LocalTime;
 import java.util.*;
 
-@Mapper(builder = @Builder(disableBuilder = true), imports = {LocalTime.class})
+@Mapper(imports = {PartMapper.class, LocalTime.class}, builder = @Builder(disableBuilder = true))
 public interface TopicMapper {
 
     TopicMapper INSTANCE = Mappers.getMapper(TopicMapper.class);

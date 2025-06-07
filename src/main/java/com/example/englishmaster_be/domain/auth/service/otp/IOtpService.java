@@ -1,8 +1,8 @@
-package com.example.englishmaster_be.shared.service.otp;
+package com.example.englishmaster_be.domain.auth.service.otp;
 
 
 import com.example.englishmaster_be.common.constant.OtpStatus;
-import com.example.englishmaster_be.shared.model.otp.OtpEntity;
+import com.example.englishmaster_be.domain.auth.model.OtpEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 
 public interface IOtpService {

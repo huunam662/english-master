@@ -3,8 +3,8 @@ package com.example.englishmaster_be.domain.admin.service;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.Role;
 import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.domain.user.model.QUserEntity;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
-
 import com.example.englishmaster_be.domain.mock_test.service.IMockTestService;
 import com.example.englishmaster_be.domain.pack.service.IPackService;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
@@ -15,7 +15,6 @@ import com.example.englishmaster_be.domain.user.mapper.UserMapper;
 import com.example.englishmaster_be.domain.mock_test.model.MockTestEntity;
 import com.example.englishmaster_be.domain.pack.model.PackEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
-import com.example.englishmaster_be.model.user.QUserEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.domain.user.repository.UserRepository;
 import com.example.englishmaster_be.domain.admin.dto.response.CountMockTestTopicResponse;

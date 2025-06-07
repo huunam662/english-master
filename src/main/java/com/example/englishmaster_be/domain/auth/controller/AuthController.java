@@ -2,7 +2,7 @@ package com.example.englishmaster_be.domain.auth.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.auth.dto.request.*;
-import com.example.englishmaster_be.domain.auth.service.IAuthService;
+import com.example.englishmaster_be.domain.auth.service.auth.IAuthService;
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

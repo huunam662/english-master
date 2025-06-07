@@ -4,7 +4,7 @@ import com.example.englishmaster_be.domain.pack_type.dto.request.PackTypeFilterR
 import com.example.englishmaster_be.domain.pack_type.dto.response.PackTypeResponse;
 import com.example.englishmaster_be.domain.pack_type.model.PackTypeEntity;
 import com.example.englishmaster_be.domain.pack_type.mapper.PackTypeMapper;
-import com.example.englishmaster_be.model.pack_type.QPackTypeEntity;
+import com.example.englishmaster_be.domain.pack_type.model.QPackTypeEntity;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.pack_type.util.PackTypeUtil;
 import com.querydsl.core.types.dsl.BooleanExpression;

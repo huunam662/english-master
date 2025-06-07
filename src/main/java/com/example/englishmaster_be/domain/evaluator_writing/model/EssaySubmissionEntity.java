@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.shared.model.essay_submission;
+package com.example.englishmaster_be.domain.evaluator_writing.model;
 
 import com.example.englishmaster_be.domain.mock_test.model.MockTestEntity;
 import io.swagger.v3.oas.annotations.media.Schema;

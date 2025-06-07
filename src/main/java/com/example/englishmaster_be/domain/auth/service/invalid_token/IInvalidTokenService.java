@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.shared.service.invalid_token;
+package com.example.englishmaster_be.domain.auth.service.invalid_token;
 
 import com.example.englishmaster_be.common.constant.InvalidTokenType;
 import com.example.englishmaster_be.domain.auth.model.SessionActiveEntity;

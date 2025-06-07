@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.domain.flash_card_word.service;
 
 import com.example.englishmaster_be.domain.flash_card.service.IFlashCardService;
+import com.example.englishmaster_be.domain.flash_card_word.model.QFlashCardWordEntity;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
@@ -9,7 +10,6 @@ import com.example.englishmaster_be.domain.flash_card_word.mapper.FlashCardWordM
 import com.example.englishmaster_be.domain.flash_card.model.FlashCardEntity;
 import com.example.englishmaster_be.domain.flash_card_word.model.FlashCardWordEntity;
 import com.example.englishmaster_be.domain.flash_card_word.repository.FlashCardWordRepository;
-import com.example.englishmaster_be.model.flash_card_word.QFlashCardWordEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
