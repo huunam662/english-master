@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.auth.service;
+package com.example.englishmaster_be.domain.auth.service.auth;
 
 import com.example.englishmaster_be.common.constant.InvalidTokenType;
 import com.example.englishmaster_be.common.constant.SessionActiveType;
@@ -7,14 +7,14 @@ import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.auth.dto.request.*;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.domain.auth.model.SessionActiveEntity;
-import com.example.englishmaster_be.shared.service.invalid_token.IInvalidTokenService;
-import com.example.englishmaster_be.shared.service.otp.IOtpService;
-import com.example.englishmaster_be.shared.service.session_active.ISessionActiveService;
+import com.example.englishmaster_be.domain.auth.service.invalid_token.IInvalidTokenService;
+import com.example.englishmaster_be.domain.auth.service.otp.IOtpService;
+import com.example.englishmaster_be.domain.auth.service.session_active.ISessionActiveService;
 import com.example.englishmaster_be.shared.service.jwt.JwtService;
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.domain.user.mapper.UserMapper;
-import com.example.englishmaster_be.shared.model.otp.OtpEntity;
+import com.example.englishmaster_be.domain.auth.model.OtpEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.shared.service.mailer.MailerService;
 import jakarta.mail.MessagingException;

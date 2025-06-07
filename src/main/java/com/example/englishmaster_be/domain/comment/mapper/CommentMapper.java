@@ -4,6 +4,7 @@ import com.example.englishmaster_be.domain.comment.dto.response.CommentChildResp
 import com.example.englishmaster_be.domain.comment.dto.response.CommentNewsResponse;
 import com.example.englishmaster_be.domain.comment.model.CommentEntity;
 import com.example.englishmaster_be.domain.comment.dto.response.CommentResponse;
+import com.example.englishmaster_be.domain.user.mapper.UserMapper;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -12,7 +13,7 @@ import org.mapstruct.factory.Mappers;
 import java.util.Collection;
 import java.util.List;
 
-@Mapper(builder = @Builder(disableBuilder = true))
+@Mapper(imports = {UserMapper.class}, builder = @Builder(disableBuilder = true))
 public interface CommentMapper {
 
     CommentMapper INSTANCE = Mappers.getMapper(CommentMapper.class);

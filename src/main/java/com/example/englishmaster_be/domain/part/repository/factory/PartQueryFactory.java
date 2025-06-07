@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.domain.part.repository.factory;
 
 import com.example.englishmaster_be.domain.part.model.PartEntity;
+import com.example.englishmaster_be.domain.part.model.QPartEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
-import com.example.englishmaster_be.model.part.QPartEntity;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-
 import java.util.List;
 import java.util.Optional;
 

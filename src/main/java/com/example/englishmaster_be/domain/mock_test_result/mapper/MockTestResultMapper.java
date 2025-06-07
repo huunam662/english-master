@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.domain.mock_test_result.mapper;
 
 
+import com.example.englishmaster_be.domain.mock_test.mapper.MockTestMapper;
 import com.example.englishmaster_be.domain.mock_test_result.dto.response.MockTestResultResponse;
 import com.example.englishmaster_be.domain.mock_test_result.dto.request.ResultMockTestRequest;
 import com.example.englishmaster_be.domain.mock_test_result.model.MockTestResultEntity;
@@ -13,7 +14,10 @@ import org.mapstruct.factory.Mappers;
 import java.util.Collection;
 import java.util.List;
 
-@Mapper(builder = @Builder(disableBuilder = true))
+@Mapper(
+        imports = {MockTestMapper.class, MockTestDetailMapper.class},
+        builder = @Builder(disableBuilder = true)
+)
 public interface MockTestResultMapper {
 
     MockTestResultMapper INSTANCE = Mappers.getMapper(MockTestResultMapper.class);

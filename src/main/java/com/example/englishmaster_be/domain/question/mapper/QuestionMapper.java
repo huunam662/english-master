@@ -3,9 +3,11 @@ package com.example.englishmaster_be.domain.question.mapper;
 import com.example.englishmaster_be.domain.answer.mapper.AnswerMapper;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
 import com.example.englishmaster_be.domain.part.dto.response.PartBasicResponse;
+import com.example.englishmaster_be.domain.part.mapper.PartMapper;
 import com.example.englishmaster_be.domain.question.dto.request.*;
 import com.example.englishmaster_be.domain.question.dto.response.*;
 import com.example.englishmaster_be.domain.content.model.ContentEntity;
+import com.example.englishmaster_be.domain.topic.mapper.TopicMapper;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.domain.question.util.QuestionUtil;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
@@ -17,7 +19,10 @@ import org.mapstruct.factory.Mappers;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Mapper(builder = @Builder(disableBuilder = true))
+@Mapper(
+        imports = {AnswerMapper.class, TopicMapper.class, PartMapper.class},
+        builder = @Builder(disableBuilder = true)
+)
 public interface QuestionMapper {
 
     QuestionMapper INSTANCE = Mappers.getMapper(QuestionMapper.class);

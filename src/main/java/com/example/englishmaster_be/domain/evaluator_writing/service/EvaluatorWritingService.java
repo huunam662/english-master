@@ -7,7 +7,7 @@ import com.example.englishmaster_be.domain.evaluator_writing.dto.WritingPartProj
 import com.example.englishmaster_be.domain.evaluator_writing.factory.WritingTaskPromptFactory;
 import com.example.englishmaster_be.domain.evaluator_writing.prompt.WritingTaskPrompt;
 import com.example.englishmaster_be.domain.user.service.UserService;
-import com.example.englishmaster_be.shared.model.essay_submission.EssaySubmissionRepository;
+import com.example.englishmaster_be.domain.evaluator_writing.repository.jpa.EssaySubmissionRepository;
 import com.example.englishmaster_be.domain.mock_test.repository.jdbc.MockTestJdbcRepository;
 import com.example.englishmaster_be.shared.util.gemini.GeminiClient;
 import com.example.englishmaster_be.shared.util.gemini.GenerationConfig;

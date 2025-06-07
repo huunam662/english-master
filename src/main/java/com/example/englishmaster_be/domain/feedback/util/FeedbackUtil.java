@@ -1,8 +1,7 @@
 package com.example.englishmaster_be.domain.feedback.util;
 
 import com.example.englishmaster_be.common.constant.sort.FeedbackSortBy;
-
-import com.example.englishmaster_be.model.feedback.QFeedbackEntity;
+import com.example.englishmaster_be.domain.feedback.model.QFeedbackEntity;
 import com.querydsl.core.types.OrderSpecifier;
 import org.springframework.data.domain.Sort;
 

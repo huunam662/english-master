@@ -3,7 +3,7 @@ package com.example.englishmaster_be.domain.user.model;
 import com.example.englishmaster_be.domain.comment.model.CommentEntity;
 import com.example.englishmaster_be.domain.auth.model.InvalidTokenEntity;
 import com.example.englishmaster_be.domain.news.model.NewsEntity;
-import com.example.englishmaster_be.shared.model.otp.OtpEntity;
+import com.example.englishmaster_be.domain.auth.model.OtpEntity;
 import com.example.englishmaster_be.domain.auth.model.SessionActiveEntity;
 import com.example.englishmaster_be.domain.flash_card.model.FlashCardEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;

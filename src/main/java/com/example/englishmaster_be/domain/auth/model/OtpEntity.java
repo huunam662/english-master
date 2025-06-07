@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.shared.model.otp;
+package com.example.englishmaster_be.domain.auth.model;
 
 import com.example.englishmaster_be.common.constant.OtpStatus;
 import com.example.englishmaster_be.domain.user.model.UserEntity;

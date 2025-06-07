@@ -105,27 +105,20 @@ public class ExcelUtil {
         int jColBody = 1;
 
         int iRowExamName = 0;
-        checkCellTopicHeader(sheet, iRowExamName, jColHeader, ExcelTopicConstant.Name);
-
         String topicName = getCellValueAsString(sheet, iRowExamName, jColBody);
-
         int iRowImagePath = 1;
-        checkCellTopicHeader(sheet, iRowImagePath, jColHeader, ExcelTopicConstant.Image_Path);
 
         String imagePath = getCellValueAsString(sheet, iRowImagePath, jColBody);
 
         int iRowDescription = 2;
-        checkCellTopicHeader(sheet, iRowDescription, jColHeader, ExcelTopicConstant.Description);
 
         String description = getCellValueAsString(sheet, iRowDescription, jColBody);
 
         int iRowExamType = 3;
-        checkCellTopicHeader(sheet, iRowExamType, jColHeader, ExcelTopicConstant.Type);
 
         String topicType = getCellValueAsString(sheet, iRowExamType, jColBody);
 
         int iRowWorkTime = 4;
-        checkCellTopicHeader(sheet, iRowWorkTime, jColHeader, ExcelTopicConstant.Work_Time);
 
         String workTimeString = getCellValueAsString(sheet, iRowWorkTime, jColBody);
 
@@ -136,17 +129,14 @@ public class ExcelUtil {
         LocalTime workTime = localDateTime.toLocalTime();
 
         int iRowNumberQuestion = 5;
-        checkCellTopicHeader(sheet, iRowNumberQuestion, jColHeader, ExcelTopicConstant.Number_Question);
 
         int numberQuestion = (int) sheet.getRow(iRowNumberQuestion).getCell(jColBody).getNumericCellValue();
 
         int iRowPackName = 6;
-        checkCellTopicHeader(sheet, iRowPackName, jColHeader, ExcelTopicConstant.Exam_Set);
 
         String packName = getCellValueAsString(sheet, iRowPackName, jColBody);
 
         int iRowPart = 7;
-        checkCellTopicHeader(sheet, iRowPart, jColHeader, ExcelTopicConstant.Part);
 
         String part = getCellValueAsString(sheet, iRowPart, jColBody).replaceAll("\n", "");
 

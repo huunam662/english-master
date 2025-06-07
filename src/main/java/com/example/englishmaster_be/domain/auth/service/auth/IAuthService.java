@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.auth.service;
+package com.example.englishmaster_be.domain.auth.service.auth;
 
 import com.example.englishmaster_be.domain.auth.dto.request.*;
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;

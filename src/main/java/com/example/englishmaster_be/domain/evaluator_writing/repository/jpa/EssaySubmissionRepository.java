@@ -1,6 +1,7 @@
-package com.example.englishmaster_be.shared.model.essay_submission;
+package com.example.englishmaster_be.domain.evaluator_writing.repository.jpa;
 
 import com.example.englishmaster_be.domain.evaluator_writing.dto.WritingPartProjection;
+import com.example.englishmaster_be.domain.evaluator_writing.model.EssaySubmissionEntity;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;

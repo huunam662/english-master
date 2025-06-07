@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.domain.content.helper;
 
 import com.example.englishmaster_be.domain.content.model.ContentEntity;
+import com.example.englishmaster_be.domain.content.model.QContentEntity;
 import com.example.englishmaster_be.shared.helper.FileHelper;
-import com.example.englishmaster_be.model.content.QContentEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.querydsl.jpa.impl.JPAQueryFactory;

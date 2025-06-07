@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.shared.service.session_active;
+package com.example.englishmaster_be.domain.auth.service.session_active;
 
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.SessionActiveType;

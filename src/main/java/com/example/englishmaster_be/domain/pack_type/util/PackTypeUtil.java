@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.pack_type.util;
 
 import com.example.englishmaster_be.common.constant.sort.PackTypeSortBy;
-import com.example.englishmaster_be.model.pack_type.QPackTypeEntity;
+import com.example.englishmaster_be.domain.pack_type.model.QPackTypeEntity;
 import com.querydsl.core.types.OrderSpecifier;
 import org.springframework.data.domain.Sort;
 

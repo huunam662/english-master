@@ -4,16 +4,13 @@ import com.example.englishmaster_be.advice.exception.handler.GlobalExceptionHand
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.shared.service.jwt.JwtService;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
-import com.example.englishmaster_be.shared.service.invalid_token.IInvalidTokenService;
-import com.example.englishmaster_be.value.AppValue;
-import io.swagger.v3.core.util.Json;
+import com.example.englishmaster_be.domain.auth.service.invalid_token.IInvalidTokenService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,10 +18,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 
 @Slf4j(topic = "MIDDLEWARE-FILTER")
 @Component

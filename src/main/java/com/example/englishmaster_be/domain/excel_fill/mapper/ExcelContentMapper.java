@@ -1,8 +1,12 @@
 package com.example.englishmaster_be.domain.excel_fill.mapper;
 
+import com.example.englishmaster_be.domain.answer.mapper.AnswerMapper;
+import com.example.englishmaster_be.domain.content.mapper.ContentMapper;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionListResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
+import com.example.englishmaster_be.domain.pack.mapper.PackMapper;
+import com.example.englishmaster_be.domain.part.mapper.PartMapper;
 import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import org.mapstruct.Builder;
@@ -13,7 +17,10 @@ import org.mapstruct.factory.Mappers;
 import java.util.Collection;
 import java.util.List;
 
-@Mapper(builder = @Builder(disableBuilder = true))
+@Mapper(
+        imports = {ContentMapper.class, AnswerMapper.class, PackMapper.class, PartMapper.class},
+        builder = @Builder(disableBuilder = true)
+)
 public interface ExcelContentMapper {
 
     ExcelContentMapper INSTANCE = Mappers.getMapper(ExcelContentMapper.class);

@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.shared.model.essay_submission;
+package com.example.englishmaster_be.domain.evaluator_writing.repository.jdbc;
 
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;

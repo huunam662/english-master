@@ -2,6 +2,7 @@ package com.example.englishmaster_be.domain.feedback.service;
 
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.domain.feedback.model.QFeedbackEntity;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackRequest;
 import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackFilterRequest;
@@ -10,7 +11,6 @@ import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.domain.feedback.mapper.FeedbackMapper;
 import com.example.englishmaster_be.domain.feedback.repository.FeedbackRepository;
-import com.example.englishmaster_be.model.feedback.QFeedbackEntity;
 import com.example.englishmaster_be.domain.feedback.util.FeedbackUtil;
 import com.example.englishmaster_be.domain.feedback.model.FeedbackEntity;
 import com.example.englishmaster_be.domain.feedback.dto.response.FeedbackResponse;

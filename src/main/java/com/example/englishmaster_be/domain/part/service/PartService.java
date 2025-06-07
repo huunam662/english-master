@@ -6,6 +6,7 @@ import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestPartReq
 import com.example.englishmaster_be.domain.part.dto.request.CreatePartQuestionsAnswersRequest;
 import com.example.englishmaster_be.domain.part.dto.request.EditPartQuestionsAnswersRequest;
 import com.example.englishmaster_be.domain.part.dto.response.PartKeyResponse;
+import com.example.englishmaster_be.domain.part.model.QPartEntity;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
@@ -15,7 +16,6 @@ import com.example.englishmaster_be.domain.part.dto.request.PartSaveContentReque
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.domain.part.mapper.PartMapper;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
-import com.example.englishmaster_be.model.part.QPartEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.domain.user.service.IUserService;

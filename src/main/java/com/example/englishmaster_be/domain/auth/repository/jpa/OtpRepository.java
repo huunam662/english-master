@@ -1,6 +1,7 @@
-package com.example.englishmaster_be.shared.model.otp;
+package com.example.englishmaster_be.domain.auth.repository.jpa;
 
 import com.example.englishmaster_be.common.constant.OtpStatus;
+import com.example.englishmaster_be.domain.auth.model.OtpEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

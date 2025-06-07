@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.pack.repository.factory;
 
 import com.example.englishmaster_be.domain.pack.model.PackEntity;
-import com.example.englishmaster_be.model.pack.QPackEntity;
+import com.example.englishmaster_be.domain.pack.model.QPackEntity;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
