@@ -2,12 +2,11 @@ package com.example.englishmaster_be.domain.excel_fill.controller;
 
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
-import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionListResponse;
-import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
-import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
+import com.example.englishmaster_be.domain.excel_fill.dto.response.*;
 import com.example.englishmaster_be.domain.excel_fill.service.IExcelFillService;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyResponse;
 import com.example.englishmaster_be.domain.excel_fill.mapper.ExcelContentMapper;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
@@ -38,6 +37,18 @@ public class ExcelFillController {
         return excelService.importTopicExcel(file);
     }
 
+    @PostMapping(value = "/import/topic-information", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @DefaultMessage("Import topic information from excel successful.")
+    @SneakyThrows
+    @Operation(
+            summary = "Import topic information from excel file.",
+            description = "Import topic information from excel file."
+    )
+    public TopicKeyResponse importTopicInformationFromExcel(@RequestPart("file") MultipartFile file) {
+
+        return excelService.importTopicFromExcel(file);
+    }
+
     @PostMapping(value = "/importQuestionForTopicAndPart", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @DefaultMessage("File processed successfully")
     public ExcelQuestionListResponse importQuestionForTopicAndPart(
@@ -52,6 +63,23 @@ public class ExcelFillController {
         return ExcelContentMapper.INSTANCE.toExcelQuestionListResponse(excelQuestionResponses);
     }
 
+    @PostMapping(value = "/import/{topicId:.+}/questions-to-topic-part", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @DefaultMessage("File processed successfully")
+    @SneakyThrows
+    @Operation(
+            summary = "Import questions for topic and part.",
+            description = "Import questions for topic and part."
+    )
+    public ExcelTopicPartIdsResponse importQuestionsForTopicAndPart(
+            @PathVariable("topicId") UUID topicId,
+            @Parameter(description = "Part number must one value in scope [1, 2, 3, 4, 5, 6, 7]")
+            @RequestParam("partNumber") int partNumber,
+            @RequestPart("file") MultipartFile file
+    ){
+
+        return excelService.importQuestionForTopicAnyPartFromExcel(topicId, partNumber, file);
+    }
+
     @PostMapping(value = "/importAllPartsForTopic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @DefaultMessage("File processed successfully")
     public ExcelTopicResponse importAllPartsForTopic(
@@ -60,6 +88,21 @@ public class ExcelFillController {
     ){
 
         return excelService.importAllPartsForTopicExcel(topicId, file);
+    }
+
+    @PostMapping(value = "/import/{topicId:.+}/parts-to-topic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @DefaultMessage("Import parts for topic successful.")
+    @SneakyThrows
+    @Operation(
+            summary = "Import all parts for topic from excel file.",
+            description = "Import all parts for topic from excel file."
+    )
+    public ExcelPartIdsResponse importPartsForTopicFromExcel(
+            @PathVariable("topicId") UUID topicId,
+            @RequestPart("file") MultipartFile file
+    ){
+
+        return excelService.importAllPartsForTopicFromExcel(topicId, file);
     }
 
 
@@ -72,6 +115,21 @@ public class ExcelFillController {
     ) {
 
         return excelService.importQuestionAllPartsExcel(topicId, file);
+    }
+
+    @PostMapping(value = "/import/{topicId:.+}/all-questions-to-topic-part", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @DefaultMessage("File processed successfully.")
+    @SneakyThrows
+    @Operation(
+            summary = "Import all questions from parts for topic from excel file.",
+            description = "Import all questions from parts for topic from excel file."
+    )
+    public ExcelPartIdsResponse importAllQuestionsFromPartForTopicFromExcel(
+            @PathVariable("topicId") UUID topicId,
+            @RequestPart("file") MultipartFile file
+    ){
+
+        return excelService.importQuestionAtAllPartForTopicFromExcel(topicId, file);
     }
 
     @PostMapping(value = "/import/exam/funny-intern-test", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

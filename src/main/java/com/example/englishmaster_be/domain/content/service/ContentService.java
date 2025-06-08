@@ -13,6 +13,7 @@ import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.shared.helper.FileHelper;
+import com.example.englishmaster_be.shared.util.FileUtil;
 import com.example.englishmaster_be.value.LinkValue;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +31,6 @@ import java.util.UUID;
 public class ContentService implements IContentService {
 
     LinkValue linkValue;
-
-    FileHelper fileUtil;
 
     ContentRepository contentRepository;
 
@@ -106,7 +105,7 @@ public class ContentService implements IContentService {
                 );
 
             content.setContentData(contentRequest.getImage());
-            content.setContentType(fileUtil.mimeTypeFile(contentRequest.getImage()));
+            content.setContentType(FileUtil.mimeTypeFile(contentRequest.getImage()));
         }
 
         if(!content.getQuestions().contains(question))

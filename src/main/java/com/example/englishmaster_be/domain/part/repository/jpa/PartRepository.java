@@ -25,31 +25,6 @@ public interface PartRepository extends JpaRepository<PartEntity, UUID>, JpaSpec
     @Query("SELECT EXISTS(SELECT p FROM PartEntity p WHERE p != :part AND LOWER(p.partName) = LOWER(:partName))")
     boolean isExistedPartNameWithDiff(@Param("part") PartEntity part, @Param("partName") String partName);
 
-    @Query(value = """
-        SELECT EXISTS(
-            SELECT p.id FROM part p
-            WHERE p.part_name = :partName
-            AND p.part_type = :partType
-        )
-    """, nativeQuery = true)
-    boolean isExistedByPartNameAndPartType(
-            @Param("partName") String partName,
-            @Param("partType") String partType
-    );
-
-    @Query(value = """
-        SELECT EXISTS(
-                    SELECT p.id FROM part p 
-                    WHERE p.part_name = :partName 
-                    AND p.part_type = :partType
-                    AND p.id != :partId
-        )
-    """, nativeQuery = true)
-    boolean isExistedByPartNameAndPartTypeAndIdNot(
-            @Param("partName") String partName,
-            @Param("partType") String partType,
-            @Param("partId") UUID partId
-    );
 
     @Query(value = """
         SELECT EXISTS(SELECT p.id FROM part p WHERE p.id = :partId)
@@ -69,24 +44,6 @@ public interface PartRepository extends JpaRepository<PartEntity, UUID>, JpaSpec
 
     @Query("""
         SELECT p FROM PartEntity p
-        INNER JOIN FETCH p.topics t
-        LEFT JOIN FETCH p.questions qp
-        LEFT JOIN FETCH qp.questionGroupChildren qc
-        LEFT JOIN FETCH qc.answers ac
-        WHERE t.topicId = :topicId AND LOWER(p.partName) = LOWER(:partName)
-        AND qp.isQuestionParent = TRUE AND qc.isQuestionParent = FALSE
-    """)
-    List<PartEntity> findPartJoinTopicQuestionAnswerContent(@Param("topicId") UUID topicId, @Param("partName") String partName);
-
-    @Query("""
-        SELECT DISTINCT p FROM PartEntity p
-        INNER JOIN FETCH p.topics t
-        WHERE t.topicId = :topicId
-    """)
-    List<PartEntity> findPartJoinTopic(@Param("topicId") UUID topicId);
-
-    @Query("""
-        SELECT p FROM PartEntity p
         INNER JOIN p.topics t
         WHERE LOWER(p.partName) = LOWER(:partName)
         AND t.topicId = :topicId
@@ -103,4 +60,24 @@ public interface PartRepository extends JpaRepository<PartEntity, UUID>, JpaSpec
         AND qc.isQuestionParent = FALSE
     """)
     Optional<PartEntity> findPartJoinQuestionAnswer(@Param("partId") UUID partId);
+
+    @Query(value = """
+        SELECT part_name FROM part
+        WHERE topic_id = :topicId
+        AND part_name IN :partNames
+    """, nativeQuery = true)
+    List<String> findPartNamesByTopicIdAndIn(@Param("topicId") UUID topicId, @Param("partNames") List<String> partNames);
+
+    @Query(value = """
+        SELECT id FROM part
+        WHERE topic_id = :topicId
+    """, nativeQuery = true)
+    List<UUID> findPartIdsByTopicId(@Param("topicId") UUID topicId);
+
+    @Query(value = """
+        SELECT id FROM part
+        WHERE topic_id = :topicId
+        AND LOWER(part_name) = LOWER(:partName)
+    """, nativeQuery = true)
+    UUID findPartIdByTopicIdAndPartName(@Param("topicId") UUID topicId, @Param("partName") String partName);
 }

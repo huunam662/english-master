@@ -57,6 +57,13 @@ public class PartEntity {
 	@Column(name = "update_at")
 	LocalDateTime updateAt;
 
+    @Column(name = "topic_id", insertable = false, updatable = false)
+    UUID topicId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "topic_id", referencedColumnName = "id")
+    TopicEntity topic;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by", referencedColumnName = "id")
     UserEntity userCreate;

@@ -7,6 +7,7 @@ import com.example.englishmaster_be.domain.pack.model.PackEntity;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
 import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.status.model.StatusEntity;
+import com.example.englishmaster_be.domain.topic_type.model.TopicTypeEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -46,9 +47,6 @@ public class TopicEntity {
     @Column(name = "topic_description")
     String topicDescription;
 
-    @Column(name = "topic_type")
-    String topicType;
-
     @Column(name = "work_time")
     LocalTime workTime;
 
@@ -83,6 +81,9 @@ public class TopicEntity {
     @Column(name = "pack_id", insertable = false, updatable = false)
     UUID packId;
 
+    @Column(name = "topic_type_id", insertable = false, updatable = false)
+    UUID topicTypeId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by", referencedColumnName = "id")
     UserEntity userCreate;
@@ -99,6 +100,10 @@ public class TopicEntity {
     @JoinColumn(name = "status_id", referencedColumnName = "id")
     StatusEntity status;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "topic_type_id", referencedColumnName = "id")
+    TopicTypeEntity topicType;
+
     @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY)
     Set<ContentEntity> contents;
 
@@ -108,19 +113,16 @@ public class TopicEntity {
     @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     Set<MockTestEntity> mockTests;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY)
+    Set<PartEntity> parts;
+
+    @ManyToMany
     @JoinTable(name = "topic_question",
             joinColumns = @JoinColumn(name = "topic_id"),
             inverseJoinColumns = @JoinColumn(name = "question_id")
     )
     Set<QuestionEntity> questions;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JoinTable(name = "topic_part",
-            joinColumns = @JoinColumn(name = "topic_id"),
-            inverseJoinColumns = @JoinColumn(name = "part_id")
-    )
-    Set<PartEntity> parts;
 
     @PrePersist
     void onCreate() {

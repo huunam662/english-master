@@ -46,6 +46,7 @@ public enum Error {
     BAD_REQUEST("Bad request.", HttpStatus.BAD_REQUEST),
     SERVER_ERROR("Server error.", HttpStatus.INTERNAL_SERVER_ERROR),
     BAD_CREDENTIALS("Wrong username or password.", HttpStatus.UNAUTHORIZED),
+    METHOD_NOT_ALLOWED("Not allowed.", HttpStatus.METHOD_NOT_ALLOWED),
     CONFLICT("Conflict system resource.", HttpStatus.CONFLICT);
 
     String message;

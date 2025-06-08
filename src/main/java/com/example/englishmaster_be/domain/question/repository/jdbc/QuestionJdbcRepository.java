@@ -80,7 +80,7 @@ public class QuestionJdbcRepository {
                     ps.setString(12, question.getQuestionType().name());
                     ps.setBoolean(13, question.getIsQuestionParent());
                     ps.setObject(14, question.getQuestionGroupParent() != null ? question.getQuestionGroupParent().getQuestionId() : null);
-                    ps.setObject(15, question.getPart().getPartId());
+                    ps.setObject(15, question.getPart() != null ? question.getPart().getPartId() : question.getPartId());
                 }
 
                 @Override

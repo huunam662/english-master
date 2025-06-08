@@ -35,8 +35,8 @@ public class PartJdbcRepository {
         String sql = """
                     INSERT INTO part(
                         id, part_name, part_type, part_description,
-                        create_at, update_at, create_by, update_by
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                        create_at, update_at, create_by, update_by, topic_id
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
         int partsSize = parts.size();
@@ -64,6 +64,7 @@ public class PartJdbcRepository {
                     ps.setTimestamp(6, Timestamp.valueOf(LocalDateTime.now()));
                     ps.setObject(7, part.getUserCreate().getUserId());
                     ps.setObject(8, part.getUserCreate().getUserId());
+                    ps.setObject(9, part.getTopic() != null ? part.getTopic().getTopicId() : part.getTopicId());
                 }
 
                 @Override
@@ -74,63 +75,6 @@ public class PartJdbcRepository {
 
             startIndex = endIndex;
         }
-
-        batchInsertPartTopic(parts);
-    }
-
-    @Transactional
-    public void batchInsertPartTopic(List<PartEntity> parts){
-
-        if(parts == null || parts.isEmpty()) return;
-
-        String sql = """
-                    INSERT INTO topic_part(
-                        part_id, topic_id
-                    ) VALUES(?, ?)
-                """;
-
-        List<Map.Entry<UUID, UUID>> partsTopics = parts.stream()
-                .map(
-                        part -> {
-                            UUID partId = part.getPartId();
-                            UUID topicId = part.getTopics().iterator().next().getTopicId();
-
-                            return Map.entry(partId, topicId);
-                        }
-                ).toList();
-
-        int partsTopicsSize = partsTopics.size();
-        int batchSize = appValue.getBatchSize();
-        int startIndex = 0;
-
-        while(startIndex < partsTopicsSize){
-
-            int endIndex = startIndex + batchSize;
-
-            if(endIndex > partsTopicsSize)
-                endIndex = partsTopicsSize;
-
-            List<Map.Entry<UUID, UUID>> partsTopicsSub = partsTopics.subList(startIndex, endIndex);
-
-            jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
-                @Override
-                public void setValues(PreparedStatement ps, int i) throws SQLException {
-                    Map.Entry<UUID, UUID> partTopicKey = partsTopicsSub.get(i);
-                    ps.setObject(1, partTopicKey.getKey());
-                    ps.setObject(2, partTopicKey.getValue());
-                }
-
-                @Override
-                public int getBatchSize() {
-                    return partsTopicsSub.size();
-                }
-            });
-
-            startIndex = endIndex;
-        }
-
-
-
     }
 
 }

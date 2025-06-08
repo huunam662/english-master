@@ -4,6 +4,7 @@ import com.example.englishmaster_be.common.constant.sort.TopicSortBy;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicFilterRequest;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.pack.model.PackEntity;
+import com.example.englishmaster_be.domain.topic_type.model.TopicTypeEntity;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -35,6 +36,31 @@ public class TopicSpecification {
                 Join<TopicEntity, PackEntity> joinPack = root.join("pack", joinType);
                 if(packExamId != null)
                     return cb.equal(joinPack.get("packId"), packExamId);
+            }
+
+            return cb.conjunction();
+        };
+    }
+
+    public static Specification<TopicEntity> innerJoinTopicType(UUID topicTypeId){
+
+        return (root, query, cb) -> {
+
+            query.distinct(true);
+
+            JoinType joinType = JoinType.INNER;
+
+            if(query.getResultType() != Long.class) {
+                root.fetch("topicType", joinType);
+                if(topicTypeId != null) {
+                    Join<TopicEntity, TopicTypeEntity> joinPack = root.join("topicType", joinType);
+                    return cb.equal(joinPack.get("topicTypeId"), topicTypeId);
+                }
+            }
+            else{
+                Join<TopicEntity, PackEntity> joinPack = root.join("topicType", joinType);
+                if(topicTypeId != null)
+                    return cb.equal(joinPack.get("topicTypeId"), topicTypeId);
             }
 
             return cb.conjunction();

@@ -27,11 +27,13 @@ public class TopicJdbcRepository {
         String sql = """
                     INSERT INTO topics(
                         id, topic_name, topic_description, create_at, update_at, enable,
-                        create_by, update_by, topic_image, work_time, number_question, pack_id
+                        create_by, update_by, topic_image, work_time, number_question,
+                        pack_id, topic_type_id
                     )
                     VALUES(
                         :id, :topicName, :topicDescription, now(), now(), :enable,
-                        :createBy, :updateBy, :topicImage, :workTime, :numberQuestion, :packId
+                        :createBy, :updateBy, :topicImage, :workTime, :numberQuestion,
+                        :packId, :topicTypeId
                     )
                     """;
 
@@ -45,7 +47,8 @@ public class TopicJdbcRepository {
                 .addValue("topicImage", topic.getTopicImage())
                 .addValue("workTime", Time.valueOf(topic.getWorkTime()))
                 .addValue("numberQuestion", topic.getNumberQuestion())
-                .addValue("packId", topic.getPack() != null ? topic.getPack().getPackId() : topic.getPackId());
+                .addValue("packId", topic.getPack() != null ? topic.getPack().getPackId() : topic.getPackId())
+                .addValue("topicTypeId", topic.getTopicType() != null ? topic.getTopicType().getTopicTypeId() : topic.getTopicTypeId());
 
         namedParameterJdbcTemplate.update(sql, params);
     }

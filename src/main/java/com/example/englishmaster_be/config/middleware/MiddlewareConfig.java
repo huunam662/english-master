@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.config.middleware.filter;
+package com.example.englishmaster_be.config.middleware;
 
 import com.example.englishmaster_be.advice.exception.handler.GlobalExceptionHandler;
 import com.example.englishmaster_be.common.constant.error.Error;
@@ -25,7 +25,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-public class MiddlewareFilterConfig extends OncePerRequestFilter {
+public class MiddlewareConfig extends OncePerRequestFilter {
 
     JwtService jwtUtil;
 

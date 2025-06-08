@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.config.app.error;
 
 import com.example.englishmaster_be.advice.exception.handler.GlobalExceptionHandler;
+import com.example.englishmaster_be.common.constant.error.Error;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -13,15 +14,19 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Slf4j(topic = "APP-ERROR-CONTROLLER")
 @Controller
-@RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AppErrorController implements ErrorController {
 
-    GlobalExceptionHandler globalExceptionHandler;
-
-    @GetMapping("/error")
+    @GetMapping("${server.error.path:${error.path:/error}}")
     public ModelAndView handleError(Exception ex) {
 
-        return globalExceptionHandler.noResourceFoundHandler(ex);
+        Error error = Error.RESOURCE_NOT_FOUND;
+
+        log.error("{} -> code {}", ex.getMessage(), error.getStatusCode().value());
+
+        ModelAndView mav = new ModelAndView("404/endpoint.404");
+
+        mav.setStatus(error.getStatusCode());
+
+        return mav;
     }
 }

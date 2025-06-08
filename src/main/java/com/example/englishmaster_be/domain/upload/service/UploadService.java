@@ -6,6 +6,7 @@ import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
+import com.example.englishmaster_be.shared.util.FileUtil;
 import com.example.englishmaster_be.value.UploadValue;
 import com.example.englishmaster_be.domain.content.model.ContentEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;

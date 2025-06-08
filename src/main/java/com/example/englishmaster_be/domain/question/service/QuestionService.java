@@ -32,6 +32,7 @@ import com.example.englishmaster_be.domain.part.repository.jpa.PartRepository;
 import com.example.englishmaster_be.shared.batch.JpaBatchProcessor;
 import com.example.englishmaster_be.shared.helper.FileHelper;
 import com.example.englishmaster_be.domain.question.util.QuestionUtil;
+import com.example.englishmaster_be.shared.util.FileUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -138,7 +139,7 @@ public class QuestionService implements IQuestionService {
             addContentToQuestion(
                     createdQuestion,
                     questionRequest.getContentImage(),
-                    fileUtil.mimeTypeFile(questionRequest.getContentImage()),
+                    FileUtil.mimeTypeFile(questionRequest.getContentImage()),
                     currentUser
             );
         }
@@ -147,7 +148,7 @@ public class QuestionService implements IQuestionService {
             addContentToQuestion(
                     createdQuestion,
                     questionRequest.getContentAudio(),
-                    fileUtil.mimeTypeFile(questionRequest.getContentAudio()),
+                    FileUtil.mimeTypeFile(questionRequest.getContentAudio()),
                     currentUser
             );
         }
@@ -207,7 +208,7 @@ public class QuestionService implements IQuestionService {
             addContentToQuestion(
                     question,
                     request.getContentImage(),
-                    fileUtil.mimeTypeFile(request.getContentImage()),
+                    FileUtil.mimeTypeFile(request.getContentImage()),
                     user
             );
         }
@@ -217,7 +218,7 @@ public class QuestionService implements IQuestionService {
             addContentToQuestion(
                     question,
                     request.getContentAudio(),
-                    fileUtil.mimeTypeFile(request.getContentAudio()),
+                    FileUtil.mimeTypeFile(request.getContentAudio()),
                     user
             );
         }
