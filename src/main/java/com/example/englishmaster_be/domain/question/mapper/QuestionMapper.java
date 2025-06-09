@@ -94,7 +94,25 @@ public interface QuestionMapper {
         return topic.getParts().stream()
                 .sorted(Comparator.comparing(PartEntity::getPartName))
                 .map(
-                        part -> toQuestionPartResponse(part.getQuestions(), topic, part)
+                        part -> {
+
+                            if(topic.getTopicType().getTopicTypeName().equalsIgnoreCase("speaking")){
+                                part.setQuestions(
+                                        part.getQuestions().stream()
+                                        .peek(
+                                                questionParent -> questionParent.setQuestionGroupChildren(
+                                                        questionParent.getQuestionGroupChildren().stream()
+                                                        .sorted(Comparator.comparing(QuestionEntity::getQuestionScore))
+                                                        .collect(Collectors.toCollection(LinkedHashSet::new))
+                                                )
+                                        )
+                                        .sorted(Comparator.comparing(QuestionEntity::getQuestionScore))
+                                        .collect(Collectors.toCollection(LinkedHashSet::new))
+                                );
+                            }
+
+                            return toQuestionPartResponse(part.getQuestions(), topic, part);
+                        }
                 ).collect(Collectors.toList());
     }
 

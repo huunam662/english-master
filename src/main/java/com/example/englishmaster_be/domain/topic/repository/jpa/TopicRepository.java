@@ -27,7 +27,12 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, JpaSp
     @Query("SELECT t FROM TopicEntity t WHERE FUNCTION('DATE', t.startTime) = FUNCTION('DATE', :startTime)")
     List<TopicEntity> findByStartTime(@Param("startTime") LocalDateTime startTime);
 
-    Optional<TopicEntity> findByTopicId(UUID topicId);
+    @Query("""
+        SELECT t FROM TopicEntity t
+        INNER JOIN FETCH t.topicType
+        WHERE t.topicId = :topicId
+    """)
+    Optional<TopicEntity> findByTopicId(@Param("topicId") UUID topicId);
 
     @Query("SELECT t.topicImage FROM TopicEntity t order by t.topicId")
     List<String> findAllTopicImages();

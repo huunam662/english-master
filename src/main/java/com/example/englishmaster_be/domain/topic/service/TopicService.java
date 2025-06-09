@@ -74,8 +74,6 @@ public class TopicService implements ITopicService {
 
     AnswerRepository answerRepository;
 
-    IQuestionService questionService;
-
     IUserService userService;
 
     IPackService packService;
@@ -83,10 +81,6 @@ public class TopicService implements ITopicService {
     IPartService partService;
 
     IUploadService uploadService;
-
-    IExcelFillService excelService;
-
-    IAnswerService answerService;
 
     ITopicService topicService;
 
@@ -250,11 +244,38 @@ public class TopicService implements ITopicService {
 
         PartEntity part = partService.getPartToId(partId);
 
-        List<QuestionEntity> listQuestion = questionRepository.findByTopicsAndPart(topic, part);
+        List<QuestionEntity> listQuestionParent = questionRepository.findByTopicsAndPart(topic.getTopicId(), part.getPartId());
 
-        Collections.shuffle(listQuestion);
+        List<UUID> parentIds = listQuestionParent.stream().map(QuestionEntity::getQuestionId).toList();
 
-        return listQuestion;
+        List<QuestionEntity> questionChilds = questionRepository.findAllQuestionChildOfParentIn(parentIds);
+
+        List<UUID> childIds = questionChilds.stream().map(QuestionEntity::getQuestionId).toList();
+
+        List<AnswerEntity> answersChild = answerRepository.findAnswersInQuestionIds(childIds);
+
+        Map<UUID, List<QuestionEntity>> questionParentChildGroup = questionChilds.stream().collect(
+                Collectors.groupingBy(QuestionEntity::getQuestionGroupId)
+        );
+
+        Map<UUID, List<AnswerEntity>> answerParentChildGroup = answersChild.stream().collect(
+                Collectors.groupingBy(AnswerEntity::getQuestionChildId)
+        );
+
+        for(QuestionEntity questionParent : listQuestionParent){
+            if(questionParent == null) continue;
+            List<QuestionEntity> questionChildsList = questionParentChildGroup.getOrDefault(questionParent.getQuestionId(), Collections.emptyList());
+            for(QuestionEntity questionChild : questionChildsList){
+                if(questionChild == null) continue;
+                List<AnswerEntity> answersList = answerParentChildGroup.getOrDefault(questionChild.getQuestionId(), Collections.emptyList());
+                questionChild.setAnswers(new HashSet<>(answersList));
+            }
+            questionParent.setQuestionGroupChildren(new HashSet<>(questionChildsList));
+        }
+
+        Collections.shuffle(listQuestionParent);
+
+        return listQuestionParent;
     }
 
 
@@ -290,26 +311,6 @@ public class TopicService implements ITopicService {
         }
 
         throw new ErrorHolder(Error.BAD_REQUEST, "Delete Part to Topic fail: Topic don't have Part");
-    }
-
-    @Override
-    public boolean existQuestionInTopic(TopicEntity topic, QuestionEntity question) {
-        for (QuestionEntity questionItem : topic.getQuestions()) {
-            if (questionItem.equals(question)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean existPartInTopic(TopicEntity topic, PartEntity part) {
-        for (PartEntity partItem : topic.getParts()) {
-            if (partItem.equals(part)) {
-                return false;
-            }
-        }
-        return true;
     }
 
     @Transactional
@@ -372,325 +373,18 @@ public class TopicService implements ITopicService {
 
         TopicEntity topic = getTopicById(topicId);
 
-        List<AnswerEntity> answersQuestionChild = answerRepository.findAnswersJoinQuestionPartTopic(topicId, partName);
-
-        TopicUtil.fillAnswerToTopic(topic, answersQuestionChild);
+        if (topic.getTopicType().getTopicTypeName().equalsIgnoreCase("speaking")){
+            List<QuestionEntity> questionChilds = questionRepository.findAllQuestionChildOfTopicAndPart(topicId, partName);
+            TopicUtil.fillQuestionToTopic(topic, questionChilds);
+        }
+        else{
+            List<AnswerEntity> answersQuestionChild = answerRepository.findAnswersJoinQuestionPartTopic(topicId, partName);
+            TopicUtil.fillAnswerToTopic(topic, answersQuestionChild);
+        }
 
         return QuestionMapper.INSTANCE.toQuestionPartResponseList(topic);
     }
 
-    @Transactional
-    @Override
-    public void deleteQuestionToTopic(UUID topicId, UUID questionId) {
-
-        QuestionEntity question = questionService.getQuestionById(questionId);
-
-        TopicEntity topic = getTopicById(topicId);
-
-        UserEntity user = userService.currentUser();
-
-        if(!existQuestionInTopic(topic, question))
-            throw new ErrorHolder(Error.BAD_REQUEST, "Question don't have in Topic");
-
-        topic.setUserUpdate(user);
-
-        topic.setUpdateAt(LocalDateTime.now());
-
-        topic.getQuestions().remove(question);
-
-        topicRepository.save(topic);
-
-    }
-
-    @Transactional
-    protected QuestionEntity saveQuestionFromExcelTemplate(ExcelQuestionResponse questionByExcelFileResponse, UserEntity user) {
-
-        PartEntity part = partService.getPartToId(questionByExcelFileResponse.getPartId());
-
-        QuestionEntity question = QuestionEntity.builder()
-                .userCreate(user)
-                .userUpdate(user)
-                .part(part)
-                .build();
-
-        QuestionMapper.INSTANCE.flowToQuestionEntity(questionByExcelFileResponse, question);
-
-        return questionRepository.save(question);
-    }
-
-    protected void processAnswers(List<AnswerBasicRequest> answerBasicRequestList, QuestionEntity question, UserEntity user) {
-
-        if(answerBasicRequestList == null || answerBasicRequestList.isEmpty()) return;
-
-        if (question.getAnswers() == null)
-            question.setAnswers(new HashSet<>());
-
-        answerBasicRequestList.forEach(answerBasicRequest -> {
-
-            AnswerEntity answer = AnswerEntity.builder()
-                    .question(question)
-                    .userCreate(user)
-                    .userUpdate(user)
-                    .build();
-
-            AnswerMapper.INSTANCE.flowToAnswerEntity(answerBasicRequest, answer);
-
-            answer = answerRepository.save(answer);
-
-            question.getAnswers().add(answer);
-        });
-
-    }
-
-
-    @Transactional
-    protected void processQuestions(ExcelQuestionListResponse listQuestionByExcelFileResponse, UUID topicId, UserEntity user) {
-
-        for (ExcelQuestionResponse questionByExcelFileResponse : listQuestionByExcelFileResponse.getQuestions()) {
-
-            // Tạo câu hỏi và lưu nó trước khi xử lý câu trả lời
-
-            QuestionEntity question = saveQuestionFromExcelTemplate(questionByExcelFileResponse, user);
-
-            // Xử lý câu trả lời
-            processAnswers(AnswerMapper.INSTANCE.toAnswerRequestList(questionByExcelFileResponse.getAnswers()), question, user);
-
-            // Tương tự cho questionChild
-            if (questionByExcelFileResponse.getQuestionsChildren() != null && !questionByExcelFileResponse.getQuestionsChildren().isEmpty()) {
-                for (ExcelQuestionResponse createQuestionChildDTO : questionByExcelFileResponse.getQuestionsChildren()) {
-
-                    QuestionEntity questionChild = saveQuestionFromExcelTemplate(createQuestionChildDTO, user);
-
-                    questionChild.setQuestionGroupParent(question);
-
-                    questionChild = questionRepository.save(questionChild); // Lưu câu hỏi con trước
-
-                    processAnswers(AnswerMapper.INSTANCE.toAnswerRequestList(createQuestionChildDTO.getAnswers()), questionChild, user);
-                }
-            }
-
-            // Lưu câu hỏi đã cập nhật với ContentEntity
-            questionRepository.save(question);
-
-            // Xử lý TopicEntity
-            TopicEntity topic = getTopicById(topicId);
-
-            PartEntity part = question.getPart();
-
-            if (!existPartInTopic(topic, part)){
-                topic.setUserUpdate(user);
-                topic.setUpdateAt(LocalDateTime.now());
-                topic.getQuestions().add(question);
-                topicRepository.save(topic);
-            }
-        }
-    }
-
-    @Transactional
-    @Override
-    public void addListQuestionToTopic(UUID topicId, TopicQuestionListRequest listQuestionRequest) {
-
-        UserEntity user = userService.currentUser();
-
-        for (QuestionRequest questionRequest : listQuestionRequest.getListQuestion()) {
-
-            PartEntity part = partService.getPartToId(questionRequest.getPartId());
-
-            QuestionEntity question = QuestionEntity.builder()
-                    .userCreate(user)
-                    .userUpdate(user)
-                    .part(part)
-                    .build();
-
-            QuestionMapper.INSTANCE.flowToQuestionEntity(questionRequest, question);
-
-            question = questionRepository.save(question);
-
-            if (questionRequest.getListAnswer() != null && !questionRequest.getListAnswer().isEmpty()) {
-                for (AnswerBasicRequest answerBasicRequest : questionRequest.getListAnswer()) {
-
-                    AnswerEntity answer = AnswerEntity.builder()
-                            .question(question)
-                            .userCreate(user)
-                            .userUpdate(user)
-                            .build();
-
-                    AnswerMapper.INSTANCE.flowToAnswerEntity(answerBasicRequest, answer);
-
-                    answerRepository.save(answer);
-                }
-            }
-
-            if (questionRequest.getListQuestionChild() != null && !questionRequest.getListQuestionChild().isEmpty()) {
-                for (QuestionRequest questionRequestItem : questionRequest.getListQuestionChild()) {
-
-                    QuestionEntity questionChild = QuestionEntity.builder()
-                            .questionGroupParent(question)
-                            .part(part)
-                            .userCreate(user)
-                            .userUpdate(user)
-                            .build();
-
-                    QuestionMapper.INSTANCE.flowToQuestionEntity(questionRequestItem, questionChild);
-
-                    questionChild = questionRepository.save(questionChild);
-
-
-                    if (questionChild.getAnswers() == null)
-                        questionChild.setAnswers(new HashSet<>());
-
-                    for (AnswerBasicRequest answerBasicRequest : questionRequestItem.getListAnswer()) {
-
-                        AnswerEntity answer = AnswerEntity.builder()
-                                .question(questionChild)
-                                .userCreate(user)
-                                .userUpdate(user)
-                                .build();
-
-                        answer.setQuestion(questionChild);
-                        answer.setUserUpdate(user);
-                        answer.setUserCreate(user);
-
-                        AnswerMapper.INSTANCE.flowToAnswerEntity(answerBasicRequest, answer);
-
-                        answer = answerRepository.save(answer);
-
-                        questionChild.getAnswers().add(answer);
-                    }
-
-                    questionRepository.save(questionChild);
-                }
-
-            }
-
-            questionRepository.save(question);
-
-            TopicEntity topic = getTopicById(topicId);
-
-            if (!existPartInTopic(topic, part)) {
-                topic.setUserUpdate(user);
-                topic.setUpdateAt(LocalDateTime.now());
-                topic.getQuestions().add(question);
-                topicRepository.save(topic);
-            }
-        }
-    }
-
-
-    @Transactional
-    @Override
-    public QuestionResponse addQuestionToTopic(UUID topicId, QuestionRequest questionRequest) {
-
-        UserEntity user = userService.currentUser();
-
-        PartEntity part = partService.getPartToId(questionRequest.getPartId());
-
-        Boolean isAdmin = user.getRole().getRoleName().equals(Role.ADMIN);
-
-        QuestionEntity question = QuestionEntity.builder()
-                .questionContent(questionRequest.getQuestionContent())
-                .questionScore(questionRequest.getQuestionScore())
-                .userCreate(user)
-                .userUpdate(user)
-                .part(part)
-                .build();
-
-        question = questionRepository.saveAndFlush(question);
-
-        if (question.getAnswers() == null)
-            question.setAnswers(new HashSet<>());
-
-        if (questionRequest.getListAnswer() != null && !questionRequest.getListAnswer().isEmpty()) {
-            for (AnswerBasicRequest answerBasicRequest : questionRequest.getListAnswer()) {
-
-                AnswerEntity answer = AnswerEntity.builder()
-                        .question(question)
-                        .userCreate(user)
-                        .userUpdate(user)
-                        .build();
-
-                AnswerMapper.INSTANCE.flowToAnswerEntity(answerBasicRequest, answer);
-
-                answerRepository.save(answer);
-
-                question.getAnswers().add(answer);
-            }
-        }
-
-        if (questionRequest.getListQuestionChild() != null && !questionRequest.getListQuestionChild().isEmpty()) {
-            for (QuestionRequest questionRequestItem : questionRequest.getListQuestionChild()) {
-
-                QuestionEntity questionChild = QuestionEntity.builder()
-                        .questionGroupParent(question)
-                        .part(question.getPart())
-                        .userCreate(user)
-                        .userUpdate(user)
-                        .build();
-
-                QuestionMapper.INSTANCE.flowToQuestionEntity(questionRequestItem, questionChild);
-
-                questionChild = questionRepository.save(questionChild);
-
-                if (questionChild.getAnswers() == null)
-                    questionChild.setAnswers(new HashSet<>());
-
-                for (AnswerBasicRequest answerBasicRequest : questionRequestItem.getListAnswer()) {
-
-                    AnswerEntity answer = AnswerEntity.builder()
-                            .question(questionChild)
-                            .userCreate(user)
-                            .userUpdate(user)
-                            .build();
-
-                    AnswerMapper.INSTANCE.flowToAnswerEntity(answerBasicRequest, answer);
-
-                    answer = answerRepository.save(answer);
-
-                    questionChild.getAnswers().add(answer);
-                }
-
-                questionRepository.save(questionChild);
-            }
-
-        }
-
-        question = questionRepository.saveAndFlush(question);
-
-        TopicEntity topic = getTopicById(topicId);
-
-        if (existPartInTopic(topic, part)){
-            return QuestionMapper.INSTANCE.toQuestionResponse(question);
-        }
-        else {
-            topic.setUserUpdate(user);
-            topic.setUpdateAt(LocalDateTime.now());
-            topic.getQuestions().add(question);
-            topicRepository.save(topic);
-
-            QuestionEntity question1 = questionService.getQuestionById(question.getQuestionId());
-            QuestionResponse questionResponse = QuestionMapper.INSTANCE.toQuestionResponse(question1, part);
-
-            if (questionService.checkQuestionGroup(question1.getQuestionId())) {
-                List<QuestionEntity> questionGroupList = questionService.listQuestionGroup(question1);
-                List<QuestionChildResponse> questionGroupResponseList = new ArrayList<>();
-
-                for (QuestionEntity questionGroup : questionGroupList) {
-
-                    AnswerEntity answerCorrect = answerService.correctAnswer(questionGroup);
-                    QuestionChildResponse questionGroupResponse = QuestionMapper.INSTANCE.toQuestionChildResponse(questionGroup);
-                    questionGroupResponse.setAnswerCorrectId(answerCorrect.getAnswerId());
-                    questionGroupResponseList.add(questionGroupResponse);
-                }
-
-                questionResponse.setQuestionsChildren(questionGroupResponseList);
-            } else {
-                AnswerEntity answerCorrect = answerService.correctAnswer(question1);
-                questionResponse.setAnswerCorrectId(answerCorrect.getAnswerId());
-            }
-
-            return questionResponse;
-        }
-    }
 
     @Override
     public FilterResponse<?> filterTopics(TopicFilterRequest filterRequest) {

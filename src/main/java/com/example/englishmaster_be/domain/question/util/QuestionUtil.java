@@ -18,6 +18,7 @@ import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class QuestionUtil {
 
@@ -25,7 +26,8 @@ public class QuestionUtil {
 
         if(questionEntityList == null) return null;
 
-        questionEntityList = shuffleQuestionsAndAnswers(questionEntityList, partEntity);
+        if(!partEntity.getTopic().getTopicType().getTopicTypeName().equalsIgnoreCase("speaking"))
+            questionEntityList = shuffleQuestionsAndAnswers(questionEntityList, partEntity);
 
         return questionEntityList.stream().map(
                 questionEntity -> {
@@ -84,11 +86,14 @@ public class QuestionUtil {
                 questionsList4Shuffle.forEach(
                         questionGroupChildEntity -> {
 
-                            if (!questionGroupChildEntity.getIsQuestionParent() && questionGroupChildEntity.getQuestionGroupChildren() != null)
-                                questionGroupChildEntity.setQuestionGroupChildren(null);
-
-                            if(!notShuffleAnswer && !questionGroupChildEntity.getIsQuestionParent()){
-
+                            if(notShuffleAnswer){
+                                questionGroupChildEntity.setAnswers(
+                                        questionGroupChildEntity.getAnswers().stream().sorted(
+                                                Comparator.comparing(AnswerEntity::getAnswerContent)
+                                        ).collect(Collectors.toCollection(LinkedHashSet::new))
+                                );
+                            }
+                            else{
                                 if(questionGroupChildEntity.getAnswers() != null){
 
                                     List<AnswerEntity> answersList4Shuffle = new ArrayList<>(questionGroupChildEntity.getAnswers());

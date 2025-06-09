@@ -26,7 +26,11 @@ public interface OtpRepository extends JpaRepository<OtpEntity, UUID> {
     """, nativeQuery = true)
     void deleteByEmail(@Param("email") String email);
 
-    Optional<OtpEntity> findByOtp(String otp);
+    @Query("""
+        SELECT o FROM OtpEntity o
+        WHERE o.otp = :otp
+    """)
+    Optional<OtpEntity> findByOtp(@Param("otp") String otp);
 
     Optional<OtpEntity> findByEmailAndOtp(String email, String otp);
 

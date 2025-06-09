@@ -10,10 +10,9 @@ import java.util.Arrays;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum ImportExcelType {
 
-    TOEIC("TOEIC"),
-    IELTs("IELTs"),
-    TOEFT("TOEFT"),
-    FUNNY_TEST("Funny-test-intern");
+    LISTENING_READING("Listening & Reading"),
+    SPEAKING("Speaking"),
+    FUNNY_TEST("Funny test intern");
 
     String type;
 
@@ -21,7 +20,7 @@ public enum ImportExcelType {
         this.type = type;
     }
 
-    public static final ImportExcelType DEFAULT = TOEIC;
+    public static final ImportExcelType DEFAULT = LISTENING_READING;
 
     public static ImportExcelType fromType(final String type) {
 

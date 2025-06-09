@@ -135,14 +135,4 @@ public class ExcelFillController {
 
         return excelService.importQuestionAtAllPartForTopicFromExcel(topicId, file, typeImport);
     }
-
-    @PostMapping(value = "/import/exam/funny-intern-test", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @DefaultMessage("File processes successful.")
-    @SneakyThrows
-    public TopicKeyResponse importTopicPartsQuestionsAnswersFunnyTest(
-            @RequestPart("file") MultipartFile file
-    ){
-
-        return excelService.importTopicPartsQuestionsAnswersFunnyTest(file);
-    }
 }

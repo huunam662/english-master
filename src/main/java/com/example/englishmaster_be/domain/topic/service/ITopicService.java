@@ -40,10 +40,6 @@ public interface ITopicService {
 
     void deletePartToTopic(UUID topicId, UUID partId);
 
-    boolean existQuestionInTopic(TopicEntity topic, QuestionEntity question);
-
-    boolean existPartInTopic(TopicEntity topic, PartEntity part);
-
     void deleteTopic(UUID topicId);
 
     void enableTopic(UUID topicId, boolean enable);
@@ -53,12 +49,6 @@ public interface ITopicService {
     List<QuestionPartResponse> getQuestionOfToTopicPart(UUID topicId, UUID partId);
 
     List<String> get5SuggestTopic(String query);
-
-    void deleteQuestionToTopic(UUID topicId, UUID questionId);
-
-    void addListQuestionToTopic(UUID topicId, TopicQuestionListRequest createQuestionDTOList);
-
-    QuestionResponse addQuestionToTopic(UUID topicId, QuestionRequest createQuestionDTO);
 
     List<QuestionPartResponse> getQuestionPartListOfTopic(UUID topicId);
 

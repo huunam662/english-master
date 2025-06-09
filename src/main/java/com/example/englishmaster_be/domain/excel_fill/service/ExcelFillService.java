@@ -208,6 +208,13 @@ public class ExcelFillService implements IExcelFillService {
                     .topicId(topicId)
                     .build();
         }
+        catch (Exception e){
+
+            if(e instanceof ErrorHolder errorHolder)
+                throw errorHolder;
+
+            throw new ErrorHolder(Error.CONFLICT, e.getMessage(), false);
+        }
     }
 
     @Transactional
@@ -476,6 +483,13 @@ public class ExcelFillService implements IExcelFillService {
                     .partIds(partRepository.findPartIdsByTopicId(topicId))
                     .build();
         }
+        catch (Exception e){
+
+            if(e instanceof ErrorHolder errorHolder)
+                throw errorHolder;
+
+            throw new ErrorHolder(Error.CONFLICT, e.getMessage(), false);
+        }
     }
 
     @Transactional
@@ -609,6 +623,13 @@ public class ExcelFillService implements IExcelFillService {
                     .topicId(topicId)
                     .partIds(partRepository.findPartIdsByTopicId(topicId))
                     .build();
+        }
+        catch (Exception e){
+
+            if(e instanceof ErrorHolder errorHolder)
+                throw errorHolder;
+
+            throw new ErrorHolder(Error.CONFLICT, e.getMessage(), false);
         }
     }
 
@@ -792,7 +813,6 @@ public class ExcelFillService implements IExcelFillService {
 
             QuestionEntity questionParent = QuestionEntity.builder()
                     .part(partEntity)
-                    .topics(Set.of(topicEntity))
                     .userCreate(currentUser)
                     .userUpdate(currentUser)
                     .questionScore(excelQuestionContentResponse.getTotalScore())
@@ -896,10 +916,6 @@ public class ExcelFillService implements IExcelFillService {
                     .build();
 
         }
-//        catch (Exception e) {
-//            e.printStackTrace();
-//            throw new CustomException(part == 1 ? ErrorEnum.CAN_NOT_CREATE_PART_1_BY_EXCEL : ErrorEnum.CAN_NOT_CREATE_PART_2_BY_EXCEL);
-//        }
     }
 
     @Transactional
@@ -920,6 +936,13 @@ public class ExcelFillService implements IExcelFillService {
                     .topicId(topicId)
                     .partIds(partRepository.findPartIdsByTopicId(topicId))
                     .build();
+        }
+        catch (Exception e){
+
+            if(e instanceof ErrorHolder errorHolder)
+                throw errorHolder;
+
+            throw new ErrorHolder(Error.CONFLICT, e.getMessage(), false);
         }
     }
 
@@ -1078,7 +1101,6 @@ public class ExcelFillService implements IExcelFillService {
 
             QuestionEntity questionParent = QuestionEntity.builder()
                     .part(partEntity)
-                    .topics(Set.of(topicEntity))
                     .userCreate(currentUser)
                     .userUpdate(currentUser)
                     .questionScore(excelQuestionContentResponse.getTotalScore())
@@ -1244,7 +1266,6 @@ public class ExcelFillService implements IExcelFillService {
 
                 QuestionEntity questionParent = QuestionEntity.builder()
                         .part(partEntity)
-                        .topics(Set.of(topicEntity))
                         .userCreate(currentUser)
                         .userUpdate(currentUser)
                         .questionScore(excelQuestionContentResponse.getTotalScore())
@@ -1384,6 +1405,13 @@ public class ExcelFillService implements IExcelFillService {
                     .topicId(topicId)
                     .partIds(partRepository.findPartIdsByTopicId(topicId))
                     .build();
+        }
+        catch (Exception e){
+
+            if(e instanceof ErrorHolder errorHolder)
+                throw errorHolder;
+
+            throw new ErrorHolder(Error.CONFLICT, e.getMessage(), false);
         }
     }
 
@@ -1570,7 +1598,6 @@ public class ExcelFillService implements IExcelFillService {
 
                 QuestionEntity questionParent = QuestionEntity.builder()
                         .part(partEntity)
-                        .topics(Set.of(topicEntity))
                         .userCreate(currentUser)
                         .userUpdate(currentUser)
                         .questionScore(excelQuestionContentResponse.getTotalScore())
@@ -1748,6 +1775,13 @@ public class ExcelFillService implements IExcelFillService {
         try(Workbook workbook = new XSSFWorkbook(file.getInputStream())){
             fillQuestionForTopicAnyPartFromExcelToDb(topicId, userImport, workbook, part);
         }
+        catch (Exception e){
+
+            if(e instanceof ErrorHolder errorHolder)
+                throw errorHolder;
+
+            throw new ErrorHolder(Error.CONFLICT, e.getMessage(), false);
+        }
 
         return ExcelTopicPartIdsResponse.builder()
                 .topicId(topicId)
@@ -1768,6 +1802,9 @@ public class ExcelFillService implements IExcelFillService {
 
             if(typeImport.equals(ImportExcelType.FUNNY_TEST)){
                 fillTopicPartsQuestionsAnswersFunnyTestToDb(topicId, userImport, workbook, file);
+            }
+            else if(typeImport.equals(ImportExcelType.SPEAKING)){
+                fillSpeakingPartsToDb(topicId, userImport, workbook);
             }
             else{
                 for(int part = 1; part < numberOfSheets; part++)
@@ -1950,6 +1987,131 @@ public class ExcelFillService implements IExcelFillService {
 
             return TopicKeyResponse.builder()
                     .topicId(topicKey.getTopicId())
+                    .build();
+        }
+        catch (Exception e){
+
+            if(e instanceof ErrorHolder errorHolder)
+                throw errorHolder;
+
+            throw new ErrorHolder(Error.CONFLICT, e.getMessage(), false);
+        }
+    }
+
+    @Transactional
+    protected void fillSpeakingPartsToDb(UUID topicId, UserEntity userImport, Workbook workbook){
+
+        List<PartEntity> partsOfTopic = new ArrayList<>();
+        List<QuestionEntity> questionsParentOfPart = new ArrayList<>();
+        List<QuestionEntity> questionsChildOfParent = new ArrayList<>();
+
+        int numberOfSheets = workbook.getNumberOfSheets();
+        int sheetPartStep = 1;
+        while(sheetPartStep < numberOfSheets){
+            Sheet sheet = workbook.getSheetAt(sheetPartStep);
+            int iRowPart = 0;
+            Row rowPart = sheet.getRow(iRowPart);
+            if(rowPart == null) break;
+
+            String partName = ExcelUtil.getStringCellValue(sheet.getRow(0).getCell(0));
+            UUID partId = partRepository.findPartIdByTopicIdAndPartName(topicId, partName);
+            if(partId == null){
+                partId = UUID.randomUUID();
+                partsOfTopic.add(
+                        PartEntity.builder()
+                                .partId(partId)
+                                .partName(ExcelUtil.getStringCellValue(rowPart.getCell(0)))
+                                .partType(ExcelUtil.getStringCellValue(rowPart.getCell(1)))
+                                .userCreate(userImport)
+                                .userUpdate(userImport)
+                                .topicId(topicId)
+                                .build()
+                );
+            }
+
+            int iRowImage = iRowPart + 1;
+            Row rowImage = sheet.getRow(iRowImage);
+            int orderParent = 1;
+            while (rowImage != null){
+
+                int iRowTitle = iRowImage + 1;
+                int iRowDuration = iRowTitle + 1;
+
+                QuestionEntity questionParent = QuestionEntity.builder()
+                        .questionId(UUID.randomUUID())
+                        .questionContent(ExcelUtil.getStringCellValue(sheet.getRow(iRowTitle).getCell(1)))
+                        .durationRecord(
+                                LocalDateTime.parse(
+                                        ExcelUtil.getStringCellValue(sheet.getRow(iRowDuration).getCell(1)),
+                                        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm[:ss]")
+                                ).toLocalTime()
+                        )
+                        .partId(partId)
+                        .contentImage(ExcelUtil.getStringCellValue(rowImage.getCell(1)))
+                        .questionType(QuestionType.Question_Parent)
+                        .isQuestionParent(true)
+                        .questionScore(orderParent)
+                        .userCreate(userImport)
+                        .userUpdate(userImport)
+                        .build();
+                questionsParentOfPart.add(questionParent);
+
+                // bỏ qua header question
+                int nextRow = iRowDuration + 2;
+                Row rowQuestionChild = sheet.getRow(nextRow);
+                int orderChild = 1;
+                while (rowQuestionChild != null){
+
+                    if(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(0)).equalsIgnoreCase("image")){
+                        iRowImage = nextRow;
+                        break;
+                    }
+
+                    questionsChildOfParent.add(
+                            QuestionEntity.builder()
+                                    .questionId(UUID.randomUUID())
+                                    .questionContent(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(1)))
+                                    .partId(partId)
+                                    .questionGroupParent(questionParent)
+                                    .isQuestionParent(false)
+                                    .numberChoice(0)
+                                    .questionType(QuestionType.Question_Child)
+                                    .questionScore(orderChild)
+                                    .userCreate(userImport)
+                                    .userUpdate(userImport)
+                                    .build()
+                    );
+
+                    nextRow++;
+                    orderChild++;
+                    rowQuestionChild = sheet.getRow(nextRow);
+                }
+                rowImage = rowQuestionChild;
+                orderParent++;
+            }
+            sheetPartStep++;
+        }
+
+        partJdbcRepository.batchInsertPart(partsOfTopic);
+        questionJdbcRepository.batchInsertQuestion(questionsParentOfPart);
+        questionJdbcRepository.batchInsertQuestion(questionsChildOfParent);
+    }
+
+    @Transactional
+    @Override
+    @SneakyThrows
+    public ExcelTopicPartIdsResponse importSpeakingAllPartsForTopicFromExcel(UUID topicId, MultipartFile file) {
+
+        Assert.notNull(topicId, "Topic id is required.");
+
+        UserEntity userImport = userService.currentUser();
+
+        try(Workbook workbook = new XSSFWorkbook(file.getInputStream())){
+            fillSpeakingPartsToDb(topicId, userImport, workbook);
+
+            return ExcelTopicPartIdsResponse.builder()
+                    .topicId(topicId)
+                    .partIds(partRepository.findPartIdsByTopicId(topicId))
                     .build();
         }
         catch (Exception e){

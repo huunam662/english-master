@@ -107,13 +107,6 @@ public class TopicEntity {
     @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY)
     Set<PartEntity> parts;
 
-    @ManyToMany
-    @JoinTable(name = "topic_question",
-            joinColumns = @JoinColumn(name = "topic_id"),
-            inverseJoinColumns = @JoinColumn(name = "question_id")
-    )
-    Set<QuestionEntity> questions;
-
 
     @PrePersist
     void onCreate() {

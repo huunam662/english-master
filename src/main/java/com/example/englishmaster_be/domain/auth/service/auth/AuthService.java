@@ -152,6 +152,9 @@ public class AuthService implements IAuthService {
 
         OtpEntity otpEntity = otpService.getByOtp(otp);
 
+        if(!otpEntity.getStatus().equals(OtpStatus.UN_VERIFIED))
+            throw new ErrorHolder(Error.BAD_REQUEST, "OTP is used.");
+
         if (otpService.isExpiredOtp(otpEntity))
             throw new ErrorHolder(Error.BAD_REQUEST, "OTP is expired.");
 

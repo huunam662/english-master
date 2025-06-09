@@ -56,14 +56,6 @@ public class QuestionService implements IQuestionService {
 
 
     @Override
-    public int countQuestionToQuestionGroup(QuestionEntity question) {
-
-        if (question == null) return 0;
-
-        return listQuestionGroup(question).size();
-    }
-
-    @Override
     public boolean checkQuestionGroup(UUID questionId) {
 
         QuestionEntity question = getQuestionById(questionId);
