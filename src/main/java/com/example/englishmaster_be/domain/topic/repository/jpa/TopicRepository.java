@@ -1,6 +1,5 @@
 package com.example.englishmaster_be.domain.topic.repository.jpa;
 
-import com.example.englishmaster_be.domain.topic.dto.projection.INumberAndScoreQuestionTopic;
 import com.example.englishmaster_be.domain.topic.dto.projection.ITopicKeyProjection;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.pack.model.PackEntity;
@@ -32,15 +31,6 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, JpaSp
 
     @Query("SELECT t.topicImage FROM TopicEntity t order by t.topicId")
     List<String> findAllTopicImages();
-
-    @Query(value = """
-        SELECT COUNT(qc.id) as numberQuestions, COALESCE(SUM(qc.question_score), 0) as scoreQuestions
-        FROM topics t
-                 LEFT JOIN part p ON t.id = p.topic_id
-                 LEFT JOIN question qc ON p.id = qc.part_id
-        WHERE qc.question_group != NULL AND t.id = :topicId
-    """, nativeQuery = true)
-    INumberAndScoreQuestionTopic findNumberAndScoreQuestions(@Param("topicId") UUID topicId);
 
     @Query("""
         SELECT DISTINCT t.topicId as topicId, t.packId as packId

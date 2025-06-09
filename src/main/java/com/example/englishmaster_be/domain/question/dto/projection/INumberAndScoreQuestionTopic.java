@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.topic.dto.projection;
+package com.example.englishmaster_be.domain.question.dto.projection;
 
 public interface INumberAndScoreQuestionTopic {
 

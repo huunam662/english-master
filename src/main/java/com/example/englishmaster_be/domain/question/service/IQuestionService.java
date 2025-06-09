@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.question.service;
 
+import com.example.englishmaster_be.domain.question.dto.projection.INumberAndScoreQuestionTopic;
 import com.example.englishmaster_be.domain.question.dto.request.*;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
@@ -28,4 +29,6 @@ public interface IQuestionService {
     void editListQuestionsParentOfPart(PartEntity part, List<EditQuestionParentRequest> questionParentsRequest);
 
     void deleteAllQuestions(List<UUID> questionIds);
+
+    INumberAndScoreQuestionTopic getNumberAndScoreQuestionTopic(UUID topicId);
 }

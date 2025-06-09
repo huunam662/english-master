@@ -1,26 +1,21 @@
 package com.example.englishmaster_be.domain.mock_test.service;
 
 import com.example.englishmaster_be.domain.answer.repository.jpa.AnswerRepository;
-import com.example.englishmaster_be.domain.mock_test.model.QMockTestEntity;
 import com.example.englishmaster_be.domain.mock_test.repository.jdbc.MockTestJdbcRepository;
 import com.example.englishmaster_be.domain.mock_test_result.repository.jdbc.MockTestDetailJdbcRepository;
 import com.example.englishmaster_be.domain.mock_test_result.repository.jpa.MockTestDetailRepository;
 import com.example.englishmaster_be.domain.mock_test_result.repository.jdbc.MockTestResultJdbcRepository;
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestKeyResponse;
-import com.example.englishmaster_be.domain.topic.dto.projection.INumberAndScoreQuestionTopic;
+import com.example.englishmaster_be.domain.question.dto.projection.INumberAndScoreQuestionTopic;
 import com.example.englishmaster_be.domain.mock_test_result.model.MockTestResultEntity;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
-import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.mock_test.dto.request.*;
 import com.example.englishmaster_be.domain.mock_test.dto.response.IMockTestToUserResponse;
-import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestPartResponse;
-import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionMockTestResponse;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.domain.mock_test.mapper.MockTestMapper;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
 import com.example.englishmaster_be.domain.mock_test_result.model.MockTestDetailEntity;
@@ -30,16 +25,12 @@ import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.shared.service.mailer.MailerService;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import com.example.englishmaster_be.common.constant.error.Error;
 import org.springframework.transaction.annotation.Transactional;
@@ -195,7 +186,11 @@ public class MockTestService implements IMockTestService {
         if(!userSubmitAnswers.getUserId().equals(userOfMockTest.getUserId()))
             throw new ErrorHolder(Error.UNAUTHORIZED, "User current mustn't owner of mock test");
 
-        INumberAndScoreQuestionTopic numberAndScoreQuestionTopic = topicService.getNumberAndScoreQuestionTopic(topicOfMockTest.getTopicId());
+        INumberAndScoreQuestionTopic numberAndScoreQuestionTopic = questionService.getNumberAndScoreQuestionTopic(topicOfMockTest.getTopicId());
+
+        int numberAndScoreQuestion = numberAndScoreQuestionTopic.getNumberQuestions();
+
+        int ScoreQuestions = numberAndScoreQuestionTopic.getScoreQuestions();
 
         List<AnswerEntity> answersSubmit = answerRepository.findAnswersInAnswerIds(topicOfMockTest.getTopicId(), listAnswerId);
 

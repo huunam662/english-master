@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.question.service;
 
+import com.example.englishmaster_be.domain.question.dto.projection.INumberAndScoreQuestionTopic;
 import com.example.englishmaster_be.domain.question.dto.request.*;
 import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.question.repository.jdbc.QuestionJdbcRepository;
@@ -22,6 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
+
 import java.util.*;
 
 @Slf4j(topic = "QUESTION-SERVICE")
@@ -167,5 +170,13 @@ public class QuestionService implements IQuestionService {
         List<UUID> answerIds = answerRepository.findAllAnswerIdsIn(questionIds);
         answerRepository.deleteAll(answerIds);
         questionRepository.deleteAll(questionIds);
+    }
+
+    @Override
+    public INumberAndScoreQuestionTopic getNumberAndScoreQuestionTopic(UUID topicId) {
+
+        Assert.notNull(topicId, "Id of topic is required.");
+
+        return questionRepository.findNumberAndScoreQuestions(topicId);
     }
 }

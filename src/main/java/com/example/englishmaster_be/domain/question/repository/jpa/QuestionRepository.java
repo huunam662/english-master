@@ -2,6 +2,7 @@ package com.example.englishmaster_be.domain.question.repository.jpa;
 
 import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
+import com.example.englishmaster_be.domain.question.dto.projection.INumberAndScoreQuestionTopic;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +37,15 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, UUID> 
         WHERE id IN :questionIds
     """, nativeQuery = true)
     void deleteAll(@Param("questionIds") List<UUID> questionIds);
+
+    @Query(value = """
+       SELECT COUNT(qc.id) as numberQuestions, COALESCE(SUM(qc.question_score), 0) as scoreQuestions
+       FROM question qc
+                INNER JOIN part p ON qc.part_id = p.id
+                INNER JOIN topics t ON p.topic_id = t.id
+       WHERE t.id = :topicId AND qc.question_group IS NOT NULL
+    """, nativeQuery = true)
+    INumberAndScoreQuestionTopic findNumberAndScoreQuestions(@Param("topicId") UUID topicId);
 
 }
 
