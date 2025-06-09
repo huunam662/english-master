@@ -53,17 +53,6 @@ public class PartService implements IPartService {
 
     IQuestionService questionService;
 
-
-    @Override
-    public PartEntity getPartByPartNameTopicId(String partName, UUID topicId) {
-
-        Assert.notNull(partName, "Part name is required.");
-        Assert.notNull(topicId, "Topic id is required.");
-
-        return partRepository.findPartByPartNameTopicId(partName, topicId)
-                .orElseThrow(() -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Part " +partName+" not found."));
-    }
-
     @Transactional
     @Override
     @SneakyThrows
@@ -135,7 +124,7 @@ public class PartService implements IPartService {
                 .where(
                         QPartEntity.partEntity.partName.equalsIgnoreCase(partName)
                                 .and(QPartEntity.partEntity.partType.equalsIgnoreCase(partType))
-                                .and(QPartEntity.partEntity.topics.contains(topicEntity))
+                                .and(QPartEntity.partEntity.topic.eq(topicEntity))
                 ).fetchOne();
 
         return Optional.ofNullable(partEntity).orElseThrow(
@@ -163,57 +152,6 @@ public class PartService implements IPartService {
         partRepository.delete(partEntity);
     }
 
-    @Override
-    public List<PartEntity> getPartsFromMockTestPartRequestList(List<MockTestPartRequest> mockTestPartRequestList) {
-
-        if(mockTestPartRequestList == null)
-            throw new ErrorHolder(Error.RESOURCE_NOT_FOUND, "parts of mock test is null");
-
-        return mockTestPartRequestList.stream().map(
-                partMockTest -> getPartToId(partMockTest.getPartId())
-        ).toList();
-    }
-
-    @Transactional
-    @Override
-    public PartEntity uploadFilePart(UUID partId, MultipartFile contentData) {
-
-        if(
-                contentData == null
-                        ||
-                        contentData.isEmpty()
-        ) throw new ErrorHolder(Error.NULL_OR_EMPTY_FILE);
-
-        UserEntity user = userService.currentUser();
-
-        PartEntity partEntity = getPartToId(partId);
-
-        FileResponse fileResponse = uploadService.upload(contentData);
-
-        partEntity.setContentType(fileResponse.getUrl());
-        partEntity.setContentData(fileResponse.getType());
-        partEntity.setUserUpdate(user);
-
-
-        return partRepository.save(partEntity);
-    }
-
-
-    @Transactional
-    @Override
-    public PartEntity uploadTextPart(UUID partId, PartSaveContentRequest uploadTextDTO) {
-
-        UserEntity user = userService.currentUser();
-
-        PartEntity partEntity = getPartToId(partId);
-
-        partEntity.setContentData(uploadTextDTO.getContentData());
-        partEntity.setContentType(uploadTextDTO.getContentType());
-        partEntity.setUserUpdate(user);
-        partEntity.setUpdateAt(LocalDateTime.now());
-
-        return partRepository.save(partEntity);
-    }
 
     @Transactional
     @Override
@@ -260,12 +198,6 @@ public class PartService implements IPartService {
         return PartKeyResponse.builder()
                 .partId(part.getPartId())
                 .build();
-    }
-
-    @Override
-    public List<PartEntity> getPartsFinishExam(UUID topicId, List<UUID> answerIds) {
-
-        return partRepository.findPartJoinQuestionsAndAnswers(topicId, answerIds);
     }
 
     @Override

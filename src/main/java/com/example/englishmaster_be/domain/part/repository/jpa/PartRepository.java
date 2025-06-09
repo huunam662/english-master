@@ -16,7 +16,7 @@ public interface PartRepository extends JpaRepository<PartEntity, UUID>, JpaSpec
 
     Optional<PartEntity> findByPartId(UUID partID);
 
-    @Query("SELECT DISTINCT p FROM PartEntity p JOIN FETCH p.topics t WHERE t.topicId =:topicId ORDER BY p.partName ASC")
+    @Query("SELECT DISTINCT p FROM PartEntity p JOIN FETCH p.topic t WHERE t.topicId =:topicId ORDER BY p.partName ASC")
     Page<PartEntity> findByTopics(UUID topicId, Pageable pageable);
 
     @Query("SELECT p FROM PartEntity p WHERE LOWER(p.partName) = LOWER(:partName)")
@@ -33,18 +33,18 @@ public interface PartRepository extends JpaRepository<PartEntity, UUID>, JpaSpec
 
     @Query("""
         SELECT DISTINCT p FROM PartEntity p
-        INNER JOIN FETCH p.topics t
+        INNER JOIN FETCH p.topic t
         LEFT JOIN FETCH p.questions qgc
         LEFT JOIN FETCH qgc.answers aqc
         WHERE t.topicId = :topicId
-        AND qgc.isQuestionParent = FALSE
+        AND qgc.questionGroupParent != NULL
         AND aqc.answerId IN :answerIds
     """)
     List<PartEntity> findPartJoinQuestionsAndAnswers(@Param("topicId") UUID topicId, @Param("answerIds") List<UUID> answerIds);
 
     @Query("""
         SELECT p FROM PartEntity p
-        INNER JOIN p.topics t
+        INNER JOIN p.topic t
         WHERE LOWER(p.partName) = LOWER(:partName)
         AND t.topicId = :topicId
     """)

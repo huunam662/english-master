@@ -1,12 +1,10 @@
 package com.example.englishmaster_be.domain.topic.model;
 
 import com.example.englishmaster_be.domain.comment.model.CommentEntity;
-import com.example.englishmaster_be.domain.content.model.ContentEntity;
 import com.example.englishmaster_be.domain.mock_test.model.MockTestEntity;
 import com.example.englishmaster_be.domain.pack.model.PackEntity;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
 import com.example.englishmaster_be.domain.question.model.QuestionEntity;
-import com.example.englishmaster_be.domain.status.model.StatusEntity;
 import com.example.englishmaster_be.domain.topic_type.model.TopicTypeEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -97,15 +95,8 @@ public class TopicEntity {
     PackEntity pack;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "status_id", referencedColumnName = "id")
-    StatusEntity status;
-
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "topic_type_id", referencedColumnName = "id")
     TopicTypeEntity topicType;
-
-    @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY)
-    Set<ContentEntity> contents;
 
     @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY)
     Set<CommentEntity> comments;

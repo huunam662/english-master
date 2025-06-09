@@ -1,26 +1,21 @@
 package com.example.englishmaster_be.domain.mock_test.service;
 
 import com.example.englishmaster_be.domain.answer.repository.jpa.AnswerRepository;
-import com.example.englishmaster_be.domain.mock_test.model.QMockTestEntity;
 import com.example.englishmaster_be.domain.mock_test.repository.jdbc.MockTestJdbcRepository;
 import com.example.englishmaster_be.domain.mock_test_result.repository.jdbc.MockTestDetailJdbcRepository;
 import com.example.englishmaster_be.domain.mock_test_result.repository.jpa.MockTestDetailRepository;
 import com.example.englishmaster_be.domain.mock_test_result.repository.jdbc.MockTestResultJdbcRepository;
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestKeyResponse;
-import com.example.englishmaster_be.domain.topic.dto.projection.INumberAndScoreQuestionTopic;
+import com.example.englishmaster_be.domain.question.dto.projection.INumberAndScoreQuestionTopic;
 import com.example.englishmaster_be.domain.mock_test_result.model.MockTestResultEntity;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
-import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.mock_test.dto.request.*;
 import com.example.englishmaster_be.domain.mock_test.dto.response.IMockTestToUserResponse;
-import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestPartResponse;
-import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionMockTestResponse;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.domain.mock_test.mapper.MockTestMapper;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
 import com.example.englishmaster_be.domain.mock_test_result.model.MockTestDetailEntity;
@@ -30,16 +25,12 @@ import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.shared.service.mailer.MailerService;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import com.example.englishmaster_be.common.constant.error.Error;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,8 +48,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class MockTestService implements IMockTestService {
-
-    JPAQueryFactory queryFactory;
 
     MockTestRepository mockTestRepository;
 
@@ -139,29 +128,7 @@ public class MockTestService implements IMockTestService {
     }
 
 
-    @Override
-    public List<MockTestEntity> getTop10MockTest(int index) {
 
-        Sort sortOption = Sort.by(Sort.Order.desc("updateAt"));
-
-        Pageable pageable = PageRequest.of(index, 10, sortOption);
-
-        Page<MockTestEntity> mockTestPage = mockTestRepository.findAll(pageable);
-
-        return mockTestPage.getContent();
-    }
-
-    @Override
-    public List<MockTestEntity> getTop10MockTestToUser(int index, UserEntity user) {
-
-        Sort sortOption = Sort.by(Sort.Order.desc("updateAt"));
-
-        Pageable pageable = PageRequest.of(index, 10, sortOption);
-
-        Page<MockTestEntity> mockTestPage = mockTestRepository.findAllByUser(user, pageable);
-
-        return mockTestPage.getContent();
-    }
 
     @Override
     public MockTestEntity findMockTestToId(UUID mockTestId) {
@@ -172,40 +139,8 @@ public class MockTestService implements IMockTestService {
                 );
     }
 
-    @Override
-    public List<MockTestDetailEntity> getTop10DetailToCorrect(int index, boolean isCorrect, MockTestEntity mockTest) {
-
-        return null;
-
-//        Page<MockTestDetailEntity> detailMockTestPage = detailMockTestRepository.findAllByMockTest(mockTest, PageRequest.of(index, 10, Sort.by(Sort.Order.desc("updateAt"))));
-//
-//        log.info("Repository returned: {}", detailMockTestPage.getContent());
-//        List<MockTestDetailEntity> detailMockTests = detailMockTestPage.getContent();
-//        Iterator<MockTestDetailEntity> iterator = detailMockTests.iterator();
-
-        // Dùng Iterator để tránh ConcurrentModificationException
-//        while (iterator.hasNext()) {
-//            MockTestDetailEntity detailMockTest = iterator.next();
-//            if (detailMockTest.getAnswer().getCorrectAnswer() != isCorrect) {
-//                iterator.remove();
-//            }
-//        }
-
-//        return detailMockTests;
-    }
 
 
-    @Override
-    public int countCorrectAnswer(UUID mockTestId) {
-        int count = 0;
-//        MockTestEntity mockTest = findMockTestToId(mockTestId);
-//        for (MockTestDetailEntity detailMockTest : mockTest.getDetailMockTests()) {
-//            if (detailMockTest.getAnswer().getCorrectAnswer()) {
-//                count = count + 1;
-//            }
-//        }
-        return count;
-    }
 
     @Override
     public List<MockTestEntity> getAllMockTestByYearMonthAndDay(TopicEntity topic, String year, String month, String day) {
@@ -221,43 +156,6 @@ public class MockTestService implements IMockTestService {
     @Override
     public List<MockTestEntity> getAllMockTestToTopic(TopicEntity topic) {
         return mockTestRepository.findAllByTopic(topic);
-    }
-
-    @Override
-    public FilterResponse<?> getListMockTestOfAdmin(MockTestFilterRequest filterRequest) {
-
-        FilterResponse<MockTestResponse> filterResponse = FilterResponse.<MockTestResponse>builder()
-                .pageNumber(filterRequest.getPage())
-                .pageSize(filterRequest.getSize())
-                .offset((long) (filterRequest.getPage() - 1) * filterRequest.getSize())
-                .build();
-
-        long totalElements = Optional.ofNullable(
-                queryFactory
-                        .select(QMockTestEntity.mockTestEntity.count())
-                        .from(QMockTestEntity.mockTestEntity)
-                        .fetchOne()
-        ).orElse(0L);
-        long totalPages = (long) Math.ceil((double) totalElements / filterResponse.getPageSize());
-        filterResponse.setTotalPages(totalPages);
-
-        OrderSpecifier<?> orderSpecifier;
-
-        if (Sort.Direction.DESC.equals(filterRequest.getSortDirection()))
-            orderSpecifier = QMockTestEntity.mockTestEntity.updateAt.desc();
-        else orderSpecifier = QMockTestEntity.mockTestEntity.updateAt.asc();
-
-        JPAQuery<MockTestEntity> query = queryFactory
-                .selectFrom(QMockTestEntity.mockTestEntity)
-                .orderBy(orderSpecifier)
-                .offset(filterResponse.getOffset())
-                .limit(filterResponse.getPageSize());
-
-        filterResponse.setContent(
-                MockTestMapper.INSTANCE.toMockTestResponseList(query.fetch())
-        );
-
-        return filterResponse;
     }
 
     @Override
@@ -288,7 +186,11 @@ public class MockTestService implements IMockTestService {
         if(!userSubmitAnswers.getUserId().equals(userOfMockTest.getUserId()))
             throw new ErrorHolder(Error.UNAUTHORIZED, "User current mustn't owner of mock test");
 
-        INumberAndScoreQuestionTopic numberAndScoreQuestionTopic = topicService.getNumberAndScoreQuestionTopic(topicOfMockTest.getTopicId());
+        INumberAndScoreQuestionTopic numberAndScoreQuestionTopic = questionService.getNumberAndScoreQuestionTopic(topicOfMockTest.getTopicId());
+
+        int numberAndScoreQuestion = numberAndScoreQuestionTopic.getNumberQuestions();
+
+        int ScoreQuestions = numberAndScoreQuestionTopic.getScoreQuestions();
 
         List<AnswerEntity> answersSubmit = answerRepository.findAnswersInAnswerIds(topicOfMockTest.getTopicId(), listAnswerId);
 
@@ -387,60 +289,6 @@ public class MockTestService implements IMockTestService {
 
 
 
-//    protected void saveResultMockTest(MockTestEntity mockTest, UUID partUUID, int correctAnswers, int score, UserEntity user) {
-//
-//        PartEntity part = partService.getPartToId(partUUID);
-//
-//        MockTestResultEntity resultMockTest = MockTestResultEntity.builder()
-//                .mockTest(mockTest)
-//                .part(part)
-//                .correctAnswer(correctAnswers)
-//                .score(score)
-//                .createAt(LocalDateTime.now())
-//                .updateAt(LocalDateTime.now())
-//                .userCreate(user)
-//                .userUpdate(user)
-//                .build();
-//
-//        mockTestResultRepository.save(resultMockTest);
-//    }
-
-
-    protected int getPartIndex(UUID partId) {
-        Map<UUID, Integer> partIdToIndexMap = Map.of(
-                UUID.fromString("5e051716-1b41-4385-bfe6-3e350d5acb06"), 0, // PartEntity 1
-                UUID.fromString("9509bfa5-0403-48db-bee1-1af41cfc73df"), 1, // PartEntity 2
-                UUID.fromString("2496a543-49c3-4580-80b6-c9984e4142e1"), 2, // PartEntity 3
-                UUID.fromString("3b4d6b90-fc31-484e-afe3-3a21162b6454"), 3, // PartEntity 4
-                UUID.fromString("57572f04-27cf-4da7-8344-ac484c7d9e08"), 4, // PartEntity 5
-                UUID.fromString("22b25c09-33db-4e3a-b228-37b331b39c96"), 5, // PartEntity 6
-                UUID.fromString("2416aa89-3284-4315-b759-f3f1b1d5ff3f"), 6  // PartEntity 7
-        );
-        return partIdToIndexMap.getOrDefault(partId, -1);
-    }
-
-    protected UUID getPartUUID(int index) {
-        List<UUID> partUUIDs = List.of(
-                UUID.fromString("5e051716-1b41-4385-bfe6-3e350d5acb06"), // PartEntity 1
-                UUID.fromString("9509bfa5-0403-48db-bee1-1af41cfc73df"), // PartEntity 2
-                UUID.fromString("2496a543-49c3-4580-80b6-c9984e4142e1"), // PartEntity 3
-                UUID.fromString("3b4d6b90-fc31-484e-afe3-3a21162b6454"), // PartEntity 4
-                UUID.fromString("57572f04-27cf-4da7-8344-ac484c7d9e08"), // PartEntity 5
-                UUID.fromString("22b25c09-33db-4e3a-b228-37b331b39c96"), // PartEntity 6
-                UUID.fromString("2416aa89-3284-4315-b759-f3f1b1d5ff3f")  // PartEntity 7
-        );
-        return partUUIDs.get(index);
-    }
-
-    @Override
-    public List<MockTestDetailEntity> getListCorrectAnswer(int index, boolean isCorrect, UUID mockTestId) {
-
-        MockTestEntity mockTest = findMockTestToId(mockTestId);
-
-        List<MockTestDetailEntity> detailMockTestList = getTop10DetailToCorrect(index, isCorrect, mockTest);
-
-        return detailMockTestList;
-    }
 
     @SneakyThrows
     @Override
@@ -449,39 +297,6 @@ public class MockTestService implements IMockTestService {
         mailerService.sendResultEmail(mockTestId);
     }
 
-    @Override
-    public MockTestPartResponse getPartToMockTest(UUID mockTestId) {
-
-        return null;
-
-//        UserEntity currentUser = userService.currentUser();
-//
-//        MockTestEntity mockTest = findMockTestToId(mockTestId);
-//
-//        if (!currentUser.equals(mockTest.getUser()))
-//            throw new ErrorHolder(Error.BAD_REQUEST, )("You cannot view other people's tests");
-//
-//        MockTestPartResponse partMockTestResponse = MockTestMapper.INSTANCE.toPartMockTestResponse(mockTest);
-//
-//        partMockTestResponse.setParts(
-//                mockTest.getTopic().getParts().stream()
-//                        .sorted(Comparator.comparing(PartEntity::getCreateAt))
-//                        .map(
-//                        partItem -> {
-//
-//                            int totalQuestion = topicService.totalQuestion(partItem, mockTest.getTopic().getTopicId());
-//
-//                            PartResponse partResponse = PartMapper.INSTANCE.toPartResponse(partItem);
-//
-//                            partResponse.setTotalQuestion(totalQuestion);
-//
-//                            return partResponse;
-//                        }
-//                ).toList()
-//        );
-//
-//        return partMockTestResponse;
-    }
 
     @Override
     public List<QuestionMockTestResponse> getQuestionOfToMockTest(UUID mockTestId, UUID partId) {

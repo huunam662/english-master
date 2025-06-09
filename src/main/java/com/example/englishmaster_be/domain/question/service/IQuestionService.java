@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.question.service;
 
+import com.example.englishmaster_be.domain.question.dto.projection.INumberAndScoreQuestionTopic;
 import com.example.englishmaster_be.domain.question.dto.request.*;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
@@ -13,31 +14,13 @@ import java.util.UUID;
 
 public interface IQuestionService {
 
-    QuestionEntity saveQuestion(QuestionRequest questionRequest);
-
-    QuestionEntity updateQuestion(QuestionUpdateRequest questionUpdateRequest);
-
     QuestionEntity getQuestionById(UUID questionId);
-
-    QuestionEntity uploadFileQuestion(UUID questionId, List<MultipartFile> newFile);
-
-    QuestionEntity updateFileQuestion(UUID questionId, String oldFileName, MultipartFile newFile);
-
-    QuestionEntity createGroupQuestion(QuestionGroupRequest createGroupQuestionDTO);
-
-    List<QuestionEntity> getTop10Question(int index, UUID partId);
 
     int countQuestionToQuestionGroup(QuestionEntity question);
 
     boolean checkQuestionGroup(UUID questionId);
 
-    List<QuestionEntity> getQuestionsParentBy(List<PartEntity> partEntityList, TopicEntity topicEntity);
-
     List<QuestionEntity> listQuestionGroup(QuestionEntity question);
-
-    void deleteQuestion(UUID questionId);
-
-    List<QuestionEntity> getQuestionGroupListByQuestionId(UUID questionId);
 
     List<QuestionPartResponse> getAllPartQuestions(String partName, UUID topicId);
 
@@ -46,4 +29,6 @@ public interface IQuestionService {
     void editListQuestionsParentOfPart(PartEntity part, List<EditQuestionParentRequest> questionParentsRequest);
 
     void deleteAllQuestions(List<UUID> questionIds);
+
+    INumberAndScoreQuestionTopic getNumberAndScoreQuestionTopic(UUID topicId);
 }

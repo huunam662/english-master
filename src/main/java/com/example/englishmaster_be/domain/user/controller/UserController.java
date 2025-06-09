@@ -50,25 +50,4 @@ public class UserController {
         return UserMapper.INSTANCE.toInformationUserResponse(user);
     }
 
-
-    @GetMapping(value = "/listExamResultsUser")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show list exam result successfully")
-    public FilterResponse<?> getExamResultsUser(
-            @RequestParam(value = "page", defaultValue = "1") @Min(1) int page,
-            @RequestParam(value = "size", defaultValue = "5") @Min(1) @Max(100) int size,
-            @RequestParam(value = "sortBy", defaultValue = "updateAt") String sortBy,
-            @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction sortDirection
-    ) {
-
-        UserFilterRequest userFilterRequest = UserFilterRequest.builder()
-                .page(page)
-                .size(size)
-                .sortBy(sortBy)
-                .sortDirection(sortDirection)
-                .build();
-
-        return userService.getExamResultsUser(userFilterRequest);
-    }
-
 }

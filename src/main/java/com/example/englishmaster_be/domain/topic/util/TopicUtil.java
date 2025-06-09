@@ -39,7 +39,7 @@ public class TopicUtil {
                 questionParent.setQuestionGroupChildren(new HashSet<>(questionChilds));
             }
             part.setQuestions(new HashSet<>(questionParents));
-            part.setTopics(Set.of(topic));
+            part.setTopic(topic);
         }
 
         partsOfTopic = partsOfTopic.stream()

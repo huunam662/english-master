@@ -2,7 +2,6 @@ package com.example.englishmaster_be.domain.excel_fill.dto.response;
 
 import com.example.englishmaster_be.common.constant.QuestionType;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
-import com.example.englishmaster_be.domain.content.dto.response.ContentBasicResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -40,8 +39,6 @@ public class ExcelQuestionResponse {
     Boolean isQuestionParent;
 
     QuestionType questionType;
-
-    List<ContentBasicResponse> contents;
 
     List<AnswerResponse> answers;
 

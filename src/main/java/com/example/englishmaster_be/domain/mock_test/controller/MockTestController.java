@@ -52,35 +52,6 @@ public class MockTestController {
         return MockTestMapper.INSTANCE.toMockTestResponse(mockTest);
     }
 
-    @GetMapping(value = "/listMockTest")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Get top 10 mock test successfully")
-    public List<MockTestResponse> listTop10MockTest(@RequestParam("index") int index) {
-
-        List<MockTestEntity> listMockTest = mockTestService.getTop10MockTest(index);
-
-        return MockTestMapper.INSTANCE.toMockTestResponseList(listMockTest);
-    }
-
-    @GetMapping(value = "/listMockTestAdmin")
-    @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("List mock test successfully")
-    public FilterResponse<?> listMockTestOfAdmin(
-            @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
-            @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
-            @RequestParam(value = "sortBy", defaultValue = "updateAt") String sortBy,
-            @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction sortDirection
-    ) {
-
-        MockTestFilterRequest mockTestFilterRequest = MockTestFilterRequest.builder()
-                .page(page)
-                .size(size)
-                .sortBy(sortBy)
-                .sortDirection(sortDirection)
-                .build();
-
-        return mockTestService.getListMockTestOfAdmin(mockTestFilterRequest);
-    }
 
     @GetMapping(value = "/listTestToUser")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
@@ -99,29 +70,12 @@ public class MockTestController {
     }
 
 
-    @GetMapping(value = "/{mockTestId:.+}/listCorrectAnswer")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public List<MockTestDetailResponse> listCorrectAnswer(@RequestParam("index") int index, @RequestParam("isCorrect") boolean isCorrect, @PathVariable("mockTestId") UUID mockTestId) {
-
-        List<MockTestDetailEntity> detailMockTestEntityList = mockTestService.getListCorrectAnswer(index, isCorrect, mockTestId);
-
-        return MockTestDetailMapper.INSTANCE.toMockTestDetailResponseList(detailMockTestEntityList);
-    }
-
     @GetMapping(value = "/{mockTestId:.+}/sendEmail")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Send email successfully")
     public void sendEmailToMock(@PathVariable("mockTestId") UUID mockTestId) {
 
         mockTestService.sendEmailToMock(mockTestId);
-    }
-
-    @GetMapping(value = "/{mockTestId:.+}/listPart")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show part to mock test successfully")
-    public MockTestPartResponse getPartToMockTest(@PathVariable("mockTestId") UUID mockTestId) {
-
-        return mockTestService.getPartToMockTest(mockTestId);
     }
 
     @GetMapping(value = "/{mockTestId:.+}/listQuestionToPart")

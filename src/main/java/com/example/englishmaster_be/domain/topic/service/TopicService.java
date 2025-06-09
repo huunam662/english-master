@@ -1,31 +1,23 @@
 package com.example.englishmaster_be.domain.topic.service;
 
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
-import com.example.englishmaster_be.common.constant.Status;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.answer.mapper.AnswerMapper;
-import com.example.englishmaster_be.domain.excel_fill.mapper.ExcelContentMapper;
-import com.example.englishmaster_be.domain.pack.model.QPackEntity;
 import com.example.englishmaster_be.domain.part.mapper.PartMapper;
-import com.example.englishmaster_be.domain.part.model.QPartEntity;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionChildResponse;
 import com.example.englishmaster_be.domain.question.mapper.QuestionMapper;
-import com.example.englishmaster_be.domain.topic.dto.projection.INumberAndScoreQuestionTopic;
+import com.example.englishmaster_be.domain.question.dto.projection.INumberAndScoreQuestionTopic;
 import com.example.englishmaster_be.domain.topic.mapper.TopicMapper;
 import com.example.englishmaster_be.domain.topic.repository.spec.TopicSpecification;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.common.constant.Role;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
-import com.example.englishmaster_be.domain.content.service.IContentService;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
-import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicContentResponse;
 import com.example.englishmaster_be.domain.excel_fill.service.IExcelFillService;
-import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.pack.service.IPackService;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
-import com.example.englishmaster_be.domain.status.service.IStatusService;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
@@ -37,29 +29,18 @@ import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionListResponse;
-import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
 import com.example.englishmaster_be.domain.answer.repository.jpa.AnswerRepository;
 import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
-import com.example.englishmaster_be.domain.comment.model.CommentEntity;
-import com.example.englishmaster_be.domain.content.model.ContentEntity;
-import com.example.englishmaster_be.domain.content.repository.jpa.ContentRepository;
 import com.example.englishmaster_be.domain.pack.model.PackEntity;
-import com.example.englishmaster_be.domain.pack.repository.jpa.PackRepository;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
 import com.example.englishmaster_be.domain.part.repository.jpa.PartRepository;
 import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.question.repository.jpa.QuestionRepository;
-import com.example.englishmaster_be.domain.status.model.StatusEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.topic.repository.jpa.TopicRepository;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
-import com.example.englishmaster_be.shared.helper.FileHelper;
 import com.example.englishmaster_be.domain.question.util.QuestionUtil;
 import com.example.englishmaster_be.domain.topic.util.TopicUtil;
-import com.example.englishmaster_be.shared.util.FileUtil;
-import com.example.englishmaster_be.value.AppValue;
-import com.example.englishmaster_be.value.LinkValue;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -71,8 +52,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import org.springframework.web.multipart.MultipartFile;
-import java.time.LocalDate;
+
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -86,14 +66,6 @@ import java.util.stream.Collectors;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TopicService implements ITopicService {
 
-    LinkValue linkValue;
-
-    AppValue appValue;
-
-    FileHelper fileUtil;
-
-    JPAQueryFactory jpaQueryFactory;
-
     TopicRepository topicRepository;
 
     PartRepository partRepository;
@@ -102,13 +74,7 @@ public class TopicService implements ITopicService {
 
     AnswerRepository answerRepository;
 
-    ContentRepository contentRepository;
-
-    PackRepository packRepository;
-
     IQuestionService questionService;
-
-    IStatusService statusService;
 
     IUserService userService;
 
@@ -121,8 +87,6 @@ public class TopicService implements ITopicService {
     IExcelFillService excelService;
 
     IAnswerService answerService;
-
-    IContentService contentService;
 
     ITopicService topicService;
 
@@ -142,7 +106,6 @@ public class TopicService implements ITopicService {
                 .pack(pack)
                 .enable(true)
                 .numberQuestion(0)
-                .status(statusService.getStatusByName(Status.ACTIVE.name()))
                 .build();
 
         TopicMapper.INSTANCE.flowToTopicEntity(topicRequest, topic);
@@ -238,121 +201,12 @@ public class TopicService implements ITopicService {
         return topicRepository.save(topic);
     }
 
-    @Transactional
-    @Override
-    public ExcelTopicResponse updateTopicByExcelFile(UUID topicId, MultipartFile file) {
-
-        TopicEntity topicEntity = topicService.getTopicById(topicId);
-
-        UserEntity currentUser = userService.currentUser();
-
-        ExcelTopicContentResponse excelTopicContentResponse = excelService.readTopicContentFromExcel(file);
-
-        PackEntity packEntity = jpaQueryFactory.selectFrom(QPackEntity.packEntity).where(
-                QPackEntity.packEntity.packName.equalsIgnoreCase(excelTopicContentResponse.getPackName())
-        ).fetchOne();
-
-        if(packEntity == null) {
-
-            packEntity = PackEntity.builder()
-                    .userCreate(currentUser)
-                    .userUpdate(currentUser)
-                    .packName(excelTopicContentResponse.getPackName())
-                    .build();
-
-            packEntity = packRepository.save(packEntity);
-        }
-
-        TopicMapper.INSTANCE.flowToTopicEntity(excelTopicContentResponse, topicEntity);
-
-        topicEntity.setPack(packEntity);
-
-        topicEntity = topicRepository.save(topicEntity);
-
-        if(topicEntity.getParts() == null)
-            topicEntity.setParts(new HashSet<>());
-
-        int partNamesSize = excelTopicContentResponse.getPartNamesList().size();
-
-        for(int i = 0; i < partNamesSize; i++) {
-
-            String partNameAtI = excelTopicContentResponse.getPartNamesList().get(i);
-
-            String partTypeAtI = excelTopicContentResponse.getPartTypesList().get(i);
-
-            PartEntity partEntity = jpaQueryFactory.selectFrom(QPartEntity.partEntity).where(
-                    QPartEntity.partEntity.partName.equalsIgnoreCase(partNameAtI)
-                            .and(QPartEntity.partEntity.partType.equalsIgnoreCase(partTypeAtI))
-            ).fetchOne();
-
-            if (partEntity == null)
-                partEntity = PartEntity.builder()
-                        .contentData("")
-                        .contentType(FileUtil.mimeTypeFile(""))
-                        .partName(partNameAtI)
-                        .partType(partTypeAtI)
-                        .partDescription(String.join(": ", List.of(partNameAtI, partTypeAtI)))
-                        .userCreate(currentUser)
-                        .userUpdate(currentUser)
-                        .build();
-
-            if(partEntity.getTopics() == null)
-                partEntity.setTopics(Set.of(topicEntity));
-            else if(!partEntity.getTopics().contains(topicEntity))
-                partEntity.getTopics().add(topicEntity);
-
-            partEntity = partRepository.save(partEntity);
-
-            if(!topicEntity.getParts().contains(partEntity))
-                topicEntity.getParts().add(partEntity);
-        }
-
-        return ExcelContentMapper.INSTANCE.toExcelTopicResponse(topicEntity);
-
-    }
-
-    @Transactional
-    @SneakyThrows
-    @Override
-    public ExcelTopicResponse saveTopicByExcelFile(MultipartFile file) {
-
-        return excelService.importTopicExcel(file);
-    }
-
-    @Transactional
-    @Override
-    public TopicEntity uploadFileImage(UUID topicId, MultipartFile contentData) {
-
-        if(contentData == null || contentData.isEmpty())
-            throw new ErrorHolder(Error.BAD_REQUEST, "File required non empty or null content");
-
-        UserEntity user = userService.currentUser();
-
-        TopicEntity topic = getTopicById(topicId);
-
-        FileResponse fileResponse = uploadService.upload(contentData);
-
-        topic.setTopicImage(fileResponse.getUrl());
-        topic.setUserUpdate(user);
-
-        return topicRepository.save(topic);
-    }
-
     @Override
     public TopicEntity  getTopicById(UUID topicId) {
 
         return topicRepository.findByTopicId(topicId)
                 .orElseThrow(
                         () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Topic not found with ID: " + topicId, false)
-                );
-    }
-
-    @Override
-    public TopicEntity getTopicByName(String topicName) {
-
-        return topicRepository.findByTopicName(topicName)
-                .orElseThrow(
-                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Topic not found with name: " + topicName, false)
                 );
     }
 
@@ -467,25 +321,6 @@ public class TopicService implements ITopicService {
         topicRepository.delete(topic);
     }
 
-    @Override
-    public int totalQuestion(PartEntity part, UUID topicId) {
-
-        TopicEntity topic = topicService.getTopicById(topicId);
-
-        int total = 0;
-
-        for (QuestionEntity question : topic.getQuestions()) {
-            if (question.getPart().getPartId() == part.getPartId()) {
-
-                boolean check = questionService.checkQuestionGroup(question.getQuestionId());
-
-                if (check) total = total + questionService.countQuestionToQuestionGroup(question);
-
-                else total++;
-            }
-        }
-        return total;
-    }
 
     @Override
     public List<String> get5SuggestTopic(String query) {
@@ -500,38 +335,6 @@ public class TopicService implements ITopicService {
                 .toList();
     }
 
-    @Override
-    public List<TopicEntity> getTopicsByStartTime(LocalDate startTime) {
-
-        LocalDateTime startTimeParse = startTime.atStartOfDay();
-
-        return topicRepository.findByStartTime(startTimeParse);
-    }
-
-    @Override
-    public List<String> getImageCdnLinkTopic() {
-
-        List<String> listLinkCdn = topicRepository.findAllTopicImages();
-
-        return listLinkCdn.stream()
-                .filter(linkCdn -> linkCdn != null && !linkCdn.isEmpty())
-                .map(linkCdn -> linkValue.getLinkFileShowImageBE() + linkCdn)
-                .toList();
-    }
-
-    @Override
-    public List<CommentEntity> listComment(UUID topicId) {
-
-        TopicEntity topic = getTopicById(topicId);
-
-        if(topic.getComments() == null) return new ArrayList<>();
-
-        return topic.getComments().stream()
-                .sorted(
-                        Comparator.comparing(CommentEntity::getCreateAt).reversed()
-                )
-                .toList();
-    }
 
     @Transactional
     @Override
@@ -542,12 +345,6 @@ public class TopicService implements ITopicService {
         topic.setEnable(enable);
 
         topic.setUpdateAt(LocalDateTime.now());
-
-        String statusName = enable ? "ACTIVE" : "DEACTIVATE";
-
-        StatusEntity statusUpdate = statusService.getStatusByName(statusName);
-
-        topic.setStatus(statusUpdate);
 
         topicRepository.save(topic);
     }
@@ -606,20 +403,6 @@ public class TopicService implements ITopicService {
     }
 
     @Transactional
-    @Override
-    @SneakyThrows
-    public ExcelQuestionListResponse addQuestionAllPartsToTopicByExcelFile(UUID topicId, MultipartFile file) {
-
-        return excelService.importQuestionAllPartsExcel(topicId, file);
-    }
-
-    @Override
-    public ExcelTopicResponse addAllPartsForTopicByExcelFile(UUID topicId, MultipartFile file) {
-
-        return excelService.importAllPartsForTopicExcel(topicId, file);
-    }
-
-    @Transactional
     protected QuestionEntity saveQuestionFromExcelTemplate(ExcelQuestionResponse questionByExcelFileResponse, UserEntity user) {
 
         PartEntity part = partService.getPartToId(questionByExcelFileResponse.getPartId());
@@ -659,38 +442,6 @@ public class TopicService implements ITopicService {
 
     }
 
-    @Transactional
-    protected void processContent(String contentImage, String contentAudio, QuestionEntity question, UserEntity user) {
-        if (contentImage != null) {
-
-            ContentEntity content = contentService.getContentByContentData(contentImage);
-
-            content.setUserUpdate(user);
-
-            if (question.getContentCollection() == null)
-                question.setContentCollection(new HashSet<>());
-
-            content = contentRepository.save(content);
-
-            if(!question.getContentCollection().contains(content))
-                question.getContentCollection().add(content);
-
-            contentRepository.save(content);
-        }
-
-        if (contentAudio != null) {
-
-            ContentEntity content = contentService.getContentByContentData(contentAudio);
-
-            if (question.getContentCollection() == null)
-                question.setContentCollection(new HashSet<>());
-
-            question.getContentCollection().add(content);
-
-            contentRepository.save(content);
-        }
-    }
-
 
     @Transactional
     protected void processQuestions(ExcelQuestionListResponse listQuestionByExcelFileResponse, UUID topicId, UserEntity user) {
@@ -715,18 +466,8 @@ public class TopicService implements ITopicService {
                     questionChild = questionRepository.save(questionChild); // Lưu câu hỏi con trước
 
                     processAnswers(AnswerMapper.INSTANCE.toAnswerRequestList(createQuestionChildDTO.getAnswers()), questionChild, user);
-
-                    processContent(
-                            null,
-                            null,
-                            questionChild,
-                            user
-                    );
                 }
             }
-
-            // Xử lý ContentEntity
-            processContent(null, null, question, user);
 
             // Lưu câu hỏi đã cập nhật với ContentEntity
             questionRepository.save(question);
@@ -743,17 +484,6 @@ public class TopicService implements ITopicService {
                 topicRepository.save(topic);
             }
         }
-    }
-
-    @Transactional
-    @Override
-    public ExcelQuestionListResponse addQuestionForTopicAndPartByExcelFile(UUID topicId, int partNumber, MultipartFile file) {
-
-        List<ExcelQuestionResponse> excelQuestionResponses = excelService.importQuestionForTopicAndPart(topicId, partNumber, file);
-
-        return ExcelQuestionListResponse.builder()
-                .questions(excelQuestionResponses)
-                .build();
     }
 
     @Transactional
@@ -831,39 +561,6 @@ public class TopicService implements ITopicService {
                     questionRepository.save(questionChild);
                 }
 
-            }
-
-            if (questionRequest.getContentImage() != null && !questionRequest.getContentImage().isEmpty()) {
-
-                ContentEntity content = ContentEntity.builder()
-                        .contentData(questionRequest.getContentImage())
-                        .contentType(FileUtil.mimeTypeFile(questionRequest.getContentImage()))
-                        .userCreate(user)
-                        .userUpdate(user)
-                        .build();
-
-                if (question.getContentCollection() == null)
-                    question.setContentCollection(new HashSet<>());
-
-                question.getContentCollection().add(content);
-
-                contentRepository.save(content);
-            }
-            if (questionRequest.getContentAudio() != null && !questionRequest.getContentAudio().isEmpty()) {
-
-                ContentEntity content = ContentEntity.builder()
-                        .contentData(questionRequest.getContentAudio())
-                        .contentType(FileUtil.mimeTypeFile(questionRequest.getContentAudio()))
-                        .userCreate(user)
-                        .userUpdate(user)
-                        .build();
-
-                if (question.getContentCollection() == null)
-                    question.setContentCollection(new HashSet<>());
-
-                question.getContentCollection().add(content);
-
-                contentRepository.save(content);
             }
 
             questionRepository.save(question);
@@ -957,39 +654,6 @@ public class TopicService implements ITopicService {
 
         }
 
-        if (question.getContentCollection() == null)
-            question.setContentCollection(new HashSet<>());
-
-        if (questionRequest.getContentImage() != null && !questionRequest.getContentImage().isEmpty()) {
-
-            ContentEntity content = ContentEntity.builder()
-                    .contentData(questionRequest.getContentImage())
-                    .contentType(FileUtil.mimeTypeFile(questionRequest.getContentImage()))
-                    .userCreate(user)
-                    .userUpdate(user)
-                    .build();
-
-            question.getContentCollection().add(content);
-
-            contentRepository.save(content);
-
-        }
-
-        if (questionRequest.getContentAudio() != null && !questionRequest.getContentAudio().isEmpty()) {
-
-            ContentEntity content = ContentEntity.builder()
-                    .contentData(questionRequest.getContentImage())
-                    .contentType(FileUtil.mimeTypeFile(questionRequest.getContentAudio()))
-                    .userCreate(user)
-                    .userUpdate(user)
-                    .build();
-
-
-            question.getContentCollection().add(content);
-
-            contentRepository.save(content);
-        }
-
         question = questionRepository.saveAndFlush(question);
 
         TopicEntity topic = getTopicById(topicId);
@@ -1066,14 +730,6 @@ public class TopicService implements ITopicService {
         TopicUtil.fillAnswerToTopic(topic, answersQuestionChild);
 
         return QuestionMapper.INSTANCE.toQuestionPartResponseList(topic);
-    }
-
-    @Override
-    public INumberAndScoreQuestionTopic getNumberAndScoreQuestionTopic(UUID topicId) {
-
-        Assert.notNull(topicId, "Id of topic is required.");
-
-        return topicRepository.findNumberAndScoreQuestions(topicId);
     }
 
 }

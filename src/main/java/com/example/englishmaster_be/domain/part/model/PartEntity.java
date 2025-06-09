@@ -73,14 +73,6 @@ public class PartEntity {
     @JoinColumn(name = "update_by", referencedColumnName = "id")
     UserEntity userUpdate;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "topic_part",
-            joinColumns = @JoinColumn(name = "part_id"),
-            inverseJoinColumns = @JoinColumn(name = "topic_id")
-    )
-    Set<TopicEntity> topics;
-
     @OneToMany(mappedBy = "part", fetch = FetchType.LAZY)
     Set<QuestionEntity> questions;
 

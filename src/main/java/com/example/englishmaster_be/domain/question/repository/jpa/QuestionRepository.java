@@ -2,6 +2,7 @@ package com.example.englishmaster_be.domain.question.repository.jpa;
 
 import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
+import com.example.englishmaster_be.domain.question.dto.projection.INumberAndScoreQuestionTopic;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,65 +28,7 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, UUID> 
 
     Page<QuestionEntity> findAll(Pageable pageable);
 
-    int countByQuestionGroupParent(QuestionEntity question);
-
     boolean existsByQuestionGroupParent(QuestionEntity question);
-
-    List<QuestionEntity> findByPart(PartEntity part);
-
-    @Query("""
-        SELECT DISTINCT qp FROM QuestionEntity qp
-        INNER JOIN FETCH qp.part p
-        LEFT JOIN FETCH qp.questionGroupChildren qc
-        LEFT JOIN FETCH qc.answers
-        WHERE p.partId = :partId
-    """)
-    List<QuestionEntity> findQuestionParentJoinChildAnswerByPart(@Param("partId") UUID partId);
-
-    @Query("""
-        SELECT qp FROM QuestionEntity qp
-        INNER JOIN FETCH qp.part p
-        LEFT JOIN FETCH qp.questionGroupChildren qc
-        LEFT JOIN FETCH qc.answers
-        WHERE p.partId = :partId
-    """)
-    List<QuestionEntity> findBatchQuestionParentJoinChildAnswerByPart(
-            @Param("partId") UUID partId,
-            Pageable pageable
-    );
-
-    @Query("""
-        SELECT DISTINCT qp FROM QuestionEntity qp
-        WHERE qp.partId IN :partIds AND qp.isQuestionParent = TRUE
-        ORDER BY qp.partId ASC
-    """)
-    List<QuestionEntity> findQuestionsParentsInPartIds(@Param("partIds") List<UUID> partIds);
-
-    @Query("""
-        SELECT DISTINCT qc FROM QuestionEntity qc
-        WHERE qc.questionGroupId IN :questionParentIds AND qc.isQuestionParent = FALSE
-    """)
-    List<QuestionEntity> findQuestionsChildsInQuestionParentIds(@Param("questionParentIds") List<UUID> questionParentIds);
-
-
-    @Query("""
-        SELECT DISTINCT q FROM QuestionEntity q
-        INNER JOIN FETCH q.contentCollection c
-        WHERE q.questionId IN :questionIds
-    """)
-    List<QuestionEntity> findContentInQuestionIds(@Param("questionIds") List<UUID> questionIds);
-
-    @Query("""
-        SELECT DISTINCT qp FROM QuestionEntity qp
-        WHERE qp.partId = :partId AND qp.isQuestionParent = TRUE
-    """)
-    List<QuestionEntity> findQuestionsParentByPartId(@Param("partId") UUID partId);
-
-    @Query("""
-        SELECT DISTINCT qc FROM QuestionEntity qc
-        WHERE qc.questionGroupId = :questionParentId AND qc.isQuestionParent = FALSE
-    """)
-    List<QuestionEntity> findQuestionsChildByQuestionParentId(@Param("questionParentId") UUID questionParentId);
 
     @Transactional
     @Modifying
@@ -94,6 +37,15 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, UUID> 
         WHERE id IN :questionIds
     """, nativeQuery = true)
     void deleteAll(@Param("questionIds") List<UUID> questionIds);
+
+    @Query(value = """
+       SELECT COUNT(qc.id) as numberQuestions, COALESCE(SUM(qc.question_score), 0) as scoreQuestions
+       FROM question qc
+                INNER JOIN part p ON qc.part_id = p.id
+                INNER JOIN topics t ON p.topic_id = t.id
+       WHERE t.id = :topicId AND qc.question_group IS NOT NULL
+    """, nativeQuery = true)
+    INumberAndScoreQuestionTopic findNumberAndScoreQuestions(@Param("topicId") UUID topicId);
 
 }
 

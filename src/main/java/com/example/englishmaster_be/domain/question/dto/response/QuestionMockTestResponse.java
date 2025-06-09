@@ -1,11 +1,9 @@
 package com.example.englishmaster_be.domain.question.dto.response;
 
 import com.example.englishmaster_be.domain.answer.mapper.AnswerMapper;
-import com.example.englishmaster_be.domain.content.mapper.ContentMapper;
 import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
 import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
-import com.example.englishmaster_be.domain.content.dto.response.ContentBasicResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -46,8 +44,6 @@ public class QuestionMockTestResponse {
 
     List<AnswerResponse> listAnswer;
 
-    List<ContentBasicResponse> contentList;
-
     public QuestionMockTestResponse(QuestionEntity question, AnswerEntity answerChoice, AnswerEntity answerCorrect) {
 
         this(question);
@@ -70,10 +66,6 @@ public class QuestionMockTestResponse {
 
         if (Objects.nonNull(question.getAnswers()))
             this.listAnswer = AnswerMapper.INSTANCE.toAnswerResponseList(question.getAnswers());
-
-        if (Objects.nonNull(question.getContentCollection()))
-            contentList = question.getContentCollection().stream().map(ContentMapper.INSTANCE::toContentBasicResponse).toList();
-
     }
 
 }

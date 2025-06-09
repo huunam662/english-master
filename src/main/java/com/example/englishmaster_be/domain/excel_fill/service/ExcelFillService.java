@@ -8,7 +8,6 @@ import com.example.englishmaster_be.common.constant.excel.ExcelQuestionConstant;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.*;
 import com.example.englishmaster_be.domain.pack.dto.IPackKeyProjection;
 import com.example.englishmaster_be.domain.pack_type.dto.projection.IPackTypeKeyProjection;
-import com.example.englishmaster_be.domain.status.service.IStatusService;
 import com.example.englishmaster_be.domain.topic.dto.projection.ITopicKeyProjection;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyResponse;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
@@ -23,8 +22,6 @@ import com.example.englishmaster_be.domain.topic.mapper.TopicMapper;
 import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
 import com.example.englishmaster_be.domain.answer.repository.jdbc.AnswerJdbcRepository;
 import com.example.englishmaster_be.domain.answer.repository.jpa.AnswerRepository;
-import com.example.englishmaster_be.domain.content.model.ContentEntity;
-import com.example.englishmaster_be.domain.content.repository.jpa.ContentRepository;
 import com.example.englishmaster_be.domain.pack.model.PackEntity;
 import com.example.englishmaster_be.domain.pack.repository.jdbc.PackJdbcRepository;
 import com.example.englishmaster_be.domain.pack.repository.factory.PackQueryFactory;
@@ -42,13 +39,10 @@ import com.example.englishmaster_be.domain.topic.repository.jdbc.TopicJdbcReposi
 import com.example.englishmaster_be.domain.excel_fill.util.ExcelUtil;
 import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.question.repository.jpa.QuestionRepository;
-import com.example.englishmaster_be.domain.status.model.StatusEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.topic.repository.factory.TopicQueryFactory;
 import com.example.englishmaster_be.domain.topic.repository.jpa.TopicRepository;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
-import com.example.englishmaster_be.domain.content.helper.ContentHelper;
-import com.example.englishmaster_be.shared.helper.FileHelper;
 import com.example.englishmaster_be.shared.util.FileUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -72,8 +66,6 @@ import java.util.*;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ExcelFillService implements IExcelFillService {
 
-    ContentHelper contentUtil;
-
     PartQueryFactory partQueryFactory;
 
     PackQueryFactory packQueryFactory;
@@ -81,8 +73,6 @@ public class ExcelFillService implements IExcelFillService {
     TopicQueryFactory topicQueryFactory;
 
     PartRepository partRepository;
-
-    ContentRepository contentRepository;
 
     QuestionRepository questionRepository;
 
@@ -97,8 +87,6 @@ public class ExcelFillService implements IExcelFillService {
     ITopicService topicService;
 
     IUserService userService;
-
-    IStatusService statusService;
 
     PackTypeRepository packTypeRepository;
 
@@ -320,8 +308,6 @@ public class ExcelFillService implements IExcelFillService {
 
         UserEntity currentUser = userService.currentUser();
 
-        StatusEntity statusEntity = statusService.getStatusByName("ACTIVE");
-
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
 
             int sheetNumber = 0;
@@ -352,7 +338,6 @@ public class ExcelFillService implements IExcelFillService {
 
             if (topicEntity == null)
                 topicEntity = TopicEntity.builder()
-                        .status(statusEntity)
                         .pack(packEntity)
                         .userCreate(currentUser)
                         .userUpdate(currentUser)
@@ -362,21 +347,10 @@ public class ExcelFillService implements IExcelFillService {
 
             topicEntity = topicRepository.save(topicEntity);
 
-            if (topicEntity.getContents() == null)
-                topicEntity.setContents(new HashSet<>());
-
             if (topicEntity.getParts() == null)
                 topicEntity.setParts(new HashSet<>());
 
-            ContentEntity contentImage = contentUtil.makeContentEntity(
-                    currentUser,
-                    topicEntity,
-                    excelTopicContentResponse.getTopicImage()
-            );
-
-            contentImage = contentRepository.save(contentImage);
-
-            topicEntity.setTopicImage(contentImage.getContentData());
+            topicEntity.setTopicImage(excelTopicContentResponse.getTopicImage());
 
             int partNamesSize = excelTopicContentResponse.getPartNamesList().size();
 
@@ -828,21 +802,7 @@ public class ExcelFillService implements IExcelFillService {
 
             questionParent = questionRepository.save(questionParent);
 
-            if (questionParent.getContentCollection() == null)
-                questionParent.setContentCollection(new HashSet<>());
-
-            ContentEntity contentAudio = contentUtil.makeContentEntity(
-                    currentUser,
-                    topicEntity,
-                    excelQuestionContentResponse.getAudioPath()
-            );
-
-            contentAudio = contentRepository.save(contentAudio);
-
-            questionParent.setContentAudio(contentAudio.getContentData());
-
-            if (!questionParent.getContentCollection().contains(contentAudio))
-                questionParent.getContentCollection().add(contentAudio);
+            questionParent.setContentAudio(excelQuestionContentResponse.getAudioPath());
 
             if (questionParent.getQuestionGroupChildren() == null)
                 questionParent.setQuestionGroupChildren(new HashSet<>());
@@ -882,25 +842,11 @@ public class ExcelFillService implements IExcelFillService {
 
                 if (part == 1) {
 
-                    if (questionChildren.getContentCollection() == null)
-                        questionChildren.setContentCollection(new HashSet<>());
-
                     int jColQuestionImage = 3;
 
                     String imageQuestion = ExcelUtil.getStringCellValue(rowBodyTable, jColQuestionImage);
 
-                    ContentEntity contentImage = contentUtil.makeContentEntity(
-                            currentUser,
-                            topicEntity,
-                            imageQuestion
-                    );
-
-                    contentImage = contentRepository.save(contentImage);
-
-                    questionChildren.setContentImage(contentImage.getContentData());
-
-                    if (!questionChildren.getContentCollection().contains(contentImage))
-                        questionChildren.getContentCollection().add(contentImage);
+                    questionChildren.setContentImage(imageQuestion);
 
                 }
 
@@ -1308,34 +1254,10 @@ public class ExcelFillService implements IExcelFillService {
 
                 questionParent = questionRepository.save(questionParent);
 
-                if (questionParent.getContentCollection() == null)
-                    questionParent.setContentCollection(new HashSet<>());
 
-                ContentEntity contentAudio = contentUtil.makeContentEntity(
-                        currentUser,
-                        topicEntity,
-                        excelQuestionContentResponse.getAudioPath()
-                );
+                questionParent.setContentAudio(excelQuestionContentResponse.getAudioPath());
 
-                contentAudio = contentRepository.save(contentAudio);
-
-                questionParent.setContentAudio(contentAudio.getContentData());
-
-                if (!questionParent.getContentCollection().contains(contentAudio))
-                    questionParent.getContentCollection().add(contentAudio);
-
-                ContentEntity contentImage = contentUtil.makeContentEntity(
-                        currentUser,
-                        topicEntity,
-                        excelQuestionContentResponse.getImagePath()
-                );
-
-                contentImage = contentRepository.save(contentImage);
-
-                questionParent.setContentImage(contentImage.getContentData());
-
-                if (!questionParent.getContentCollection().contains(contentImage))
-                    questionParent.getContentCollection().add(contentImage);
+                questionParent.setContentImage(excelQuestionContentResponse.getImagePath());
 
                 if (questionParent.getQuestionGroupChildren() == null)
                     questionParent.setQuestionGroupChildren(new HashSet<>());
@@ -1661,21 +1583,7 @@ public class ExcelFillService implements IExcelFillService {
 
                 if (part == 7) {
 
-                    if (questionParent.getContentCollection() == null)
-                        questionParent.setContentCollection(new HashSet<>());
-
-                    ContentEntity contentImage = contentUtil.makeContentEntity(
-                            currentUser,
-                            topicEntity,
-                            excelQuestionContentResponse.getImagePath()
-                    );
-
-                    contentImage = contentRepository.save(contentImage);
-
-                    questionParent.setContentImage(contentImage.getContentData());
-
-                    if (!questionParent.getContentCollection().contains(contentImage))
-                        questionParent.getContentCollection().add(contentImage);
+                    questionParent.setContentImage(excelQuestionContentResponse.getImagePath());
                 }
 
                 if (questionParent.getQuestionGroupChildren() == null)

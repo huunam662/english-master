@@ -237,6 +237,5 @@ public class AuthService implements IAuthService {
             sessionActiveService.deleteByCode(userLogoutRequest.getRefreshToken());
         }
 
-        userService.logoutUser();
     }
 }

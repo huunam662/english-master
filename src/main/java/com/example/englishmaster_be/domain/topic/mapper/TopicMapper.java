@@ -18,11 +18,8 @@ public interface TopicMapper {
 
     TopicMapper INSTANCE = Mappers.getMapper(TopicMapper.class);
 
-    TopicRequest toTopicRequest(ExcelTopicResponse topicByExcelFileResponse);
-
     @Mapping(target = "packId", source = "pack.packId")
     @Mapping(target = "packName", source = "pack.packName")
-    @Mapping(target = "statusId", source = "status.statusId")
     @Mapping(target = "partNames", expression = "java(PartMapper.INSTANCE.toPartNameResponseList(topicEntity.getParts()))")
     @Mapping(target = "topicType", source = "topicType.topicTypeName")
     TopicResponse toTopicResponse(TopicEntity topicEntity);

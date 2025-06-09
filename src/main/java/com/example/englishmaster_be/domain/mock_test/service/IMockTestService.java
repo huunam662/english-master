@@ -19,33 +19,19 @@ public interface IMockTestService {
 
     MockTestKeyResponse saveMockTest(MockTestRequest mockTestRequest);
 
-    List<MockTestEntity> getTop10MockTest(int index);
-
-    List<MockTestEntity> getTop10MockTestToUser(int index, UserEntity user);
-
     MockTestEntity findMockTestToId(UUID mockTestId);
 
     MockTestEntity getMockTestById(UUID mockTestId);
-
-    List<MockTestDetailEntity> getTop10DetailToCorrect(int index, boolean isCorrect , MockTestEntity mockTest);
-
-    int countCorrectAnswer(UUID mockTestId);
 
     List<MockTestEntity> getAllMockTestByYearMonthAndDay(TopicEntity topic, String year, String month, String day);
 
     List<MockTestEntity> getAllMockTestToTopic(TopicEntity topic);
 
-    FilterResponse<?> getListMockTestOfAdmin(MockTestFilterRequest filterRequest);
-
     List<IMockTestToUserResponse> getListMockTestToUser();
 
     MockTestKeyResponse addAnswerToMockTest(UUID mockTestId, List<UUID> listAnswerId);
 
-    List<MockTestDetailEntity> getListCorrectAnswer(int index, boolean isCorrect, UUID mockTestId);
-
     void sendEmailToMock(UUID mockTestId);
-
-    MockTestPartResponse getPartToMockTest(UUID mockTestId);
 
     List<QuestionMockTestResponse> getQuestionOfToMockTest(UUID mockTestId, UUID partId);
 
