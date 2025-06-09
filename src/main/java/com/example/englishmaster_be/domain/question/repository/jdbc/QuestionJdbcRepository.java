@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,8 +46,8 @@ public class QuestionJdbcRepository {
                     id, number_choice, question_score, create_at, update_at,
                     create_by, update_by, question_title, question_content,
                     content_audio, content_image, question_type, is_question_parent,
-                    question_group, part_id
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    question_group, part_id, duration_record
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
         int questionsSize = questions.size();
@@ -81,6 +82,7 @@ public class QuestionJdbcRepository {
                     ps.setBoolean(13, question.getIsQuestionParent());
                     ps.setObject(14, question.getQuestionGroupParent() != null ? question.getQuestionGroupParent().getQuestionId() : null);
                     ps.setObject(15, question.getPart() != null ? question.getPart().getPartId() : question.getPartId());
+                    ps.setTime(16, question.getDurationRecord() == null ? null : Time.valueOf(question.getDurationRecord()));
                 }
 
                 @Override

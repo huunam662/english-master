@@ -48,4 +48,7 @@ public interface IExcelFillService {
     ExcelQuestionListResponse importQuestionAllPartsExcel(UUID topicId, MultipartFile file);
 
     TopicKeyResponse importTopicPartsQuestionsAnswersFunnyTest(MultipartFile file);
+
+    ExcelTopicPartIdsResponse importSpeakingAllPartsForTopicFromExcel(UUID topicId, MultipartFile file);
+
 }

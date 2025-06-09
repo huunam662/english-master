@@ -13,6 +13,7 @@ import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -73,6 +74,9 @@ public class QuestionEntity {
     @Column(name = "update_at")
     LocalDateTime updateAt;
 
+    @Column(name = "duration_record")
+    LocalTime durationRecord;
+
     @Column(name = "part_id", insertable = false, updatable = false)
     UUID partId;
 
@@ -90,14 +94,6 @@ public class QuestionEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "part_id", referencedColumnName = "id")
     PartEntity part;
-    
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "topic_question",
-            joinColumns = @JoinColumn(name = "question_id"),
-            inverseJoinColumns = @JoinColumn(name = "topic_id")
-    )
-    Set<TopicEntity> topics;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "question_group", referencedColumnName = "id")

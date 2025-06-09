@@ -130,18 +130,6 @@ public class TopicController {
     }
 
 
-    @DeleteMapping(value = "/{topicId:.+}/deleteQuestion")
-    @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Delete Question to Topic successfully")
-    public void deleteQuestionToTopic(
-            @PathVariable("topicId") UUID topicId,
-            @RequestParam("questionId") UUID questionId
-    ) {
-
-        topicService.deleteQuestionToTopic(topicId, questionId);
-    }
-
-
     @GetMapping(value = "/{topicId:.+}/listPart")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Show Part to Topic successfully")

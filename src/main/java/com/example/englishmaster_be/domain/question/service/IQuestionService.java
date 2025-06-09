@@ -16,8 +16,6 @@ public interface IQuestionService {
 
     QuestionEntity getQuestionById(UUID questionId);
 
-    int countQuestionToQuestionGroup(QuestionEntity question);
-
     boolean checkQuestionGroup(UUID questionId);
 
     List<QuestionEntity> listQuestionGroup(QuestionEntity question);

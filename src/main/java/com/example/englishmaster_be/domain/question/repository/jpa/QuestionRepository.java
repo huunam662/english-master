@@ -22,9 +22,13 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, UUID> 
 
     List<QuestionEntity> findAllByQuestionGroupParent(QuestionEntity question);
 
-    Page<QuestionEntity> findAllByQuestionGroupParentAndPart(QuestionEntity question, PartEntity part, Pageable pageable);
-
-    List<QuestionEntity> findByTopicsAndPart(TopicEntity topic, PartEntity part);
+    @Query("""
+        SELECT qp FROM QuestionEntity qp
+        INNER JOIN FETCH qp.part p
+        INNER JOIN FETCH p.topic t
+        WHERE p.partId = :partId AND t.topicId = :topicId
+    """)
+    List<QuestionEntity> findByTopicsAndPart(@Param("topicId") UUID topicId, @Param("partId") UUID partId);
 
     Page<QuestionEntity> findAll(Pageable pageable);
 
@@ -47,5 +51,30 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, UUID> 
     """, nativeQuery = true)
     INumberAndScoreQuestionTopic findNumberAndScoreQuestions(@Param("topicId") UUID topicId);
 
+    @Query("""
+        SELECT qc FROM QuestionEntity qc
+        WHERE qc.questionGroupId IN :parentIds
+    """)
+    List<QuestionEntity> findAllQuestionChildOfParentIn(@Param("parentIds") List<UUID> parentIds);
+
+    @Query("""
+        SELECT qc FROM QuestionEntity qc
+        INNER JOIN FETCH qc.questionGroupParent qp
+        INNER JOIN FETCH qp.part p
+        INNER JOIN FETCH p.topic t
+        WHERE t.topicId = :topicId AND qc.questionGroupParent IS NOT NULL
+    """)
+    List<QuestionEntity> findAllQuestionChildOfTopic(@Param("topicId") UUID topicId);
+
+    @Query("""
+        SELECT qc FROM QuestionEntity qc
+        INNER JOIN FETCH qc.questionGroupParent qp
+        INNER JOIN FETCH qp.part p
+        INNER JOIN FETCH p.topic t
+        WHERE t.topicId = :topicId
+        AND LOWER(p.partName) = LOWER(:partName)
+        AND qc.questionGroupParent IS NOT NULL
+    """)
+    List<QuestionEntity> findAllQuestionChildOfTopicAndPart(@Param("topicId") UUID topicId, @Param("partName") String partName);
 }
 

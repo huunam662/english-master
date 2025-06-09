@@ -59,7 +59,7 @@ public class AuthController {
 
     @GetMapping("/verify/otp")
     @DefaultMessage("Verification OTP code successful.")
-    public void verifyOtp(@RequestParam String otp) {
+    public void verifyOtp(@RequestParam("otp") String otp) {
 
         authService.verifyOtp(otp);
     }
