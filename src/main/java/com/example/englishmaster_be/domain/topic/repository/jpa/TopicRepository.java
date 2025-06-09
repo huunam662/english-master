@@ -36,10 +36,9 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, JpaSp
     @Query(value = """
         SELECT COUNT(qc.id) as numberQuestions, COALESCE(SUM(qc.question_score), 0) as scoreQuestions
         FROM topics t
-                 INNER JOIN topic_part tp ON tp.topic_id = t.id
-                 INNER JOIN part p ON tp.part_id = p.id
-                 INNER JOIN question qc ON p.id = qc.part_id
-        WHERE qc.is_question_parent = FALSE AND t.id = :topicId
+                 LEFT JOIN part p ON t.id = p.topic_id
+                 LEFT JOIN question qc ON p.id = qc.part_id
+        WHERE qc.question_group != NULL AND t.id = :topicId
     """, nativeQuery = true)
     INumberAndScoreQuestionTopic findNumberAndScoreQuestions(@Param("topicId") UUID topicId);
 

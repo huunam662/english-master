@@ -16,11 +16,7 @@ public interface IUserService {
 
     UserEntity changeProfile(UserChangeProfileRequest changeProfileRequest);
 
-    FilterResponse<?> getExamResultsUser(UserFilterRequest filterRequest);
-
     UserEntity currentUser();
-
-    Boolean currentUserIsAdmin();
 
     Boolean currentUserIsAdmin(UserDetails userDetails);
 
@@ -32,13 +28,9 @@ public interface IUserService {
 
     void enabledUser(UUID userId);
 
-    boolean existsEmail(String email);
-
     void updateLastLoginTime(UUID userId, LocalDateTime lastLoginTime);
 
     UserAuthResponse updatePassword(UserEntity user, String oldPassword, String newPassword);
 
     void updatePasswordForgot(UserEntity user, String newPassword);
-
-    void logoutUser();
 }

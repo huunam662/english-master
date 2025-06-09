@@ -39,7 +39,7 @@ public class PartQueryFactory {
     public List<PartEntity> findAllPartsByNameAndTopic(String partName, TopicEntity topic){
 
         BooleanExpression conditionQueryPattern = QPartEntity.partEntity.partName.equalsIgnoreCase(partName)
-                .and(QPartEntity.partEntity.topics.contains(topic));
+                .and(QPartEntity.partEntity.topic.eq(topic));
 
         return selectFromPartEntity().where(conditionQueryPattern).fetch();
 

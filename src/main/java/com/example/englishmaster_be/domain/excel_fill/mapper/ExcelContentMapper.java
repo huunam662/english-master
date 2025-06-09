@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.domain.excel_fill.mapper;
 
 import com.example.englishmaster_be.domain.answer.mapper.AnswerMapper;
-import com.example.englishmaster_be.domain.content.mapper.ContentMapper;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionListResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
@@ -18,7 +17,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Mapper(
-        imports = {ContentMapper.class, AnswerMapper.class, PackMapper.class, PartMapper.class},
+        imports = {AnswerMapper.class, PackMapper.class, PartMapper.class},
         builder = @Builder(disableBuilder = true)
 )
 public interface ExcelContentMapper {
@@ -27,7 +26,6 @@ public interface ExcelContentMapper {
 
     @Mapping(target = "partId", source = "part.partId")
     @Mapping(target = "isQuestionParent", defaultValue = "false")
-    @Mapping(target = "contents", expression = "java(ContentMapper.INSTANCE.toContentBasicResponseList(questionEntity.getContentCollection()))")
     @Mapping(target = "answers", expression = "java(AnswerMapper.INSTANCE.toAnswerResponseList(questionEntity.getAnswers()))")
     @Mapping(target = "questionsChildren", expression = "java(toExcelResponseExcludeChildList(questionEntity.getQuestionGroupChildren()))")
     ExcelQuestionResponse toExcelQuestionResponse(QuestionEntity questionEntity);

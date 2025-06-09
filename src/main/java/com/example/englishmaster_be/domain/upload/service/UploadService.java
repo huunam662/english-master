@@ -5,12 +5,7 @@ import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
-import com.example.englishmaster_be.domain.topic.model.TopicEntity;
-import com.example.englishmaster_be.shared.util.FileUtil;
 import com.example.englishmaster_be.value.UploadValue;
-import com.example.englishmaster_be.domain.content.model.ContentEntity;
-import com.example.englishmaster_be.domain.user.model.UserEntity;
-import com.example.englishmaster_be.domain.content.repository.jpa.ContentRepository;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,8 +34,6 @@ public class UploadService implements IUploadService {
 
     RestTemplate restTemplate;
 
-    ContentRepository contentRepository;
-
     UploadValue uploadValue;
 
     IUserService userService;
@@ -65,9 +58,6 @@ public class UploadService implements IUploadService {
     public FileResponse upload(MultipartFile file, String dir, boolean isPrivateFile, UUID topicId, String code) {
 
         FileResponse fileResponse = upload(file, dir, isPrivateFile);
-
-        if(topicId != null && code != null && !code.isEmpty())
-            return handleSuccessfulUpload(fileResponse, topicId, code);
 
         return fileResponse;
     }
@@ -133,32 +123,6 @@ public class UploadService implements IUploadService {
         return upload(file, dir, isPrivateFile);
     }
 
-    @Transactional
-    protected FileResponse handleSuccessfulUpload(FileResponse fileResponse, UUID topicId, String code) {
-        
-        UserEntity currentUser = userService.currentUser();
-
-        String existsContent = contentRepository.findContentDataByTopicIdAndCode(topicId, code);
-
-        if(existsContent != null)
-            throw new ErrorHolder(Error.CODE_EXISTED_IN_TOPIC);
-
-        TopicEntity topicEntity = topicService.getTopicById(topicId);
-
-        ContentEntity content = ContentEntity.builder()
-                .topic(topicEntity)
-                .code(code)
-                .contentType(fileResponse.getType())
-                .contentData(fileResponse.getUrl())
-                .userCreate(currentUser)
-                .userUpdate(currentUser)
-                .build();
-
-        contentRepository.save(content);
-
-        return fileResponse;
-    }
-
 
     @Transactional
     @Override
@@ -175,8 +139,6 @@ public class UploadService implements IUploadService {
 
         if (response.getStatusCode() != HttpStatus.OK)
             throw new RuntimeException("Failed to delete image: " + response.getBody());
-
-        contentRepository.deleteByContentData(dto.getFilepath());
     }
 
     @Transactional
@@ -194,8 +156,6 @@ public class UploadService implements IUploadService {
 
         if (response.getStatusCode() != HttpStatus.OK)
             throw new RuntimeException("Failed to delete image: " + response.getBody());
-
-        contentRepository.deleteByContentData(filepath);
     }
 
     private String extractPathFromFilepath(String filepath) {

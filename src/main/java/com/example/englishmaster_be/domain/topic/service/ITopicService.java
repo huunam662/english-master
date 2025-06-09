@@ -30,15 +30,7 @@ public interface ITopicService {
 
     TopicEntity updateTopic(UUID topicId, TopicRequest topicRequest);
 
-    ExcelTopicResponse saveTopicByExcelFile(MultipartFile file);
-
-    ExcelTopicResponse updateTopicByExcelFile(@PathVariable UUID topicId, MultipartFile file);
-
-    TopicEntity uploadFileImage(UUID topicId, MultipartFile contentData);
-
     TopicEntity getTopicById(UUID topicId);
-
-    TopicEntity getTopicByName(String topicName);
 
     List<TopicEntity> get5TopicName(String query);
 
@@ -60,14 +52,6 @@ public interface ITopicService {
 
     void deleteTopic(UUID topicId);
 
-    int totalQuestion(PartEntity part, UUID topicId);
-
-    List<TopicEntity> getTopicsByStartTime(LocalDate startTime);
-
-    List<String> getImageCdnLinkTopic();
-
-    List<CommentEntity> listComment(UUID topicId);
-
     void enableTopic(UUID topicId, boolean enable);
 
     List<QuestionPartResponse> getQuestionOfToTopicPart(UUID topicId, String partName);
@@ -77,12 +61,6 @@ public interface ITopicService {
     List<String> get5SuggestTopic(String query);
 
     void deleteQuestionToTopic(UUID topicId, UUID questionId);
-
-    ExcelTopicResponse addAllPartsForTopicByExcelFile(UUID topicId, MultipartFile file);
-
-    ExcelQuestionListResponse addQuestionAllPartsToTopicByExcelFile(UUID topicId, MultipartFile file);
-
-    ExcelQuestionListResponse addQuestionForTopicAndPartByExcelFile(UUID topicId, int partNumber, MultipartFile file);
 
     void addListQuestionToTopic(UUID topicId, TopicQuestionListRequest createQuestionDTOList);
 

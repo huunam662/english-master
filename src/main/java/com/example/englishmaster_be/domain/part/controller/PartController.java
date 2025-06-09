@@ -63,7 +63,6 @@ public class PartController {
         return partService.editPartAndQuestionsAnswers(request);
     }
 
-
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Create part successfully")
@@ -75,7 +74,6 @@ public class PartController {
 
         return PartMapper.INSTANCE.toPartResponse(part);
     }
-
 
     @PutMapping(value = "/{partId:.+}/update")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
@@ -108,32 +106,6 @@ public class PartController {
         return PartMapper.INSTANCE.toPartQuestionResponse(part);
     }
 
-    @PutMapping(value = "/{partId:.+}/uploadfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Upload file content part successfully")
-    public PartResponse uploadFilePart(
-            @PathVariable("partId") UUID partId,
-            @RequestPart("contentData") MultipartFile contentData
-    ) {
-
-        PartEntity part = partService.uploadFilePart(partId, contentData);
-
-        return PartMapper.INSTANCE.toPartResponse(part);
-    }
-
-    @PutMapping(value = "/{partId:.+}/uploadText")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Upload file part content successfully")
-    public PartResponse uploadTextPart(
-            @PathVariable("partId") UUID partId,
-            @RequestBody PartSaveContentRequest uploadTextRequest
-    ) {
-
-        PartEntity part = partService.uploadTextPart(partId, uploadTextRequest);
-
-        return PartMapper.INSTANCE.toPartResponse(part);
-    }
-
     @GetMapping(value = "/listPart")
     @DefaultMessage("Show part successfully")
     public List<PartResponse> getAllPart() {
@@ -151,15 +123,4 @@ public class PartController {
         partService.deletePart(partId);
     }
 
-
-    @GetMapping(value = "/{partId:.+}/content")
-    @DefaultMessage("Show information part successfully")
-    public PartResponse getPartToId(
-            @PathVariable("partId") UUID partId
-    ) {
-
-        PartEntity partEntity = partService.getPartToId(partId);
-
-        return PartMapper.INSTANCE.toPartResponse(partEntity);
-    }
 }

@@ -79,40 +79,6 @@ public class TopicController {
         return TopicMapper.INSTANCE.toTopicResponse(topic);
     }
 
-    @PostMapping(value = "/createTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Create topic successfully")
-    public ExcelTopicResponse createTopicByExcelFile(
-            @RequestParam("file") MultipartFile file
-    ) {
-
-        return topicService.saveTopicByExcelFile(file);
-    }
-
-
-    @PutMapping(value = "/{topicId:.+}/updateTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @DefaultMessage("Update topic successfully")
-    public ExcelTopicResponse updateTopicByExcelFile(
-            @PathVariable("topicId") UUID topicId,
-            @RequestParam("file") MultipartFile file
-    ) {
-
-        return topicService.updateTopicByExcelFile(topicId, file);
-    }
-
-
-    @PutMapping(value = "/{topicId:.+}/uploadImage", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Upload Topic file storage successfully")
-    public TopicResponse uploadFileImage(
-            @PathVariable("topicId") UUID topicId,
-            @RequestPart("contentData") MultipartFile contentData
-    ) {
-
-        TopicEntity topic = topicService.uploadFileImage(topicId, contentData);
-
-        return TopicMapper.INSTANCE.toTopicResponse(topic);
-    }
 
     @DeleteMapping(value = "/{topicId:.+}/delete")
     @PreAuthorize("hasRole('ADMIN')")
@@ -161,61 +127,6 @@ public class TopicController {
     public void deletePartToTopic(@PathVariable("topicId") UUID topicId, @RequestParam("partId") UUID partId) {
 
         topicService.deletePartToTopic(topicId, partId);
-    }
-
-    @PostMapping(value = "/{topicId:.+}/addQuestion")
-    @PreAuthorize("hasRole('ADMIN')")
-    public QuestionResponse addQuestionToTopic(
-            @PathVariable("topicId") UUID topicId,
-            @ModelAttribute QuestionRequest createQuestionDTO
-    ) {
-
-        return topicService.addQuestionToTopic(topicId, createQuestionDTO);
-    }
-
-    @PostMapping(value = "/{topicId:.+}/addListQuestion")
-    @PreAuthorize("hasRole('ADMIN')")
-    public void addListQuestionToTopic(
-            @PathVariable("topicId") UUID topicId,
-            @ModelAttribute("listQuestion") TopicQuestionListRequest createQuestionDTOList
-    ) {
-
-        topicService.addListQuestionToTopic(topicId, createQuestionDTOList);
-    }
-
-    @PostMapping(value = "/{topicId:.+}/addQuestionForTopicAndPartByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Add Questions to Topic successfully")
-    public ExcelQuestionListResponse addQuestionForTopicAndPartByExcelFile(
-            @PathVariable("topicId") UUID topicId,
-            @RequestParam("partNumber") int partNumber,
-            @RequestPart("file") MultipartFile file
-    ){
-
-        return topicService.addQuestionForTopicAndPartByExcelFile(topicId, partNumber, file);
-    }
-
-
-    @PostMapping(value = "/{topicId:.+}/addQuestionAllPartsToTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Add Questions to Topic successfully")
-    public ExcelQuestionListResponse addQuestionAllPartsToTopicByExcelFile(
-            @PathVariable("topicId") UUID topicId,
-            @RequestParam("file") MultipartFile file
-    ) {
-
-        return topicService.addQuestionAllPartsToTopicByExcelFile(topicId, file);
-    }
-
-    @PostMapping(value = "/{topicId:.+}/addAllPartsToTopicByExcelFile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Add Parts to Topic successfully")
-    public ExcelTopicResponse addAllPartsToTopicByExcelFile(
-            @PathVariable("topicId") UUID topicId,
-            @RequestPart("file") MultipartFile file
-    ){
-
-        return topicService.addAllPartsForTopicByExcelFile(topicId, file);
     }
 
 
@@ -275,33 +186,6 @@ public class TopicController {
     public void enableTopic(@PathVariable("topicId") UUID topicId, @RequestParam("enable") boolean enable) {
 
         topicService.enableTopic(topicId, enable);
-    }
-
-
-    @GetMapping(value = "/{topicId:.+}/listComment")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show list Comment successfully")
-    public List<CommentResponse> listComment(@PathVariable("topicId") UUID topicId) {
-
-        List<CommentEntity> commentEntityList = topicService.listComment(topicId);
-
-        return CommentMapper.INSTANCE.toCommentResponseList(commentEntityList);
-    }
-
-
-    @GetMapping("/searchByStartTime")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Topic retrieved successfully")
-    public List<TopicResponse> getTopicByStartTime(
-            @RequestParam("startDate")
-            @Parameter(description = "format startDate is 'yyyy-MM-dd'", example = "2025-01-12")
-            @DateTimeFormat(pattern ="yyyy-MM-dd")
-            LocalDate startDate
-    ){
-
-        List<TopicEntity> topicEntityList = topicService.getTopicsByStartTime(startDate);
-
-        return TopicMapper.INSTANCE.toTopicResponseList(topicEntityList);
     }
 
     @GetMapping("/{topicId}/list-question-from-all-part")

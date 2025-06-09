@@ -13,31 +13,13 @@ import java.util.UUID;
 
 public interface IQuestionService {
 
-    QuestionEntity saveQuestion(QuestionRequest questionRequest);
-
-    QuestionEntity updateQuestion(QuestionUpdateRequest questionUpdateRequest);
-
     QuestionEntity getQuestionById(UUID questionId);
-
-    QuestionEntity uploadFileQuestion(UUID questionId, List<MultipartFile> newFile);
-
-    QuestionEntity updateFileQuestion(UUID questionId, String oldFileName, MultipartFile newFile);
-
-    QuestionEntity createGroupQuestion(QuestionGroupRequest createGroupQuestionDTO);
-
-    List<QuestionEntity> getTop10Question(int index, UUID partId);
 
     int countQuestionToQuestionGroup(QuestionEntity question);
 
     boolean checkQuestionGroup(UUID questionId);
 
-    List<QuestionEntity> getQuestionsParentBy(List<PartEntity> partEntityList, TopicEntity topicEntity);
-
     List<QuestionEntity> listQuestionGroup(QuestionEntity question);
-
-    void deleteQuestion(UUID questionId);
-
-    List<QuestionEntity> getQuestionGroupListByQuestionId(UUID questionId);
 
     List<QuestionPartResponse> getAllPartQuestions(String partName, UUID topicId);
 

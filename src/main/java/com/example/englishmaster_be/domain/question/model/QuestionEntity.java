@@ -2,7 +2,6 @@ package com.example.englishmaster_be.domain.question.model;
 
 import com.example.englishmaster_be.common.constant.QuestionType;
 import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
-import com.example.englishmaster_be.domain.content.model.ContentEntity;
 import com.example.englishmaster_be.domain.mock_test_result.model.MockTestDetailEntity;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
@@ -113,27 +112,11 @@ public class QuestionEntity {
     @OneToMany(mappedBy = "questionChild", fetch = FetchType.LAZY)
     Set<MockTestDetailEntity> detailMockTests;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-            name = "question_content",
-            joinColumns = @JoinColumn(name = "question_id"),
-            inverseJoinColumns = @JoinColumn(name = "content_id")
-    )
-    Set<ContentEntity> contentCollection;
-
     @Column(name = "has_hints")
     Boolean hasHints;
 
     @Column(name = "is_question_parent")
     Boolean isQuestionParent;
-
-    @PreRemove
-    void preRemove(){
-        topics.forEach(topic -> topic.getQuestions().remove(this));
-        questionGroupChildren.forEach(question -> question.setQuestionGroupParent(null));
-        answers.clear();
-        contentCollection.clear();
-    }
 
 
     @PrePersist

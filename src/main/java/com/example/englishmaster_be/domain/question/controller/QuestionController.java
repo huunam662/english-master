@@ -39,102 +39,6 @@ public class QuestionController {
     IAnswerService answerService;
 
 
-    @PostMapping(value = "/create")
-    @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Create question successfully")
-    public QuestionResponse createQuestion(
-            @RequestBody QuestionRequest questionRequest
-    ) {
-
-        QuestionEntity question = questionService.saveQuestion(questionRequest);
-        return QuestionMapper.INSTANCE.toQuestionResponse(question);
-    }
-
-    @PutMapping(value = "/{questionId:.+}/editQuestion")
-    @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Update question to topic successfully")
-    public QuestionResponse editQuestion(
-            @PathVariable("questionId") UUID questionId,
-            @RequestBody QuestionUpdateRequest questionRequest
-    ) {
-
-        questionRequest.setQuestionId(questionId);
-
-        QuestionEntity question = questionService.updateQuestion(questionRequest);
-
-        return QuestionMapper.INSTANCE.toQuestionResponse(question);
-    }
-
-    @PutMapping(value = "/{questionId:.+}/uploadfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Upload question successfully")
-    public QuestionResponse uploadFileQuestion(
-            @PathVariable("questionId") UUID questionId,
-            @RequestPart List<MultipartFile> uploadMultiFileRequest
-    ) {
-
-        QuestionEntity question = questionService.uploadFileQuestion(questionId, uploadMultiFileRequest);
-
-        return QuestionMapper.INSTANCE.toQuestionResponse(question);
-    }
-
-    @PutMapping(value = "/{questionId:.+}/updatefile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Update file question successfully")
-    public QuestionResponse updateFileQuestion(
-            @PathVariable("questionId") UUID questionId,
-            @RequestParam("oldFileName") String oldFileName,
-            @RequestPart MultipartFile newFile
-    ) {
-
-        QuestionEntity question = questionService.updateFileQuestion(questionId, oldFileName, newFile);
-
-        return QuestionMapper.INSTANCE.toQuestionResponse(question);
-    }
-
-    @PostMapping(value = "/create/groupQuestion")
-    @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Create question successfully")
-    public QuestionResponse createGroupQuestion(
-            @RequestBody QuestionGroupRequest groupQuestionRequest
-    ) {
-
-        QuestionEntity question = questionService.createGroupQuestion(groupQuestionRequest);
-
-        return QuestionMapper.INSTANCE.toQuestionResponse(question);
-    }
-
-    @GetMapping(value = "/{partId:.+}/listTop10Question")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("List top 10 question successfully")
-    public List<QuestionResponse> getTop10Question(
-            @PathVariable("partId") UUID partId,
-            @RequestParam("index") int index
-    ) {
-
-        List<QuestionEntity> questionList = questionService.getTop10Question(index, partId);
-
-        return QuestionMapper.INSTANCE.toQuestionResponseList(questionList);
-    }
-
-    @GetMapping(value = "/{questionId:.+}/checkQuestionGroup")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Question has question group")
-    public void checkQuestionGroup(@PathVariable("questionId") UUID questionId) {
-
-        questionService.checkQuestionGroup(questionId);
-    }
-
-    @GetMapping(value = "/{questionId:.+}/listQuestionGroup")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("List question group successfully")
-    public List<QuestionResponse> getQuestionGroupToQuestion(@PathVariable("questionId") UUID questionId) {
-
-        List<QuestionEntity> questionEntityList = questionService.getQuestionGroupListByQuestionId(questionId);
-
-        return QuestionMapper.INSTANCE.toQuestionResponseList(questionEntityList);
-    }
-
     @GetMapping(value = "/{questionId:.+}/listAnswer")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("List answer to question successfully")
@@ -151,16 +55,6 @@ public class QuestionController {
     public void deleteQuestion(@RequestBody List<UUID> questionIds) {
 
         questionService.deleteAllQuestions(questionIds);
-    }
-
-    @GetMapping(value = "/{questionId:.+}/content")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show content question successfully")
-    public QuestionResponse getContentToQuestion(@PathVariable("questionId") UUID questionId) {
-
-        QuestionEntity question = questionService.getQuestionById(questionId);
-
-        return QuestionMapper.INSTANCE.toQuestionResponse(question);
     }
 
     @GetMapping("/list-question")

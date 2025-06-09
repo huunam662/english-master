@@ -23,8 +23,6 @@ public class TopicResponse {
 
     UUID packId;
 
-    UUID statusId;
-
     String topicName;
 
     String topicImage;
