@@ -10,7 +10,7 @@ import java.util.Arrays;
 public enum PackTypeSortBy {
 
     UPDATED_AT("latest"),
-    TYPE_NAME("type_name");
+    TYPE_NAME("type-name");
 
     String value;
 

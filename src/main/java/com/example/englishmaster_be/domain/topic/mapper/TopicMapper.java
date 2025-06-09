@@ -28,6 +28,7 @@ public interface TopicMapper {
     TopicResponse toTopicResponse(TopicEntity topicEntity);
 
     List<TopicResponse> toTopicResponseList(Collection<TopicEntity> topicEntityList);
+
     TopicBasicResponse toTopicBasicResponse(TopicEntity topicEntity);
 
     @Mapping(target = "topicId", ignore = true)

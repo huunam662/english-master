@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.excel_fill.service;
 
+import com.example.englishmaster_be.common.constant.ImportExcelType;
 import com.example.englishmaster_be.common.constant.QuestionType;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.common.constant.PartType;
@@ -503,6 +504,7 @@ public class ExcelFillService implements IExcelFillService {
         }
     }
 
+    @Transactional
     protected void fillListeningPart12FromExcelToDb(UUID topicId, UserEntity userImport, Workbook workbook, int part){
 
         Sheet sheet = workbook.getSheetAt(part);
@@ -636,6 +638,7 @@ public class ExcelFillService implements IExcelFillService {
         }
     }
 
+    @Transactional
     protected void fillListeningPart34FromExcelToDb(UUID topicId, UserEntity userImport, Workbook workbook, int part){
 
         Sheet sheet = workbook.getSheetAt(part);
@@ -974,6 +977,7 @@ public class ExcelFillService implements IExcelFillService {
         }
     }
 
+    @Transactional
     protected void fillReadingPart5FromExcelToDb(UUID topicId, UserEntity userImport, Workbook workbook){
 
         Sheet sheet = workbook.getSheetAt(5);
@@ -1461,6 +1465,7 @@ public class ExcelFillService implements IExcelFillService {
         }
     }
 
+    @Transactional
     protected void fillReadingPart67FromExcelToDb(UUID topicId, UserEntity userImport, Workbook workbook, int part){
 
         Sheet sheet = workbook.getSheetAt(part);
@@ -1830,7 +1835,7 @@ public class ExcelFillService implements IExcelFillService {
     @SneakyThrows
     public ExcelTopicPartIdsResponse importQuestionForTopicAnyPartFromExcel(UUID topicId, int part, MultipartFile file) {
 
-        UserEntity userImport = new UserEntity();
+        UserEntity userImport = userService.currentUser();
 
         try(Workbook workbook = new XSSFWorkbook(file.getInputStream())){
             fillQuestionForTopicAnyPartFromExcelToDb(topicId, userImport, workbook, part);
@@ -1845,16 +1850,21 @@ public class ExcelFillService implements IExcelFillService {
     @Transactional
     @Override
     @SneakyThrows
-    public ExcelTopicPartIdsResponse importQuestionAtAllPartForTopicFromExcel(UUID topicId, MultipartFile file) {
+    public ExcelTopicPartIdsResponse importQuestionAtAllPartForTopicFromExcel(UUID topicId, MultipartFile file, ImportExcelType typeImport) {
 
-        UserEntity userImport = new UserEntity();
+        UserEntity userImport = userService.currentUser();
 
         try(Workbook workbook = new XSSFWorkbook(file.getInputStream())){
 
             int numberOfSheets = workbook.getNumberOfSheets();
 
-            for(int part = 1; part < numberOfSheets; part++)
-                fillQuestionForTopicAnyPartFromExcelToDb(topicId, userImport, workbook, part);
+            if(typeImport.equals(ImportExcelType.FUNNY_TEST)){
+                fillTopicPartsQuestionsAnswersFunnyTestToDb(topicId, userImport, workbook, file);
+            }
+            else{
+                for(int part = 1; part < numberOfSheets; part++)
+                    fillQuestionForTopicAnyPartFromExcelToDb(topicId, userImport, workbook, part);
+            }
         }
 
         return ExcelTopicPartIdsResponse.builder()
@@ -1891,6 +1901,132 @@ public class ExcelFillService implements IExcelFillService {
     }
 
     @Transactional
+    @SneakyThrows
+    protected void fillTopicPartsQuestionsAnswersFunnyTestToDb(UUID topicId, UserEntity userImport, Workbook workbook, MultipartFile file){
+
+        int numberOfSheet = workbook.getNumberOfSheets();
+
+        List<PartEntity> partsOfTopic = new ArrayList<>();
+        List<QuestionEntity> questionsParentOfPart = new ArrayList<>();
+        List<QuestionEntity> questionsChildOfParent = new ArrayList<>();
+        List<AnswerEntity> answersOfQuestionChild = new ArrayList<>();
+
+        int countOfQuestionsTopic = 0;
+
+        int sheetPartStep = 1;
+        // Thêm part, question, answer cho topic
+        while(sheetPartStep < numberOfSheet){
+
+            Sheet sheetPart = workbook.getSheetAt(sheetPartStep);
+
+            int iRowPart = 0;
+            Row rowPart = sheetPart.getRow(iRowPart);
+            if(rowPart == null) break;
+
+            String partName = ExcelUtil.getStringCellValue(rowPart.getCell(0));
+            UUID partId = partRepository.findPartIdByTopicIdAndPartName(topicId, partName);
+            if(partId == null){
+                partId = UUID.randomUUID();
+                partsOfTopic.add(
+                        PartEntity.builder()
+                                .partId(partId)
+                                .partName(ExcelUtil.getStringCellValue(rowPart.getCell(0)))
+                                .partType(ExcelUtil.getStringCellValue(rowPart.getCell(1)))
+                                .userCreate(userImport)
+                                .userUpdate(userImport)
+                                .topicId(topicId)
+                                .build()
+                );
+            }
+
+            int iRowAudioQuestionParent = iRowPart + 1;
+
+            Row rowAudio = sheetPart.getRow(iRowAudioQuestionParent);
+            while (rowAudio != null){
+
+                int iRowImageQuestionParent = iRowAudioQuestionParent + 1;
+                Row rowImage = sheetPart.getRow(iRowImageQuestionParent);
+                if(rowImage == null) break;
+
+                QuestionEntity questionParent = QuestionEntity.builder()
+                        .questionId(UUID.randomUUID())
+                        .partId(partId)
+                        .isQuestionParent(true)
+                        .questionType(QuestionType.Question_Parent)
+                        .questionScore(0)
+                        .contentAudio(ExcelUtil.getStringCellValue(rowAudio.getCell(1)))
+                        .contentImage(ExcelUtil.getStringCellValue(rowImage.getCell(1)))
+                        .userCreate(userImport)
+                        .userUpdate(userImport)
+                        .build();
+                questionsParentOfPart.add(questionParent);
+
+                // Bỏ qua header table
+                int nextRow = iRowImageQuestionParent + 2;
+                Row rowQuestionChild = sheetPart.getRow(nextRow);
+                while (rowQuestionChild != null){
+
+                    if(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(0)).equalsIgnoreCase("audio"))
+                        break;
+
+                    int jQuestionContent = 1;
+                    int jStartAnswer = jQuestionContent + 1;
+                    int jQuestionResult = jStartAnswer + 4;
+                    int jAudioQuestionChild = jQuestionResult + 1;
+                    int jImageQuestionChild = jAudioQuestionChild + 1;
+                    int jScoreQuestionChild = jImageQuestionChild + 1;
+
+                    QuestionEntity questionChild = QuestionEntity.builder()
+                            .questionId(UUID.randomUUID())
+                            .partId(partId)
+                            .questionGroupParent(questionParent)
+                            .questionType(QuestionType.Question_Child)
+                            .isQuestionParent(false)
+                            .numberChoice(1)
+                            .questionContent(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(jQuestionContent)))
+                            .questionResult(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(jQuestionResult)))
+                            .contentAudio(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(jAudioQuestionChild)))
+                            .contentImage(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(jImageQuestionChild)))
+                            .questionScore((int) ExcelUtil.getNumericCellValue(rowQuestionChild.getCell(jScoreQuestionChild)))
+                            .userCreate(userImport)
+                            .userUpdate(userImport)
+                            .build();
+                    questionParent.setQuestionScore(questionParent.getQuestionScore() + questionChild.getQuestionScore());
+                    questionsChildOfParent.add(questionChild);
+                    countOfQuestionsTopic++;
+
+                    for(int i = jStartAnswer; i < jQuestionResult; i++){
+                        String answerChildContent = ExcelUtil.getStringCellValue(rowQuestionChild.getCell(i));
+                        answersOfQuestionChild.add(
+                                AnswerEntity.builder()
+                                        .answerId(UUID.randomUUID())
+                                        .question(questionChild)
+                                        .answerContent(answerChildContent)
+                                        .correctAnswer(answerChildContent.equalsIgnoreCase(questionChild.getQuestionResult()))
+                                        .userCreate(userImport)
+                                        .userUpdate(userImport)
+                                        .build()
+                        );
+                    }
+                    nextRow++;
+                    rowQuestionChild = sheetPart.getRow(nextRow);
+                }
+
+                rowAudio = sheetPart.getRow(nextRow);
+                iRowAudioQuestionParent = nextRow;
+            }
+
+            sheetPartStep++;
+        }
+
+        partJdbcRepository.batchInsertPart(partsOfTopic);
+        questionJdbcRepository.batchInsertQuestion(questionsParentOfPart);
+        questionJdbcRepository.batchInsertQuestion(questionsChildOfParent);
+        answerJdbcRepository.batchInsertAnswer(answersOfQuestionChild);
+        topicJdbcRepository.updateTopic(topicId, countOfQuestionsTopic);
+    }
+
+    @Transactional
     @Override
     public TopicKeyResponse importTopicPartsQuestionsAnswersFunnyTest(MultipartFile file) {
 
@@ -1898,130 +2034,11 @@ public class ExcelFillService implements IExcelFillService {
 
         UserEntity userImport = userService.currentUser();
 
+        TopicKeyResponse topicKey = importTopicFromExcel(file);
+
         try(Workbook workbook = new XSSFWorkbook(file.getInputStream())){
 
-            int numberOfSheet = workbook.getNumberOfSheets();
-
-            TopicKeyResponse topicKey = importTopicFromExcel(file);
-
-            List<PartEntity> partsOfTopic = new ArrayList<>();
-            List<QuestionEntity> questionsParentOfPart = new ArrayList<>();
-            List<QuestionEntity> questionsChildOfParent = new ArrayList<>();
-            List<AnswerEntity> answersOfQuestionChild = new ArrayList<>();
-
-            int countOfQuestionsTopic = 0;
-
-            int sheetPartStep = 1;
-            // Thêm part, question, answer cho topic
-            while(sheetPartStep < numberOfSheet){
-
-                Sheet sheetPart = workbook.getSheetAt(sheetPartStep);
-
-                int iRowPart = 0;
-                Row rowPart = sheetPart.getRow(iRowPart);
-                if(rowPart == null) break;
-
-                String partName = ExcelUtil.getStringCellValue(rowPart.getCell(0));
-                UUID partId = partRepository.findPartIdByTopicIdAndPartName(topicKey.getTopicId(), partName);
-                if(partId == null){
-                    partId = UUID.randomUUID();
-                    partsOfTopic.add(
-                            PartEntity.builder()
-                                    .partId(partId)
-                                    .partName(ExcelUtil.getStringCellValue(rowPart.getCell(0)))
-                                    .partType(ExcelUtil.getStringCellValue(rowPart.getCell(1)))
-                                    .userCreate(userImport)
-                                    .userUpdate(userImport)
-                                    .topicId(topicKey.getTopicId())
-                                    .build()
-                    );
-                }
-
-                int iRowAudioQuestionParent = iRowPart + 1;
-
-                Row rowAudio = sheetPart.getRow(iRowAudioQuestionParent);
-                while (rowAudio != null){
-
-                    int iRowImageQuestionParent = iRowAudioQuestionParent + 1;
-                    Row rowImage = sheetPart.getRow(iRowImageQuestionParent);
-                    if(rowImage == null) break;
-
-                    QuestionEntity questionParent = QuestionEntity.builder()
-                            .questionId(UUID.randomUUID())
-                            .partId(partId)
-                            .isQuestionParent(true)
-                            .questionType(QuestionType.Question_Parent)
-                            .questionScore(0)
-                            .contentAudio(ExcelUtil.getStringCellValue(rowAudio.getCell(1)))
-                            .contentImage(ExcelUtil.getStringCellValue(rowImage.getCell(1)))
-                            .userCreate(userImport)
-                            .userUpdate(userImport)
-                            .build();
-                    questionsParentOfPart.add(questionParent);
-
-                    // Bỏ qua header table
-                    int nextRow = iRowImageQuestionParent + 2;
-                    Row rowQuestionChild = sheetPart.getRow(nextRow);
-                    while (rowQuestionChild != null){
-
-                        if(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(0)).equalsIgnoreCase("audio"))
-                            break;
-
-                        int jQuestionContent = 1;
-                        int jStartAnswer = jQuestionContent + 1;
-                        int jQuestionResult = jStartAnswer + 4;
-                        int jAudioQuestionChild = jQuestionResult + 1;
-                        int jImageQuestionChild = jAudioQuestionChild + 1;
-                        int jScoreQuestionChild = jImageQuestionChild + 1;
-
-                        QuestionEntity questionChild = QuestionEntity.builder()
-                                .questionId(UUID.randomUUID())
-                                .partId(partId)
-                                .questionGroupParent(questionParent)
-                                .questionType(QuestionType.Question_Child)
-                                .isQuestionParent(false)
-                                .numberChoice(1)
-                                .questionContent(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(jQuestionContent)))
-                                .questionResult(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(jQuestionResult)))
-                                .contentAudio(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(jAudioQuestionChild)))
-                                .contentImage(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(jImageQuestionChild)))
-                                .questionScore((int) ExcelUtil.getNumericCellValue(rowQuestionChild.getCell(jScoreQuestionChild)))
-                                .userCreate(userImport)
-                                .userUpdate(userImport)
-                                .build();
-                        questionParent.setQuestionScore(questionParent.getQuestionScore() + questionChild.getQuestionScore());
-                        questionsChildOfParent.add(questionChild);
-                        countOfQuestionsTopic++;
-
-                        for(int i = jStartAnswer; i < jQuestionResult; i++){
-                            String answerChildContent = ExcelUtil.getStringCellValue(rowQuestionChild.getCell(i));
-                            answersOfQuestionChild.add(
-                                    AnswerEntity.builder()
-                                            .answerId(UUID.randomUUID())
-                                            .question(questionChild)
-                                            .answerContent(answerChildContent)
-                                            .correctAnswer(answerChildContent.equalsIgnoreCase(questionChild.getQuestionResult()))
-                                            .userCreate(userImport)
-                                            .userUpdate(userImport)
-                                            .build()
-                            );
-                        }
-                        nextRow++;
-                        rowQuestionChild = sheetPart.getRow(nextRow);
-                    }
-
-                    rowAudio = sheetPart.getRow(nextRow);
-                    iRowAudioQuestionParent = nextRow;
-                }
-
-                sheetPartStep++;
-            }
-
-            partJdbcRepository.batchInsertPart(partsOfTopic);
-            questionJdbcRepository.batchInsertQuestion(questionsParentOfPart);
-            questionJdbcRepository.batchInsertQuestion(questionsChildOfParent);
-            answerJdbcRepository.batchInsertAnswer(answersOfQuestionChild);
-            topicJdbcRepository.updateTopic(topicKey.getTopicId(), countOfQuestionsTopic);
+            fillTopicPartsQuestionsAnswersFunnyTestToDb(topicKey.getTopicId(), userImport, workbook, file);
 
             return TopicKeyResponse.builder()
                     .topicId(topicKey.getTopicId())

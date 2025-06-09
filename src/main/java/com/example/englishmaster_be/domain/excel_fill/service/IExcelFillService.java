@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.excel_fill.service;
 
+import com.example.englishmaster_be.common.constant.ImportExcelType;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.*;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyResponse;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
@@ -42,7 +43,7 @@ public interface IExcelFillService {
 
     ExcelTopicPartIdsResponse importQuestionForTopicAnyPartFromExcel(UUID topicId, int part, MultipartFile file);
 
-    ExcelTopicPartIdsResponse importQuestionAtAllPartForTopicFromExcel(UUID topicId, MultipartFile file);
+    ExcelTopicPartIdsResponse importQuestionAtAllPartForTopicFromExcel(UUID topicId, MultipartFile file, ImportExcelType typeImport);
 
     ExcelQuestionListResponse importQuestionAllPartsExcel(UUID topicId, MultipartFile file);
 

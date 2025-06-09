@@ -2,6 +2,7 @@ package com.example.englishmaster_be.domain.excel_fill.controller;
 
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.common.constant.ImportExcelType;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.*;
 import com.example.englishmaster_be.domain.excel_fill.service.IExcelFillService;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyResponse;
@@ -126,10 +127,13 @@ public class ExcelFillController {
     )
     public ExcelPartIdsResponse importAllQuestionsFromPartForTopicFromExcel(
             @PathVariable("topicId") UUID topicId,
-            @RequestPart("file") MultipartFile file
-    ){
+            @RequestPart("file") MultipartFile file,
+            @RequestParam(value = "typeImport", required = false) ImportExcelType typeImport
+            ){
 
-        return excelService.importQuestionAtAllPartForTopicFromExcel(topicId, file);
+        if(typeImport == null) typeImport = ImportExcelType.DEFAULT;
+
+        return excelService.importQuestionAtAllPartForTopicFromExcel(topicId, file, typeImport);
     }
 
     @PostMapping(value = "/import/exam/funny-intern-test", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
