@@ -56,6 +56,7 @@ import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.shared.helper.FileHelper;
 import com.example.englishmaster_be.domain.question.util.QuestionUtil;
 import com.example.englishmaster_be.domain.topic.util.TopicUtil;
+import com.example.englishmaster_be.shared.util.FileUtil;
 import com.example.englishmaster_be.value.AppValue;
 import com.example.englishmaster_be.value.LinkValue;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -287,7 +288,7 @@ public class TopicService implements ITopicService {
             if (partEntity == null)
                 partEntity = PartEntity.builder()
                         .contentData("")
-                        .contentType(fileUtil.mimeTypeFile(""))
+                        .contentType(FileUtil.mimeTypeFile(""))
                         .partName(partNameAtI)
                         .partType(partTypeAtI)
                         .partDescription(String.join(": ", List.of(partNameAtI, partTypeAtI)))
@@ -836,7 +837,7 @@ public class TopicService implements ITopicService {
 
                 ContentEntity content = ContentEntity.builder()
                         .contentData(questionRequest.getContentImage())
-                        .contentType(fileUtil.mimeTypeFile(questionRequest.getContentImage()))
+                        .contentType(FileUtil.mimeTypeFile(questionRequest.getContentImage()))
                         .userCreate(user)
                         .userUpdate(user)
                         .build();
@@ -852,7 +853,7 @@ public class TopicService implements ITopicService {
 
                 ContentEntity content = ContentEntity.builder()
                         .contentData(questionRequest.getContentAudio())
-                        .contentType(fileUtil.mimeTypeFile(questionRequest.getContentAudio()))
+                        .contentType(FileUtil.mimeTypeFile(questionRequest.getContentAudio()))
                         .userCreate(user)
                         .userUpdate(user)
                         .build();
@@ -963,7 +964,7 @@ public class TopicService implements ITopicService {
 
             ContentEntity content = ContentEntity.builder()
                     .contentData(questionRequest.getContentImage())
-                    .contentType(fileUtil.mimeTypeFile(questionRequest.getContentImage()))
+                    .contentType(FileUtil.mimeTypeFile(questionRequest.getContentImage()))
                     .userCreate(user)
                     .userUpdate(user)
                     .build();
@@ -978,7 +979,7 @@ public class TopicService implements ITopicService {
 
             ContentEntity content = ContentEntity.builder()
                     .contentData(questionRequest.getContentImage())
-                    .contentType(fileUtil.mimeTypeFile(questionRequest.getContentAudio()))
+                    .contentType(FileUtil.mimeTypeFile(questionRequest.getContentAudio()))
                     .userCreate(user)
                     .userUpdate(user)
                     .build();

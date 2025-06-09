@@ -20,6 +20,7 @@ import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.shared.helper.FileHelper;
+import com.example.englishmaster_be.shared.util.FileUtil;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -101,7 +102,7 @@ public class PartService implements IPartService {
                 );
 
             partEntity.setContentData(partRequest.getFile());
-            partEntity.setContentType(fileUtil.mimeTypeFile(partRequest.getFile()));
+            partEntity.setContentType(FileUtil.mimeTypeFile(partRequest.getFile()));
         }
 
         PartMapper.INSTANCE.flowToPartEntity(partRequest, partEntity);

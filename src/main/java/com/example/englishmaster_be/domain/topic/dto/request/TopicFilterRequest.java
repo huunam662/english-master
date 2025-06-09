@@ -23,6 +23,8 @@ public class TopicFilterRequest extends FilterRequest {
     @NotNull(message = "Pack id is required.")
     UUID packId;
 
+    UUID topicTypeId;
+
     String search = "";
 
     Boolean enabled = null;

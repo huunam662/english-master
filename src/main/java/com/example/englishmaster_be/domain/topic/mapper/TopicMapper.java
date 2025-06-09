@@ -24,18 +24,20 @@ public interface TopicMapper {
     @Mapping(target = "packName", source = "pack.packName")
     @Mapping(target = "statusId", source = "status.statusId")
     @Mapping(target = "partNames", expression = "java(PartMapper.INSTANCE.toPartNameResponseList(topicEntity.getParts()))")
+    @Mapping(target = "topicType", source = "topicType.topicTypeName")
     TopicResponse toTopicResponse(TopicEntity topicEntity);
 
     List<TopicResponse> toTopicResponseList(Collection<TopicEntity> topicEntityList);
+
     TopicBasicResponse toTopicBasicResponse(TopicEntity topicEntity);
 
     @Mapping(target = "topicId", ignore = true)
     @Mapping(target = "topicImage", ignore = true)
     @Mapping(target = "workTime", ignore = true)
+    @Mapping(target = "topicType", ignore = true)
     void flowToTopicEntity(TopicRequest topicRequest, @MappingTarget TopicEntity topicEntity);
 
 
-    void flowToTopicEntity(ExcelTopicResponse topicByExcelFileResponse, @MappingTarget TopicEntity topicEntity);
-
+    @Mapping(target = "topicType", ignore = true)
     void flowToTopicEntity(ExcelTopicContentResponse excelTopicContentResponse, @MappingTarget TopicEntity topicEntity);
 }

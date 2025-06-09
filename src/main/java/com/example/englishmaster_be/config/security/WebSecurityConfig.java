@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.config.security;
 
-import com.example.englishmaster_be.config.middleware.filter.MiddlewareFilterConfig;
+import com.example.englishmaster_be.config.middleware.MiddlewareConfig;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -28,7 +28,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class WebSecurityConfig {
 
-    MiddlewareFilterConfig authTokenFilter;
+    MiddlewareConfig authTokenFilter;
 
 
     @Bean
