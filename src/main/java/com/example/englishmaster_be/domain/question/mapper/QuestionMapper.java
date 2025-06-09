@@ -55,20 +55,6 @@ public interface QuestionMapper {
         return QuestionUtil.parseQuestionResponseList(questionEntityList, partEntity);
     }
 
-    @Mapping(target = "answers", ignore = true)
-    @Mapping(target = "questionsChildren", ignore = true)
-    @Mapping(target = "contents", ignore = true)
-    @Mapping(target = "partId", source = "questionEntity.partId")
-    QuestionMatchingResponse toQuestionMatchingResponse(QuestionEntity questionEntity, TopicEntity topicEntity, PartEntity partEntity);
-
-    default List<QuestionMatchingResponse> toQuestionMatchingResponseList(Collection<QuestionEntity> questionEntityList, TopicEntity topicEntity, PartEntity partEntity){
-
-        if(questionEntityList == null) return null;
-
-        return questionEntityList.stream().map(
-                questionEntity -> toQuestionMatchingResponse(questionEntity, topicEntity, partEntity)
-        ).toList();
-    }
 
     @Mapping(target = "answers", expression = "java(AnswerMapper.INSTANCE.toAnswerResponseList(questionEntity.getAnswers()))")
     @Mapping(target = "questionsChildren", ignore = true)

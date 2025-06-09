@@ -62,6 +62,7 @@ public interface ExcelContentMapper {
 
     @Mapping(target = "pack", expression = "java(PackMapper.INSTANCE.toPackResponse(topicEntity.getPack()))")
     @Mapping(target = "parts", expression = "java(PartMapper.INSTANCE.toPartResponseList(topicEntity.getParts()))")
+    @Mapping(target = "topicType", source = "topicType.topicTypeName")
     ExcelTopicResponse toExcelTopicResponse(TopicEntity topicEntity);
 
 }
