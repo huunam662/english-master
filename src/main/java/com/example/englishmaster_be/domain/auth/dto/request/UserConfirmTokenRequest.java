@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.auth.dto.request;
 
-import com.example.englishmaster_be.model.user.UserEntity;
+import com.example.englishmaster_be.domain.user.model.UserEntity;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

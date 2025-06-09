@@ -8,4 +8,5 @@ public interface ICloudinaryService {
 
     FileResponse uploadFile(MultipartFile file);
 
+    FileResponse uploadAudio(MultipartFile file);
 }

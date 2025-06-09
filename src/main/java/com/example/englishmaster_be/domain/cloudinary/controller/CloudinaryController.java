@@ -28,4 +28,11 @@ public class CloudinaryController {
 
 		return cloudinaryService.uploadFile(file);
 	}
+
+	@PostMapping(value = "/audio", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@DefaultMessage("Audio uploaded successfully")
+	public FileResponse uploadAudio(@RequestPart("audio") MultipartFile file) {
+
+		return cloudinaryService.uploadAudio(file);
+	}
 }

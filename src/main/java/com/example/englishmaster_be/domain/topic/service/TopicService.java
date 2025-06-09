@@ -3,11 +3,17 @@ package com.example.englishmaster_be.domain.topic.service;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.Status;
 import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.domain.answer.mapper.AnswerMapper;
+import com.example.englishmaster_be.domain.excel_fill.mapper.ExcelContentMapper;
+import com.example.englishmaster_be.domain.pack.model.QPackEntity;
+import com.example.englishmaster_be.domain.part.mapper.PartMapper;
+import com.example.englishmaster_be.domain.part.model.QPartEntity;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionChildResponse;
+import com.example.englishmaster_be.domain.question.mapper.QuestionMapper;
 import com.example.englishmaster_be.domain.topic.dto.projection.INumberAndScoreQuestionTopic;
-import com.example.englishmaster_be.model.topic.TopicSpecification;
+import com.example.englishmaster_be.domain.topic.mapper.TopicMapper;
+import com.example.englishmaster_be.domain.topic.repository.spec.TopicSpecification;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
-
 import com.example.englishmaster_be.common.constant.Role;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.content.service.IContentService;
@@ -22,7 +28,6 @@ import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.status.service.IStatusService;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.mapper.*;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicQuestionListRequest;
@@ -33,27 +38,25 @@ import com.example.englishmaster_be.domain.question.dto.response.QuestionRespons
 import com.example.englishmaster_be.domain.topic.dto.response.TopicResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionListResponse;
 import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
-import com.example.englishmaster_be.model.answer.AnswerRepository;
-import com.example.englishmaster_be.model.answer.AnswerEntity;
-import com.example.englishmaster_be.model.comment.CommentEntity;
-import com.example.englishmaster_be.model.content.ContentEntity;
-import com.example.englishmaster_be.model.content.ContentRepository;
-import com.example.englishmaster_be.model.pack.PackEntity;
-import com.example.englishmaster_be.model.pack.PackRepository;
-import com.example.englishmaster_be.model.pack.QPackEntity;
-import com.example.englishmaster_be.model.part.PartEntity;
-import com.example.englishmaster_be.model.part.PartRepository;
-import com.example.englishmaster_be.model.part.QPartEntity;
-import com.example.englishmaster_be.model.question.QuestionEntity;
-import com.example.englishmaster_be.model.question.QuestionQueryFactory;
-import com.example.englishmaster_be.model.question.QuestionRepository;
-import com.example.englishmaster_be.model.status.StatusEntity;
-import com.example.englishmaster_be.model.topic.TopicEntity;
-import com.example.englishmaster_be.model.topic.TopicRepository;
-import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.helper.FileHelper;
-import com.example.englishmaster_be.util.QuestionUtil;
-import com.example.englishmaster_be.util.TopicUtil;
+import com.example.englishmaster_be.domain.answer.repository.jpa.AnswerRepository;
+import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
+import com.example.englishmaster_be.domain.comment.model.CommentEntity;
+import com.example.englishmaster_be.domain.content.model.ContentEntity;
+import com.example.englishmaster_be.domain.content.repository.jpa.ContentRepository;
+import com.example.englishmaster_be.domain.pack.model.PackEntity;
+import com.example.englishmaster_be.domain.pack.repository.jpa.PackRepository;
+import com.example.englishmaster_be.domain.part.model.PartEntity;
+import com.example.englishmaster_be.domain.part.repository.jpa.PartRepository;
+import com.example.englishmaster_be.domain.question.model.QuestionEntity;
+import com.example.englishmaster_be.domain.question.repository.jpa.QuestionRepository;
+import com.example.englishmaster_be.domain.status.model.StatusEntity;
+import com.example.englishmaster_be.domain.topic.model.TopicEntity;
+import com.example.englishmaster_be.domain.topic.repository.jpa.TopicRepository;
+import com.example.englishmaster_be.domain.user.model.UserEntity;
+import com.example.englishmaster_be.shared.helper.FileHelper;
+import com.example.englishmaster_be.domain.question.util.QuestionUtil;
+import com.example.englishmaster_be.domain.topic.util.TopicUtil;
+import com.example.englishmaster_be.shared.util.FileUtil;
 import com.example.englishmaster_be.value.AppValue;
 import com.example.englishmaster_be.value.LinkValue;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -62,7 +65,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
@@ -286,7 +288,7 @@ public class TopicService implements ITopicService {
             if (partEntity == null)
                 partEntity = PartEntity.builder()
                         .contentData("")
-                        .contentType(fileUtil.mimeTypeFile(""))
+                        .contentType(FileUtil.mimeTypeFile(""))
                         .partName(partNameAtI)
                         .partType(partTypeAtI)
                         .partDescription(String.join(": ", List.of(partNameAtI, partTypeAtI)))
@@ -560,7 +562,7 @@ public class TopicService implements ITopicService {
 
         List<AnswerEntity> answersQuestionChild = answerRepository.findAnswersJoinQuestionPartTopic(topicId, partId);
 
-        TopicUtil.fillAnswerToTopic(topic, answersQuestionChild, questionRepository);
+        TopicUtil.fillAnswerToTopic(topic, answersQuestionChild);
 
         return QuestionMapper.INSTANCE.toQuestionPartResponseList(topic);
     }
@@ -575,7 +577,7 @@ public class TopicService implements ITopicService {
 
         List<AnswerEntity> answersQuestionChild = answerRepository.findAnswersJoinQuestionPartTopic(topicId, partName);
 
-        TopicUtil.fillAnswerToTopic(topic, answersQuestionChild, questionRepository);
+        TopicUtil.fillAnswerToTopic(topic, answersQuestionChild);
 
         return QuestionMapper.INSTANCE.toQuestionPartResponseList(topic);
     }
@@ -835,7 +837,7 @@ public class TopicService implements ITopicService {
 
                 ContentEntity content = ContentEntity.builder()
                         .contentData(questionRequest.getContentImage())
-                        .contentType(fileUtil.mimeTypeFile(questionRequest.getContentImage()))
+                        .contentType(FileUtil.mimeTypeFile(questionRequest.getContentImage()))
                         .userCreate(user)
                         .userUpdate(user)
                         .build();
@@ -851,7 +853,7 @@ public class TopicService implements ITopicService {
 
                 ContentEntity content = ContentEntity.builder()
                         .contentData(questionRequest.getContentAudio())
-                        .contentType(fileUtil.mimeTypeFile(questionRequest.getContentAudio()))
+                        .contentType(FileUtil.mimeTypeFile(questionRequest.getContentAudio()))
                         .userCreate(user)
                         .userUpdate(user)
                         .build();
@@ -962,7 +964,7 @@ public class TopicService implements ITopicService {
 
             ContentEntity content = ContentEntity.builder()
                     .contentData(questionRequest.getContentImage())
-                    .contentType(fileUtil.mimeTypeFile(questionRequest.getContentImage()))
+                    .contentType(FileUtil.mimeTypeFile(questionRequest.getContentImage()))
                     .userCreate(user)
                     .userUpdate(user)
                     .build();
@@ -977,7 +979,7 @@ public class TopicService implements ITopicService {
 
             ContentEntity content = ContentEntity.builder()
                     .contentData(questionRequest.getContentImage())
-                    .contentType(fileUtil.mimeTypeFile(questionRequest.getContentAudio()))
+                    .contentType(FileUtil.mimeTypeFile(questionRequest.getContentAudio()))
                     .userCreate(user)
                     .userUpdate(user)
                     .build();
@@ -1061,7 +1063,7 @@ public class TopicService implements ITopicService {
 
         List<AnswerEntity> answersQuestionChild = answerRepository.findAnswersJoinQuestionPartTopic(topicId);
 
-        TopicUtil.fillAnswerToTopic(topic, answersQuestionChild, questionRepository);
+        TopicUtil.fillAnswerToTopic(topic, answersQuestionChild);
 
         return QuestionMapper.INSTANCE.toQuestionPartResponseList(topic);
     }

@@ -7,8 +7,8 @@ import com.example.englishmaster_be.domain.comment.dto.request.UpdateCommentRequ
 import com.example.englishmaster_be.domain.comment.dto.response.*;
 import com.example.englishmaster_be.domain.comment.service.ICommentService;
 import com.example.englishmaster_be.domain.comment.dto.request.CreateNewsCommentRequest;
-import com.example.englishmaster_be.mapper.CommentMapper;
-import com.example.englishmaster_be.model.comment.CommentEntity;
+import com.example.englishmaster_be.domain.comment.mapper.CommentMapper;
+import com.example.englishmaster_be.domain.comment.model.CommentEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -56,9 +56,7 @@ public class CommentController {
             @RequestParam("sizeLoad") Integer sizeLoad
     ){
 
-        List<CommentEntity> comments = commentService.getNewsComments(newsId, stepLoad, sizeLoad);
-
-        return CommentMapper.INSTANCE.toCommentNewsResponseList(comments);
+        return commentService.getNewsComments(newsId, stepLoad, sizeLoad);
     }
 
     @GetMapping("/{commentParentId:.+}/comments-child")
@@ -73,9 +71,7 @@ public class CommentController {
             @RequestParam("sizeLoad") Integer sizeLoad
     ){
 
-        List<CommentEntity> comments = commentService.getCommentsChild(commentParentId, stepLoad, sizeLoad);
-
-        return CommentMapper.INSTANCE.toCommentChildResponseList(comments);
+        return commentService.getCommentsChild(commentParentId, stepLoad, sizeLoad);
     }
 
     @PostMapping("/to-news")

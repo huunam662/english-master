@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.flash_card_word.service;
 
 import com.example.englishmaster_be.domain.flash_card_word.dto.request.FlashCardWordRequest;
-import com.example.englishmaster_be.model.flash_card_word.FlashCardWordEntity;
+import com.example.englishmaster_be.domain.flash_card_word.model.FlashCardWordEntity;
 
 import java.util.List;
 import java.util.UUID;

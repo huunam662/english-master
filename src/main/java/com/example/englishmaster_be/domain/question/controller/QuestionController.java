@@ -6,14 +6,14 @@ import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionUpdateRequest;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
-import com.example.englishmaster_be.mapper.AnswerMapper;
-import com.example.englishmaster_be.mapper.QuestionMapper;
+import com.example.englishmaster_be.domain.answer.mapper.AnswerMapper;
+import com.example.englishmaster_be.domain.question.mapper.QuestionMapper;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionGroupRequest;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
-import com.example.englishmaster_be.model.answer.AnswerEntity;
-import com.example.englishmaster_be.model.question.QuestionEntity;
+import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
+import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -65,7 +65,6 @@ public class QuestionController {
         return QuestionMapper.INSTANCE.toQuestionResponse(question);
     }
 
-
     @PutMapping(value = "/{questionId:.+}/uploadfile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Upload question successfully")
@@ -104,7 +103,6 @@ public class QuestionController {
 
         return QuestionMapper.INSTANCE.toQuestionResponse(question);
     }
-
 
     @GetMapping(value = "/{partId:.+}/listTop10Question")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
@@ -147,14 +145,13 @@ public class QuestionController {
         return AnswerMapper.INSTANCE.toAnswerResponseList(answerList);
     }
 
-    @DeleteMapping(value = "/{questionId:.+}/deleteQuestion")
+    @DeleteMapping("/all")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Delete question successfully")
-    public void deleteQuestion(@PathVariable("questionId") UUID questionId) {
+    @DefaultMessage("Delete questions successfully")
+    public void deleteQuestion(@RequestBody List<UUID> questionIds) {
 
-        questionService.deleteQuestion(questionId);
+        questionService.deleteAllQuestions(questionIds);
     }
-
 
     @GetMapping(value = "/{questionId:.+}/content")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")

@@ -6,22 +6,21 @@ import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestPartReq
 import com.example.englishmaster_be.domain.part.dto.request.CreatePartQuestionsAnswersRequest;
 import com.example.englishmaster_be.domain.part.dto.request.EditPartQuestionsAnswersRequest;
 import com.example.englishmaster_be.domain.part.dto.response.PartKeyResponse;
+import com.example.englishmaster_be.domain.part.model.QPartEntity;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
-import com.example.englishmaster_be.model.answer.AnswerEntity;
-import com.example.englishmaster_be.model.answer.AnswerRepository;
-import com.example.englishmaster_be.model.part.PartRepository;
+import com.example.englishmaster_be.domain.part.repository.jpa.PartRepository;
 import com.example.englishmaster_be.domain.part.dto.request.PartSaveContentRequest;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
-import com.example.englishmaster_be.mapper.PartMapper;
-import com.example.englishmaster_be.model.part.PartEntity;
-import com.example.englishmaster_be.model.part.QPartEntity;
-import com.example.englishmaster_be.model.topic.TopicEntity;
-import com.example.englishmaster_be.model.user.UserEntity;
+import com.example.englishmaster_be.domain.part.mapper.PartMapper;
+import com.example.englishmaster_be.domain.part.model.PartEntity;
+import com.example.englishmaster_be.domain.topic.model.TopicEntity;
+import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.helper.FileHelper;
+import com.example.englishmaster_be.shared.helper.FileHelper;
+import com.example.englishmaster_be.shared.util.FileUtil;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -103,7 +102,7 @@ public class PartService implements IPartService {
                 );
 
             partEntity.setContentData(partRequest.getFile());
-            partEntity.setContentType(fileUtil.mimeTypeFile(partRequest.getFile()));
+            partEntity.setContentType(FileUtil.mimeTypeFile(partRequest.getFile()));
         }
 
         PartMapper.INSTANCE.flowToPartEntity(partRequest, partEntity);

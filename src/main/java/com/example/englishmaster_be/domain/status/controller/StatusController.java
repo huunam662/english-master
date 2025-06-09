@@ -2,8 +2,8 @@ package com.example.englishmaster_be.domain.status.controller;
 
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
-import com.example.englishmaster_be.model.status.StatusEntity;
-import com.example.englishmaster_be.mapper.StatusMapper;
+import com.example.englishmaster_be.domain.status.model.StatusEntity;
+import com.example.englishmaster_be.domain.status.mapper.StatusMapper;
 import com.example.englishmaster_be.domain.status.dto.request.StatusRequest;
 import com.example.englishmaster_be.domain.status.dto.response.StatusResponse;
 import com.example.englishmaster_be.domain.status.service.IStatusService;
@@ -14,7 +14,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "Status")

@@ -1,13 +1,12 @@
 package com.example.englishmaster_be.domain.cloudinary.service;
 
 import com.cloudinary.Cloudinary;
-import com.example.englishmaster_be.domain.cloudinary.dto.response.CloudiaryUploadFileResponse;
+import com.cloudinary.utils.ObjectUtils;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -21,6 +20,7 @@ public class CloudinaryService implements ICloudinaryService {
 	Cloudinary cloudinary;
 
 	@SneakyThrows
+	@Override
 	public FileResponse uploadFile(MultipartFile file){
 
 			Map uploadResultResponse = cloudinary.uploader().upload(file.getBytes(), Map.of());
@@ -34,5 +34,22 @@ public class CloudinaryService implements ICloudinaryService {
 					.build();
 	}
 
+	@SneakyThrows
+	@Override
+	public FileResponse uploadAudio(MultipartFile file) {
 
+		Map uploadResult = cloudinary.uploader().upload(
+				file.getBytes(),
+				ObjectUtils.asMap(
+						"resource_type", "video"
+				)
+		);
+
+		String audioUrl = String.valueOf(uploadResult.get("url"));
+
+		return FileResponse.builder()
+				.url(audioUrl)
+				.type(file.getContentType())
+				.build();
+	}
 }

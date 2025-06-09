@@ -2,24 +2,25 @@ package com.example.englishmaster_be.domain.comment.service;
 
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.domain.comment.dto.projection.ICountReplyCommentProjection;
+import com.example.englishmaster_be.domain.comment.dto.projection.IVotesCommentProjection;
 import com.example.englishmaster_be.domain.comment.dto.request.CreateCmToCommentRequest;
 import com.example.englishmaster_be.domain.comment.dto.request.CreateNewsCommentRequest;
 import com.example.englishmaster_be.domain.comment.dto.request.UpdateCommentRequest;
-import com.example.englishmaster_be.domain.comment.dto.response.CmToCommentNewsKeyResponse;
-import com.example.englishmaster_be.domain.comment.dto.response.CommentChildResponse;
-import com.example.englishmaster_be.domain.comment.dto.response.CommentKeyResponse;
-import com.example.englishmaster_be.domain.comment.dto.response.CommentNewsKeyResponse;
+import com.example.englishmaster_be.domain.comment.dto.response.*;
 import com.example.englishmaster_be.domain.news.service.INewsService;
-import com.example.englishmaster_be.model.comment.CommentEntity;
-import com.example.englishmaster_be.model.comment.CommentJdbcRepository;
-import com.example.englishmaster_be.model.comment.CommentRepository;
-import com.example.englishmaster_be.model.news.NewsEntity;
-import com.example.englishmaster_be.model.user.UserEntity;
+import com.example.englishmaster_be.domain.comment.mapper.CommentMapper;
+import com.example.englishmaster_be.domain.comment.model.CommentEntity;
+import com.example.englishmaster_be.domain.comment.repository.jdbc.CommentJdbcRepository;
+import com.example.englishmaster_be.domain.comment.repository.jpa.CommentRepository;
+import com.example.englishmaster_be.domain.news.model.NewsEntity;
+import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springdoc.core.service.GenericParameterService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,7 +30,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j(topic = "COMMENT-SERVICE")
 @Service
@@ -44,6 +47,7 @@ public class CommentService implements ICommentService {
     CommentRepository commentRepository;
 
     CommentJdbcRepository commentJdbcRepository;
+    private final GenericParameterService parameterBuilder;
 
     @Override
     public CommentEntity getCommentById(UUID id) {
@@ -68,7 +72,7 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public List<CommentEntity> getNewsComments(UUID newsId, Integer stepLoad, Integer sizeLoad) {
+    public List<CommentNewsResponse> getNewsComments(UUID newsId, Integer stepLoad, Integer sizeLoad) {
 
         Assert.notNull(newsId, "News id is required.");
 
@@ -82,7 +86,37 @@ public class CommentService implements ICommentService {
 
         Page<CommentEntity> pageResult = commentRepository.findAllCommentsByNewsId(newsId, pageable);
 
-        return pageResult.getContent();
+        List<CommentEntity> comments = pageResult.getContent();
+
+        List<UUID> commentIds = comments.stream().map(CommentEntity::getCommentId).toList();
+
+        List<IVotesCommentProjection> countVotesComment = commentRepository.countVotesCommentIn(commentIds);
+
+        List<ICountReplyCommentProjection> countReplyComment = commentRepository.countReplyCommentIn(commentIds);
+
+        Map<UUID, Integer> commentCountVotesGroup = countVotesComment.stream()
+                .collect(Collectors.toMap(
+                        IVotesCommentProjection::getCommentId,
+                        IVotesCommentProjection::getCountVotes
+                ));
+        Map<UUID, Integer> commentCountReplyGroup = countReplyComment.stream()
+                .collect(Collectors.toMap(
+                        ICountReplyCommentProjection::getCommentId,
+                        ICountReplyCommentProjection::getCountReplies
+                ));
+
+        return comments.stream().map(
+            comment -> {
+                CommentNewsResponse commentNewsResponse = CommentMapper.INSTANCE.toCommentNewsResponse(comment);
+                commentNewsResponse.setNumberOfVotes(
+                        commentCountVotesGroup.getOrDefault(comment.getCommentId(), 0)
+                );
+                commentNewsResponse.setNumberOfCommentsChild(
+                        commentCountReplyGroup.getOrDefault(comment.getCommentId(), 0)
+                );
+                return commentNewsResponse;
+            }
+        ).toList();
     }
 
     @Transactional
@@ -192,7 +226,7 @@ public class CommentService implements ICommentService {
     }
 
     @Override
-    public List<CommentEntity> getCommentsChild(UUID commentParentId, Integer stepLoad, Integer sizeLoad) {
+    public List<CommentChildResponse> getCommentsChild(UUID commentParentId, Integer stepLoad, Integer sizeLoad) {
 
         Assert.notNull(commentParentId, "Comment parent id is required.");
 
@@ -206,7 +240,26 @@ public class CommentService implements ICommentService {
 
         Page<CommentEntity> pageResult = commentRepository.findAllCommentsChildByCommentParentId(commentParentId, pageable);
 
-        return pageResult.getContent();
+        List<CommentEntity> comments = pageResult.getContent();
+
+        List<UUID> commentIds = comments.stream().map(CommentEntity::getCommentId).toList();
+
+        List<IVotesCommentProjection> countVotesComment = commentRepository.countVotesCommentIn(commentIds);
+
+        Map<UUID, Integer> countVotesCommentGroup = countVotesComment.stream().collect(
+                Collectors.toMap(
+                        IVotesCommentProjection::getCommentId,
+                        IVotesCommentProjection::getCountVotes
+                )
+        );
+
+        return comments.stream().map(
+                comment -> {
+                    CommentChildResponse commentChild = CommentMapper.INSTANCE.toCommentChildResponse(comment);
+                    commentChild.setNumberOfVotes(countVotesCommentGroup.getOrDefault(comment.getCommentId(), 0));
+                    return commentChild;
+                }
+        ).toList();
     }
 
     @Transactional

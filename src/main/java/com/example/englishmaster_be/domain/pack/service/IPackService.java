@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.pack.service;
 
 import com.example.englishmaster_be.domain.pack.dto.request.PackRequest;
-import com.example.englishmaster_be.model.pack.PackEntity;
+import com.example.englishmaster_be.domain.pack.model.PackEntity;
 
 import java.util.List;
 import java.util.UUID;

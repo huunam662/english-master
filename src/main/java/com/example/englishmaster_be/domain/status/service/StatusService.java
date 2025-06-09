@@ -1,13 +1,11 @@
 package com.example.englishmaster_be.domain.status.service;
 
-import com.example.englishmaster_be.mapper.StatusMapper;
+import com.example.englishmaster_be.domain.status.mapper.StatusMapper;
 import com.example.englishmaster_be.domain.status.dto.request.StatusRequest;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
-import com.example.englishmaster_be.model.status.QStatusEntity;
-import com.example.englishmaster_be.model.status.StatusEntity;
-import com.example.englishmaster_be.model.status.StatusRepository;
-import com.querydsl.jpa.impl.JPAQuery;
+import com.example.englishmaster_be.domain.status.model.StatusEntity;
+import com.example.englishmaster_be.domain.status.repository.StatusRepository;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +13,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
+
 import java.util.UUID;
 
 

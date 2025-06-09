@@ -98,26 +98,22 @@ public class GlobalExceptionHandler implements AccessDeniedHandler, Authenticati
     }
 
     @ExceptionHandler({
-            NoResourceFoundException.class,
             HttpRequestMethodNotSupportedException.class
     })
-    public ModelAndView noResourceFoundHandler(Exception ex) {
+    public ResultApiResponse.ErrorResponse methodNotAllowed(Exception ex) {
 
-        Error error = Error.RESOURCE_NOT_FOUND;
+        Error error = Error.METHOD_NOT_ALLOWED;
 
         logError(error, ex);
 
-        ModelAndView mav = new ModelAndView("404/endpoint.404");
-
-        mav.setStatus(error.getStatusCode());
-
-        return mav;
+        return ResultApiResponse.ErrorResponse.build(error);
     }
 
     @ExceptionHandler({
-            NoSuchElementException.class
+            NoSuchElementException.class,
+            NoResourceFoundException.class
     })
-    public ResultApiResponse.ErrorResponse handlingResourceNotFoundException(NoSuchElementException e){
+    public ResultApiResponse.ErrorResponse handlingResourceNotFoundException(Exception e){
 
         Error error = Error.RESOURCE_NOT_FOUND;
 

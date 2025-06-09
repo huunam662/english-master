@@ -1,14 +1,15 @@
 package com.example.englishmaster_be.domain.question.service;
 
-import com.example.englishmaster_be.batch.*;
 import com.example.englishmaster_be.common.constant.QuestionType;
-import com.example.englishmaster_be.domain.answer.dto.request.EditAnswer1Request;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.content.service.IContentService;
 import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
-import com.example.englishmaster_be.domain.part.dto.request.EditPartQuestionsAnswersRequest;
 import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.domain.question.dto.request.*;
+import com.example.englishmaster_be.domain.question.model.QuestionEntity;
+import com.example.englishmaster_be.domain.question.repository.factory.QuestionQueryFactory;
+import com.example.englishmaster_be.domain.question.repository.jdbc.QuestionJdbcRepository;
+import com.example.englishmaster_be.domain.question.repository.jpa.QuestionRepository;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
@@ -17,21 +18,21 @@ import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
-import com.example.englishmaster_be.mapper.AnswerMapper;
-import com.example.englishmaster_be.model.answer.AnswerEntity;
-import com.example.englishmaster_be.model.answer.AnswerJdbcRepository;
-import com.example.englishmaster_be.model.content.ContentEntity;
-import com.example.englishmaster_be.model.content.ContentJdbcRepository;
-import com.example.englishmaster_be.model.part.PartEntity;
-import com.example.englishmaster_be.model.question.*;
-import com.example.englishmaster_be.model.topic.TopicEntity;
-import com.example.englishmaster_be.model.user.UserEntity;
-import com.example.englishmaster_be.mapper.QuestionMapper;
-import com.example.englishmaster_be.model.answer.AnswerRepository;
-import com.example.englishmaster_be.model.content.ContentRepository;
-import com.example.englishmaster_be.model.part.PartRepository;
-import com.example.englishmaster_be.helper.FileHelper;
-import com.example.englishmaster_be.util.QuestionUtil;
+import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
+import com.example.englishmaster_be.domain.answer.repository.jdbc.AnswerJdbcRepository;
+import com.example.englishmaster_be.domain.content.model.ContentEntity;
+import com.example.englishmaster_be.domain.content.repository.jdbc.ContentJdbcRepository;
+import com.example.englishmaster_be.domain.part.model.PartEntity;
+import com.example.englishmaster_be.domain.topic.model.TopicEntity;
+import com.example.englishmaster_be.domain.user.model.UserEntity;
+import com.example.englishmaster_be.domain.question.mapper.QuestionMapper;
+import com.example.englishmaster_be.domain.answer.repository.jpa.AnswerRepository;
+import com.example.englishmaster_be.domain.content.repository.jpa.ContentRepository;
+import com.example.englishmaster_be.domain.part.repository.jpa.PartRepository;
+import com.example.englishmaster_be.shared.batch.JpaBatchProcessor;
+import com.example.englishmaster_be.shared.helper.FileHelper;
+import com.example.englishmaster_be.domain.question.util.QuestionUtil;
+import com.example.englishmaster_be.shared.util.FileUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -45,7 +46,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -139,7 +139,7 @@ public class QuestionService implements IQuestionService {
             addContentToQuestion(
                     createdQuestion,
                     questionRequest.getContentImage(),
-                    fileUtil.mimeTypeFile(questionRequest.getContentImage()),
+                    FileUtil.mimeTypeFile(questionRequest.getContentImage()),
                     currentUser
             );
         }
@@ -148,7 +148,7 @@ public class QuestionService implements IQuestionService {
             addContentToQuestion(
                     createdQuestion,
                     questionRequest.getContentAudio(),
-                    fileUtil.mimeTypeFile(questionRequest.getContentAudio()),
+                    FileUtil.mimeTypeFile(questionRequest.getContentAudio()),
                     currentUser
             );
         }
@@ -208,7 +208,7 @@ public class QuestionService implements IQuestionService {
             addContentToQuestion(
                     question,
                     request.getContentImage(),
-                    fileUtil.mimeTypeFile(request.getContentImage()),
+                    FileUtil.mimeTypeFile(request.getContentImage()),
                     user
             );
         }
@@ -218,7 +218,7 @@ public class QuestionService implements IQuestionService {
             addContentToQuestion(
                     question,
                     request.getContentAudio(),
-                    fileUtil.mimeTypeFile(request.getContentAudio()),
+                    FileUtil.mimeTypeFile(request.getContentAudio()),
                     user
             );
         }
@@ -514,5 +514,17 @@ public class QuestionService implements IQuestionService {
         questionJdbcRepository.batchUpdateQuestion(questionChildToUpdate);
         answerJdbcRepository.batchInsertAnswer(answerChildToCreate);
         answerJdbcRepository.batchUpdateAnswer(answerChildToUpdate);
+    }
+
+    @Transactional
+    @Override
+    public void deleteAllQuestions(List<UUID> questionIds) {
+
+        if(questionIds == null || questionIds.isEmpty())
+            return;
+
+        List<UUID> answerIds = answerRepository.findAllAnswerIdsIn(questionIds);
+        answerRepository.deleteAll(answerIds);
+        questionRepository.deleteAll(questionIds);
     }
 }

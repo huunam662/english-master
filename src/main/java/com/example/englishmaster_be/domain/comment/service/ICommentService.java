@@ -4,12 +4,8 @@ package com.example.englishmaster_be.domain.comment.service;
 import com.example.englishmaster_be.domain.comment.dto.request.CreateCmToCommentRequest;
 import com.example.englishmaster_be.domain.comment.dto.request.CreateNewsCommentRequest;
 import com.example.englishmaster_be.domain.comment.dto.request.UpdateCommentRequest;
-import com.example.englishmaster_be.domain.comment.dto.response.CmToCommentNewsKeyResponse;
-import com.example.englishmaster_be.domain.comment.dto.response.CommentChildResponse;
-import com.example.englishmaster_be.domain.comment.dto.response.CommentKeyResponse;
-import com.example.englishmaster_be.domain.comment.dto.response.CommentNewsKeyResponse;
-import com.example.englishmaster_be.model.comment.CommentEntity;
-import org.springframework.web.bind.annotation.PathVariable;
+import com.example.englishmaster_be.domain.comment.dto.response.*;
+import com.example.englishmaster_be.domain.comment.model.CommentEntity;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,7 +16,7 @@ public interface ICommentService {
 
     CommentEntity getCommentInfoById(UUID id);
 
-    List<CommentEntity> getNewsComments(UUID newsId, Integer stepLoad, Integer sizeLoad);
+    List<CommentNewsResponse> getNewsComments(UUID newsId, Integer stepLoad, Integer sizeLoad);
 
     CommentNewsKeyResponse commentToNews(CreateNewsCommentRequest request);
 
@@ -30,7 +26,7 @@ public interface ICommentService {
 
     CmToCommentNewsKeyResponse commentToAnyComment(CreateCmToCommentRequest request);
 
-    List<CommentEntity> getCommentsChild(UUID commentParentId, Integer stepLoad, Integer sizeLoad);
+    List<CommentChildResponse> getCommentsChild(UUID commentParentId, Integer stepLoad, Integer sizeLoad);
 
     CommentKeyResponse votesToComment(UUID commentId);
 

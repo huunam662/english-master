@@ -1,36 +1,34 @@
 package com.example.englishmaster_be.domain.mock_test.service;
 
-import com.example.englishmaster_be.domain.mock_test_result.service.IResultMockTestService;
-import com.example.englishmaster_be.model.answer.AnswerRepository;
-import com.example.englishmaster_be.model.mock_test.MockTestJdbcRepository;
-import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailJdbcRepository;
-import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailRepository;
-import com.example.englishmaster_be.model.mock_test_result.MockTestResultJdbcRepository;
+import com.example.englishmaster_be.domain.answer.repository.jpa.AnswerRepository;
+import com.example.englishmaster_be.domain.mock_test.model.QMockTestEntity;
+import com.example.englishmaster_be.domain.mock_test.repository.jdbc.MockTestJdbcRepository;
+import com.example.englishmaster_be.domain.mock_test_result.repository.jdbc.MockTestDetailJdbcRepository;
+import com.example.englishmaster_be.domain.mock_test_result.repository.jpa.MockTestDetailRepository;
+import com.example.englishmaster_be.domain.mock_test_result.repository.jdbc.MockTestResultJdbcRepository;
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestKeyResponse;
 import com.example.englishmaster_be.domain.topic.dto.projection.INumberAndScoreQuestionTopic;
-import com.example.englishmaster_be.model.mock_test_result.MockTestResultEntity;
-import com.example.englishmaster_be.model.part.PartEntity;
+import com.example.englishmaster_be.domain.mock_test_result.model.MockTestResultEntity;
+import com.example.englishmaster_be.domain.part.model.PartEntity;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
-
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.mock_test.dto.request.*;
 import com.example.englishmaster_be.domain.mock_test.dto.response.IMockTestToUserResponse;
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestPartResponse;
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestResponse;
-import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionMockTestResponse;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.mapper.MockTestMapper;
+import com.example.englishmaster_be.domain.mock_test.mapper.MockTestMapper;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
-import com.example.englishmaster_be.model.answer.AnswerEntity;
-import com.example.englishmaster_be.model.mock_test_detail.MockTestDetailEntity;
-import com.example.englishmaster_be.model.mock_test.MockTestEntity;
-import com.example.englishmaster_be.model.mock_test.MockTestRepository;
-import com.example.englishmaster_be.model.question.QuestionEntity;
-import com.example.englishmaster_be.model.topic.TopicEntity;
-import com.example.englishmaster_be.model.user.UserEntity;
+import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
+import com.example.englishmaster_be.domain.mock_test_result.model.MockTestDetailEntity;
+import com.example.englishmaster_be.domain.mock_test.model.MockTestEntity;
+import com.example.englishmaster_be.domain.mock_test.repository.jpa.MockTestRepository;
+import com.example.englishmaster_be.domain.question.model.QuestionEntity;
+import com.example.englishmaster_be.domain.topic.model.TopicEntity;
+import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.shared.service.mailer.MailerService;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -46,7 +44,6 @@ import org.springframework.stereotype.Service;
 import com.example.englishmaster_be.common.constant.error.Error;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -54,7 +51,6 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.example.englishmaster_be.model.mock_test.QMockTestEntity;
 
 @Slf4j(topic = "MOCK-TEST-SERVICE")
 @Service

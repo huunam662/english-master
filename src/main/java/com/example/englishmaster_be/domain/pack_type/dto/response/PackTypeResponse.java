@@ -19,6 +19,8 @@ public class PackTypeResponse {
 
     String packTypeName;
 
+    String description;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
     LocalDateTime createdAt;
 

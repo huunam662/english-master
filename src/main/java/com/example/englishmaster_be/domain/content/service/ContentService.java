@@ -2,18 +2,18 @@ package com.example.englishmaster_be.domain.content.service;
 
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
-
 import com.example.englishmaster_be.domain.content.dto.request.ContentRequest;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
-import com.example.englishmaster_be.mapper.ContentMapper;
-import com.example.englishmaster_be.model.content.ContentEntity;
-import com.example.englishmaster_be.model.content.ContentRepository;
-import com.example.englishmaster_be.model.question.QuestionEntity;
-import com.example.englishmaster_be.model.user.UserEntity;
+import com.example.englishmaster_be.domain.content.mapper.ContentMapper;
+import com.example.englishmaster_be.domain.content.model.ContentEntity;
+import com.example.englishmaster_be.domain.content.repository.jpa.ContentRepository;
+import com.example.englishmaster_be.domain.question.model.QuestionEntity;
+import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.helper.FileHelper;
+import com.example.englishmaster_be.shared.helper.FileHelper;
+import com.example.englishmaster_be.shared.util.FileUtil;
 import com.example.englishmaster_be.value.LinkValue;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -32,8 +31,6 @@ import java.util.UUID;
 public class ContentService implements IContentService {
 
     LinkValue linkValue;
-
-    FileHelper fileUtil;
 
     ContentRepository contentRepository;
 
@@ -108,7 +105,7 @@ public class ContentService implements IContentService {
                 );
 
             content.setContentData(contentRequest.getImage());
-            content.setContentType(fileUtil.mimeTypeFile(contentRequest.getImage()));
+            content.setContentType(FileUtil.mimeTypeFile(contentRequest.getImage()));
         }
 
         if(!content.getQuestions().contains(question))

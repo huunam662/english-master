@@ -1,8 +1,9 @@
 package com.example.englishmaster_be.config.web;
 
+import com.example.englishmaster_be.common.constant.ImportExcelType;
 import com.example.englishmaster_be.common.constant.sort.PackTypeSortBy;
 import com.example.englishmaster_be.common.constant.sort.TopicSortBy;
-import com.example.englishmaster_be.config.middleware.interceptor.MiddlewareInterceptorConfig;
+import com.example.englishmaster_be.config.interceptor.InterceptorConfig;
 import com.example.englishmaster_be.value.AppValue;
 import lombok.AccessLevel;
 import lombok.NonNull;
@@ -26,7 +27,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     AppValue appValue;
 
-    MiddlewareInterceptorConfig globalInterceptorHandler;
+    InterceptorConfig globalInterceptorHandler;
 
 
     @Override
@@ -68,7 +69,6 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addFormatters(FormatterRegistry registry) {
 
         registry.addConverter(new Converter<String, PackTypeSortBy>() {
-
             @Override
             @NonNull
             public PackTypeSortBy convert(@NonNull String source) {
@@ -79,12 +79,19 @@ public class WebMvcConfig implements WebMvcConfigurer {
         });
 
         registry.addConverter(new Converter<String, TopicSortBy>() {
-
             @Override
             @NonNull
             public TopicSortBy convert(@NonNull String source) {
 
                 return TopicSortBy.fromCode(source);
+            }
+        });
+
+        registry.addConverter(new Converter<String, ImportExcelType>() {
+            @Override
+            @NonNull
+            public ImportExcelType convert(@NonNull String source) {
+                return ImportExcelType.fromType(source);
             }
         });
     }

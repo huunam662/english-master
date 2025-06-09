@@ -4,16 +4,15 @@ import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.domain.pack.dto.request.PackRequest;
-import com.example.englishmaster_be.model.pack.PackRepository;
-import com.example.englishmaster_be.model.pack.PackEntity;
-import com.example.englishmaster_be.model.user.UserEntity;
+import com.example.englishmaster_be.domain.pack.repository.jpa.PackRepository;
+import com.example.englishmaster_be.domain.pack.model.PackEntity;
+import com.example.englishmaster_be.domain.user.model.UserEntity;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
-
 import java.util.List;
 import java.util.UUID;
 
