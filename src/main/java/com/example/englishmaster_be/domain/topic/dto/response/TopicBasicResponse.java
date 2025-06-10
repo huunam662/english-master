@@ -22,4 +22,6 @@ public class TopicBasicResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     LocalTime workTime;
 
+    String topicType;
+
 }

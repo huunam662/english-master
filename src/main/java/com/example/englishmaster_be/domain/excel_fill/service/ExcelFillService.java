@@ -2067,20 +2067,20 @@ public class ExcelFillService implements IExcelFillService {
                         break;
                     }
 
-                    questionsChildOfParent.add(
-                            QuestionEntity.builder()
-                                    .questionId(UUID.randomUUID())
-                                    .questionContent(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(1)))
-                                    .partId(partId)
-                                    .questionGroupParent(questionParent)
-                                    .isQuestionParent(false)
-                                    .numberChoice(0)
-                                    .questionType(QuestionType.Question_Child)
-                                    .questionScore(orderChild)
-                                    .userCreate(userImport)
-                                    .userUpdate(userImport)
-                                    .build()
-                    );
+                    QuestionEntity questionChild = QuestionEntity.builder()
+                            .questionId(UUID.randomUUID())
+                            .questionContent(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(1)))
+                            .partId(partId)
+                            .questionGroupParent(questionParent)
+                            .isQuestionParent(false)
+                            .numberChoice(0)
+                            .questionType(QuestionType.Question_Child)
+                            .questionScore(orderChild)
+                            .userCreate(userImport)
+                            .userUpdate(userImport)
+                            .build();
+                    questionParent.setQuestionScore(questionParent.getQuestionScore() + questionChild.getQuestionScore());
+                    questionsChildOfParent.add(questionChild);
 
                     nextRow++;
                     orderChild++;
