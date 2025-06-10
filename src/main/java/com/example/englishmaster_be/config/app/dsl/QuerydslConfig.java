@@ -1,5 +1,6 @@
-package com.example.englishmaster_be.config.app.query_dsl;
+package com.example.englishmaster_be.config.app.dsl;
 
+import com.querydsl.core.types.dsl.PathBuilderFactory;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.springframework.data.jpa.repository.support.Querydsl;
 
 
 @Configuration
@@ -23,4 +25,5 @@ public class QuerydslConfig {
     public JPAQueryFactory jpaQueryFactory() {
         return new JPAQueryFactory(entityManager);
     }
+
 }

@@ -2,14 +2,20 @@ package com.example.englishmaster_be.domain.flash_card.controller;
 
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
+import com.example.englishmaster_be.domain.flash_card.dto.request.FlashCardFilterRequest;
+import com.example.englishmaster_be.domain.flash_card.dto.response.FlashCardKeyResponse;
+import com.example.englishmaster_be.domain.flash_card.dto.response.FlashCardUserResponse;
 import com.example.englishmaster_be.domain.flash_card.service.IFlashCardService;
 import com.example.englishmaster_be.domain.flash_card.dto.request.FlashCardRequest;
 import com.example.englishmaster_be.domain.flash_card.mapper.FlashCardMapper;
 import com.example.englishmaster_be.domain.flash_card_word.dto.response.FlashCardWordListResponse;
 import com.example.englishmaster_be.domain.flash_card.dto.response.FlashCardResponse;
 import com.example.englishmaster_be.domain.flash_card.model.FlashCardEntity;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,65 +31,137 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FlashCardController {
 
-
     IFlashCardService flashCardService;
 
 
-    @GetMapping(value = "/{flashCardId:.+}/listFlashCardWord")
+    @GetMapping("/{flashCardId}/user")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @DefaultMessage("Get single flash card successful.")
+    @Operation(
+            summary = "Get single flash card to user.",
+            description = "Get single flash card to user."
+    )
+    public FlashCardUserResponse getFlashCardToUser(@PathVariable("flashCardId") UUID flashCardId) {
+
+        return flashCardService.getFlashCardResponseToUserById(flashCardId);
+    }
+
+    @GetMapping(value = "/user")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Show list successfully")
-    public FlashCardWordListResponse getWordToFlashCard(@PathVariable("flashCardId") UUID flashCardId){
+    @Operation(
+            summary = "Get flash card to user with filter on page and page size,...",
+            description = "Get flash card to user with filter on page and page size,..."
+    )
+    public FilterResponse<?> listFlashCardUser(@ModelAttribute FlashCardFilterRequest filterRequest){
 
-        FlashCardEntity flashCard = flashCardService.getFlashCardById(flashCardId);
-
-        return FlashCardMapper.INSTANCE.toFlashCardListWordResponse(flashCard);
+        return flashCardService.getListFlashCardUser(filterRequest);
     }
 
 
-    @GetMapping(value = "/listFlashCardUser")
-    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @GetMapping
     @DefaultMessage("Show list successfully")
-    public List<FlashCardResponse> listFlashCardUser(){
+    @Operation(
+            summary = "Get flash card with filter on page and page size,...",
+            description = "Get flash card with filter on page and page size,..."
+    )
+    public FilterResponse<?> listFlashCard(@ModelAttribute FlashCardFilterRequest filterRequest){
 
-        List<FlashCardEntity> flashCardList = flashCardService.getListFlashCardByCurrentUser();
-
-        return FlashCardMapper.INSTANCE.toFlashCardResponseList(flashCardList);
+        return flashCardService.getListFlashCard(filterRequest);
     }
 
-
-    @PostMapping(value = "/addFlashCardUser")
+    @PostMapping(value = "/user")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Save successfully")
-    public FlashCardResponse addFlashCardUser(
+    @Operation(
+            summary = "Create new flash card to user.",
+            description = "Create new flash card to user."
+    )
+    public FlashCardKeyResponse addFlashCardUser(
             @RequestBody FlashCardRequest flashCardRequest
     ){
 
-        FlashCardEntity flashCard = flashCardService.saveFlashCard(flashCardRequest);
-
-        return FlashCardMapper.INSTANCE.toFlashCardResponse(flashCard);
+        return flashCardService.createFlashCard(flashCardRequest);
     }
 
-    @PutMapping(value = "/{flashCardId:.+}/updateFlashCard")
+    @PutMapping(value = "/{flashCardId:.+}/user")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Save successfully")
-    public FlashCardResponse updateFlashCard(
+    @Operation(
+            summary = "Update existed flash card to user.",
+            description = "Update existed flash card to user."
+    )
+    public FlashCardKeyResponse updateFlashCardUser(
             @PathVariable("flashCardId") UUID flashCardId,
             @ModelAttribute FlashCardRequest flashCardRequest
     ){
 
-        flashCardRequest.setFlashCardId(flashCardId);
-
-        FlashCardEntity flashCard = flashCardService.saveFlashCard(flashCardRequest);
-
-        return FlashCardMapper.INSTANCE.toFlashCardResponse(flashCard);
+        return flashCardService.updateFlashCard(flashCardId, flashCardRequest);
     }
 
-    @DeleteMapping(value = "/{flashCardId:.+}/removeFlashCard")
+    @DeleteMapping(value = "/{flashCardId:.+}/user")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @DefaultMessage("Delete successfully")
-    public void removeWord(@PathVariable("flashCardId") UUID flashCardId){
+    @Operation(
+            summary = "Delete existed flash card to user.",
+            description = "Delete existed flash card to user."
+    )
+    public void removeFlashCardUser(@PathVariable("flashCardId") UUID flashCardId){
 
-        flashCardService.delete(flashCardId);
+        flashCardService.deleteFlashCard(flashCardId);
     }
 
+    @DeleteMapping(value = "/{flashCardId:.+}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @DefaultMessage("Delete successfully")
+    @Operation(
+            summary = "Delete existed flash card.",
+            description = "Delete existed flash card."
+    )
+    public void removeFlashCard(@PathVariable("flashCardId") UUID flashCardId){
+
+        flashCardService.deleteFlashCard(flashCardId);
+    }
+
+    @GetMapping("/{flashCardId}")
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @DefaultMessage("Get single flash card successful.")
+    @Operation(
+            summary = "Get single flash card.",
+            description = "Get single flash card."
+    )
+    public FlashCardResponse getFlashCard(@PathVariable("flashCardId") UUID flashCardId) {
+
+        return flashCardService.getFlashCardResponseById(flashCardId);
+    }
+
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @DefaultMessage("Save successfully.")
+    @Operation(
+            summary = "Create new flash card.",
+            description = "Create new flash card."
+    )
+    public FlashCardKeyResponse addFlashCard(
+            @RequestBody FlashCardRequest flashCardRequest
+    ) {
+
+        return flashCardService.createFlashCard(flashCardRequest);
+    }
+
+
+    @PutMapping("/{flashCardId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @DefaultMessage("Save successfully.")
+    @Operation(
+            summary = "Update flash card.",
+            description = "Update new flash card."
+    )
+    public FlashCardKeyResponse updateFlashCard(
+            @PathVariable("flashCardId") UUID flashCardId,
+            @RequestBody FlashCardRequest flashCardRequest
+    ) {
+
+        return flashCardService.updateFlashCard(flashCardId, flashCardRequest);
+    }
 }

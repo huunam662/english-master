@@ -17,9 +17,6 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FlashCardRequest {
 
-    @Hidden
-    UUID flashCardId;
-
     String flashCardTitle;
 
     String flashCardDescription;

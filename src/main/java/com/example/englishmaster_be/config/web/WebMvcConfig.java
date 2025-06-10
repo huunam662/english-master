@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.config.web;
 
 import com.example.englishmaster_be.common.constant.ImportExcelType;
+import com.example.englishmaster_be.common.constant.sort.FlashCardSortBy;
 import com.example.englishmaster_be.common.constant.sort.PackTypeSortBy;
 import com.example.englishmaster_be.common.constant.sort.TopicSortBy;
 import com.example.englishmaster_be.config.interceptor.InterceptorConfig;
@@ -92,6 +93,14 @@ public class WebMvcConfig implements WebMvcConfigurer {
             @NonNull
             public ImportExcelType convert(@NonNull String source) {
                 return ImportExcelType.fromType(source);
+            }
+        });
+
+        registry.addConverter(new Converter<String, FlashCardSortBy>() {
+            @Override
+            @NonNull
+            public FlashCardSortBy convert(@NonNull String source) {
+                return FlashCardSortBy.fromValue(source);
             }
         });
     }

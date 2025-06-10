@@ -50,6 +50,9 @@ public class FlashCardEntity {
     @Column(name = "update_at")
     LocalDateTime updateAt;
 
+    @Column(name = "user_id", insertable = false, updatable = false)
+    UUID userId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by", referencedColumnName = "id")
     UserEntity userCreate;
@@ -58,10 +61,12 @@ public class FlashCardEntity {
     @JoinColumn(name = "update_by", referencedColumnName = "id")
     UserEntity userUpdate;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    UserEntity flashCardOwner;
+
     @OneToMany(mappedBy = "flashCard", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Set<FlashCardWordEntity> flashCardWords;
-
-
 
     @PrePersist
     void onCreate() {

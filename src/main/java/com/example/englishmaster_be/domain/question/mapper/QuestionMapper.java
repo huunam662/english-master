@@ -38,11 +38,13 @@ public interface QuestionMapper {
 
     @Mapping(target = "numberOfQuestionsChild", expression = "java(questionEntity.getQuestionGroupChildren() != null ? questionEntity.getQuestionGroupChildren().size() : 0)")
     @Mapping(target = "questionsChildren" , expression = "java(toQuestionChildResponseList(questionEntity.getQuestionGroupChildren()))")
+    @Mapping(target = "topicId", source = "part.topicId")
     QuestionResponse toQuestionResponse(QuestionEntity questionEntity);
 
     List<QuestionResponse> toQuestionResponseList(Collection<QuestionEntity> questionEntityList);
 
     @Mapping(target = "questionsChildren", expression = "java(toQuestionChildResponseList(questionEntity.getQuestionGroupChildren(), partEntity))")
+    @Mapping(target = "topicId", source = "questionEntity.part.topicId")
     @Mapping(target = "partId", source = "questionEntity.partId")
     QuestionResponse toQuestionResponse(QuestionEntity questionEntity, PartEntity partEntity);
 
@@ -53,6 +55,7 @@ public interface QuestionMapper {
 
 
     @Mapping(target = "answers", expression = "java(AnswerMapper.INSTANCE.toAnswerResponseList(questionEntity.getAnswers()))")
+    @Mapping(target = "topicId", source = "part.topicId")
     @Mapping(target = "questionsChildren", ignore = true)
     QuestionChildResponse toQuestionChildResponse(QuestionEntity questionEntity);
 

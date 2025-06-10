@@ -1,12 +1,9 @@
 package com.example.englishmaster_be.domain.flash_card.dto.response;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.example.englishmaster_be.domain.user.dto.response.UserBasicResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 
 @Getter
 @Setter
@@ -14,16 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class FlashCardResponse {
+public class FlashCardUserResponse extends FlashCardResponse{
 
-    UUID flashCardId;
-
-    String flashCardTitle;
-
-    String flashCardImage;
-
-    String flashCardDescription;
-
-    Integer countOfWords;
-
+    UserBasicResponse flashCardOwner;
 }
