@@ -36,10 +36,6 @@ public class UploadService implements IUploadService {
 
     UploadValue uploadValue;
 
-    IUserService userService;
-
-    ITopicService topicService;
-
 
     private ResponseEntity<String> sendHttpRequest(String url, HttpMethod method, HttpHeaders headers, Object body) {
         HttpEntity<?> entity = new HttpEntity<>(body, headers);
