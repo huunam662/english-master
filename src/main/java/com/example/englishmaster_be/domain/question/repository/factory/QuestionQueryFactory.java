@@ -29,7 +29,7 @@ public class QuestionQueryFactory {
     public List<QuestionEntity> findAllQuestionsParentBy(TopicEntity topic, List<PartEntity> partTopicList){
 
         BooleanExpression conditionQueryPattern = QQuestionEntity.questionEntity.isQuestionParent
-                .and(QQuestionEntity.questionEntity.topics.contains(topic))
+                .and(QQuestionEntity.questionEntity.part.topic.eq(topic))
                 .and(QQuestionEntity.questionEntity.part.in(partTopicList));
 
         return selectFromQuestionEntity().where(conditionQueryPattern).fetch();
