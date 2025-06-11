@@ -84,12 +84,9 @@ public class ExcelImportController {
     )
     public ExcelPartIdsResponse importAllQuestionsFromPartForTopicFromExcel(
             @PathVariable("topicId") UUID topicId,
-            @RequestPart("file") MultipartFile file,
-            @RequestParam(value = "typeImport", required = false) TopicType typeImport
+            @RequestPart("file") MultipartFile file
     ){
 
-        if(typeImport == null) typeImport = TopicType.DEFAULT;
-
-        return excelService.importQuestionAtAllPartForTopicFromExcel(topicId, file, typeImport);
+        return excelService.importQuestionAtAllPartForTopicFromExcel(topicId, file);
     }
 }

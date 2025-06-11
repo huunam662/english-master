@@ -46,7 +46,7 @@ public class ExcelExportController {
     }
 
     @GetMapping("/topic/all")
-    @PreAuthorize("hasRole('ADMIN')")
+//    @PreAuthorize("hasRole('ADMIN')")
     @DefaultMessage("Export topic successful.")
     @Operation(
             summary = "Export to excel for topic.",
