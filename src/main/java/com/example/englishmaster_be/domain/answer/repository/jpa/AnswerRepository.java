@@ -59,6 +59,18 @@ public interface AnswerRepository extends JpaRepository<AnswerEntity, UUID> {
         INNER JOIN FETCH qc.questionGroupParent qp
         INNER JOIN FETCH qp.part qpp
         INNER JOIN FETCH qpp.topic t
+        WHERE t.topicId IN :topicIds
+    """)
+    List<AnswerEntity> findAnswersJoinQuestionPartTopicIn(@Param("topicIds") List<UUID> topicIds);
+
+
+    @Query("""
+        SELECT DISTINCT ac FROM AnswerEntity ac
+        INNER JOIN FETCH ac.question qc
+        INNER JOIN FETCH qc.part qcp
+        INNER JOIN FETCH qc.questionGroupParent qp
+        INNER JOIN FETCH qp.part qpp
+        INNER JOIN FETCH qpp.topic t
         WHERE t.topicId = :topicId AND LOWER(qpp.partName) = LOWER(:partName) 
     """)
     List<AnswerEntity> findAnswersJoinQuestionPartTopic(@Param("topicId") UUID topicId, @Param("partName") String partName);
@@ -94,4 +106,5 @@ public interface AnswerRepository extends JpaRepository<AnswerEntity, UUID> {
         WHERE id IN :answerIds
     """, nativeQuery = true)
     void deleteAll(@Param("answerIds") List<UUID> answerIds);
+
 }

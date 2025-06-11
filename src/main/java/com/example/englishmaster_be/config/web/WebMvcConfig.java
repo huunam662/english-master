@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.config.web;
 
-import com.example.englishmaster_be.common.constant.ImportExcelType;
+import com.example.englishmaster_be.common.constant.TopicType;
 import com.example.englishmaster_be.common.constant.sort.FlashCardSortBy;
 import com.example.englishmaster_be.common.constant.sort.PackTypeSortBy;
 import com.example.englishmaster_be.common.constant.sort.TopicSortBy;
@@ -88,11 +88,11 @@ public class WebMvcConfig implements WebMvcConfigurer {
             }
         });
 
-        registry.addConverter(new Converter<String, ImportExcelType>() {
+        registry.addConverter(new Converter<String, TopicType>() {
             @Override
             @NonNull
-            public ImportExcelType convert(@NonNull String source) {
-                return ImportExcelType.fromType(source);
+            public TopicType convert(@NonNull String source) {
+                return TopicType.fromType(source);
             }
         });
 

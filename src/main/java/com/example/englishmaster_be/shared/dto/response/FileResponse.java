@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.file_storage.dto.response;
+package com.example.englishmaster_be.shared.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;

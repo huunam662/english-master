@@ -49,5 +49,34 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, JpaSp
         WHERE id = :topicId
     """, nativeQuery = true)
     Integer countQuestionsByTopicId(@Param("topicId") UUID topicId);
+
+    @Query("""
+        SELECT t FROM TopicEntity t
+        INNER JOIN FETCH t.topicType tt
+        INNER JOIN FETCH t.pack tp
+        INNER JOIN FETCH tp.packType pt
+        WHERE LOWER(tt.topicTypeName) = LOWER(:topicTypeName) 
+        ORDER BY t.updateAt
+    """)
+    List<TopicEntity> findAllTopicWithJoinParent(@Param("topicTypeName") String topicTypeName, Pageable pageable);
+
+    @Query("""
+        SELECT t FROM TopicEntity t
+        INNER JOIN FETCH t.topicType tt
+        INNER JOIN FETCH t.pack tp
+        INNER JOIN FETCH tp.packType pt
+        WHERE t.topicId = :topicId
+        ORDER BY t.updateAt
+    """)
+    Optional<TopicEntity> findAllTopicWithJoinParent(@Param("topicId") UUID  topicId);
+
+    @Query("""
+        SELECT t FROM TopicEntity t
+        INNER JOIN FETCH t.topicType tt
+        INNER JOIN FETCH t.pack tp
+        INNER JOIN FETCH tp.packType pt
+        ORDER BY t.updateAt
+    """)
+    List<TopicEntity> findAllTopicWithJoinParent(Pageable pageable);
 }
 

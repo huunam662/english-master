@@ -6,8 +6,6 @@ import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.shared.dto.response.ResultApiResponse;
-
-import com.example.englishmaster_be.domain.file_storage.dto.response.ResourceResponse;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseBodyAdvice;
 
-import javax.xml.transform.Result;
-import java.io.IOException;
 
 @Slf4j(topic = "GLOBAL-OBJECT-RESPONSE-WRAPPER")
 @RestControllerAdvice
@@ -80,21 +76,6 @@ public class GlobalObjectResponseWrapper implements ResponseBodyAdvice<Object> {
         }
 
         response.setStatusCode(HttpStatus.OK);
-
-        if(body instanceof ResourceResponse resourceResponse) {
-
-            String typeLoad = resourceResponse.getTypeLoad().name().toLowerCase();
-
-            response.getHeaders().set(HttpHeaders.CONTENT_TYPE, resourceResponse.getContentType());
-            response.getHeaders().set(HttpHeaders.CONTENT_DISPOSITION, typeLoad + "; filename=\"" + resourceResponse.getFileName() + "\"");
-            response.getHeaders().setContentLength(resourceResponse.getContentLength());
-
-            try {
-                return resourceResponse.getResource().getInputStream().readAllBytes();
-            } catch (IOException e) {
-                throw new ErrorHolder(Error.SERVER_ERROR);
-            }
-        }
 
         if(body instanceof FilterResponse<?> filterResponse){
 

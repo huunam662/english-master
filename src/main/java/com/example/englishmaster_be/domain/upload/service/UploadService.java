@@ -1,12 +1,10 @@
 package com.example.englishmaster_be.domain.upload.service;
 
-import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
-import com.example.englishmaster_be.domain.topic.service.ITopicService;
+import com.example.englishmaster_be.shared.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.value.UploadValue;
-import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AccessLevel;

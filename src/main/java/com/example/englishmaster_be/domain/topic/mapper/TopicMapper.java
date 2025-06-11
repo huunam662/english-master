@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.domain.topic.mapper;
 
-import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicContentResponse;
-import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
+import com.example.englishmaster_be.domain.excel.dto.response.ExcelTopicContentResponse;
 import com.example.englishmaster_be.domain.part.mapper.PartMapper;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicRequest;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicBasicResponse;
