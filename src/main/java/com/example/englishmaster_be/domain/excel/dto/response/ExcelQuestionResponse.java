@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.excel_fill.dto.response;
+package com.example.englishmaster_be.domain.excel.dto.response;
 
 import com.example.englishmaster_be.common.constant.QuestionType;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;

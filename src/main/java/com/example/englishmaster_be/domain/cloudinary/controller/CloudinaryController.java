@@ -3,7 +3,7 @@ package com.example.englishmaster_be.domain.cloudinary.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.cloudinary.service.ICloudinaryService;
-import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
+import com.example.englishmaster_be.shared.dto.response.FileResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

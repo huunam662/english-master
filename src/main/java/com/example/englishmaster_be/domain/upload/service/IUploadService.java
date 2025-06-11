@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.upload.service;
 
-import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
+import com.example.englishmaster_be.shared.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import org.springframework.web.multipart.MultipartFile;
 

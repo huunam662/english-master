@@ -46,8 +46,8 @@ public class QuestionJdbcRepository {
                     id, number_choice, question_score, create_at, update_at,
                     create_by, update_by, question_title, question_content,
                     content_audio, content_image, question_type, is_question_parent,
-                    question_group, part_id, duration_record
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    question_group, part_id, duration_record, question_result
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """;
 
         int questionsSize = questions.size();
@@ -83,6 +83,7 @@ public class QuestionJdbcRepository {
                     ps.setObject(14, question.getQuestionGroupParent() != null ? question.getQuestionGroupParent().getQuestionId() : null);
                     ps.setObject(15, question.getPart() != null ? question.getPart().getPartId() : question.getPartId());
                     ps.setTime(16, question.getDurationRecord() == null ? null : Time.valueOf(question.getDurationRecord()));
+                    ps.setString(17, question.getQuestionResult());
                 }
 
                 @Override

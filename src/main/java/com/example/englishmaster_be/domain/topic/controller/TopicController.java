@@ -2,34 +2,22 @@ package com.example.englishmaster_be.domain.topic.controller;
 
 import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
-import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelQuestionListResponse;
-import com.example.englishmaster_be.domain.excel_fill.dto.response.ExcelTopicResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
-import com.example.englishmaster_be.domain.question.dto.response.QuestionResponse;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
-import com.example.englishmaster_be.domain.comment.mapper.CommentMapper;
 import com.example.englishmaster_be.domain.topic.mapper.TopicMapper;
-import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
-import com.example.englishmaster_be.domain.topic.dto.request.TopicQuestionListRequest;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicRequest;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicFilterRequest;
-import com.example.englishmaster_be.domain.comment.dto.response.CommentResponse;
 import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicResponse;
-import com.example.englishmaster_be.domain.comment.model.CommentEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import java.time.LocalDate;
+
 import java.util.*;
 
 

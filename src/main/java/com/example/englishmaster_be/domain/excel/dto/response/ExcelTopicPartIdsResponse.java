@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.excel_fill.dto.response;
+package com.example.englishmaster_be.domain.excel.dto.response;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

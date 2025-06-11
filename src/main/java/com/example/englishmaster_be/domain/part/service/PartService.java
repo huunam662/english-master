@@ -1,8 +1,6 @@
 package com.example.englishmaster_be.domain.part.service;
 
 import com.example.englishmaster_be.common.constant.error.Error;
-import com.example.englishmaster_be.domain.file_storage.dto.response.FileResponse;
-import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestPartRequest;
 import com.example.englishmaster_be.domain.part.dto.request.CreatePartQuestionsAnswersRequest;
 import com.example.englishmaster_be.domain.part.dto.request.EditPartQuestionsAnswersRequest;
 import com.example.englishmaster_be.domain.part.dto.response.PartKeyResponse;
@@ -12,7 +10,6 @@ import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
 import com.example.englishmaster_be.domain.part.repository.jpa.PartRepository;
-import com.example.englishmaster_be.domain.part.dto.request.PartSaveContentRequest;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.domain.part.mapper.PartMapper;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
@@ -30,7 +27,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import org.springframework.web.multipart.MultipartFile;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;

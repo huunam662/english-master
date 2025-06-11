@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.question.repository.jpa;
 
+import com.example.englishmaster_be.common.constant.TopicType;
 import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
 import com.example.englishmaster_be.domain.question.dto.projection.INumberAndScoreQuestionTopic;
@@ -76,5 +77,15 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, UUID> 
         AND qc.questionGroupParent IS NOT NULL
     """)
     List<QuestionEntity> findAllQuestionChildOfTopicAndPart(@Param("topicId") UUID topicId, @Param("partName") String partName);
+
+    @Query("""
+        SELECT qc FROM QuestionEntity qc
+        INNER JOIN FETCH qc.questionGroupParent qp
+        INNER JOIN FETCH qp.part p
+        INNER JOIN FETCH p.topic t
+        WHERE t.topicId IN :topicIds
+    """)
+    List<QuestionEntity> findAllChildOfTopicByTopicType(@Param("topicIds") List<UUID> topicIds);
+
 }
 
