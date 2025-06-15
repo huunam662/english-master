@@ -35,6 +35,9 @@ import org.springframework.stereotype.Service;
 import com.example.englishmaster_be.common.constant.error.Error;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -188,10 +191,6 @@ public class MockTestService implements IMockTestService {
 
         INumberAndScoreQuestionTopic numberAndScoreQuestionTopic = questionService.getNumberAndScoreQuestionTopic(topicOfMockTest.getTopicId());
 
-        int numberAndScoreQuestion = numberAndScoreQuestionTopic.getNumberQuestions();
-
-        int ScoreQuestions = numberAndScoreQuestionTopic.getScoreQuestions();
-
         List<AnswerEntity> answersSubmit = answerRepository.findAnswersInAnswerIds(topicOfMockTest.getTopicId(), listAnswerId);
 
         int totalQuestionsFinish = listAnswerId.size();
@@ -265,8 +264,8 @@ public class MockTestService implements IMockTestService {
             totalScoreMockTest += totalScoreOfPart;
         }
 
-        float answersCorrectPercent = (float) totalAnswersCorrect / numberAndScoreQuestionTopic.getNumberQuestions();
-        answersCorrectPercent = Math.round(answersCorrectPercent * 100f) / 100f;
+        float answersCorrectPercent = BigDecimal.valueOf((float) totalAnswersCorrect / numberAndScoreQuestionTopic.getNumberQuestions())
+                        .setScale(2, RoundingMode.HALF_UP).floatValue();
 
         mockTestRepository.updateMockTest(
                 mockTestId, answersCorrectPercent, totalAnswersCorrect, totalAnswersWrong,

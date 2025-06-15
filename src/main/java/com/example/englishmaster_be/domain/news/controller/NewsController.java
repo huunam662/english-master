@@ -1,6 +1,5 @@
 package com.example.englishmaster_be.domain.news.controller;
 
-import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.news.dto.request.UpdateNewsRequest;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 
@@ -36,7 +35,6 @@ public class NewsController {
 
     @GetMapping(value = "/listNewsAdmin")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("List news successfully")
     public FilterResponse<?> listNewsOfAdmin(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
@@ -60,7 +58,6 @@ public class NewsController {
 
 
     @GetMapping(value = "/listNewsUser")
-    @DefaultMessage("List NewsEntity successfully")
     public List<NewsResponse> listNewsOfUser(
             @RequestParam(value = "size", defaultValue = "5") @Min(1) @Max(100) Integer size
     ){
@@ -84,7 +81,6 @@ public class NewsController {
 
     @PostMapping(value = "/createNews")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Create news successfully")
     public ResourceKeyResponse createNews(
             @RequestBody CreateNewsRequest newsRequest
     ){
@@ -95,7 +91,6 @@ public class NewsController {
 
     @PutMapping(value = "/updateNews")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Update NewsEntity successfully")
     public ResourceKeyResponse updateNews(
             @RequestBody UpdateNewsRequest newsRequest
     ){
@@ -114,7 +109,6 @@ public class NewsController {
 
     @DeleteMapping(value = "/{newsId:.+}/deleteNews")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Delete news successfully")
     public void deleteNews(@PathVariable("newsId") UUID newsId){
 
         newsService.deleteNews(newsId);
@@ -123,7 +117,6 @@ public class NewsController {
 
     @GetMapping(value="/searchByTitle")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Search by title successfully")
     public List<NewsResponse> searchByTitle(@RequestParam("title") String title) {
 
         List<NewsEntity> newsEntityList = newsService.searchByTitle(title);

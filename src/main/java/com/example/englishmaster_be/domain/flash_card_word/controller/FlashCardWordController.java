@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.domain.flash_card_word.controller;
 
 
-import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.flash_card_word.service.IFlashCardWordService;
 import com.example.englishmaster_be.domain.flash_card_word.dto.request.FlashCardWordRequest;
 import com.example.englishmaster_be.domain.flash_card_word.mapper.FlashCardWordMapper;
@@ -31,7 +30,6 @@ public class FlashCardWordController {
 
     @DeleteMapping(value = "/{flashCardWordId:.+}/removeWord")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Delete successfully")
     public void removeWord(@PathVariable("flashCardWordId") UUID flashCardWordId){
 
         flashCardWordService.delete(flashCardWordId);
@@ -39,7 +37,6 @@ public class FlashCardWordController {
 
     @PostMapping(value = "/{flashCardId:.+}/addWordToFlashCard")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Save successfully")
     public FlashCardWordResponse addWordToFlashCard(
             @PathVariable("flashCardId") UUID flashCardId,
             @RequestBody FlashCardWordRequest flashCardWordRequest
@@ -55,7 +52,6 @@ public class FlashCardWordController {
 
     @PutMapping(value = "/{flashCardWordId:.+}/updateWord")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Save successfully")
     public FlashCardWordResponse updateWord(
             @PathVariable("flashCardWordId") UUID flashCardWordId,
             @RequestBody FlashCardWordRequest flashCardWordRequest
@@ -69,7 +65,6 @@ public class FlashCardWordController {
     }
 
     @GetMapping("/searchByWord")
-    @DefaultMessage("Show list successfully")
     public List<String> searchFlashCardByWord(@RequestParam(value = "query") String query) {
 
         return flashCardWordService.searchByFlashCardWord(query);

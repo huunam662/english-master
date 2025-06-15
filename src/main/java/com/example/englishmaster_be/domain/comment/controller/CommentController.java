@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.domain.comment.controller;
 
 
-import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.comment.dto.request.CreateCmToCommentRequest;
 import com.example.englishmaster_be.domain.comment.dto.request.UpdateCommentRequest;
 import com.example.englishmaster_be.domain.comment.dto.response.*;
@@ -32,7 +31,6 @@ public class CommentController {
 
 
     @GetMapping("/{commentId:.+}")
-    @DefaultMessage("Load comment successful.")
     @Operation(
             summary = "Get single comment.",
             description = "Get single comment."
@@ -45,7 +43,6 @@ public class CommentController {
     }
 
     @GetMapping("/{newsId:.+}/news-comments")
-    @DefaultMessage("load new comments successful.")
     @Operation(
             summary = "Get comments for news.",
             description = "Get comments for news."
@@ -60,7 +57,6 @@ public class CommentController {
     }
 
     @GetMapping("/{commentParentId:.+}/comments-child")
-    @DefaultMessage("load comments child successful.")
     @Operation(
             summary = "Get comments child.",
             description = "Get comments child"
@@ -75,7 +71,6 @@ public class CommentController {
     }
 
     @PostMapping("/to-news")
-    @DefaultMessage("Comment for news successful.")
     @Operation(
             summary = "Comment for news.",
             description = "Comment for news."
@@ -87,7 +82,6 @@ public class CommentController {
 
     @PatchMapping("/edit")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Edit comment successful.")
     @Operation(
             summary = "Edit comment.",
             description = "Edit comment."
@@ -99,7 +93,6 @@ public class CommentController {
 
     @DeleteMapping("/{commentId:.+}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Delete comment successful.")
     @Operation(
             summary = "Delete comment.",
             description = "Delete comment."
@@ -110,7 +103,6 @@ public class CommentController {
     }
 
     @PostMapping("/to-comment")
-    @DefaultMessage("Comment to comment successful.")
     @Operation(
             summary = "Comment to any comment.",
             description = "Comment to any comment."
@@ -122,7 +114,6 @@ public class CommentController {
 
     @GetMapping("/{commentId:.+}/votes")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Votes to comment successful.")
     @Operation(
             summary = "Votes to comment.",
             description = "Votes to comment."
@@ -134,7 +125,6 @@ public class CommentController {
 
     @GetMapping("/{commentId:.+}/un-votes")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("UnVotes to comment successful.")
     @Operation(
             summary = "UnVotes to comment.",
             description = "UnVotes to comment."

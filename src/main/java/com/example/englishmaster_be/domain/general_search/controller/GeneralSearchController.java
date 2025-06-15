@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.domain.general_search.controller;
 
 
-import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.general_search.dto.response.GeneralSearchAllResponse;
 import com.example.englishmaster_be.domain.general_search.service.IGeneralSearchService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,7 +23,6 @@ public class GeneralSearchController{
 
 
     @GetMapping("/searchAll")
-    @DefaultMessage("Search successfully")
     public GeneralSearchAllResponse searchAll(@RequestParam(value = "keyword", defaultValue = "") String keyword){
 
        return generalSearchService.searchAll(keyword);

@@ -59,33 +59,34 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, UUID> 
     List<QuestionEntity> findAllQuestionChildOfParentIn(@Param("parentIds") List<UUID> parentIds);
 
     @Query("""
-        SELECT qc FROM QuestionEntity qc
-        INNER JOIN FETCH qc.questionGroupParent qp
-        INNER JOIN FETCH qp.part p
-        INNER JOIN FETCH p.topic t
-        WHERE t.topicId = :topicId AND qc.questionGroupParent IS NOT NULL
-    """)
-    List<QuestionEntity> findAllQuestionChildOfTopic(@Param("topicId") UUID topicId);
-
-    @Query("""
-        SELECT qc FROM QuestionEntity qc
-        INNER JOIN FETCH qc.questionGroupParent qp
-        INNER JOIN FETCH qp.part p
+        SELECT qSpeaking FROM QuestionEntity qSpeaking
+        INNER JOIN FETCH qSpeaking.part p
         INNER JOIN FETCH p.topic t
         WHERE t.topicId = :topicId
+        AND LOWER(qSpeaking.questionType) = 'speaking'
         AND LOWER(p.partName) = LOWER(:partName)
-        AND qc.questionGroupParent IS NOT NULL
     """)
-    List<QuestionEntity> findAllQuestionChildOfTopicAndPart(@Param("topicId") UUID topicId, @Param("partName") String partName);
+    List<QuestionEntity> findAllQuestionSpeakingOfTopicAndPart(@Param("topicId") UUID topicId, @Param("partName") String partName);
 
     @Query("""
-        SELECT qc FROM QuestionEntity qc
-        INNER JOIN FETCH qc.questionGroupParent qp
-        INNER JOIN FETCH qp.part p
+        SELECT qSpeaking FROM QuestionEntity qSpeaking
+        INNER JOIN FETCH qSpeaking.part p
         INNER JOIN FETCH p.topic t
         WHERE t.topicId IN :topicIds
+         AND LOWER(qSpeaking.questionType) = 'speaking'
     """)
-    List<QuestionEntity> findAllChildOfTopicByTopicType(@Param("topicIds") List<UUID> topicIds);
+    List<QuestionEntity> findAllQuestionSpeakingOfTopics(@Param("topicIds") List<UUID> topicIds);
 
+    @Query(value = """
+        SELECT id FROM question
+        WHERE id IN :questionIds
+    """, nativeQuery = true)
+    List<UUID> findQuestionIdsIn(@Param("questionIds") List<UUID> questionIds);
+
+    @Query(value = """
+        SELECT question_content FROM question
+        WHERE id = :questionId
+    """, nativeQuery = true)
+    String findQuestionSpeakingContent(@Param("questionId") UUID questionId);
 }
 

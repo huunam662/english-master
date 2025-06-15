@@ -1,27 +1,21 @@
 package com.example.englishmaster_be.domain.flash_card.controller;
 
 
-import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.flash_card.dto.request.FlashCardFilterRequest;
 import com.example.englishmaster_be.domain.flash_card.dto.response.FlashCardKeyResponse;
 import com.example.englishmaster_be.domain.flash_card.dto.response.FlashCardUserResponse;
 import com.example.englishmaster_be.domain.flash_card.service.IFlashCardService;
 import com.example.englishmaster_be.domain.flash_card.dto.request.FlashCardRequest;
-import com.example.englishmaster_be.domain.flash_card.mapper.FlashCardMapper;
-import com.example.englishmaster_be.domain.flash_card_word.dto.response.FlashCardWordListResponse;
 import com.example.englishmaster_be.domain.flash_card.dto.response.FlashCardResponse;
-import com.example.englishmaster_be.domain.flash_card.model.FlashCardEntity;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "Flash card")
@@ -36,7 +30,6 @@ public class FlashCardController {
 
     @GetMapping("/{flashCardId}/user")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Get single flash card successful.")
     @Operation(
             summary = "Get single flash card to user.",
             description = "Get single flash card to user."
@@ -48,7 +41,6 @@ public class FlashCardController {
 
     @GetMapping(value = "/user")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show list successfully")
     @Operation(
             summary = "Get flash card to user with filter on page and page size,...",
             description = "Get flash card to user with filter on page and page size,..."
@@ -60,7 +52,6 @@ public class FlashCardController {
 
 
     @GetMapping
-    @DefaultMessage("Show list successfully")
     @Operation(
             summary = "Get flash card with filter on page and page size,...",
             description = "Get flash card with filter on page and page size,..."
@@ -72,7 +63,6 @@ public class FlashCardController {
 
     @PostMapping(value = "/user")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Save successfully")
     @Operation(
             summary = "Create new flash card to user.",
             description = "Create new flash card to user."
@@ -86,7 +76,6 @@ public class FlashCardController {
 
     @PutMapping(value = "/{flashCardId:.+}/user")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Save successfully")
     @Operation(
             summary = "Update existed flash card to user.",
             description = "Update existed flash card to user."
@@ -101,7 +90,6 @@ public class FlashCardController {
 
     @DeleteMapping(value = "/{flashCardId:.+}/user")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Delete successfully")
     @Operation(
             summary = "Delete existed flash card to user.",
             description = "Delete existed flash card to user."
@@ -113,7 +101,6 @@ public class FlashCardController {
 
     @DeleteMapping(value = "/{flashCardId:.+}")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Delete successfully")
     @Operation(
             summary = "Delete existed flash card.",
             description = "Delete existed flash card."
@@ -125,7 +112,6 @@ public class FlashCardController {
 
     @GetMapping("/{flashCardId}")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Get single flash card successful.")
     @Operation(
             summary = "Get single flash card.",
             description = "Get single flash card."
@@ -137,7 +123,6 @@ public class FlashCardController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Save successfully.")
     @Operation(
             summary = "Create new flash card.",
             description = "Create new flash card."
@@ -152,7 +137,6 @@ public class FlashCardController {
 
     @PutMapping("/{flashCardId}")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Save successfully.")
     @Operation(
             summary = "Update flash card.",
             description = "Update new flash card."

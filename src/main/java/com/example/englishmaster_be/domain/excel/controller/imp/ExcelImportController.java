@@ -1,8 +1,6 @@
 package com.example.englishmaster_be.domain.excel.controller.imp;
 
 
-import com.example.englishmaster_be.common.annotation.DefaultMessage;
-import com.example.englishmaster_be.common.constant.TopicType;
 import com.example.englishmaster_be.domain.excel.dto.response.*;
 import com.example.englishmaster_be.domain.excel.service.imp.IExcelImportService;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyResponse;
@@ -29,7 +27,6 @@ public class ExcelImportController {
     IExcelImportService excelService;
 
     @PostMapping(value = "/import/topic-information", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @DefaultMessage("Import topic information from excel successful.")
     @SneakyThrows
     @Operation(
             summary = "Import topic information from excel file.",
@@ -42,7 +39,6 @@ public class ExcelImportController {
 
 
     @PostMapping(value = "/import/{topicId:.+}/questions-to-topic-part", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @DefaultMessage("File processed successfully")
     @SneakyThrows
     @Operation(
             summary = "Import questions for topic and part.",
@@ -60,7 +56,6 @@ public class ExcelImportController {
 
 
     @PostMapping(value = "/import/{topicId:.+}/parts-to-topic", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @DefaultMessage("Import parts for topic successful.")
     @SneakyThrows
     @Operation(
             summary = "Import all parts for topic from excel file.",
@@ -76,7 +71,6 @@ public class ExcelImportController {
 
 
     @PostMapping(value = "/import/{topicId:.+}/all-questions-to-topic-part", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @DefaultMessage("File processed successfully.")
     @SneakyThrows
     @Operation(
             summary = "Import all questions from parts for topic from excel file.",

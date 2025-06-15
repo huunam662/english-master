@@ -2,7 +2,6 @@ package com.example.englishmaster_be.domain.dictionary.controller;
 
 
 
-import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.dictionary.dto.response.DictionarySuggestionResponse;
 import com.example.englishmaster_be.domain.dictionary.service.IDictionaryService;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -23,7 +22,6 @@ public class DictionaryController {
 
 
     @GetMapping("/search/{word}")
-    @DefaultMessage("Search successfully")
     public JsonNode searchWords(@PathVariable("word") String word) {
 
         return dictionaryService.searchWords(word);
@@ -31,7 +29,6 @@ public class DictionaryController {
 
 
     @GetMapping("/suggest/{word}")
-    @DefaultMessage("Show successfully")
     public DictionarySuggestionResponse getSuggestions(@PathVariable("word") String word) {
 
         return dictionaryService.getSuggestions(word);
@@ -39,7 +36,6 @@ public class DictionaryController {
 
 
     @GetMapping("/image/{word}")
-    @DefaultMessage("show successfully")
     public JsonNode getImage(@PathVariable("word") String word) {
         return dictionaryService.getImage(word);
     }
