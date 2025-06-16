@@ -49,27 +49,19 @@ public class TopicUtil {
         topic.setParts(partsOfTopic);
     }
 
-    public static void fillQuestionToTopic(
+    public static void fillQuestionSpeakingToTopic(
             TopicEntity topic,
-            List<QuestionEntity> questionChildsParam
+            List<QuestionEntity> questionSpeakings
     ) {
 
-        Map<QuestionEntity, List<QuestionEntity>> questionParentChildsGroup = questionChildsParam.stream()
-                .collect(Collectors.groupingBy(QuestionEntity::getQuestionGroupParent));
-
-        Map<PartEntity, List<QuestionEntity>> partQuestionParentsGroup = questionParentChildsGroup.keySet().stream()
+        Map<PartEntity, List<QuestionEntity>> partQuestionParentsGroup = questionSpeakings.stream()
                 .collect(Collectors.groupingBy(QuestionEntity::getPart));
 
         Set<PartEntity> partsOfTopic = partQuestionParentsGroup.keySet();
         for(PartEntity part: partsOfTopic){
             if(part == null) continue;
-            List<QuestionEntity> questionParents = partQuestionParentsGroup.getOrDefault(part, Collections.emptyList());
-            for(QuestionEntity questionParent: questionParents){
-                if(questionParent == null) continue;
-                List<QuestionEntity> questionChilds = questionParentChildsGroup.getOrDefault(questionParent, Collections.emptyList());
-                questionParent.setQuestionGroupChildren(new HashSet<>(questionChilds));
-            }
-            part.setQuestions(new HashSet<>(questionParents));
+            List<QuestionEntity> questions = partQuestionParentsGroup.getOrDefault(part, Collections.emptyList());
+            part.setQuestions(new HashSet<>(questions));
             part.setTopic(topic);
         }
 

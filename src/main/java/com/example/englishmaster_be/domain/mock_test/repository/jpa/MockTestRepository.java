@@ -21,8 +21,6 @@ public interface MockTestRepository extends JpaRepository<MockTestEntity, UUID> 
 
     List<MockTestEntity> findAllByTopic(TopicEntity topic);
 
-    Page<MockTestEntity> findAllByUser(UserEntity user, Pageable pageable);
-
     Optional<MockTestEntity> findByMockTestId(UUID mockTestId);
 
     @Query(value = "SELECT p FROM MockTestEntity p WHERE " +
@@ -106,20 +104,8 @@ public interface MockTestRepository extends JpaRepository<MockTestEntity, UUID> 
     """)
     MockTestEntity findMockTestJoinTopicAndUserAndResultAndPart(@Param("mockTestId") UUID mockTestId);
 
-
-    @Query("""
-        SELECT mt FROM MockTestEntity mt
-        INNER JOIN FETCH mt.topic t
-        INNER JOIN FETCH mt.user u
-        LEFT JOIN FETCH mt.mockTestResults mtr
-        LEFT JOIN FETCH mtr.part p
-        LEFT JOIN FETCH mtr.mockTestDetails mtd
-        LEFT JOIN FETCH mtd.questionChild qc
-        LEFT JOIN FETCH qc.questionGroupParent qp
-        LEFT JOIN FETCH mtd.answerChoice ac
-        WHERE mt.mockTestId = :mockTestId
-        ORDER BY p.partName
-    """)
-    Optional<MockTestEntity> findInfoMockTestById(@Param("mockTestId") UUID mockTestId);
-
+    @Query(value = """
+        SELECT EXISTS(SELECT id FROM mock_test WHERE id = :mockTestId) 
+    """, nativeQuery = true)
+    Boolean isExistedMockTest(@Param("mockTestId") UUID mockTestId);
 }

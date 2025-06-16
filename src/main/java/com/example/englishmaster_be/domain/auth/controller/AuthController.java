@@ -1,6 +1,5 @@
 package com.example.englishmaster_be.domain.auth.controller;
 
-import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.auth.dto.request.*;
 import com.example.englishmaster_be.domain.auth.service.auth.IAuthService;
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;
@@ -26,14 +25,12 @@ public class AuthController {
 
 
     @PostMapping("/login")
-    @DefaultMessage("Login successful.")
     public UserAuthResponse login(@RequestBody UserLoginRequest loginDTO) {
 
         return authService.login(loginDTO);
     }
 
     @PostMapping("/register")
-    @DefaultMessage("Send email for register successful.")
     public void register(
             @Valid @RequestBody UserRegisterRequest userRegisterRequest
     ) {
@@ -42,7 +39,6 @@ public class AuthController {
     }
 
     @GetMapping("/register/confirm")
-    @DefaultMessage("Verification successful.")
     public void confirmRegister(@RequestParam("token") UUID sessionActiveCode) {
 
         authService.confirmRegister(sessionActiveCode);
@@ -50,7 +46,6 @@ public class AuthController {
 
 
     @GetMapping("/mailer/otp")
-    @DefaultMessage("Check verify code at email.")
     public void mailerOtp(@RequestParam("email") String email) {
 
         authService.sendOtp(email);
@@ -58,14 +53,12 @@ public class AuthController {
 
 
     @GetMapping("/verify/otp")
-    @DefaultMessage("Verification OTP code successful.")
     public void verifyOtp(@RequestParam("otp") String otp) {
 
         authService.verifyOtp(otp);
     }
 
     @PostMapping("/change/password")
-    @DefaultMessage("Update password successful.")
     public UserAuthResponse changePassword(@Valid @RequestBody UserChangePasswordRequest changePasswordRequest){
 
         return authService.changePassword(changePasswordRequest);
@@ -73,7 +66,6 @@ public class AuthController {
 
 
     @PostMapping("/change/password/forgot")
-    @DefaultMessage("Update password successful.")
     public void changePasswordForgot(@Valid @RequestBody UserChangePwForgotRequest changePwForgotRequest) {
 
         authService.changePasswordForgot(changePwForgotRequest);
@@ -82,7 +74,6 @@ public class AuthController {
 
 
     @PostMapping("/refresh/token")
-    @DefaultMessage("Access code created successful.")
     public UserAuthResponse refreshToken(@RequestBody UserRefreshTokenRequest refreshTokenDTO) {
 
         return authService.refreshToken(refreshTokenDTO);
@@ -91,7 +82,6 @@ public class AuthController {
 
 
     @PostMapping("/logout")
-    @DefaultMessage("Logout successful.")
     public void logoutUser(@RequestBody UserLogoutRequest userLogoutDTO) {
 
         authService.logoutOf(userLogoutDTO);

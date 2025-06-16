@@ -7,7 +7,6 @@ import com.example.englishmaster_be.domain.user.dto.request.UserFilterRequest;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.domain.user.mapper.UserMapper;
 import com.example.englishmaster_be.domain.admin.dto.response.CountMockTestTopicResponse;
-import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -33,7 +32,6 @@ public class AdminController {
 
     @GetMapping(value = "/getAllUser")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("List User successfully")
     public FilterResponse<?> getAllUser(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) int page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) int size,
@@ -63,7 +61,6 @@ public class AdminController {
 
     @DeleteMapping(value = "/{userId:.+}/deleteUser")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Delete account of User successfully")
     public void deleteUser(@PathVariable("userId") UUID userId) {
 
         adminService.deleteUser(userId);
@@ -71,7 +68,6 @@ public class AdminController {
 
     @GetMapping(value = "/countMockTestOfTopic")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("List Topic and count mock test successfully")
     public List<CountMockTestTopicResponse> countMockTestOfTopic(
             @RequestParam(value = "date", required = false) String date,
             @RequestParam(value = "pack") UUID packId
@@ -83,7 +79,6 @@ public class AdminController {
     // API để tìm kiếm người dùng lâu ngày chưa đăng nhập
     @GetMapping("/users/inactive")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("List inactive users successfully")
     public List<UserResponse> getInactiveUsers() {
 
         List<UserEntity> inactiveUsers = adminService.getUsersNotLoggedInLast10Days();
@@ -93,7 +88,6 @@ public class AdminController {
 
     @GetMapping("/inactive-notify")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Notify inactive users successfully")
     public List<UserResponse> notifyInactiveUsers(@RequestParam int days){
 
         List<UserEntity> notifyInactiveUsers = adminService.findUsersInactiveForDaysAndNotify(days);
@@ -103,7 +97,6 @@ public class AdminController {
 
     @PostMapping("/notifyInactiveUsers")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Notify inactive users successfully")
     public void notifyInactiveUsers() {
 
         adminService.notifyInactiveUsers();

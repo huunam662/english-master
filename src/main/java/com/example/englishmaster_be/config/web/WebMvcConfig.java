@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.config.web;
 
+import com.example.englishmaster_be.common.constant.speaking_test.LevelSpeakerType;
 import com.example.englishmaster_be.common.constant.TopicType;
 import com.example.englishmaster_be.common.constant.sort.FlashCardSortBy;
 import com.example.englishmaster_be.common.constant.sort.PackTypeSortBy;
@@ -101,6 +102,13 @@ public class WebMvcConfig implements WebMvcConfigurer {
             @NonNull
             public FlashCardSortBy convert(@NonNull String source) {
                 return FlashCardSortBy.fromValue(source);
+            }
+        });
+        registry.addConverter(new Converter<String, LevelSpeakerType>() {
+            @Override
+            @NonNull
+            public LevelSpeakerType convert(@NonNull String source) {
+                return LevelSpeakerType.fromLevel(source);
             }
         });
     }
