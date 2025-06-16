@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.domain.upload.controller;
 
 
-import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.shared.dto.response.FileResponse;
 import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
 import com.example.englishmaster_be.domain.upload.service.IUploadService;
@@ -27,7 +26,6 @@ public class UploadController {
     IUploadService uploadService;
 
     @PostMapping(value = "/file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @DefaultMessage("Uploaded file successfully")
     public FileResponse uploadFile(
             @RequestPart("file") MultipartFile file,
             @RequestParam(value = "dir", defaultValue = "/") String dir,
@@ -42,7 +40,6 @@ public class UploadController {
     }
 
     @DeleteMapping
-    @DefaultMessage("Delete file successfully")
     @SneakyThrows
     public void deleteFile(@RequestBody FileDeleteRequest dto) {
 

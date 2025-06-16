@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.topic.repository.jpa;
 
+import com.example.englishmaster_be.domain.topic.dto.projection.ITopicField1Projection;
 import com.example.englishmaster_be.domain.topic.dto.projection.ITopicKeyProjection;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.pack.model.PackEntity;
@@ -33,9 +34,6 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, JpaSp
         WHERE t.topicId = :topicId
     """)
     Optional<TopicEntity> findByTopicId(@Param("topicId") UUID topicId);
-
-    @Query("SELECT t.topicImage FROM TopicEntity t order by t.topicId")
-    List<String> findAllTopicImages();
 
     @Query("""
         SELECT DISTINCT t.topicId as topicId, t.packId as packId
@@ -78,5 +76,14 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, JpaSp
         ORDER BY t.updateAt
     """)
     List<TopicEntity> findAllTopicWithJoinParent(Pageable pageable);
+
+    @Query(value = """
+        SELECT t.id as topicId, tt.type_name as topicType
+        FROM topics t
+        INNER JOIN topic_type tt ON t.topic_type_id = tt.id
+        WHERE t.id = :topicId
+    """, nativeQuery = true)
+    ITopicField1Projection findTopicTypeById(@Param("topicId") UUID topicId);
+
 }
 

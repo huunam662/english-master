@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.domain.answer.controller;
 
 
-import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerCorrectResponse;
 import com.example.englishmaster_be.domain.answer.service.IAnswerService;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerRequest;
@@ -29,7 +28,6 @@ public class AnswerController {
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Save successfully")
     public AnswerResponse createAnswer(@RequestBody AnswerRequest answerRequest) {
 
         AnswerEntity answer = answerService.saveAnswer(answerRequest);
@@ -39,7 +37,6 @@ public class AnswerController {
 
     @PutMapping(value = "/{answerId:.+}/update")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Save successfully")
     public AnswerResponse updateAnswer(@PathVariable("answerId") UUID answerId, @RequestBody AnswerRequest answerRequest) {
 
         answerRequest.setAnswerId(answerId);
@@ -51,7 +48,6 @@ public class AnswerController {
 
     @DeleteMapping(value = "/{answerId:.+}/delete")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Delete successfully")
     public void deleteAnswer(@PathVariable("answerId") UUID answerId) {
 
         answerService.deleteAnswer(answerId);
@@ -59,7 +55,6 @@ public class AnswerController {
 
     @GetMapping(value = "/{answerId:.+}/getDetailAnswer")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Detail successfully")
     public AnswerResponse getDetailAnswer(@PathVariable("answerId") UUID answerId) {
 
         AnswerEntity answer = answerService.getAnswerById(answerId);
@@ -69,7 +64,6 @@ public class AnswerController {
 
     @GetMapping(value = "/{answerId:.+}/checkCorrect")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Check successfully")
     public AnswerCorrectResponse checkCorrectAnswer(@PathVariable("answerId") UUID answerId) {
 
         AnswerEntity answer = answerService.getAnswerById(answerId);

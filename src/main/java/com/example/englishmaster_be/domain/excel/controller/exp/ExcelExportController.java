@@ -1,7 +1,5 @@
 package com.example.englishmaster_be.domain.excel.controller.exp;
 
-import com.example.englishmaster_be.common.annotation.DefaultMessage;
-import com.example.englishmaster_be.common.constant.ResourceTypeLoad;
 import com.example.englishmaster_be.common.constant.TopicType;
 import com.example.englishmaster_be.domain.excel.service.exp.IExcelExportService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,7 +25,6 @@ public class ExcelExportController {
 
     @GetMapping("/topic/type")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Export topic successful.")
     @Operation(
             summary = "Export to excel for topic.",
             description = "Export to excel for topic."
@@ -46,8 +43,7 @@ public class ExcelExportController {
     }
 
     @GetMapping("/topic/all")
-    @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Export topic successful.")
+//    @PreAuthorize("hasRole('ADMIN')")
     @Operation(
             summary = "Export to excel for topic.",
             description = "Export to excel for topic."
@@ -66,7 +62,6 @@ public class ExcelExportController {
 
     @GetMapping("/topic/{topicId:.+}")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Export topic successful.")
     @Operation(
             summary = "Export to excel for topic.",
             description = "Export to excel for topic."

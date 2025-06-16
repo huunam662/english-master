@@ -6,6 +6,7 @@ import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.excel.dto.response.*;
 import com.example.englishmaster_be.domain.pack.dto.IPackKeyProjection;
 import com.example.englishmaster_be.domain.pack_type.dto.projection.IPackTypeKeyProjection;
+import com.example.englishmaster_be.domain.topic.dto.projection.ITopicField1Projection;
 import com.example.englishmaster_be.domain.topic.dto.projection.ITopicKeyProjection;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyResponse;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
@@ -157,10 +158,11 @@ public class ExcelImportService implements IExcelImportService {
             String topicName = ExcelUtil.getStringCellValue(sheetTopic.getRow(4).getCell(1));
             String topicImage = ExcelUtil.getStringCellValue(sheetTopic.getRow(5).getCell(1));
             String topicDescription = ExcelUtil.getStringCellValue(sheetTopic.getRow(6).getCell(1));
-            LocalTime workTime = LocalDateTime.parse(
+            String time = ExcelUtil.getStringCellValue(sheetTopic.getRow(7).getCell(1));
+            LocalTime workTime = LocalTime.parse(
                     ExcelUtil.getStringCellValue(sheetTopic.getRow(7).getCell(1)),
-                    DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm[:ss]")
-            ).toLocalTime();
+                    DateTimeFormatter.ofPattern("HH:mm[:ss]")
+            );
 
             ITopicKeyProjection topicKey = topicRepository.findTopicIdByName(topicName);
 
@@ -857,18 +859,23 @@ public class ExcelImportService implements IExcelImportService {
     @Transactional
     @Override
     @SneakyThrows
-    public ExcelTopicPartIdsResponse importQuestionAtAllPartForTopicFromExcel(UUID topicId, MultipartFile file, TopicType typeImport) {
+    public ExcelTopicPartIdsResponse importQuestionAtAllPartForTopicFromExcel(UUID topicId, MultipartFile file) {
 
         UserEntity userImport = userService.currentUser();
+
+        ITopicField1Projection topicField = topicRepository.findTopicTypeById(topicId);
+
+        if(topicField == null)
+            throw new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Topic not found.");
 
         try(Workbook workbook = new XSSFWorkbook(file.getInputStream())){
 
             int numberOfSheets = workbook.getNumberOfSheets();
 
-            if(typeImport.equals(TopicType.READING)){
+            if(topicField.getTopicType().equalsIgnoreCase(TopicType.READING.getType())){
                 fillTopicPartsQuestionsAnswersReadingToDb(topicId, userImport, workbook, file);
             }
-            else if(typeImport.equals(TopicType.SPEAKING)){
+            else if(topicField.getTopicType().equalsIgnoreCase(TopicType.SPEAKING.getType())){
                 fillSpeakingPartsToDb(topicId, userImport, workbook);
             }
             else{
@@ -1040,10 +1047,10 @@ public class ExcelImportService implements IExcelImportService {
 
         List<PartEntity> partsOfTopic = new ArrayList<>();
         List<QuestionEntity> questionsParentOfPart = new ArrayList<>();
-        List<QuestionEntity> questionsChildOfParent = new ArrayList<>();
 
         int numberOfSheets = workbook.getNumberOfSheets();
         int sheetPartStep = 1;
+        int numberOfQuestions = 0;
         while(sheetPartStep < numberOfSheets){
             Sheet sheet = workbook.getSheetAt(sheetPartStep);
             int iRowPart = 0;
@@ -1068,70 +1075,31 @@ public class ExcelImportService implements IExcelImportService {
 
             int iRowImage = iRowPart + 1;
             Row rowImage = sheet.getRow(iRowImage);
-            int orderParent = 1;
             while (rowImage != null){
 
-                int iRowTitle = iRowImage + 1;
-                int iRowDuration = iRowTitle + 1;
+                int iRowQuestionSpeaking = iRowImage + 1;
 
                 QuestionEntity questionParent = QuestionEntity.builder()
                         .questionId(UUID.randomUUID())
-                        .questionContent(ExcelUtil.getStringCellValue(sheet.getRow(iRowTitle).getCell(1)))
-                        .durationRecord(
-                                LocalDateTime.parse(
-                                        ExcelUtil.getStringCellValue(sheet.getRow(iRowDuration).getCell(1)),
-                                        DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm[:ss]")
-                                ).toLocalTime()
-                        )
+                        .questionContent(ExcelUtil.getStringCellValue(sheet.getRow(iRowQuestionSpeaking).getCell(1)))
                         .partId(partId)
                         .contentImage(ExcelUtil.getStringCellValue(rowImage.getCell(1)))
-                        .questionType(QuestionType.Question_Parent)
+                        .questionType(QuestionType.Speaking)
                         .isQuestionParent(true)
-                        .questionScore(orderParent)
+                        .questionScore(0)
                         .userCreate(userImport)
                         .userUpdate(userImport)
                         .build();
                 questionsParentOfPart.add(questionParent);
-
-                // bỏ qua header question
-                int nextRow = iRowDuration + 2;
-                Row rowQuestionChild = sheet.getRow(nextRow);
-                int orderChild = 1;
-                while (rowQuestionChild != null){
-
-                    if(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(0)).equalsIgnoreCase("image")){
-                        iRowImage = nextRow;
-                        break;
-                    }
-
-                    QuestionEntity questionChild = QuestionEntity.builder()
-                            .questionId(UUID.randomUUID())
-                            .questionContent(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(1)))
-                            .partId(partId)
-                            .questionGroupParent(questionParent)
-                            .isQuestionParent(false)
-                            .numberChoice(0)
-                            .questionType(QuestionType.Question_Child)
-                            .questionScore(orderChild)
-                            .userCreate(userImport)
-                            .userUpdate(userImport)
-                            .build();
-                    questionParent.setQuestionScore(questionParent.getQuestionScore() + questionChild.getQuestionScore());
-                    questionsChildOfParent.add(questionChild);
-
-                    nextRow++;
-                    orderChild++;
-                    rowQuestionChild = sheet.getRow(nextRow);
-                }
-                rowImage = rowQuestionChild;
-                orderParent++;
+                numberOfQuestions++;
+                rowImage = sheet.getRow(iRowQuestionSpeaking + 1);
             }
             sheetPartStep++;
         }
 
+        topicJdbcRepository.updateTopic(topicId, numberOfQuestions);
         partJdbcRepository.batchInsertPart(partsOfTopic);
         questionJdbcRepository.batchInsertQuestion(questionsParentOfPart);
-        questionJdbcRepository.batchInsertQuestion(questionsChildOfParent);
     }
 
     @Transactional

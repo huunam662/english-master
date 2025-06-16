@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.domain.mock_test_result.controller;
 
 
-import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.mock_test_result.dto.response.MockTestResultResponse;
 import com.example.englishmaster_be.domain.mock_test_result.mapper.MockTestResultMapper;
 import com.example.englishmaster_be.domain.mock_test_result.model.MockTestResultEntity;
@@ -28,7 +27,6 @@ public class ResultMockTestController {
     IResultMockTestService resultMockTestService;
 
     @PostMapping(value = "/create")
-    @DefaultMessage("Create result mock test successfully")
     public MockTestResultResponse createResultMockTest(ResultMockTestRequest resultMockTestRequest) {
 
         MockTestResultEntity resultMockTest = resultMockTestService.saveResultMockTest(resultMockTestRequest);
@@ -37,7 +35,6 @@ public class ResultMockTestController {
     }
 
     @GetMapping("/getAllResult")
-    @DefaultMessage("Get all result mock test successfully")
     public List<MockTestResultResponse> getAllResult() {
 
         List<MockTestResultEntity> resultMockTestEntityList = resultMockTestService.getAllResultMockTests();
@@ -46,7 +43,6 @@ public class ResultMockTestController {
     }
 
     @GetMapping("/getResultMockTestByPartAndMockTest")
-    @DefaultMessage("Get result mock test successfully")
     public List<MockTestResultResponse> getResultMockTest(
             @RequestParam(value = "partId", required = false) UUID partId,
             @RequestParam(value = "mockTestId", required = false) UUID mockTestId
@@ -58,7 +54,6 @@ public class ResultMockTestController {
     }
 
     @DeleteMapping("/delete")
-    @DefaultMessage("Delete result mock test successfully")
     public void deleteResultMockTest(@RequestParam("id") UUID id) {
 
         resultMockTestService.deleteResultMockTestById(id);

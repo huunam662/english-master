@@ -1,6 +1,5 @@
 package com.example.englishmaster_be.domain.feedback.controller;
 
-import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.common.constant.sort.FeedbackSortBy;
 
@@ -35,7 +34,6 @@ public class FeedbackController {
 
     @GetMapping(value = "/listFeedbackAdmin")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("List successfully")
     public FilterResponse<?> listFeedbackOfAdmin(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
@@ -59,7 +57,6 @@ public class FeedbackController {
     }
 
     @GetMapping(value = "/listFeedbackUser")
-    @DefaultMessage("List successfully")
     public FilterResponse<?> listFeedbackOfUser(
             @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
             @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
@@ -82,7 +79,6 @@ public class FeedbackController {
 
     @PostMapping(value = "/createFeedback" )
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Feedback successful.")
     public FeedbackResponse createFeedback(
             @RequestBody @Valid FeedbackRequest feedbackRequest
     ){
@@ -94,7 +90,6 @@ public class FeedbackController {
 
     @PatchMapping (value = "/{feedbackId:.+}/enableFeedback")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Save successfully")
     public void enableFeedback(
             @PathVariable("feedbackId") UUID feedbackId,
             @RequestParam(defaultValue = "true") Boolean enable
@@ -105,7 +100,6 @@ public class FeedbackController {
 
     @PatchMapping(value = "/{feedbackId:.+}/updateFeedback")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Save successfully")
     public FeedbackResponse updateFeedback(
             @PathVariable("feedbackId") UUID feedbackId,
             @RequestBody @Valid FeedbackRequest feedbackRequest
@@ -120,7 +114,6 @@ public class FeedbackController {
 
     @DeleteMapping(value = "/{feedbackId:.+}/deleteFeedback")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Delete successfully")
     public void deleteFeedback(@PathVariable("feedbackId") UUID feedbackId){
 
         feedbackService.deleteFeedback(feedbackId);

@@ -1,19 +1,14 @@
 package com.example.englishmaster_be.domain.user.controller;
 
-import com.example.englishmaster_be.common.annotation.DefaultMessage;
-import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.user.dto.request.*;
 import com.example.englishmaster_be.domain.user.dto.response.UserProfileResponse;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.domain.user.mapper.UserMapper;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +25,6 @@ public class UserController {
 
     @GetMapping("/information")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Information user successfully")
     public UserProfileResponse informationUser() {
 
         UserEntity currentUser = userService.currentUser();
@@ -40,7 +34,6 @@ public class UserController {
 
     @PatchMapping(value = "/changeProfile")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Change profile user successfully")
     public UserProfileResponse changeProfile(
             @RequestBody UserChangeProfileRequest changeProfileRequest
     ) {

@@ -25,6 +25,7 @@ import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.shared.service.mailer.MailerService;
+import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -35,11 +36,16 @@ import org.springframework.stereotype.Service;
 import com.example.englishmaster_be.common.constant.error.Error;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 
@@ -188,10 +194,6 @@ public class MockTestService implements IMockTestService {
 
         INumberAndScoreQuestionTopic numberAndScoreQuestionTopic = questionService.getNumberAndScoreQuestionTopic(topicOfMockTest.getTopicId());
 
-        int numberAndScoreQuestion = numberAndScoreQuestionTopic.getNumberQuestions();
-
-        int ScoreQuestions = numberAndScoreQuestionTopic.getScoreQuestions();
-
         List<AnswerEntity> answersSubmit = answerRepository.findAnswersInAnswerIds(topicOfMockTest.getTopicId(), listAnswerId);
 
         int totalQuestionsFinish = listAnswerId.size();
@@ -265,8 +267,8 @@ public class MockTestService implements IMockTestService {
             totalScoreMockTest += totalScoreOfPart;
         }
 
-        float answersCorrectPercent = (float) totalAnswersCorrect / numberAndScoreQuestionTopic.getNumberQuestions();
-        answersCorrectPercent = Math.round(answersCorrectPercent * 100f) / 100f;
+        float answersCorrectPercent = BigDecimal.valueOf((float) totalAnswersCorrect / numberAndScoreQuestionTopic.getNumberQuestions())
+                        .setScale(2, RoundingMode.HALF_UP).floatValue();
 
         mockTestRepository.updateMockTest(
                 mockTestId, answersCorrectPercent, totalAnswersCorrect, totalAnswersWrong,
@@ -275,12 +277,7 @@ public class MockTestService implements IMockTestService {
         mockTestResultJdbcRepository.batchInsertMockTestResult(mockTestResults);
         mockTestDetailJdbcRepository.batchInsertMockTestDetail(mockTestDetails);
 
-        try{
-            sendEmailToMock(mockTestId);
-        }
-        catch (Exception e){
-            log.error(e.getMessage());
-        }
+        sendEmailToMock(mockTestId);
 
         return MockTestKeyResponse.builder()
                 .mockTestId(mockTestId)
@@ -294,7 +291,16 @@ public class MockTestService implements IMockTestService {
     @Override
     public void sendEmailToMock(UUID mockTestId) {
 
-        mailerService.sendResultEmail(mockTestId);
+        CompletableFuture.runAsync(() -> {
+            try {
+                mailerService.sendResultEmail(mockTestId);
+            } catch (IOException | MessagingException e) {
+                throw new RuntimeException(e);
+            }
+        }).exceptionally((e) -> {
+            log.error(e.getMessage());
+            return null;
+        });
     }
 
 
