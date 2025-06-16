@@ -1,9 +1,6 @@
 
 package com.example.englishmaster_be.advice.response;
 
-import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
-import com.example.englishmaster_be.common.annotation.DefaultMessage;
-import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.shared.dto.response.ResultApiResponse;
 import lombok.AccessLevel;
@@ -12,10 +9,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.MethodParameter;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -85,15 +80,11 @@ public class GlobalObjectResponseWrapper implements ResponseBodyAdvice<Object> {
             filterResponse.withPreviousAndNextPage();
         }
 
-        DefaultMessage defaultMessage = returnType.getMethodAnnotation(DefaultMessage.class);
-
-        log.info("Result api response with message: {}", defaultMessage);
-
         return ResultApiResponse.builder()
                 .success(Boolean.TRUE)
                 .status(HttpStatus.OK)
                 .code(HttpStatus.OK.value())
-                .message(defaultMessage != null ? defaultMessage.value() : "")
+                .message("Successful.")
                 .path(request.getURI().getPath())
                 .responseData(body)
                 .build();

@@ -25,7 +25,7 @@ public interface QuestionMapper {
 
     QuestionMapper INSTANCE = Mappers.getMapper(QuestionMapper.class);
 
-    @Mapping(target = "questionGroupChildren" , expression = "java(questionDtoToQuestionEntities(questionDto.getListQuestionChild()))")
+    @Mapping(target = "questionGroupChildren", expression = "java(questionDtoToQuestionEntities(questionDto.getListQuestionChild()))")
     QuestionEntity toQuestionEntity(QuestionRequest questionDto);
     default Set<QuestionEntity> questionDtoToQuestionEntities(Collection<QuestionRequest> questionDto) {
         if(questionDto == null){
@@ -37,7 +37,7 @@ public interface QuestionMapper {
     QuestionEntity toQuestionEntity(QuestionGroupRequest createGroupQuestionDTO);
 
     @Mapping(target = "numberOfQuestionsChild", expression = "java(questionEntity.getQuestionGroupChildren() != null ? questionEntity.getQuestionGroupChildren().size() : 0)")
-    @Mapping(target = "questionsChildren" , expression = "java(toQuestionChildResponseList(questionEntity.getQuestionGroupChildren()))")
+    @Mapping(target = "questionsChildren", expression = "java(toQuestionChildResponseList(questionEntity.getQuestionGroupChildren()))")
     @Mapping(target = "topicId", source = "part.topicId")
     QuestionResponse toQuestionResponse(QuestionEntity questionEntity);
 
@@ -96,64 +96,18 @@ public interface QuestionMapper {
 
         return topic.getParts().stream()
                 .sorted(Comparator.comparing(PartEntity::getPartName))
-                .map(
-                        part -> {
+                .map(part -> {
+                    QuestionPartResponse questionPartResponse = toQuestionPartResponse(part.getQuestions(), topic, part);
+                    if(topic.getTopicType().getTopicTypeName().equalsIgnoreCase("speaking")){
+                        questionPartResponse.getPart().setTotalQuestion(
+                                part.getQuestions().size()
+                        );
+                    }
+                    else questionPartResponse.getPart().setTotalQuestion(QuestionUtil.totalQuestionChildOf(part.getQuestions()));
 
-                            if(topic.getTopicType().getTopicTypeName().equalsIgnoreCase("speaking")){
-                                part.setQuestions(
-                                        part.getQuestions().stream()
-                                        .peek(
-                                                questionParent -> questionParent.setQuestionGroupChildren(
-                                                        questionParent.getQuestionGroupChildren().stream()
-                                                        .sorted(Comparator.comparing(QuestionEntity::getQuestionScore))
-                                                        .collect(Collectors.toCollection(LinkedHashSet::new))
-                                                )
-                                        )
-                                        .sorted(Comparator.comparing(QuestionEntity::getQuestionScore))
-                                        .collect(Collectors.toCollection(LinkedHashSet::new))
-                                );
-                            }
-
-                            return toQuestionPartResponse(part.getQuestions(), topic, part);
-                        }
+                    return questionPartResponse;
+                }
                 ).collect(Collectors.toList());
-    }
-
-    default List<QuestionPartResponse> toQuestionPartResponseList(Collection<QuestionEntity> questionList, TopicEntity topic){
-
-        if (questionList == null || questionList.isEmpty())
-            return Collections.emptyList();
-
-        List<PartEntity> parts = questionList.stream().map(
-                QuestionEntity::getPart
-        ).distinct().toList();
-
-        return parts.stream()
-                .sorted(Comparator.comparing(PartEntity::getPartName))
-                .map(
-                        part -> {
-                            List<QuestionEntity> questionOfPart = questionList.stream().filter(
-                                    question -> Objects.nonNull(question) && question.getPart().equals(part)
-                            ).toList();
-
-                            questionList.removeAll(questionOfPart);
-
-                            return toQuestionPartResponse(questionOfPart, topic, part);
-                        }
-                ).toList();
-    }
-
-    @AfterMapping
-    default void setTotalQuestion(@MappingTarget QuestionPartResponse response, Collection<QuestionEntity> questionParents) {
-
-        if (response.getPart() == null)
-            response.setPart(new PartBasicResponse());
-
-        response.getPart().setTotalQuestion(
-                questionParents != null
-                        ? QuestionUtil.totalQuestionChildOf(questionParents)
-                        : 0
-        );
     }
 
     @Mapping(target = "questionId", ignore = true)

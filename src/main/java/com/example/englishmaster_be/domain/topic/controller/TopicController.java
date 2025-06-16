@@ -1,6 +1,5 @@
 package com.example.englishmaster_be.domain.topic.controller;
 
-import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
@@ -33,7 +32,6 @@ public class TopicController {
 
     @GetMapping(value = "/{topicId:.+}/inforTopic")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show list topic successfully")
     public TopicResponse getInformationTopic(@PathVariable("topicId") UUID topicId) {
 
         TopicEntity topic = topicService.getTopicById(topicId);
@@ -43,7 +41,6 @@ public class TopicController {
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Create topic successfully")
     public TopicResponse createTopic(
             @RequestBody TopicRequest topicRequest
     ) {
@@ -56,7 +53,6 @@ public class TopicController {
 
     @PutMapping(value = "/{topicId:.+}/updateTopic")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Update topic successfully")
     public TopicResponse updateTopic(
             @PathVariable("topicId") UUID topicId,
             @RequestBody TopicRequest topicRequest
@@ -70,21 +66,18 @@ public class TopicController {
 
     @DeleteMapping(value = "/{topicId:.+}/delete")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Delete Topic successfully")
     public void deleteTopic(@PathVariable UUID topicId) {
 
         topicService.deleteTopic(topicId);
     }
 
     @GetMapping(value = "/listTopic")
-    @DefaultMessage("Show list Topic successfully")
     public FilterResponse<?> getAllTopic(@ModelAttribute TopicFilterRequest filterRequest) {
 
         return topicService.filterTopics(filterRequest);
     }
 
     @GetMapping("/{topicId}")
-    @DefaultMessage("Get Topic successfully")
     public TopicResponse getTopic(@PathVariable("topicId") UUID id) {
 
         TopicEntity topic = topicService.getTopicById(id);
@@ -94,7 +87,6 @@ public class TopicController {
 
 
     @GetMapping(value = "/suggestTopic")
-    @DefaultMessage("Show list 5 Topic name successfully")
     public List<String> get5SuggestTopic(@RequestParam(value = "query") String query) {
 
         return topicService.get5SuggestTopic(query);
@@ -103,7 +95,6 @@ public class TopicController {
 
     @PostMapping(value = "/{topicId:.+}/addPart")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Add Part to Topic successfully")
     public void addPartToTopic(@PathVariable("topicId") UUID topicId, @RequestParam("partId") UUID partId) {
 
         topicService.addPartToTopic(topicId, partId);
@@ -111,7 +102,6 @@ public class TopicController {
 
     @DeleteMapping(value = "/{topicId:.+}/deletePart")
     @PreAuthorize("hasRole('ADMIN')")
-    @DefaultMessage("Delete Part to Topic successfully")
     public void deletePartToTopic(@PathVariable("topicId") UUID topicId, @RequestParam("partId") UUID partId) {
 
         topicService.deletePartToTopic(topicId, partId);
@@ -120,7 +110,6 @@ public class TopicController {
 
     @GetMapping(value = "/{topicId:.+}/listPart")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show Part to Topic successfully")
     public List<PartResponse> getPartToTopic(@PathVariable("topicId") UUID topicId) {
 
         return topicService.getPartToTopic(topicId);
@@ -128,7 +117,6 @@ public class TopicController {
 
     @GetMapping(value = "/{topicId:.+}/listQuestionToPart")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show Question of Part to Topic successfully")
     @Operation(
             summary = "Get all question of part at topic by topic id and part name",
             description = "Get all question of part at topic by topicId and partId"
@@ -143,7 +131,6 @@ public class TopicController {
 
     @GetMapping(value = "/{topicId:.+}/part-infor")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show Question of Part to Topic successfully")
     @Operation(
             summary = "Get all question of part at topic by topic id and part id",
             description = "Get all question of part at topic by topic id and part id"
@@ -166,7 +153,6 @@ public class TopicController {
 
     @GetMapping("/{topicId}/list-question-from-all-part")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Topic questions all part successfully")
     public List<QuestionPartResponse> getQuestionFromAllPart(
             @PathVariable("topicId") UUID topicId
     ) {

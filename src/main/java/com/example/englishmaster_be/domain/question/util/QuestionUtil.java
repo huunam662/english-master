@@ -72,7 +72,7 @@ public class QuestionUtil {
                 partType -> partType.getType().equalsIgnoreCase(partEntity.getPartType())
         );
 
-        boolean partTypeIsTextCompletion = partEntity.getPartType().equalsIgnoreCase(PartType.PART_6_TOEIC.getType());
+        boolean partTypeIsTextCompletion = partEntity.getPartType().equalsIgnoreCase("Text Completion");
 
         questionParentsShuffle.forEach(questionEntity -> {
 
@@ -122,12 +122,7 @@ public class QuestionUtil {
         return questionParents.stream()
                 .filter(Objects::nonNull)
                 .map(
-                questionEntity -> {
-                    if(questionEntity.getQuestionType().equals(QuestionType.Words_Matching))
-                        return 1;
-
-                    return questionEntity.getQuestionGroupChildren().size();
-                }
+                questionEntity -> questionEntity.getQuestionGroupChildren().size()
         ).reduce(0, Integer::sum);
     }
 

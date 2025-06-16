@@ -4,6 +4,7 @@ import com.example.englishmaster_be.common.constant.QuestionType;
 import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
 import com.example.englishmaster_be.domain.mock_test_result.model.MockTestDetailEntity;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
+import com.example.englishmaster_be.domain.speaking_submission.model.SpeakingSubmissionEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -74,8 +75,11 @@ public class QuestionEntity {
     @Column(name = "update_at")
     LocalDateTime updateAt;
 
-    @Column(name = "duration_record")
-    LocalTime durationRecord;
+    @Column(name = "has_hints")
+    Boolean hasHints;
+
+    @Column(name = "is_question_parent")
+    Boolean isQuestionParent;
 
     @Column(name = "part_id", insertable = false, updatable = false)
     UUID partId;
@@ -108,12 +112,8 @@ public class QuestionEntity {
     @OneToMany(mappedBy = "questionChild", fetch = FetchType.LAZY)
     Set<MockTestDetailEntity> detailMockTests;
 
-    @Column(name = "has_hints")
-    Boolean hasHints;
-
-    @Column(name = "is_question_parent")
-    Boolean isQuestionParent;
-
+    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
+    Set<SpeakingSubmissionEntity> speakingSubmissions;
 
     @PrePersist
     void onCreate() {

@@ -1,5 +1,7 @@
 package com.example.englishmaster_be.shared.service.mailer;
 
+import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.mock_test.model.MockTestEntity;
 import com.example.englishmaster_be.domain.mock_test.repository.jpa.MockTestRepository;
 import com.example.englishmaster_be.domain.mock_test_result.model.MockTestResultEntity;
@@ -12,6 +14,7 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -21,19 +24,21 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 import org.springframework.util.FileCopyUtils;
-
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j(topic = "MAILER-SERVICE")
 @Service
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 public class MailerService {
-
 
     JavaMailSender mailSender;
 
@@ -45,7 +50,8 @@ public class MailerService {
 
     MockTestRepository mockTestRepository;
 
-    @Async
+    SpringTemplateEngine springTemplateEngine;
+
     public void sendMail(String recipientEmail) throws MessagingException {
 
         MimeMessage message = mailSender.createMimeMessage();
@@ -59,7 +65,6 @@ public class MailerService {
         mailSender.send(message);
     }
 
-    @Async
     public void sendMail(String to, String subject, String body) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(to);
@@ -68,8 +73,7 @@ public class MailerService {
         mailSender.send(message);
     }
 
-    @Async
-    @Transactional(readOnly = true)
+
     public void sendNotificationEmail(UUID userId){
 
         UserEntity user = userRepository.findById(userId).orElse(null);
@@ -88,7 +92,6 @@ public class MailerService {
         sendMail(user.getEmail(),subject,body);
     }
 
-    @Async
     public void sendOtpToEmail(String email, String otp)
             throws MessagingException, IOException
     {
@@ -110,7 +113,6 @@ public class MailerService {
         mailSender.send(message);
     }
 
-    @Async
     public void sendConfirmRegister(String email, String confirmationToken) throws IOException, MessagingException {
 
         MimeMessage message = mailSender.createMimeMessage();
@@ -130,7 +132,6 @@ public class MailerService {
         mailSender.send(message);
     }
 
-    @Async
     public void sendForgetPassEmail(String email, String confirmationToken) throws MessagingException, IOException {
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
@@ -155,8 +156,7 @@ public class MailerService {
         return new String(templateBytes, StandardCharsets.UTF_8);
     }
 
-    @Async
-    @Transactional(readOnly = true)
+
     public void sendResultEmail(UUID mockTestId) throws IOException, MessagingException {
 
         MockTestEntity mockTest = mockTestRepository.findMockTestJoinTopicAndUserAndResultAndPart(mockTestId);
@@ -203,5 +203,36 @@ public class MailerService {
 
         // Gửi email
         mailSender.send(message);
+    }
+
+    public void sendResultSpeakingEmail(UUID mockTestId) throws MessagingException, IOException {
+        Assert.notNull(mockTestId, "mockTestId must not be null");
+        MockTestEntity mockTest = mockTestRepository.findMockTestJoinUserAndTopic(mockTestId)
+                .orElseThrow(() -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Mock test not found."));
+        String feMockTestResultUrl = linkValue.getLinkFeMockTestResult().replace(":mockTestId", mockTestId.toString());
+        String feShowMoreTopic = linkValue.getLinkFeShowMoreTopic();
+        String htmlContent = readTemplateContent("speaking-result-email.html")
+                .replace("${topicName}", mockTest.getTopic().getTopicName())
+                .replace("${linkFeMockTestResult}", feMockTestResultUrl)
+                .replace("${linkFeShowMoreTopic}", feShowMoreTopic)
+                .replace("${currentYear}", String.valueOf(LocalDateTime.now().getYear()));
+        String sendTo = mockTest.getUser().getEmail();
+        sendToEmail("testmeusolution@gmail.com", sendTo, "Kết quả bài thi", htmlContent);
+    }
+
+    public void sendToEmail(String fromEmail, String toEmail, String subjectInEmail, String contentEmail) throws MessagingException {
+
+        log.info("Send to email {}", toEmail);
+
+        MimeMessage mimeMessage = mailSender.createMimeMessage();
+
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, Boolean.TRUE);
+
+        mimeMessageHelper.setFrom(fromEmail);
+        mimeMessageHelper.setTo(toEmail);
+        mimeMessageHelper.setSubject(subjectInEmail);
+        mimeMessageHelper.setText(contentEmail, Boolean.TRUE);
+
+        mailSender.send(mimeMessage);
     }
 }

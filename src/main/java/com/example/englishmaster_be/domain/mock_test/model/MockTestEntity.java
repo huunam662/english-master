@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.domain.mock_test.model;
 
 import com.example.englishmaster_be.domain.mock_test_result.model.MockTestResultEntity;
+import com.example.englishmaster_be.domain.speaking_submission.model.SpeakingSubmissionEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import jakarta.persistence.*;
@@ -73,6 +74,9 @@ public class MockTestEntity {
 
     @OneToMany(mappedBy = "mockTest", fetch = FetchType.LAZY, orphanRemoval = true)
     Set<MockTestResultEntity> mockTestResults;
+
+    @OneToMany(mappedBy = "mockTest", fetch = FetchType.LAZY, orphanRemoval = true)
+    Set<SpeakingSubmissionEntity> speakingSubmissions;
 
     @PrePersist
     void onCreate() {

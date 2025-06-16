@@ -23,4 +23,10 @@ public class LinkValue {
 
     @Value("${englishmaster.linkFE}")
     String linkFE;
+
+    @Value("${link.fe.mock-test-result}")
+    String linkFeMockTestResult;
+
+    @Value("${link.fe.show-more-topic}")
+    String linkFeShowMoreTopic;
 }

@@ -1,24 +1,15 @@
 package com.example.englishmaster_be.domain.mock_test.controller;
 
-import com.example.englishmaster_be.common.annotation.DefaultMessage;
-import com.example.englishmaster_be.shared.dto.response.FilterResponse;
-
 import com.example.englishmaster_be.domain.mock_test.dto.response.*;
 import com.example.englishmaster_be.domain.mock_test.service.IMockTestService;
-import com.example.englishmaster_be.domain.mock_test_result.mapper.MockTestDetailMapper;
 import com.example.englishmaster_be.domain.mock_test.mapper.MockTestMapper;
-import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestFilterRequest;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestRequest;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionMockTestResponse;
-import com.example.englishmaster_be.domain.mock_test_result.model.MockTestDetailEntity;
 import com.example.englishmaster_be.domain.mock_test.model.MockTestEntity;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.data.domain.Sort;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,7 +27,6 @@ public class MockTestController {
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Create mock test successfully")
     public MockTestKeyResponse createMockTest(@RequestBody MockTestRequest saveMockTestRequest) {
 
         return mockTestService.saveMockTest(saveMockTestRequest);
@@ -44,7 +34,6 @@ public class MockTestController {
 
     @GetMapping(value = "/getMockTestById")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Find mock test successfully")
     public MockTestResponse getMockTest(@RequestParam("id") UUID id) {
 
         MockTestEntity mockTest = mockTestService.getMockTestById(id);
@@ -55,7 +44,6 @@ public class MockTestController {
 
     @GetMapping(value = "/listTestToUser")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Get exam results for all the test users done")
     public List<IMockTestToUserResponse> listMockTestToUser() {
         List<IMockTestToUserResponse> result = mockTestService.getListMockTestToUser();
         return result;
@@ -63,7 +51,6 @@ public class MockTestController {
 
     @PostMapping(value = "/{mockTestId:.+}/submitResult")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Create detail mock test successfully")
     public MockTestKeyResponse addAnswerToMockTest(@PathVariable("mockTestId") UUID mockTestId, @RequestBody List<UUID> listAnswerId) {
 
         return mockTestService.addAnswerToMockTest(mockTestId, listAnswerId);
@@ -72,7 +59,6 @@ public class MockTestController {
 
     @GetMapping(value = "/{mockTestId:.+}/sendEmail")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Send email successfully")
     public void sendEmailToMock(@PathVariable("mockTestId") UUID mockTestId) {
 
         mockTestService.sendEmailToMock(mockTestId);
@@ -80,7 +66,6 @@ public class MockTestController {
 
     @GetMapping(value = "/{mockTestId:.+}/listQuestionToPart")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show question of part to mock test successfully")
     public List<QuestionMockTestResponse> getQuestionOfToMockTest(@PathVariable("mockTestId") UUID mockTestId, @RequestParam("partId") UUID partId) {
 
         return mockTestService.getQuestionOfToMockTest(mockTestId, partId);
@@ -88,7 +73,6 @@ public class MockTestController {
 
     @GetMapping(value = "/{mockTestId:.+}/mocketinfor")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Show all info of mocktest")
     public MockTestInforResponse getMockTestInfor(@PathVariable("mockTestId") UUID mockTestId) {
 
         MockTestEntity mockTestEntity = mockTestService.getInformationMockTest(mockTestId);

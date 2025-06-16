@@ -2,7 +2,6 @@ package com.example.englishmaster_be.domain.pack.controller;
 
 
 
-import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.pack.service.IPackService;
 import com.example.englishmaster_be.domain.pack.mapper.PackMapper;
 import com.example.englishmaster_be.domain.pack.dto.request.PackRequest;
@@ -28,7 +27,6 @@ public class PackController {
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    @DefaultMessage("Create pack successfully")
     public PackResponse createPack(@RequestBody PackRequest packRequest) {
 
         PackEntity pack = packService.createPack(packRequest);
@@ -37,7 +35,6 @@ public class PackController {
     }
 
     @GetMapping(value = "/listPack")
-    @DefaultMessage("Show list pack successfully")
     public List<PackResponse> getListPack(){
 
         List<PackEntity> packEntityList = packService.getListPack();

@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.domain.cloudinary.controller;
 
 
-import com.example.englishmaster_be.common.annotation.DefaultMessage;
 import com.example.englishmaster_be.domain.cloudinary.service.ICloudinaryService;
 import com.example.englishmaster_be.shared.dto.response.FileResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,15 +22,13 @@ public class CloudinaryController {
 
 
 	@PostMapping(value = "/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	@DefaultMessage("File uploaded successfully")
-	public FileResponse uploadImage(@RequestPart("image") MultipartFile file) {
+    public FileResponse uploadImage(@RequestPart("image") MultipartFile file) {
 
 		return cloudinaryService.uploadFile(file);
 	}
 
 	@PostMapping(value = "/audio", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	@DefaultMessage("Audio uploaded successfully")
-	public FileResponse uploadAudio(@RequestPart("audio") MultipartFile file) {
+    public FileResponse uploadAudio(@RequestPart("audio") MultipartFile file) {
 
 		return cloudinaryService.uploadAudio(file);
 	}

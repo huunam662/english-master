@@ -1047,7 +1047,6 @@ public class ExcelImportService implements IExcelImportService {
 
         List<PartEntity> partsOfTopic = new ArrayList<>();
         List<QuestionEntity> questionsParentOfPart = new ArrayList<>();
-        List<QuestionEntity> questionsChildOfParent = new ArrayList<>();
 
         int numberOfSheets = workbook.getNumberOfSheets();
         int sheetPartStep = 1;
@@ -1076,64 +1075,24 @@ public class ExcelImportService implements IExcelImportService {
 
             int iRowImage = iRowPart + 1;
             Row rowImage = sheet.getRow(iRowImage);
-            int orderParent = 1;
             while (rowImage != null){
 
-                int iRowTitle = iRowImage + 1;
-                int iRowDuration = iRowTitle + 1;
+                int iRowQuestionSpeaking = iRowImage + 1;
 
                 QuestionEntity questionParent = QuestionEntity.builder()
                         .questionId(UUID.randomUUID())
-                        .questionContent(ExcelUtil.getStringCellValue(sheet.getRow(iRowTitle).getCell(1)))
-                        .durationRecord(
-                                LocalTime.parse(
-                                        ExcelUtil.getStringCellValue(sheet.getRow(iRowDuration).getCell(1)),
-                                        DateTimeFormatter.ofPattern("HH:mm[:ss]")
-                                )
-                        )
+                        .questionContent(ExcelUtil.getStringCellValue(sheet.getRow(iRowQuestionSpeaking).getCell(1)))
                         .partId(partId)
                         .contentImage(ExcelUtil.getStringCellValue(rowImage.getCell(1)))
-                        .questionType(QuestionType.Question_Parent)
+                        .questionType(QuestionType.Speaking)
                         .isQuestionParent(true)
-                        .questionScore(orderParent)
+                        .questionScore(0)
                         .userCreate(userImport)
                         .userUpdate(userImport)
                         .build();
                 questionsParentOfPart.add(questionParent);
-
-                // bỏ qua header question
-                int nextRow = iRowDuration + 2;
-                Row rowQuestionChild = sheet.getRow(nextRow);
-                int orderChild = 1;
-                while (rowQuestionChild != null){
-
-                    if(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(0)).equalsIgnoreCase("image")){
-                        iRowImage = nextRow;
-                        break;
-                    }
-
-                    QuestionEntity questionChild = QuestionEntity.builder()
-                            .questionId(UUID.randomUUID())
-                            .questionContent(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(1)))
-                            .partId(partId)
-                            .questionGroupParent(questionParent)
-                            .isQuestionParent(false)
-                            .numberChoice(0)
-                            .questionType(QuestionType.Question_Child)
-                            .questionScore(orderChild)
-                            .userCreate(userImport)
-                            .userUpdate(userImport)
-                            .build();
-                    questionParent.setQuestionScore(questionParent.getQuestionScore() + questionChild.getQuestionScore());
-                    questionsChildOfParent.add(questionChild);
-
-                    numberOfQuestions++;
-                    nextRow++;
-                    orderChild++;
-                    rowQuestionChild = sheet.getRow(nextRow);
-                }
-                rowImage = rowQuestionChild;
-                orderParent++;
+                numberOfQuestions++;
+                rowImage = sheet.getRow(iRowQuestionSpeaking + 1);
             }
             sheetPartStep++;
         }
@@ -1141,7 +1100,6 @@ public class ExcelImportService implements IExcelImportService {
         topicJdbcRepository.updateTopic(topicId, numberOfQuestions);
         partJdbcRepository.batchInsertPart(partsOfTopic);
         questionJdbcRepository.batchInsertQuestion(questionsParentOfPart);
-        questionJdbcRepository.batchInsertQuestion(questionsChildOfParent);
     }
 
     @Transactional

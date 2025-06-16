@@ -132,11 +132,8 @@ public class ExcelExportService implements IExcelExportService{
 
     protected void exportSpeakingInformation(List<TopicEntity> topicsResult, ZipOutputStream zipOutputStream) throws IOException {
         List<UUID> topicIds = topicsResult.stream().map(TopicEntity::getTopicId).toList();
-        List<QuestionEntity> questionChilds = questionRepository.findAllChildOfTopicByTopicType(topicIds);
-        Map<QuestionEntity, List<QuestionEntity>> questionParentChildsGroup = questionChilds.stream().collect(
-                Collectors.groupingBy(QuestionEntity::getQuestionGroupParent)
-        );
-        Map<PartEntity, List<QuestionEntity>> partQuestionsParentGroup = questionParentChildsGroup.keySet().stream().collect(
+        List<QuestionEntity> questionSpeakings = questionRepository.findAllQuestionSpeakingOfTopics(topicIds);
+        Map<PartEntity, List<QuestionEntity>> partQuestionsParentGroup = questionSpeakings.stream().collect(
                 Collectors.groupingBy(QuestionEntity::getPart)
         );
         Map<TopicEntity, List<PartEntity>> topicPartsGroup = partQuestionsParentGroup.keySet().stream().collect(
@@ -151,7 +148,7 @@ public class ExcelExportService implements IExcelExportService{
                 partsTopic = partsTopic.stream().sorted(Comparator.comparing(PartEntity::getPartName)).toList();
                 writeTopicInformationToSheet(topic, partsTopic, workbook);
                 for(PartEntity part : partsTopic){
-                    exportSpeakingOfTopic(part, partQuestionsParentGroup, questionParentChildsGroup, workbook);
+                    exportSpeakingOfTopic(part, partQuestionsParentGroup, workbook);
                 }
 
                 workbook.write(workbookOut);
@@ -172,7 +169,6 @@ public class ExcelExportService implements IExcelExportService{
     protected void exportSpeakingOfTopic(
             PartEntity part,
             Map<PartEntity, List<QuestionEntity>> partQuestionsParentGroup,
-            Map<QuestionEntity, List<QuestionEntity>> questionParentChildsGroup,
             Workbook workbook
     ){
         int nextRowNew = 0;
@@ -182,28 +178,13 @@ public class ExcelExportService implements IExcelExportService{
         partRow.createCell(1).setCellValue(part.getPartType());
         List<QuestionEntity> questionParentsOfPart = partQuestionsParentGroup.getOrDefault(part, new ArrayList<>())
                 .stream().sorted(Comparator.comparing(QuestionEntity::getQuestionScore)).toList();
-        for(QuestionEntity questionParent : questionParentsOfPart){
-            Row imageQuestionParentRow = sheetPartOfSpeaking.createRow(++nextRowNew);
-            imageQuestionParentRow.createCell(0).setCellValue("Image");
-            imageQuestionParentRow.createCell(1).setCellValue(questionParent.getContentImage());
-            Row titleQuuestionParentRow = sheetPartOfSpeaking.createRow(++nextRowNew);
-            titleQuuestionParentRow.createCell(0).setCellValue("Title");
-            titleQuuestionParentRow.createCell(1).setCellValue(questionParent.getQuestionContent());
-            Row durationOfSpeakingRow = sheetPartOfSpeaking.createRow(++nextRowNew);
-            durationOfSpeakingRow.createCell(0).setCellValue("Duration");
-            durationOfSpeakingRow.createCell(1).setCellValue(questionParent.getDurationRecord().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
-            Row questionChildHeaderRow = sheetPartOfSpeaking.createRow(++nextRowNew);
-            questionChildHeaderRow.createCell(0).setCellValue("STT");
-            questionChildHeaderRow.createCell(1).setCellValue("Question Child Content");
-            List<QuestionEntity> questionChildsOfParent = questionParentChildsGroup.getOrDefault(questionParent, new ArrayList<>())
-                    .stream().sorted(Comparator.comparing(QuestionEntity::getQuestionScore)).toList();
-            int questionChildsSize = questionChildsOfParent.size();
-            for(int i = 0; i < questionChildsSize; i++){
-                QuestionEntity questionChild = questionChildsOfParent.get(i);
-                Row questionChildRow = sheetPartOfSpeaking.createRow(++nextRowNew);
-                questionChildRow.createCell(0).setCellValue(i + 1);
-                questionChildRow.createCell(1).setCellValue(questionChild.getQuestionContent());
-            }
+        for(QuestionEntity questionSpeaking : questionParentsOfPart){
+            Row imageQuestionRow = sheetPartOfSpeaking.createRow(++nextRowNew);
+            imageQuestionRow.createCell(0).setCellValue("Image");
+            imageQuestionRow.createCell(1).setCellValue(questionSpeaking.getContentImage());
+            Row questionSpeakingContentRow = sheetPartOfSpeaking.createRow(++nextRowNew);
+            questionSpeakingContentRow.createCell(0).setCellValue("Question Content");
+            questionSpeakingContentRow.createCell(1).setCellValue(questionSpeaking.getQuestionContent());
         }
     }
 

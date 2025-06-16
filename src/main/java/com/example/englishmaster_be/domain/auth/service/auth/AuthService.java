@@ -22,6 +22,8 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -33,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 
 @Service
@@ -41,6 +44,7 @@ import java.util.UUID;
 public class AuthService implements IAuthService {
 
 
+    private static final Logger log = LoggerFactory.getLogger(AuthService.class);
     JwtService jwtUtil;
 
     MailerService mailerUtil;
@@ -102,14 +106,19 @@ public class AuthService implements IAuthService {
             sessionActiveService.deleteByUserIdAndType(user.getUserId(), SessionActiveType.CONFIRM);
 
         userRegister = userService.saveUser(userRegister);
-
         SessionActiveEntity sessionConfirm = sessionActiveService.saveForUserRegister(userRegister, SessionActiveType.CONFIRM);
 
-        try {
-            mailerUtil.sendConfirmRegister(userRegister.getEmail(), sessionConfirm.getCode().toString());
-        } catch (IOException | MessagingException e) {
-            throw new ErrorHolder(Error.SEND_EMAIL_FAILURE);
-        }
+        CompletableFuture.runAsync(() -> {
+            try {
+                mailerUtil.sendConfirmRegister(userRegisterRequest.getEmail(), sessionConfirm.getCode().toString());
+            } catch (IOException | MessagingException e) {
+                throw new RuntimeException(e);
+            }
+        })
+        .exceptionally((e) -> {
+            log.error(e.getMessage());
+            return null;
+        });
     }
 
 
