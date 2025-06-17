@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.domain.mock_test.dto.response;
 
 import com.example.englishmaster_be.domain.mock_test_result.dto.response.MockTestResultResponse;
+import com.example.englishmaster_be.domain.topic.dto.response.Topic1Response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.time.LocalTime;
@@ -37,7 +38,7 @@ public class MockTestResponse {
 
     LocalTime finishTime;
 
-    MockTestTopicResponse topic;
+    Topic1Response topic;
 
     List<MockTestResultResponse> mockTestResults;
 

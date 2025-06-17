@@ -1,5 +1,6 @@
-package com.example.englishmaster_be.domain.speaking_submission.dto.response;
+package com.example.englishmaster_be.domain.speaking_submission.dto.response.speaking_submission;
 
+import com.example.englishmaster_be.domain.speaking_submission.dto.response.speaking_error.BotFeedbackErrorResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 

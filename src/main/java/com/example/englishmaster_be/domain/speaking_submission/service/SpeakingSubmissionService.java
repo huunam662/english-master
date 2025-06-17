@@ -9,8 +9,8 @@ import com.example.englishmaster_be.domain.mock_test.repository.jpa.MockTestRepo
 import com.example.englishmaster_be.domain.question.repository.jpa.QuestionRepository;
 import com.example.englishmaster_be.domain.speaking_submission.dto.request.SpeakingQuestionAudioRequest;
 import com.example.englishmaster_be.domain.speaking_submission.dto.request.SpeakingSubmitRequest;
-import com.example.englishmaster_be.domain.speaking_submission.dto.response.BotFeedbackErrorResponse;
-import com.example.englishmaster_be.domain.speaking_submission.dto.response.BotFeedbackResponse;
+import com.example.englishmaster_be.domain.speaking_submission.dto.response.speaking_error.BotFeedbackErrorResponse;
+import com.example.englishmaster_be.domain.speaking_submission.dto.response.speaking_submission.BotFeedbackResponse;
 import com.example.englishmaster_be.domain.speaking_submission.model.SpeakingErrorEntity;
 import com.example.englishmaster_be.domain.speaking_submission.model.SpeakingSubmissionEntity;
 import com.example.englishmaster_be.domain.speaking_submission.repository.jdbc.SpeakingErrorJdbcRepository;

@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.speaking_submission.util.bot;
 
-import com.example.englishmaster_be.domain.speaking_submission.dto.response.BotFeedbackResponse;
+import com.example.englishmaster_be.domain.speaking_submission.dto.response.speaking_submission.BotFeedbackResponse;
 import com.example.englishmaster_be.domain.speaking_submission.util.speaking.SpeakingUtil;
 import com.example.englishmaster_be.shared.util.gemini.SpringApplicationContext;
 import com.example.englishmaster_be.value.AssemblyValue;
@@ -10,9 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.util.Assert;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
-
 import java.util.HashMap;
 import java.util.Map;
 

@@ -104,6 +104,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 return FlashCardSortBy.fromValue(source);
             }
         });
+
         registry.addConverter(new Converter<String, LevelSpeakerType>() {
             @Override
             @NonNull

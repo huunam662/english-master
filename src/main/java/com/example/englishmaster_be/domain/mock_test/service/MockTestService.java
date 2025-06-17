@@ -1,6 +1,8 @@
 package com.example.englishmaster_be.domain.mock_test.service;
 
 import com.example.englishmaster_be.domain.answer.repository.jpa.AnswerRepository;
+import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestInforResponse;
+import com.example.englishmaster_be.domain.mock_test.mapper.MockTestMapper;
 import com.example.englishmaster_be.domain.mock_test.repository.jdbc.MockTestJdbcRepository;
 import com.example.englishmaster_be.domain.mock_test_result.repository.jdbc.MockTestDetailJdbcRepository;
 import com.example.englishmaster_be.domain.mock_test_result.repository.jpa.MockTestDetailRepository;
@@ -14,7 +16,12 @@ import com.example.englishmaster_be.domain.mock_test.dto.request.*;
 import com.example.englishmaster_be.domain.mock_test.dto.response.IMockTestToUserResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionMockTestResponse;
 import com.example.englishmaster_be.domain.question.service.IQuestionService;
+import com.example.englishmaster_be.domain.speaking_submission.model.SpeakingErrorEntity;
+import com.example.englishmaster_be.domain.speaking_submission.model.SpeakingSubmissionEntity;
+import com.example.englishmaster_be.domain.speaking_submission.repository.jpa.SpeakingErrorRepository;
+import com.example.englishmaster_be.domain.speaking_submission.repository.jpa.SpeakingSubmissionRepository;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
+import com.example.englishmaster_be.domain.topic_type.model.TopicTypeEntity;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
@@ -75,13 +82,17 @@ public class MockTestService implements IMockTestService {
 
     MockTestJdbcRepository mockTestJdbcRepository;
 
+    SpeakingSubmissionRepository speakingSubmissionRepository;
+
+    SpeakingErrorRepository speakingErrorRepository;
+
     MailerService mailerService;
 
 
     @Override
     public MockTestEntity getMockTestById(UUID mockTestId) {
 
-        return mockTestRepository.findMockTestJoinUserAndTopic(mockTestId)
+        return mockTestRepository.findMockTestById(mockTestId)
                 .orElseThrow(
                         () -> new ErrorHolder(Error.MOCK_TEST_NOT_FOUND)
                 );
@@ -347,13 +358,14 @@ public class MockTestService implements IMockTestService {
 
 
     @Override
-    public MockTestEntity getInformationMockTest(UUID mockTestId){
+    public MockTestInforResponse getInformationMockTest(UUID mockTestId){
 
         Assert.notNull(mockTestId, "Mock test id is required.");
 
         UserEntity currentUser = userService.currentUser();
 
-        MockTestEntity mockTest = getMockTestById(mockTestId);
+        MockTestEntity mockTest = mockTestRepository.findMockTestJoinUserTopicTopicType(mockTestId)
+                .orElseThrow(() -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Mock test not found."));
 
         UserEntity ownerOfMockTest = mockTest.getUser();
 
@@ -363,20 +375,36 @@ public class MockTestService implements IMockTestService {
         if(!currentUser.getUserId().equals(ownerOfMockTest.getUserId()))
             throw new ErrorHolder(Error.UNAUTHORIZED, "User current mustn't owner of mock test");
 
-        List<MockTestDetailEntity> mockTestDetails = mockTestDetailRepository.findMockDetailJoinQuestionAnswerMockResultPartByMockId(mockTestId);
+        TopicEntity topicMockTest = mockTest.getTopic();
 
-        Map<MockTestResultEntity, List<MockTestDetailEntity>> mockResultDetailsGroup = mockTestDetails.stream()
-                .collect(Collectors.groupingBy(MockTestDetailEntity::getResultMockTest));
+        TopicTypeEntity topicType = topicMockTest.getTopicType();
 
-        Set<MockTestResultEntity> mockResultSet = mockResultDetailsGroup.keySet();
-        for(MockTestResultEntity mockResult : mockResultSet){
-            mockResult.setMockTestDetails(new HashSet<>(mockResultDetailsGroup.getOrDefault(mockResult, Collections.emptyList())));
-            mockResult.setMockTest(mockTest);
+        if(topicType.getTopicTypeName().equalsIgnoreCase("speaking")){
+            List<SpeakingSubmissionEntity> speakingSubmissions = speakingSubmissionRepository.findAllByMockTestId(mockTestId);
+            List<UUID> speakingSubmissionIds = speakingSubmissions.stream().map(SpeakingSubmissionEntity::getId).toList();
+            List<SpeakingErrorEntity> speakingErrors = speakingErrorRepository.findAllSpeakingErrorIn(speakingSubmissionIds);
+            Map<UUID, List<SpeakingErrorEntity>> speakingSubmissionErrorGroup = speakingErrors.stream().collect(
+                    Collectors.groupingBy(SpeakingErrorEntity::getSpeakingSubmissionId)
+            );
+            for(SpeakingSubmissionEntity speakingSubmission : speakingSubmissions){
+                List<SpeakingErrorEntity> speakingErrorsGet = speakingSubmissionErrorGroup.getOrDefault(speakingSubmission.getId(), null);
+                speakingSubmission.setSpeakingErrors(new HashSet<>(speakingErrorsGet));
+            }
+            mockTest.setSpeakingSubmissions(new HashSet<>(speakingSubmissions));
+            return MockTestMapper.INSTANCE.toMockTestSpeakingResponse(mockTest);
         }
-
-        mockTest.setMockTestResults(mockResultSet);
-
-        return mockTest;
+        else{
+            List<MockTestDetailEntity> mockTestDetails = mockTestDetailRepository.findMockDetailJoinUpperLayerByMockId(mockTestId);
+            Map<MockTestResultEntity, List<MockTestDetailEntity>> mockResultDetailsGroup = mockTestDetails.stream()
+                    .collect(Collectors.groupingBy(MockTestDetailEntity::getResultMockTest));
+            Set<MockTestResultEntity> mockResultSet = mockResultDetailsGroup.keySet();
+            for(MockTestResultEntity mockResult : mockResultSet){
+                mockResult.setMockTestDetails(new HashSet<>(mockResultDetailsGroup.getOrDefault(mockResult, Collections.emptyList())));
+                mockResult.setMockTest(mockTest);
+            }
+            mockTest.setMockTestResults(mockResultSet);
+            return MockTestMapper.INSTANCE.toMockTestRnListeningInforResponse(mockTest);
+        }
     }
 
 }

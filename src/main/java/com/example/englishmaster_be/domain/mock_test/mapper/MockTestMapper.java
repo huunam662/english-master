@@ -1,14 +1,21 @@
 package com.example.englishmaster_be.domain.mock_test.mapper;
 
+import com.example.englishmaster_be.domain.answer.dto.response.Answer1Response;
 import com.example.englishmaster_be.domain.answer.mapper.AnswerMapper;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestRequest;
 import com.example.englishmaster_be.domain.mock_test.dto.response.*;
 import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
 import com.example.englishmaster_be.domain.mock_test.model.MockTestEntity;
 import com.example.englishmaster_be.domain.mock_test_result.mapper.MockTestResultMapper;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionAnswersResponse;
+import com.example.englishmaster_be.domain.part.dto.response.Part2Response;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
+import com.example.englishmaster_be.domain.question.dto.response.Question2Response;
 import com.example.englishmaster_be.domain.question.model.QuestionEntity;
+import com.example.englishmaster_be.domain.speaking_submission.util.speaking.SpeakingUtil;
+import com.example.englishmaster_be.domain.topic.dto.response.Topic1Response;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
+import com.example.englishmaster_be.domain.topic_type.model.TopicTypeEntity;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -32,28 +39,37 @@ public interface MockTestMapper {
     List<MockTestResponse> toMockTestResponseList(Collection<MockTestEntity> mockTestEntityList);
 
     @Mapping(target = "topic", expression = "java(toMockTestTopicResponse(mockTest.getTopic()))")
+    @Mapping(target = "topic.topicType", source = "mockTest.topic.topicType")
     MockTest1Response toMockTest1Response(MockTestEntity mockTest);
 
     List<MockTest1Response> toMockTest1ResponseList(Collection<MockTestEntity> mockTestEntityList);
 
     MockTestEntity toMockTestEntity(MockTestRequest mockTestRequest);
 
-    MockTestPartResponse toMockTestPartResponse(PartEntity partEntity);
+    Part2Response toMockTestPartResponse(PartEntity partEntity);
 
-    MockTestTopicResponse toMockTestTopicResponse(TopicEntity topicEntity);
+    Topic1Response toMockTestTopicResponse(TopicEntity topicEntity);
 
-    MockTestQuestionResponse toMockTestQuestionResponse(QuestionEntity questionEntity);
+    Question2Response toMockTestQuestionResponse(QuestionEntity questionEntity);
 
-    List<MockTestQuestionResponse> toMockTestQuestionResponseList(Collection<QuestionEntity> questionEntityList);
+    List<Question2Response> toMockTestQuestionResponseList(Collection<QuestionEntity> questionEntityList);
 
-    MockTestAnswerResponse toMockTestAnswerResponse(AnswerEntity answerEntity);
+    Answer1Response toMockTestAnswerResponse(AnswerEntity answerEntity);
 
-    List<MockTestAnswerResponse> toMockTestAnswerResponseList(Collection<AnswerEntity> answerEntityList);
+    List<Answer1Response> toMockTestAnswerResponseList(Collection<AnswerEntity> answerEntityList);
 
-    @Mapping(target = "mockTestResponse" , expression = "java(toMockTest1Response(mockTestEntity))")
-    @Mapping(target = "mockTestResultResponses" , expression = "java(MockTestResultMapper.INSTANCE.toMockTestResultResponseList(mockTestEntity.getMockTestResults()))")
-    MockTestInforResponse toMockTestInforResponse(MockTestEntity mockTestEntity);
+    @Mapping(target = "mockTestResponse" , expression = "java(toMockTest1Response(mockTest))")
+    @Mapping(target = "mockTestResultResponses" , expression = "java(MockTestResultMapper.INSTANCE.toMockTestResultResponseList(mockTest.getMockTestResults()))")
+    MockTestInforResponse toMockTestRnListeningInforResponse(MockTestEntity mockTest);
+
+    default MockTestInforResponse toMockTestSpeakingResponse(MockTestEntity mockTest){
+        if(mockTest == null) return null;
+        MockTestInforResponse infResponse = new MockTestInforResponse();
+        infResponse.setMockTestResponse(toMockTest1Response(mockTest));
+        infResponse.setSpeakingSubmissionResults(SpeakingUtil.fillToSpeakingSubmissionResults(mockTest.getSpeakingSubmissions().stream().toList()));
+        return infResponse;
+    }
 
     @Mapping(target = "answers", expression = "java(AnswerMapper.INSTANCE.toAnswerResponseList(questionChild.getAnswers()))")
-    MockTestQuestionAnswersResponse toMockTestQuestionAnswersResponse(QuestionEntity questionChild);
+    QuestionAnswersResponse toMockTestQuestionAnswersResponse(QuestionEntity questionChild);
 }

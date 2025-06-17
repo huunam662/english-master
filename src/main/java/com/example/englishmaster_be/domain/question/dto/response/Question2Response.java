@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.mock_test.dto.response;
+package com.example.englishmaster_be.domain.question.dto.response;
 
 import com.example.englishmaster_be.common.constant.QuestionType;
 import jakarta.persistence.*;
@@ -14,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MockTestQuestionResponse {
+public class Question2Response {
 
     UUID questionId;
 

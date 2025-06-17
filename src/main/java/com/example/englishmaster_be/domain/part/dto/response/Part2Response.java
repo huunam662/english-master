@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.mock_test.dto.response;
+package com.example.englishmaster_be.domain.part.dto.response;
 
 
 import lombok.*;
@@ -11,7 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MockTestPartResponse {
+public class Part2Response {
 
      UUID partId;
 
