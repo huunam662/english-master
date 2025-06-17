@@ -118,10 +118,12 @@ public interface QuestionMapper {
 
     QuestionEntity toQuestionParent(CreateQuestionParentRequest request);
 
-
     QuestionEntity toQuestionChild(CreateQuestionChildRequest request);
 
     QuestionEntity toQuestionEntity(EditQuestionParentRequest questionParentRequest);
 
     QuestionEntity toQuestionEntity(EditQuestionChildRequest questionChildRequest);
+
+    Question1Response toQuestion1Response(QuestionEntity question);
+
 }

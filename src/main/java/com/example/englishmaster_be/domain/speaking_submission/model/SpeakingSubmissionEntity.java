@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
-@Table(name = "speaking_submitssions")
+@Table(name = "speaking_submissions")
 @Entity
 @Getter
 @Setter
@@ -34,13 +34,15 @@ public class SpeakingSubmissionEntity {
     @Column(name = "feedback")
     String feedback;
 
-    @Column(name = "level")
+    @Convert(converter = LevelSpeakerType.LevelSpeakerTypeConverter.class)
+    @Column(name = "level", columnDefinition = "level_speaker_type")
     LevelSpeakerType levelSpeaker;
 
     @Column(name = "reached_percent")
     Float reachedPercent;
 
-    @Column(name = "status")
+    @Column(name = "status", columnDefinition = "status_submission_type")
+    @Enumerated(EnumType.STRING)
     StatusSpeakingSubmission status;
 
     @Column(name = "create_at")

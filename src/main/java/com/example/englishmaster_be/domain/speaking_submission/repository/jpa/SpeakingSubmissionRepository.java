@@ -15,9 +15,8 @@ public interface SpeakingSubmissionRepository extends JpaRepository<SpeakingSubm
     @Query("""
         SELECT sp FROM SpeakingSubmissionEntity sp
         INNER JOIN FETCH sp.question q
-        INNER JOIN FETCH sp.mockTest mt
-        INNER JOIN FETCH mt.topic t
-        WHERE mt.mockTestId = :mockTestId
+        INNER JOIN FETCH q.part p
+        WHERE sp.mockTestId = :mockTestId
     """)
     List<SpeakingSubmissionEntity> findAllByMockTestId(@Param("mockTestId") UUID mockTestId);
 

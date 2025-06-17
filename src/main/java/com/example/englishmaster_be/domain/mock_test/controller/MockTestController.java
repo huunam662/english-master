@@ -75,8 +75,6 @@ public class MockTestController {
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public MockTestInforResponse getMockTestInfor(@PathVariable("mockTestId") UUID mockTestId) {
 
-        MockTestEntity mockTestEntity = mockTestService.getInformationMockTest(mockTestId);
-
-        return MockTestMapper.INSTANCE.toMockTestInforResponse(mockTestEntity);
+        return mockTestService.getInformationMockTest(mockTestId);
     }
 }

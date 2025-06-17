@@ -22,7 +22,8 @@ public class SpeakingErrorEntity {
     @Column(name = "id")
     UUID id;
 
-    @Column(name = "error_type")
+    @Column(name = "error_type", columnDefinition = "speaking_error_type")
+    @Enumerated(EnumType.STRING)
     SpeakingErrorType speakingErrorType;
 
     @Column(name = "word")

@@ -64,12 +64,21 @@ public interface MockTestRepository extends JpaRepository<MockTestEntity, UUID> 
     List<IMockTestToUserResponse> findExamResultForUser(@Param("userId") UUID userId);
 
     @Query("""
-        SELECT DISTINCT mockTest FROM MockTestEntity mockTest
-        LEFT JOIN FETCH mockTest.user userCreate
-        LEFT JOIN FETCH mockTest.topic topicTest
+        SELECT mockTest FROM MockTestEntity mockTest
+        INNER JOIN FETCH mockTest.user userCreate
+        INNER JOIN FETCH mockTest.topic topicTest
         WHERE mockTest.mockTestId = :mockTestId
     """)
-    Optional<MockTestEntity> findMockTestJoinUserAndTopic(@Param("mockTestId") UUID mockTestId);
+    Optional<MockTestEntity> findMockTestById(@Param("mockTestId") UUID mockTestId);
+
+    @Query("""
+        SELECT mockTest FROM MockTestEntity mockTest
+        INNER JOIN FETCH mockTest.user userCreate
+        INNER JOIN FETCH mockTest.topic topicTest
+        INNER JOIN FETCH topicTest.topicType
+        WHERE mockTest.mockTestId = :mockTestId
+    """)
+    Optional<MockTestEntity> findMockTestJoinUserTopicTopicType(@Param("mockTestId") UUID mockTestId);
 
     @Transactional
     @Modifying
@@ -102,7 +111,7 @@ public interface MockTestRepository extends JpaRepository<MockTestEntity, UUID> 
         LEFT JOIN FETCH mtr.part
         WHERE mt.mockTestId = :mockTestId
     """)
-    MockTestEntity findMockTestJoinTopicAndUserAndResultAndPart(@Param("mockTestId") UUID mockTestId);
+    MockTestEntity findMockTestJoinTopicUserResultPart(@Param("mockTestId") UUID mockTestId);
 
     @Query(value = """
         SELECT EXISTS(SELECT id FROM mock_test WHERE id = :mockTestId) 

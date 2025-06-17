@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.mock_test.dto.response;
+package com.example.englishmaster_be.domain.answer.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -10,7 +10,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MockTestAnswerResponse {
+public class Answer1Response {
 
     UUID answerId;
 

@@ -24,5 +24,5 @@ public interface MockTestDetailRepository extends JpaRepository<MockTestDetailEn
         LEFT JOIN FETCH qc.answers aqc
         WHERE mtr.mockTestId = :mockTestId
     """)
-    List<MockTestDetailEntity> findMockDetailJoinQuestionAnswerMockResultPartByMockId(@Param("mockTestId") UUID mockTestId);
+    List<MockTestDetailEntity> findMockDetailJoinUpperLayerByMockId(@Param("mockTestId") UUID mockTestId);
 }

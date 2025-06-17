@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.mock_test.dto.response;
 
+import com.example.englishmaster_be.domain.topic.dto.response.Topic1Response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -32,6 +33,6 @@ public class MockTest1Response {
 
     LocalTime finishTime;
 
-    MockTestTopicResponse topic;
+    Topic1Response topic;
 
 }

@@ -159,7 +159,7 @@ public class MailerService {
 
     public void sendResultEmail(UUID mockTestId) throws IOException, MessagingException {
 
-        MockTestEntity mockTest = mockTestRepository.findMockTestJoinTopicAndUserAndResultAndPart(mockTestId);
+        MockTestEntity mockTest = mockTestRepository.findMockTestJoinTopicUserResultPart(mockTestId);
 
         // Tạo đối tượng MimeMessage
         MimeMessage message = mailSender.createMimeMessage();
@@ -207,7 +207,7 @@ public class MailerService {
 
     public void sendResultSpeakingEmail(UUID mockTestId) throws MessagingException, IOException {
         Assert.notNull(mockTestId, "mockTestId must not be null");
-        MockTestEntity mockTest = mockTestRepository.findMockTestJoinUserAndTopic(mockTestId)
+        MockTestEntity mockTest = mockTestRepository.findMockTestById(mockTestId)
                 .orElseThrow(() -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Mock test not found."));
         String feMockTestResultUrl = linkValue.getLinkFeMockTestResult().replace(":mockTestId", mockTestId.toString());
         String feShowMoreTopic = linkValue.getLinkFeShowMoreTopic();

@@ -25,7 +25,7 @@ public class SpeakingSubmissionController {
 
     @PostMapping("/submit-test")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public MockTestKeyResponse speakingSubmission(@RequestBody @Valid SpeakingSubmitRequest request) throws InterruptedException {
+    public MockTestKeyResponse speakingSubmission(@RequestBody @Valid SpeakingSubmitRequest request) {
 
         return speakingSubmissionService.speakingSubmitTest(request);
     }

@@ -1,5 +1,6 @@
-package com.example.englishmaster_be.domain.mock_test.dto.response;
+package com.example.englishmaster_be.domain.topic.dto.response;
 
+import com.example.englishmaster_be.domain.topic_type.dto.response.TopicTypeResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.util.UUID;
@@ -10,10 +11,12 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MockTestTopicResponse {
+public class Topic1Response {
 
     UUID topicId;
 
     String topicName;
+
+    TopicTypeResponse topicType;
 
 }
