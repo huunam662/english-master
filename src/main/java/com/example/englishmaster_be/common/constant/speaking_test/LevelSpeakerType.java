@@ -39,7 +39,7 @@ public enum LevelSpeakerType {
         return this.level;
     }
 
-    public static class LevelSpeakerTypeConverter implements AttributeConverter<LevelSpeakerType, String>{
+    public static class Converter implements AttributeConverter<LevelSpeakerType, String>{
 
         @Override
         public String convertToDatabaseColumn(LevelSpeakerType attribute) {

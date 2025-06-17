@@ -6,6 +6,7 @@ import com.example.englishmaster_be.domain.mock_test.mapper.MockTestMapper;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestRequest;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionMockTestResponse;
 import com.example.englishmaster_be.domain.mock_test.model.MockTestEntity;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,10 @@ public class MockTestController {
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @Operation(
+            summary = "Create mock test from topic exam.",
+            description = "Create mock test from topic exam."
+    )
     public MockTestKeyResponse createMockTest(@RequestBody MockTestRequest saveMockTestRequest) {
 
         return mockTestService.saveMockTest(saveMockTestRequest);
@@ -51,6 +56,10 @@ public class MockTestController {
 
     @PostMapping(value = "/{mockTestId:.+}/submitResult")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @Operation(
+            summary = "Submit mock test answers for type reading or listening or reading & listening.",
+            description = "Submit mock test answers for type reading or listening or reading & listening."
+    )
     public MockTestKeyResponse addAnswerToMockTest(@PathVariable("mockTestId") UUID mockTestId, @RequestBody List<UUID> listAnswerId) {
 
         return mockTestService.addAnswerToMockTest(mockTestId, listAnswerId);
@@ -73,6 +82,10 @@ public class MockTestController {
 
     @GetMapping(value = "/{mockTestId:.+}/mocketinfor")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @Operation(
+            summary = "Get mock test information.",
+            description = "Get mock test information."
+    )
     public MockTestInforResponse getMockTestInfor(@PathVariable("mockTestId") UUID mockTestId) {
 
         return mockTestService.getInformationMockTest(mockTestId);

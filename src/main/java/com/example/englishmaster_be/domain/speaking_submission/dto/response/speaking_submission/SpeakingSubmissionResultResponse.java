@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.speaking_submission.dto.response.speaking_submission;
 
-import com.example.englishmaster_be.domain.part.dto.response.Part1Response;
+import com.example.englishmaster_be.domain.part.dto.response.PartTopicResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -14,7 +14,7 @@ import java.util.List;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class SpeakingSubmissionResultResponse {
 
-    Part1Response part;
+    PartTopicResponse part;
 
     List<SpeakingSubmissionResponse> speakingSubmissions;
 }

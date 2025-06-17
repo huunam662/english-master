@@ -388,6 +388,7 @@ public class MockTestService implements IMockTestService {
             );
             for(SpeakingSubmissionEntity speakingSubmission : speakingSubmissions){
                 List<SpeakingErrorEntity> speakingErrorsGet = speakingSubmissionErrorGroup.getOrDefault(speakingSubmission.getId(), null);
+                if(speakingErrorsGet == null) continue;
                 speakingSubmission.setSpeakingErrors(new HashSet<>(speakingErrorsGet));
             }
             mockTest.setSpeakingSubmissions(new HashSet<>(speakingSubmissions));

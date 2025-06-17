@@ -34,7 +34,7 @@ public class SpeakingSubmissionEntity {
     @Column(name = "feedback")
     String feedback;
 
-    @Convert(converter = LevelSpeakerType.LevelSpeakerTypeConverter.class)
+    @Convert(converter = LevelSpeakerType.Converter.class)
     @Column(name = "level", columnDefinition = "level_speaker_type")
     LevelSpeakerType levelSpeaker;
 

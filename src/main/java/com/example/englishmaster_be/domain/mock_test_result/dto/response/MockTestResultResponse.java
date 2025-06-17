@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.mock_test_result.dto.response;
 
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestDetailResponse;
-import com.example.englishmaster_be.domain.part.dto.response.Part2Response;
+import com.example.englishmaster_be.domain.part.dto.response.PartBasicResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.util.List;
@@ -17,7 +17,7 @@ public class MockTestResultResponse {
 
     UUID mockTestResultId;
 
-    Part2Response part;
+    PartBasicResponse part;
 
     Integer totalScoreResult;
 

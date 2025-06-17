@@ -2,17 +2,16 @@ package com.example.englishmaster_be.domain.part.dto.response;
 
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import lombok.experimental.SuperBuilder;
 
 import java.util.UUID;
 
 @Getter
 @Setter
-@SuperBuilder
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Part1Response {
+public class PartAndTotalQuesionResponse {
 
     UUID partId;
 
@@ -22,5 +21,6 @@ public class Part1Response {
 
     String partDescription;
 
-    UUID topicId;
+    Integer totalQuestion;
+
 }

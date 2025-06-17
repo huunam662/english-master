@@ -11,7 +11,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Topic1Response {
+public class TopicAndTypeResponse {
 
     UUID topicId;
 

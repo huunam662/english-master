@@ -4,6 +4,7 @@ import com.example.englishmaster_be.domain.answer.dto.request.CreateAnswer1Reque
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
 import com.example.englishmaster_be.domain.answer.dto.request.AnswerRequest;
 import com.example.englishmaster_be.domain.answer.dto.request.EditAnswer1Request;
+import com.example.englishmaster_be.domain.answer.dto.response.AnswerBasicResponse;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerCorrectResponse;
 import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
@@ -34,7 +35,7 @@ public interface AnswerMapper {
 
     AnswerBasicRequest toAnswerBasicRequest(AnswerResponse answerResponse);
 
-    List<AnswerBasicRequest> toAnswerRequestList(Collection<AnswerResponse> answerResponseList);
+    List<AnswerBasicRequest> toAnswerBasicRequestList(Collection<AnswerResponse> answerResponseList);
 
     @Mapping(target = "answerId", ignore = true)
     void flowToAnswerEntity(AnswerRequest answerRequest, @MappingTarget AnswerEntity answer);
@@ -64,4 +65,9 @@ public interface AnswerMapper {
     }
 
     AnswerEntity toAnswerEntity(EditAnswer1Request answer1Request);
+
+    AnswerBasicResponse toAnswerBasicResponse(AnswerEntity answerEntity);
+
+    List<AnswerBasicResponse> toAnswerBasicResponseList(Collection<AnswerEntity> answerEntityList);
+
 }

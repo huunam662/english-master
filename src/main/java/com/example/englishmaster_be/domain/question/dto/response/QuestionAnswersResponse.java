@@ -13,7 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class QuestionAnswersResponse extends Question2Response {
+public class QuestionAnswersResponse extends QuestionReadingListeningResponse {
 
     List<AnswerResponse> answers;
 }

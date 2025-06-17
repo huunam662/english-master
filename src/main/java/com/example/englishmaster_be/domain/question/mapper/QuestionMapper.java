@@ -2,7 +2,6 @@ package com.example.englishmaster_be.domain.question.mapper;
 
 import com.example.englishmaster_be.domain.answer.mapper.AnswerMapper;
 import com.example.englishmaster_be.domain.excel.dto.response.ExcelQuestionResponse;
-import com.example.englishmaster_be.domain.part.dto.response.PartBasicResponse;
 import com.example.englishmaster_be.domain.part.mapper.PartMapper;
 import com.example.englishmaster_be.domain.question.dto.request.*;
 import com.example.englishmaster_be.domain.question.dto.response.*;
@@ -25,9 +24,10 @@ public interface QuestionMapper {
 
     QuestionMapper INSTANCE = Mappers.getMapper(QuestionMapper.class);
 
-    @Mapping(target = "questionGroupChildren", expression = "java(questionDtoToQuestionEntities(questionDto.getListQuestionChild()))")
+    @Mapping(target = "questionGroupChildren", expression = "java(questionDtoToQuestionSet(questionDto.getListQuestionChild()))")
     QuestionEntity toQuestionEntity(QuestionRequest questionDto);
-    default Set<QuestionEntity> questionDtoToQuestionEntities(Collection<QuestionRequest> questionDto) {
+
+    default Set<QuestionEntity> questionDtoToQuestionSet(Collection<QuestionRequest> questionDto) {
         if(questionDto == null){
             return Collections.emptySet();
         }
@@ -83,7 +83,7 @@ public interface QuestionMapper {
     }
 
     @Mapping(target = "topic", expression = "java(TopicMapper.INSTANCE.toTopicBasicResponse(topicEntity))")
-    @Mapping(target = "part", expression = "java(PartMapper.INSTANCE.toPartBasicResponse(partEntity))")
+    @Mapping(target = "part", expression = "java(PartMapper.INSTANCE.toPartAndTotalQuestionResponse(partEntity))")
     @Mapping(target = "questionParents", expression = "java(toQuestionResponseList(questionParents, partEntity))")
     QuestionPartResponse toQuestionPartResponse(Collection<QuestionEntity> questionParents, TopicEntity topicEntity, PartEntity partEntity);
 
@@ -124,6 +124,13 @@ public interface QuestionMapper {
 
     QuestionEntity toQuestionEntity(EditQuestionChildRequest questionChildRequest);
 
-    Question1Response toQuestion1Response(QuestionEntity question);
+    QuestionSpeakingResponse toQuestionSpeakingResponse(QuestionEntity question);
+
+    @Mapping(target = "answers", expression = "java(AnswerMapper.INSTANCE.toAnswerResponseList(questionChild.getAnswers()))")
+    QuestionAnswersResponse toQuestionAnswersResponse(QuestionEntity questionChild);
+
+    QuestionReadingListeningResponse toQuestionReadingListeningResponse(QuestionEntity questionEntity);
+
+    List<QuestionReadingListeningResponse> toQuestionReadingListeningResponseList(Collection<QuestionEntity> questionEntityList);
 
 }

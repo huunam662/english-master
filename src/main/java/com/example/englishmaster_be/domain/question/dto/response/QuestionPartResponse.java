@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.question.dto.response;
 
-import com.example.englishmaster_be.domain.part.dto.response.PartBasicResponse;
+import com.example.englishmaster_be.domain.part.dto.response.PartAndTotalQuesionResponse;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicBasicResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -18,7 +18,7 @@ public class QuestionPartResponse {
 
     TopicBasicResponse topic;
 
-    PartBasicResponse part;
+    PartAndTotalQuesionResponse part;
 
     List<QuestionResponse> questionParents;
 
