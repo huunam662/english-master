@@ -112,24 +112,17 @@ public class SpeakingUtil {
         Set<PartEntity> partKeys = partSpeakingSubmissionsGroup.keySet().stream().sorted(Comparator.comparing(PartEntity::getPartName)).collect(Collectors.toCollection(LinkedHashSet::new));
         for(PartEntity part : partKeys){
             SpeakingSubmissionResultResponse speakingSubmissionResult = new SpeakingSubmissionResultResponse();
-            speakingSubmissionResult.setPart(PartMapper.INSTANCE.toPart1Response(part));
-            List<SpeakingSubmissionEntity> speakingSubmission = partSpeakingSubmissionsGroup.getOrDefault(part, null);
-            if(speakingSubmission == null) continue;
-            Map<SpeakingSubmissionEntity, List<SpeakingErrorEntity>> speakingSubmissionErrorsGroup = speakingSubmission.stream().collect(
-                    Collectors.toMap(
-                            speakingSubmissionElm -> speakingSubmissionElm,
-                            speakingSubmissionElm -> speakingSubmissionElm.getSpeakingErrors().stream().toList()
-                    )
-            );
+            speakingSubmissionResult.setPart(PartMapper.INSTANCE.toPartTopicResponse(part));
+            List<SpeakingSubmissionEntity> speakingSubmissionsOfPart = partSpeakingSubmissionsGroup.getOrDefault(part, null);
+            if(speakingSubmissionsOfPart == null) continue;
             speakingSubmissionResult.setSpeakingSubmissions(new ArrayList<>());
-            Set<SpeakingSubmissionEntity> speakingSubmissionKeys = speakingSubmissionErrorsGroup.keySet();
-            for(SpeakingSubmissionEntity speakingSubmissionKey : speakingSubmissionKeys){
-                SpeakingSubmissionResponse speakingSubmissionResponse = SpeakingSubmissionMapper.INSTANCE.toSpeakingSubmissionResponse(speakingSubmissionKey);
+            for(SpeakingSubmissionEntity speakingSubmissionElm : speakingSubmissionsOfPart){
+                SpeakingSubmissionResponse speakingSubmissionResponse = SpeakingSubmissionMapper.INSTANCE.toSpeakingSubmissionResponse(speakingSubmissionElm);
                 speakingSubmissionResult.getSpeakingSubmissions().add(speakingSubmissionResponse);
                 SpeakingErrorResponse speakingErrorResponse = new SpeakingErrorResponse();
                 speakingErrorResponse.setSpeakingErrorTypes(Arrays.stream(SpeakingErrorType.values()).toList());
                 speakingSubmissionResponse.setSpeakingErrors(speakingErrorResponse);
-                List<SpeakingErrorEntity> speakingErrors = speakingSubmissionErrorsGroup.getOrDefault(speakingSubmissionKey, null);
+                Set<SpeakingErrorEntity> speakingErrors = speakingSubmissionElm.getSpeakingErrors();
                 if(speakingErrors == null) continue;
                 Map<SpeakingErrorType, List<SpeakingErrorEntity>> speakingErrorTypeErrorsGroup = speakingErrors.stream().collect(
                         Collectors.groupingBy(SpeakingErrorEntity::getSpeakingErrorType)

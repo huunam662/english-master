@@ -2,7 +2,7 @@ package com.example.englishmaster_be.domain.speaking_submission.dto.response.spe
 
 import com.example.englishmaster_be.common.constant.speaking_test.LevelSpeakerType;
 import com.example.englishmaster_be.common.constant.speaking_test.StatusSpeakingSubmission;
-import com.example.englishmaster_be.domain.question.dto.response.Question1Response;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionSpeakingResponse;
 import com.example.englishmaster_be.domain.speaking_submission.dto.response.speaking_error.SpeakingErrorResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
@@ -34,7 +34,7 @@ public class SpeakingSubmissionResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING)
     StatusSpeakingSubmission statusSubmission;
 
-    Question1Response question;
+    QuestionSpeakingResponse question;
 
     SpeakingErrorResponse speakingErrors;
 

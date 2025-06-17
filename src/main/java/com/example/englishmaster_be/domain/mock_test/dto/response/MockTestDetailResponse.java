@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.domain.mock_test.dto.response;
 
-import com.example.englishmaster_be.domain.answer.dto.response.Answer1Response;
+import com.example.englishmaster_be.domain.answer.dto.response.AnswerBasicResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionAnswersResponse;
-import com.example.englishmaster_be.domain.question.dto.response.Question2Response;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionReadingListeningResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import java.util.UUID;
@@ -27,8 +27,8 @@ public class MockTestDetailResponse {
 
     QuestionAnswersResponse questionChild;
 
-    Answer1Response answerChoice;
+    AnswerBasicResponse answerChoice;
 
-    Question2Response question;
+    QuestionReadingListeningResponse question;
 
 }

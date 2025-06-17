@@ -31,6 +31,7 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -49,8 +50,6 @@ public class MailerService {
     UserRepository userRepository;
 
     MockTestRepository mockTestRepository;
-
-    SpringTemplateEngine springTemplateEngine;
 
     public void sendMail(String recipientEmail) throws MessagingException {
 
@@ -215,7 +214,8 @@ public class MailerService {
                 .replace("${topicName}", mockTest.getTopic().getTopicName())
                 .replace("${linkFeMockTestResult}", feMockTestResultUrl)
                 .replace("${linkFeShowMoreTopic}", feShowMoreTopic)
-                .replace("${currentYear}", String.valueOf(LocalDateTime.now().getYear()));
+                .replace("${currentYear}", String.valueOf(LocalDateTime.now().getYear()))
+                .replace("${currentDate}", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         String sendTo = mockTest.getUser().getEmail();
         sendToEmail("testmeusolution@gmail.com", sendTo, "Kết quả bài thi", htmlContent);
     }

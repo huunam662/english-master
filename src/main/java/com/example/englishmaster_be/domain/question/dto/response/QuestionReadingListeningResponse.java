@@ -14,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Question2Response {
+public class QuestionReadingListeningResponse {
 
     UUID questionId;
 

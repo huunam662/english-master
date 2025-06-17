@@ -3,6 +3,7 @@ package com.example.englishmaster_be.domain.topic.mapper;
 import com.example.englishmaster_be.domain.excel.dto.response.ExcelTopicContentResponse;
 import com.example.englishmaster_be.domain.part.mapper.PartMapper;
 import com.example.englishmaster_be.domain.topic.dto.request.TopicRequest;
+import com.example.englishmaster_be.domain.topic.dto.response.TopicAndTypeResponse;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicBasicResponse;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicResponse;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
@@ -37,4 +38,7 @@ public interface TopicMapper {
 
     @Mapping(target = "topicType", ignore = true)
     void flowToTopicEntity(ExcelTopicContentResponse excelTopicContentResponse, @MappingTarget TopicEntity topicEntity);
+
+    TopicAndTypeResponse toTopicAndTypeResponse(TopicEntity topicEntity);
+
 }

@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.domain.part.dto.response;
 
+
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-
 import java.util.UUID;
 
 @Getter
@@ -13,14 +13,10 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class PartBasicResponse {
 
-    UUID partId;
+     UUID partId;
 
-    String partName;
+     String partName;
 
-    String partType;
-
-    String partDescription;
-
-    Integer totalQuestion;
+     String partType;
 
 }

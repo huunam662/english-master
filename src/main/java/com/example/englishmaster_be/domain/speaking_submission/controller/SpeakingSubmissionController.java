@@ -3,6 +3,7 @@ package com.example.englishmaster_be.domain.speaking_submission.controller;
 import com.example.englishmaster_be.domain.mock_test.dto.response.MockTestKeyResponse;
 import com.example.englishmaster_be.domain.speaking_submission.dto.request.SpeakingSubmitRequest;
 import com.example.englishmaster_be.domain.speaking_submission.service.ISpeakingSubmissionService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.AccessLevel;
@@ -25,6 +26,10 @@ public class SpeakingSubmissionController {
 
     @PostMapping("/submit-test")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+    @Operation(
+            summary = "Submit speaking recording for mock test.",
+            description = "Submit speaking recording for mock test."
+    )
     public MockTestKeyResponse speakingSubmission(@RequestBody @Valid SpeakingSubmitRequest request) {
 
         return speakingSubmissionService.speakingSubmitTest(request);

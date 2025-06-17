@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.mock_test.dto.response;
 
-import com.example.englishmaster_be.domain.topic.dto.response.Topic1Response;
+import com.example.englishmaster_be.domain.topic.dto.response.TopicAndTypeResponse;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -13,7 +13,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class MockTest1Response {
+public class MockTestTopicResponse {
 
     UUID mockTestId;
 
@@ -33,6 +33,6 @@ public class MockTest1Response {
 
     LocalTime finishTime;
 
-    Topic1Response topic;
+    TopicAndTypeResponse topic;
 
 }

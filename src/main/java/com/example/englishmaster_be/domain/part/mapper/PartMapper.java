@@ -2,11 +2,8 @@ package com.example.englishmaster_be.domain.part.mapper;
 
 
 import com.example.englishmaster_be.domain.part.dto.request.PartRequest;
-import com.example.englishmaster_be.domain.part.dto.response.Part1Response;
-import com.example.englishmaster_be.domain.part.dto.response.PartBasicResponse;
-import com.example.englishmaster_be.domain.part.dto.response.PartQuestionResponse;
+import com.example.englishmaster_be.domain.part.dto.response.*;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
-import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
 import com.example.englishmaster_be.domain.question.mapper.QuestionMapper;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
@@ -30,7 +27,11 @@ public interface PartMapper {
 
     PartBasicResponse toPartBasicResponse(PartEntity partEntity);
 
-    List<PartBasicResponse> toPartBasicResponseList(Collection<PartEntity> partList);
+    List<PartBasicResponse> toPartBasicResponseList(Collection<PartEntity> parts);
+
+    PartAndTotalQuesionResponse toPartAndTotalQuestionResponse(PartEntity partEntity);
+
+    List<PartAndTotalQuesionResponse> toPartAndTotalQuestionResponseList(Collection<PartEntity> partList);
 
     default List<String> toPartNameResponseList(Collection<PartEntity> partEntities) {
 
@@ -46,7 +47,7 @@ public interface PartMapper {
     PartQuestionResponse toPartQuestionResponse(PartEntity part);
 
 
-    Part1Response toPart1Response(PartEntity part);
+    PartTopicResponse toPartTopicResponse(PartEntity part);
 
-    List<Part1Response> toPart1ResponseList(Collection<PartEntity> partList);
+    List<PartTopicResponse> toPartTopicResponseList(Collection<PartEntity> partList);
 }
