@@ -109,7 +109,7 @@ public class SpeakingUtil {
         Map<PartEntity, List<SpeakingSubmissionEntity>> partSpeakingSubmissionsGroup = speakingSubmissions.stream().collect(
                 Collectors.groupingBy(elm -> elm.getQuestion().getPart())
         );
-        Set<PartEntity> partKeys = partSpeakingSubmissionsGroup.keySet();
+        Set<PartEntity> partKeys = partSpeakingSubmissionsGroup.keySet().stream().sorted(Comparator.comparing(PartEntity::getPartName)).collect(Collectors.toCollection(LinkedHashSet::new));
         for(PartEntity part : partKeys){
             SpeakingSubmissionResultResponse speakingSubmissionResult = new SpeakingSubmissionResultResponse();
             speakingSubmissionResult.setPart(PartMapper.INSTANCE.toPart1Response(part));
