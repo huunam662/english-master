@@ -296,15 +296,12 @@ public class MockTestService implements IMockTestService {
     }
 
 
-
-
-    @SneakyThrows
     @Override
     public void sendEmailToMock(UUID mockTestId) {
 
         CompletableFuture.runAsync(() -> {
             try {
-                mailerService.sendResultEmail(mockTestId);
+                mailerService.sendResultMockTestEmail(mockTestId);
             } catch (IOException | MessagingException e) {
                 throw new RuntimeException(e);
             }
