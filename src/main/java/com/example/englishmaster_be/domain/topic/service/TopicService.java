@@ -364,6 +364,10 @@ public class TopicService implements ITopicService {
             List<QuestionEntity> questionSpeakings = questionRepository.findAllQuestionSpeakingOfTopicAndPart(topicId, partName);
             TopicUtil.fillQuestionSpeakingToTopic(topic, questionSpeakings);
         }
+        else if (topic.getTopicType().getTopicTypeName().equalsIgnoreCase("writing")){
+            List<QuestionEntity> questionWritings = questionRepository.findAllQuestionWritingOfTopicAndPart(topicId, partName);
+            TopicUtil.fillQuestionSpeakingToTopic(topic, questionWritings);
+        }
         else{
             List<AnswerEntity> answersQuestionChild = answerRepository.findAnswersJoinQuestionPartTopic(topicId, partName);
             TopicUtil.fillAnswerToTopic(topic, answersQuestionChild);

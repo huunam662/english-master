@@ -13,7 +13,7 @@ import java.util.UUID;
 public interface ITopicTypeRepository extends JpaRepository<TopicTypeEntity, UUID> {
 
     @Query(value = """
-        SELECT id as topicTypeId
+        SELECT DISTINCT id as topicTypeId
         FROM topic_type
         WHERE LOWER(type_name) = LOWER(:typeName)
     """, nativeQuery = true)

@@ -12,7 +12,9 @@ public enum TopicType {
 
     LISTENING_READING("Reading & Listening"),
     SPEAKING("Speaking"),
-    READING("Reading");
+    READING("Reading"),
+    LISTENING("Listening"),
+    WRITING("Writing");
 
     String type;
 

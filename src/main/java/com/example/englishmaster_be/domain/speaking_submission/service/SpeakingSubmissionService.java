@@ -112,7 +112,7 @@ public class SpeakingSubmissionService implements ISpeakingSubmissionService{
             // Gửi mail
             log.info("Send Email to User.");
             try {
-                mailerService.sendResultSpeakingEmail(mockTestId);
+                mailerService.sendResultMockTestEmail(mockTestId);
             } catch (MessagingException | IOException e) {
                 log.error(e.getMessage());
             }
@@ -128,7 +128,7 @@ public class SpeakingSubmissionService implements ISpeakingSubmissionService{
     public void evaluateSpeakingTest(List<SpeakingSubmissionEntity> speakingSubmissions) {
 
         if(speakingSubmissions == null || speakingSubmissions.isEmpty())
-            throw new ErrorHolder(Error.METHOD_NOT_ALLOWED, "Speaking submissions are required.");
+            throw new ErrorHolder(Error.BAD_REQUEST, "Speaking submissions are required.");
 
         List<CompletableFuture<Void>> futures = new ArrayList<>();
         for(SpeakingSubmissionEntity speakingSubmission : speakingSubmissions){

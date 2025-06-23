@@ -21,13 +21,9 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.FileCopyUtils;
-import org.thymeleaf.context.Context;
-import org.thymeleaf.spring6.SpringTemplateEngine;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -204,7 +200,7 @@ public class MailerService {
         mailSender.send(message);
     }
 
-    public void sendResultSpeakingEmail(UUID mockTestId) throws MessagingException, IOException {
+    public void sendResultMockTestEmail(UUID mockTestId) throws MessagingException, IOException {
         Assert.notNull(mockTestId, "mockTestId must not be null");
         MockTestEntity mockTest = mockTestRepository.findMockTestById(mockTestId)
                 .orElseThrow(() -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Mock test not found."));

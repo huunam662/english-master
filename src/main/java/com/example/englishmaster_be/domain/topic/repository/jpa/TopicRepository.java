@@ -35,11 +35,12 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, JpaSp
     """)
     Optional<TopicEntity> findByTopicId(@Param("topicId") UUID topicId);
 
-    @Query("""
-        SELECT DISTINCT t.topicId as topicId, t.packId as packId
-        FROM TopicEntity t
-        WHERE LOWER(t.topicName) = LOWER(:topicName)
-    """)
+    @Query(value = """
+        SELECT t.id as topicId, t.pack_id as packId
+        FROM topics t
+        WHERE LOWER(t.topic_name) = LOWER(:topicName)
+        LIMIT 1
+    """, nativeQuery = true)
     ITopicKeyProjection findTopicIdByName(@Param("topicName") String topicName);
 
     @Query(value = """
