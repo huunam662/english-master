@@ -69,6 +69,16 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, UUID> 
     List<QuestionEntity> findAllQuestionSpeakingOfTopicAndPart(@Param("topicId") UUID topicId, @Param("partName") String partName);
 
     @Query("""
+        SELECT qWriting FROM QuestionEntity qWriting
+        INNER JOIN FETCH qWriting.part p
+        INNER JOIN FETCH p.topic t
+        WHERE t.topicId = :topicId
+        AND LOWER(qWriting.questionType) = 'writing'
+        AND LOWER(p.partName) = LOWER(:partName)
+    """)
+    List<QuestionEntity> findAllQuestionWritingOfTopicAndPart(@Param("topicId") UUID topicId, @Param("partName") String partName);
+
+    @Query("""
         SELECT qSpeaking FROM QuestionEntity qSpeaking
         INNER JOIN FETCH qSpeaking.part p
         INNER JOIN FETCH p.topic t

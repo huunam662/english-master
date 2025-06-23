@@ -159,10 +159,10 @@ public class ExcelImportService implements IExcelImportService {
             String topicImage = ExcelUtil.getStringCellValue(sheetTopic.getRow(5).getCell(1));
             String topicDescription = ExcelUtil.getStringCellValue(sheetTopic.getRow(6).getCell(1));
             String time = ExcelUtil.getStringCellValue(sheetTopic.getRow(7).getCell(1));
-            LocalTime workTime = LocalTime.parse(
+            LocalTime workTime = LocalDateTime.parse(
                     ExcelUtil.getStringCellValue(sheetTopic.getRow(7).getCell(1)),
-                    DateTimeFormatter.ofPattern("HH:mm[:ss]")
-            );
+                    DateTimeFormatter.ISO_LOCAL_DATE_TIME
+            ).toLocalTime();
 
             ITopicKeyProjection topicKey = topicRepository.findTopicIdByName(topicName);
 
@@ -878,6 +878,9 @@ public class ExcelImportService implements IExcelImportService {
             else if(topicField.getTopicType().equalsIgnoreCase(TopicType.SPEAKING.getType())){
                 fillSpeakingPartsToDb(topicId, userImport, workbook);
             }
+            else if(topicField.getTopicType().equalsIgnoreCase(TopicType.WRITING.getType())){
+                fillWritingPartsToDb(topicId, userImport, workbook);
+            }
             else{
                 for(int part = 1; part < numberOfSheets; part++)
                     fillQuestionForTopicAnyPartFromExcelToDb(topicId, userImport, workbook, part);
@@ -1085,6 +1088,66 @@ public class ExcelImportService implements IExcelImportService {
                         .partId(partId)
                         .contentImage(ExcelUtil.getStringCellValue(rowImage.getCell(1)))
                         .questionType(QuestionType.Speaking)
+                        .isQuestionParent(true)
+                        .questionScore(0)
+                        .userCreate(userImport)
+                        .userUpdate(userImport)
+                        .build();
+                questionsParentOfPart.add(questionParent);
+                numberOfQuestions++;
+                rowImage = sheet.getRow(iRowQuestionSpeaking + 1);
+            }
+            sheetPartStep++;
+        }
+
+        topicJdbcRepository.updateTopic(topicId, numberOfQuestions);
+        partJdbcRepository.batchInsertPart(partsOfTopic);
+        questionJdbcRepository.batchInsertQuestion(questionsParentOfPart);
+    }
+
+    @Transactional
+    protected void fillWritingPartsToDb(UUID topicId, UserEntity userImport, Workbook workbook){
+
+        List<PartEntity> partsOfTopic = new ArrayList<>();
+        List<QuestionEntity> questionsParentOfPart = new ArrayList<>();
+
+        int numberOfSheets = workbook.getNumberOfSheets();
+        int sheetPartStep = 1;
+        int numberOfQuestions = 0;
+        while(sheetPartStep < numberOfSheets){
+            Sheet sheet = workbook.getSheetAt(sheetPartStep);
+            int iRowPart = 0;
+            Row rowPart = sheet.getRow(iRowPart);
+            if(rowPart == null) break;
+
+            String partName = ExcelUtil.getStringCellValue(sheet.getRow(0).getCell(0));
+            UUID partId = partRepository.findPartIdByTopicIdAndPartName(topicId, partName);
+            if(partId == null){
+                partId = UUID.randomUUID();
+                partsOfTopic.add(
+                        PartEntity.builder()
+                                .partId(partId)
+                                .partName(ExcelUtil.getStringCellValue(rowPart.getCell(0)))
+                                .partType(ExcelUtil.getStringCellValue(rowPart.getCell(1)))
+                                .userCreate(userImport)
+                                .userUpdate(userImport)
+                                .topicId(topicId)
+                                .build()
+                );
+            }
+
+            int iRowImage = iRowPart + 1;
+            Row rowImage = sheet.getRow(iRowImage);
+            while (rowImage != null){
+
+                int iRowQuestionSpeaking = iRowImage + 1;
+
+                QuestionEntity questionParent = QuestionEntity.builder()
+                        .questionId(UUID.randomUUID())
+                        .questionContent(ExcelUtil.getStringCellValue(sheet.getRow(iRowQuestionSpeaking).getCell(1)))
+                        .partId(partId)
+                        .contentImage(ExcelUtil.getStringCellValue(rowImage.getCell(1)))
+                        .questionType(QuestionType.Writing)
                         .isQuestionParent(true)
                         .questionScore(0)
                         .userCreate(userImport)

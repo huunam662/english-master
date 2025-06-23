@@ -62,6 +62,9 @@ public class ExcelExportService implements IExcelExportService{
             else if(topicType.getTopicTypeName().equalsIgnoreCase(TopicType.SPEAKING.getType())){
                 exportSpeakingInformation(List.of(topic), zipOutputStream);
             }
+            else if(topicType.getTopicTypeName().equalsIgnoreCase(TopicType.WRITING.getType())){
+                exportSpeakingInformation(List.of(topic), zipOutputStream);
+            }
         }
         catch (IOException e){
             throw new ErrorHolder(Error.BAD_REQUEST, e.getMessage(), false);
@@ -93,6 +96,9 @@ public class ExcelExportService implements IExcelExportService{
                     else if(topicType.getType().equalsIgnoreCase(TopicType.SPEAKING.getType())){
                         exportSpeakingInformation(topicsOfType, zipOutputStream);
                     }
+                    else if(topicType.getType().equalsIgnoreCase(TopicType.WRITING.getType())){
+                        exportSpeakingInformation(topicsOfType, zipOutputStream);
+                    }
                 }
                 topicsResult = topicRepository.findAllTopicWithJoinParent(PageRequest.of(++pageTopic, pageTopicSize));
             }
@@ -119,6 +125,9 @@ public class ExcelExportService implements IExcelExportService{
                     exportReadingInformation(topicsResult, zipOutputStream);
                 }
                 else if(topicType.getType().equalsIgnoreCase(TopicType.SPEAKING.getType())){
+                    exportSpeakingInformation(topicsResult, zipOutputStream);
+                }
+                else if(topicType.getType().equalsIgnoreCase(TopicType.WRITING.getType())){
                     exportSpeakingInformation(topicsResult, zipOutputStream);
                 }
                 topicsResult = topicRepository.findAllTopicWithJoinParent(topicType.getType(), PageRequest.of(++pageTopic, pageTopicSize));

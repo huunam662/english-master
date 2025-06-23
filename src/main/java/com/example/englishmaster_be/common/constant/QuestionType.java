@@ -4,5 +4,6 @@ public enum QuestionType {
 
     Question_Parent,
     Question_Child,
-    Speaking
+    Speaking,
+    Writing
 }
