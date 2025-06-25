@@ -1,10 +1,12 @@
 package com.example.englishmaster_be.domain.auth.service.auth;
 
 import com.example.englishmaster_be.common.constant.InvalidTokenType;
+import com.example.englishmaster_be.common.constant.Role;
 import com.example.englishmaster_be.common.constant.SessionActiveType;
 import com.example.englishmaster_be.common.constant.OtpStatus;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.auth.dto.request.*;
+import com.example.englishmaster_be.domain.user.repository.RoleRepository;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.domain.auth.model.SessionActiveEntity;
 import com.example.englishmaster_be.domain.auth.service.invalid_token.IInvalidTokenService;
@@ -50,6 +52,8 @@ public class AuthService implements IAuthService {
     MailerService mailerUtil;
 
     AuthenticationManager authenticationManager;
+
+    RoleRepository roleRepository;
 
     PasswordEncoder passwordEncoder;
 
@@ -105,6 +109,7 @@ public class AuthService implements IAuthService {
         if(user != null && user.getConfirmTokens() != null)
             sessionActiveService.deleteByUserIdAndType(user.getUserId(), SessionActiveType.CONFIRM);
 
+        userRegister.setRole(roleRepository.findByRoleName(Role.USER));
         userRegister = userService.saveUser(userRegister);
         SessionActiveEntity sessionConfirm = sessionActiveService.saveForUserRegister(userRegister, SessionActiveType.CONFIRM);
 
