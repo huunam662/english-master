@@ -13,6 +13,8 @@ public interface IExcelImportService {
 
     TopicKeyResponse importTopicFromExcel(MultipartFile file);
 
+    TopicKeyResponse importTopicFromExcel(MultipartFile file, String imageUrl);
+
     ExcelTopicPartIdsResponse importReadingPart67FromExcel(UUID topicId, int part, MultipartFile file);
 
     ExcelTopicPartIdsResponse importReadingPart5FromExcel(UUID topicId, MultipartFile file);

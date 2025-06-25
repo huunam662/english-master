@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.topic.controller;
 
+import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyResponse;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
@@ -14,8 +15,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
 
@@ -143,6 +146,19 @@ public class TopicController {
         return topicService.getQuestionOfToTopicPart(topicId, partId);
     }
 
+    @PutMapping(value = "/{topicId:.+}/update-from-excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+            summary = "Update topic information from excel.",
+            description = "Update topic information from excel."
+    )
+    public TopicKeyResponse updateTopicInformationFromExcel(
+            @PathVariable("topicId") UUID topicId,
+            @RequestPart("file") MultipartFile file
+    ) {
+
+        return topicService.updateTopicFromExcel(topicId, file);
+    }
 
     @PatchMapping(value = "/{topicId:.+}/enableTopic")
     @PreAuthorize("hasRole('ADMIN')")
@@ -159,5 +175,6 @@ public class TopicController {
 
         return topicService.getQuestionPartListOfTopic(topicId);
     }
+
 
 }

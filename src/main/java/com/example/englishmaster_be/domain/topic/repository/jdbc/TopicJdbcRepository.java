@@ -72,4 +72,22 @@ public class TopicJdbcRepository {
         namedParameterJdbcTemplate.update(sql, params);
     }
 
+    @Transactional
+    public void updateTopic(UUID topicId, String imageUrl){
+        if(topicId == null) return;
+        if(imageUrl == null || imageUrl.isEmpty()) return;
+
+        String sql = """
+                UPDATE topics
+                SET topic_image = :imageUrl
+                WHERE id = :id
+                """;
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("id", topicId)
+                .addValue("imageUrl", imageUrl);
+
+        namedParameterJdbcTemplate.update(sql, params);
+    }
+
 }

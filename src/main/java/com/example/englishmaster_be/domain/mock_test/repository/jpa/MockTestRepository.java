@@ -55,10 +55,11 @@ public interface MockTestRepository extends JpaRepository<MockTestEntity, UUID> 
     @Query(value = """
             select
                 mt.id as mockTestId, t.id as topicId, t.topic_name as testName,
-                mt.total_score as totalScore, t.topic_type as testType,
+                coalesce(mt.total_score, 0) as totalScore, tt.type_name as testType,
                 mt.create_at as examStartTime
             from mock_test mt
             join topics t on t.id = mt.topic_id
+            join topic_type tt on tt.id = t.topic_type_id
             where mt.user_id = :userId
             """, nativeQuery = true)
     List<IMockTestToUserResponse> findExamResultForUser(@Param("userId") UUID userId);

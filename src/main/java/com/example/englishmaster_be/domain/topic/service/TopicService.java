@@ -4,6 +4,7 @@ import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.part.mapper.PartMapper;
 import com.example.englishmaster_be.domain.question.mapper.QuestionMapper;
+import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyResponse;
 import com.example.englishmaster_be.domain.topic.mapper.TopicMapper;
 import com.example.englishmaster_be.domain.topic.repository.spec.TopicSpecification;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
@@ -39,6 +40,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -417,4 +419,8 @@ public class TopicService implements ITopicService {
         return QuestionMapper.INSTANCE.toQuestionPartResponseList(topic);
     }
 
+    @Override
+    public TopicKeyResponse updateTopicFromExcel(UUID topicId, MultipartFile fileExcel) {
+        return null;
+    }
 }

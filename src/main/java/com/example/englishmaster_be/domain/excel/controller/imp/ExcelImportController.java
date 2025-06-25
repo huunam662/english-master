@@ -32,9 +32,12 @@ public class ExcelImportController {
             summary = "Import topic information from excel file.",
             description = "Import topic information from excel file."
     )
-    public TopicKeyResponse importTopicInformationFromExcel(@RequestPart("file") MultipartFile file) {
+    public TopicKeyResponse importTopicInformationFromExcel(
+            @RequestPart("file") MultipartFile file,
+            @RequestParam(value = "imageUrl", required = false) String imageUrl
+    ) {
 
-        return excelService.importTopicFromExcel(file);
+        return excelService.importTopicFromExcel(file, imageUrl);
     }
 
 
