@@ -46,6 +46,8 @@ import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,6 +64,7 @@ import java.util.*;
 public class ExcelImportService implements IExcelImportService {
 
 
+    private static final Logger log = LoggerFactory.getLogger(ExcelImportService.class);
     PartRepository partRepository;
 
     TopicRepository topicRepository;
@@ -83,7 +86,16 @@ public class ExcelImportService implements IExcelImportService {
     ITopicTypeRepository topicTypeRepository;
     TopicTypeJdbcRepository topicTypeJdbcRepository;
 
+    @Transactional
+    @Override
+    public TopicKeyResponse importTopicFromExcel(MultipartFile file, String imageUrl) {
 
+        TopicKeyResponse topicKey = importTopicFromExcel(file);
+
+        topicJdbcRepository.updateTopic(topicKey.getTopicId(), imageUrl);
+
+        return topicKey;
+    }
 
     @Transactional
     @Override
@@ -158,11 +170,25 @@ public class ExcelImportService implements IExcelImportService {
             String topicName = ExcelUtil.getStringCellValue(sheetTopic.getRow(4).getCell(1));
             String topicImage = ExcelUtil.getStringCellValue(sheetTopic.getRow(5).getCell(1));
             String topicDescription = ExcelUtil.getStringCellValue(sheetTopic.getRow(6).getCell(1));
-            String time = ExcelUtil.getStringCellValue(sheetTopic.getRow(7).getCell(1));
-            LocalTime workTime = LocalDateTime.parse(
-                    ExcelUtil.getStringCellValue(sheetTopic.getRow(7).getCell(1)),
-                    DateTimeFormatter.ISO_LOCAL_DATE_TIME
-            ).toLocalTime();
+            Cell cellWorkTime = sheetTopic.getRow(7).getCell(1);
+            LocalTime workTime = LocalTime.of(1, 0, 0);
+            try{
+                if(cellWorkTime.getCellType().equals(CellType.STRING)){
+                    workTime = LocalTime.parse(
+                            ExcelUtil.getStringCellValue(cellWorkTime),
+                            DateTimeFormatter.ofPattern("HH:mm[:ss]")
+                    );
+                }
+                else{
+                    workTime = LocalDateTime.parse(
+                            ExcelUtil.getStringCellValue(cellWorkTime),
+                            DateTimeFormatter.ISO_LOCAL_DATE_TIME
+                    ).toLocalTime();
+                }
+            }
+            catch (Exception e){
+                log.error(e.getMessage());
+            }
 
             ITopicKeyProjection topicKey = topicRepository.findTopicIdByName(topicName);
 

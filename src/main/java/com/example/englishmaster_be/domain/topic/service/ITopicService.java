@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.domain.topic.service;
 
 import com.example.englishmaster_be.domain.question.dto.projection.INumberAndScoreQuestionTopic;
+import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyResponse;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.question.dto.request.QuestionRequest;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
@@ -13,6 +14,7 @@ import com.example.englishmaster_be.domain.pack.model.PackEntity;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
 import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.UUID;
@@ -51,5 +53,8 @@ public interface ITopicService {
     List<String> get5SuggestTopic(String query);
 
     List<QuestionPartResponse> getQuestionPartListOfTopic(UUID topicId);
+
+    TopicKeyResponse updateTopicFromExcel(UUID topicId, MultipartFile fileExcel);
+
 
 }
