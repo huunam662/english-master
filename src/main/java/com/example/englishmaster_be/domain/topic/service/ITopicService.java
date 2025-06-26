@@ -14,6 +14,7 @@ import com.example.englishmaster_be.domain.pack.model.PackEntity;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
 import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
+import org.apache.coyote.BadRequestException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -54,7 +55,5 @@ public interface ITopicService {
 
     List<QuestionPartResponse> getQuestionPartListOfTopic(UUID topicId);
 
-    TopicKeyResponse updateTopicFromExcel(UUID topicId, MultipartFile fileExcel);
-
-
+    TopicKeyResponse updateTopicToExcel(MultipartFile file, UUID topicId, String imageUrl) throws BadRequestException;
 }

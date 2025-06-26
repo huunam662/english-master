@@ -17,6 +17,9 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
 
     Optional<UserEntity> findByEmail(String email);
 
+    @Query(value = """
+        SELECT EXISTS(SELECT email FROM users WHERE email = :email)
+    """, nativeQuery = true)
     boolean existsByEmail(String email);
 
     // Lấy danh sách người dùng lâu không đăng nhập

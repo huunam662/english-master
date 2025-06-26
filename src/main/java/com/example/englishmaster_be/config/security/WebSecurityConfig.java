@@ -61,7 +61,8 @@ public class WebSecurityConfig {
                         "http://localhost:3000",
                         "http://localhost:8080",
                         "https://englishmaster.erp.meu-solutions.com",
-                        "https://gateway.dev.meu-solutions.com"
+                        "https://gateway.dev.meu-solutions.com",
+                        "https://meu-english-media-hub.lovable.app"
                 )
         );
         corsConfiguration.setAllowedHeaders(List.of("*"));

@@ -2,6 +2,7 @@ package com.example.englishmaster_be.domain.pack.service;
 
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.domain.pack.dto.IPackKeyProjection;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.domain.pack.dto.request.PackRequest;
 import com.example.englishmaster_be.domain.pack.repository.jpa.PackRepository;
@@ -12,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import java.util.List;
 import java.util.UUID;
@@ -84,5 +86,17 @@ public class PackService implements IPackService {
         Assert.notNull(packTypeId, "Pack type id is required.");
 
         return packRepository.getAllByPackTypeId(packTypeId);
+    }
+
+    @Override
+    public IPackKeyProjection getPackKeyProjection(String packName) {
+        return packRepository.findPackIdByName(packName);
+    }
+
+    @Transactional
+    @Override
+    public PackEntity savePack(PackEntity pack) {
+        Assert.notNull(pack, "Pack is required.");
+        return packRepository.save(pack);
     }
 }

@@ -2,11 +2,19 @@ package com.example.englishmaster_be.domain.topic.service;
 
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.domain.excel.util.ExcelUtil;
+import com.example.englishmaster_be.domain.pack.dto.IPackKeyProjection;
+import com.example.englishmaster_be.domain.pack_type.dto.projection.IPackTypeKeyProjection;
+import com.example.englishmaster_be.domain.pack_type.model.PackTypeEntity;
+import com.example.englishmaster_be.domain.pack_type.service.IPackTypeService;
 import com.example.englishmaster_be.domain.part.mapper.PartMapper;
 import com.example.englishmaster_be.domain.question.mapper.QuestionMapper;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyResponse;
 import com.example.englishmaster_be.domain.topic.mapper.TopicMapper;
+import com.example.englishmaster_be.domain.topic.repository.jdbc.TopicJdbcRepository;
 import com.example.englishmaster_be.domain.topic.repository.spec.TopicSpecification;
+import com.example.englishmaster_be.domain.topic_type.model.TopicTypeEntity;
+import com.example.englishmaster_be.domain.topic_type.service.ITopicTypeService;
 import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.pack.service.IPackService;
 import com.example.englishmaster_be.domain.part.service.IPartService;
@@ -29,11 +37,18 @@ import com.example.englishmaster_be.domain.topic.repository.jpa.TopicRepository;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.domain.question.util.QuestionUtil;
 import com.example.englishmaster_be.domain.topic.util.TopicUtil;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
@@ -70,9 +85,10 @@ public class TopicService implements ITopicService {
     IPartService partService;
 
     IUploadService uploadService;
-
+    TopicJdbcRepository topicJdbcRepository;
     ITopicService topicService;
-
+    IPackTypeService packTypeService;
+    ITopicTypeService topicTypeService;
 
     @Transactional
     @Override
@@ -419,8 +435,84 @@ public class TopicService implements ITopicService {
         return QuestionMapper.INSTANCE.toQuestionPartResponseList(topic);
     }
 
+    @Transactional
     @Override
-    public TopicKeyResponse updateTopicFromExcel(UUID topicId, MultipartFile fileExcel) {
-        return null;
+    public TopicKeyResponse updateTopicToExcel(MultipartFile file, UUID topicId, String imageUrl) throws BadRequestException {
+        Assert.notNull(topicId, "Topic id is required.");
+        Assert.notNull(file, "Excel file is required.");
+        UserEntity userCurrent = userService.currentUser();
+        if(!topicRepository.existsById(topicId))
+            throw new EntityNotFoundException("Topic not found with id.");
+        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())){
+            Sheet sheet = workbook.getSheetAt(0);
+            String packTypeName = ExcelUtil.getStringCellValue(sheet.getRow(0).getCell(1));
+            UUID packTypeIdToName = packTypeService.getPackTypeIdByName(packTypeName);
+            if(packTypeIdToName == null){
+                packTypeIdToName = UUID.randomUUID();
+                String packTypeDescription = ExcelUtil.getStringCellValue(sheet.getRow(1).getCell(1));
+                PackTypeEntity packType = new PackTypeEntity();
+                packType.setId(packTypeIdToName);
+                packType.setName(packTypeName);
+                packType.setDescription(packTypeDescription);
+                packType.setCreatedBy(userCurrent);
+                packType.setUpdatedBy(userCurrent);
+                packTypeService.savePackType(packType);
+            }
+            String packName = ExcelUtil.getStringCellValue(sheet.getRow(2).getCell(1));
+            IPackKeyProjection packKeyProjection = packService.getPackKeyProjection(packName);
+            UUID packIdToName = packKeyProjection != null ? packKeyProjection.getPackId() : null;
+            if(packIdToName == null || !packKeyProjection.getPackTypeId().equals(packTypeIdToName)){
+                packIdToName = UUID.randomUUID();
+                PackEntity pack = new PackEntity();
+                pack.setPackId(packIdToName);
+                pack.setPackName(packName);
+                pack.setPackTypeId(packTypeIdToName);
+                pack.setUserCreate(userCurrent);
+                pack.setUserUpdate(userCurrent);
+                packService.savePack(pack);
+            }
+            String topicTypeName = ExcelUtil.getStringCellValue(sheet.getRow(3).getCell(1));
+            UUID topicTypeIdToName = topicTypeService.getTopicTypeIdToName(topicTypeName);
+            if(topicTypeIdToName == null){
+                topicTypeIdToName = UUID.randomUUID();
+                TopicTypeEntity topicType = new TopicTypeEntity();
+                topicType.setTopicTypeId(topicTypeIdToName);
+                topicType.setTopicTypeName(topicTypeName);
+                topicType.setUserCreate(userCurrent);
+                topicType.setUserUpdate(userCurrent);
+                topicTypeService.saveTopicType(topicType);
+            }
+            String topicName = ExcelUtil.getStringCellValue(sheet.getRow(4).getCell(1));
+            String topicImage = imageUrl != null ? imageUrl : ExcelUtil.getStringCellValue(sheet.getRow(5).getCell(1));
+            if(topicImage == null || topicImage.isEmpty()){
+                topicImage = topicRepository.findTopicImageById(topicId);
+            }
+            String topicDescription = ExcelUtil.getStringCellValue(sheet.getRow(6).getCell(1));
+            LocalTime workTime;
+            try{
+                Cell cellWorkTime = sheet.getRow(7).getCell(1);
+                if(cellWorkTime.getCellType().equals(CellType.STRING)){
+                    workTime = LocalTime.parse(
+                            ExcelUtil.getStringCellValue(cellWorkTime),
+                            DateTimeFormatter.ofPattern("HH:mm[:ss]")
+                    );
+                }
+                else{
+                    workTime = LocalDateTime.parse(
+                            ExcelUtil.getStringCellValue(cellWorkTime),
+                            DateTimeFormatter.ISO_LOCAL_DATE_TIME
+                    ).toLocalTime();
+                }
+            }
+            catch (Exception e){
+                log.error(e.getMessage());
+                workTime = topicRepository.findWorkTimeById(topicId);
+            }
+            topicJdbcRepository.updateTopic(topicId, packIdToName, topicTypeIdToName, userCurrent.getUserId(), topicName, topicImage, topicDescription, workTime);
+            return new TopicKeyResponse(topicId);
+        }
+        catch (Exception e){
+            throw new BadRequestException("Cannot update topic to excel.");
+        }
     }
 }

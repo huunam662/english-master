@@ -15,6 +15,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -154,10 +155,11 @@ public class TopicController {
     )
     public TopicKeyResponse updateTopicInformationFromExcel(
             @PathVariable("topicId") UUID topicId,
-            @RequestPart("file") MultipartFile file
-    ) {
+            @RequestPart("file") MultipartFile file,
+            @RequestParam(value = "imageUrl", required = false) String imageUrl
+    ) throws BadRequestException {
 
-        return topicService.updateTopicFromExcel(topicId, file);
+        return topicService.updateTopicToExcel(file, topicId, imageUrl);
     }
 
     @PatchMapping(value = "/{topicId:.+}/enableTopic")
