@@ -192,4 +192,10 @@ public class UserService implements IUserService, UserDetailsService {
 
         sessionActiveService.deleteAll(sessionActiveEntityList);
     }
+
+    @Override
+    public boolean isExistingEmail(String email) {
+
+        return userRepository.existsByEmail(email);
+    }
 }

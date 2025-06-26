@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.UUID;
 
 @Repository
@@ -87,6 +88,42 @@ public class TopicJdbcRepository {
                 .addValue("id", topicId)
                 .addValue("imageUrl", imageUrl);
 
+        namedParameterJdbcTemplate.update(sql, params);
+    }
+
+    @Transactional
+    public void updateTopic(
+            UUID topicId,
+            UUID packId,
+            UUID topicTypeId,
+            UUID userUpdateId,
+            String topicName,
+            String topicImage,
+            String topicDescription,
+            LocalTime workTime
+    ){
+        if(topicId == null || packId == null || topicTypeId == null || userUpdateId == null) return;
+        String sql = """
+                UPDATE topics
+                SET pack_id = :packId,
+                    topic_type_id = :topicTypeId,
+                    update_by = :userUpdateId,
+                    update_at = now(),
+                    topic_name = :topicName,
+                    topic_description = :topicDescription,
+                    topic_image = :topicImage,
+                    work_time = :workTime
+                WHERE id = :topicId
+                """;
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("topicId", topicId)
+                .addValue("packId", packId)
+                .addValue("topicTypeId", topicTypeId)
+                .addValue("userUpdateId", userUpdateId)
+                .addValue("topicName", topicName)
+                .addValue("topicImage", topicImage)
+                .addValue("topicDescription", topicDescription)
+                .addValue("workTime", Time.valueOf(workTime));
         namedParameterJdbcTemplate.update(sql, params);
     }
 

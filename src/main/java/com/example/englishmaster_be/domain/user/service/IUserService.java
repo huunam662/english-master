@@ -33,4 +33,6 @@ public interface IUserService {
     UserAuthResponse updatePassword(UserEntity user, String oldPassword, String newPassword);
 
     void updatePasswordForgot(UserEntity user, String newPassword);
+
+    boolean isExistingEmail(String email);
 }

@@ -3,21 +3,17 @@ package com.example.englishmaster_be.advice.exception.handler;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.shared.dto.response.ResultApiResponse;
-import com.example.englishmaster_be.value.AppValue;
 import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import io.swagger.v3.core.util.Json;
 import jakarta.mail.MessagingException;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -36,9 +32,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
@@ -85,6 +79,13 @@ public class GlobalExceptionHandler implements AccessDeniedHandler, Authenticati
         logError(error, accessDeniedException);
 
         this.printError(error, response);
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResultApiResponse.ErrorResponse handleEntityNotFoundException(EntityNotFoundException ex){
+        Error error = Error.RESOURCE_NOT_FOUND;
+        logError(error, ex);
+        return ResultApiResponse.ErrorResponse.build(new ErrorHolder(error, ex.getMessage()));
     }
 
     @ExceptionHandler(ErrorHolder.class)

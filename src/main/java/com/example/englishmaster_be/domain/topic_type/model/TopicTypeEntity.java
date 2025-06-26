@@ -46,4 +46,15 @@ public class TopicTypeEntity {
     @JoinColumn(name = "update_by", referencedColumnName = "id")
     UserEntity userUpdate;
 
+    @PrePersist
+    private void prePersist() {
+        if(topicTypeId == null) topicTypeId = UUID.randomUUID();
+        updateAt = LocalDateTime.now();
+        createAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    private void preUpdate() {
+        updateAt = LocalDateTime.now();
+    }
 }

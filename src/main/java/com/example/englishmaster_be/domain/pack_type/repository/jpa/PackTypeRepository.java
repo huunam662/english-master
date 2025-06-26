@@ -17,10 +17,8 @@ public interface PackTypeRepository extends JpaRepository<PackTypeEntity, UUID> 
     @Query("SELECT EXISTS(SELECT pt.name FROM PackTypeEntity pt WHERE LOWER(pt.name) = :name)")
     Boolean existsByName(@Param("name") String name);
 
-    @Query("""
-        SELECT DISTINCT pt.id as packTypeId
-        FROM PackTypeEntity pt
-        WHERE LOWER(pt.name) = LOWER(:packTypeName)
-    """)
-    IPackTypeKeyProjection findPackTypeIdByName(@Param("packTypeName") String packTypeName);
+    @Query(value = """
+        SELECT id FROM pack_type WHERE LOWER(name) = LOWER(:packTypeName)
+    """, nativeQuery = true)
+    UUID findPackTypeIdByName(@Param("packTypeName") String packTypeName);
 }

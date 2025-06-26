@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.pack_type.service;
 
+import com.example.englishmaster_be.domain.pack_type.dto.projection.IPackTypeKeyProjection;
 import com.example.englishmaster_be.domain.pack_type.dto.request.CreatePackTypeRequest;
 import com.example.englishmaster_be.domain.pack_type.dto.request.PackTypeFilterRequest;
 import com.example.englishmaster_be.domain.pack_type.dto.request.UpdatePackTypeRequest;
@@ -26,5 +27,9 @@ public interface IPackTypeService {
     void deletePackTypeById(UUID id);
 
     Boolean isExistedByPackTypeName(String packTypeName, Boolean throwable);
+
+    UUID getPackTypeIdByName(String packTypeName);
+
+    PackTypeEntity savePackType(PackTypeEntity packTypeEntity);
 
 }

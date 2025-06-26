@@ -5,45 +5,38 @@ import com.example.englishmaster_be.common.constant.QuestionType;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.excel.dto.response.*;
 import com.example.englishmaster_be.domain.pack.dto.IPackKeyProjection;
-import com.example.englishmaster_be.domain.pack_type.dto.projection.IPackTypeKeyProjection;
 import com.example.englishmaster_be.domain.topic.dto.projection.ITopicField1Projection;
 import com.example.englishmaster_be.domain.topic.dto.projection.ITopicKeyProjection;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyResponse;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
-import com.example.englishmaster_be.domain.topic_type.dto.response.ITopicTypeKeyProjection;
 import com.example.englishmaster_be.domain.topic_type.model.TopicTypeEntity;
 import com.example.englishmaster_be.domain.topic_type.repository.jdbc.TopicTypeJdbcRepository;
-import com.example.englishmaster_be.domain.topic_type.repository.jpa.ITopicTypeRepository;
+import com.example.englishmaster_be.domain.topic_type.repository.jpa.TopicTypeRepository;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
 import com.example.englishmaster_be.domain.answer.repository.jdbc.AnswerJdbcRepository;
-import com.example.englishmaster_be.domain.answer.repository.jpa.AnswerRepository;
 import com.example.englishmaster_be.domain.pack.model.PackEntity;
 import com.example.englishmaster_be.domain.pack.repository.jdbc.PackJdbcRepository;
-import com.example.englishmaster_be.domain.pack.repository.factory.PackQueryFactory;
 import com.example.englishmaster_be.domain.pack.repository.jpa.PackRepository;
 import com.example.englishmaster_be.domain.pack_type.model.PackTypeEntity;
 import com.example.englishmaster_be.domain.pack_type.repository.jdbc.PackTypeJdbcRepository;
 import com.example.englishmaster_be.domain.pack_type.repository.jpa.PackTypeRepository;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
 import com.example.englishmaster_be.domain.part.repository.jdbc.PartJdbcRepository;
-import com.example.englishmaster_be.domain.part.repository.factory.PartQueryFactory;
 import com.example.englishmaster_be.domain.part.repository.jpa.PartRepository;
-import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.domain.question.repository.jdbc.QuestionJdbcRepository;
 import com.example.englishmaster_be.domain.topic.repository.jdbc.TopicJdbcRepository;
 import com.example.englishmaster_be.domain.excel.util.ExcelUtil;
 import com.example.englishmaster_be.domain.question.model.QuestionEntity;
-import com.example.englishmaster_be.domain.question.repository.jpa.QuestionRepository;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
-import com.example.englishmaster_be.domain.topic.repository.factory.TopicQueryFactory;
 import com.example.englishmaster_be.domain.topic.repository.jpa.TopicRepository;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.slf4j.Logger;
@@ -58,13 +51,12 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+@Slf4j(topic = "EXCEL-IMPORT-SERVICE")
 @Service
 @RequiredArgsConstructor(onConstructor_ = {@Lazy})
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ExcelImportService implements IExcelImportService {
 
-
-    private static final Logger log = LoggerFactory.getLogger(ExcelImportService.class);
     PartRepository partRepository;
 
     TopicRepository topicRepository;
@@ -83,7 +75,7 @@ public class ExcelImportService implements IExcelImportService {
     PartJdbcRepository partJdbcRepository;
     QuestionJdbcRepository questionJdbcRepository;
     AnswerJdbcRepository answerJdbcRepository;
-    ITopicTypeRepository topicTypeRepository;
+    TopicTypeRepository topicTypeRepository;
     TopicTypeJdbcRepository topicTypeJdbcRepository;
 
     @Transactional
@@ -114,9 +106,7 @@ public class ExcelImportService implements IExcelImportService {
             String packTypeName = ExcelUtil.getStringCellValue(sheetTopic.getRow(0).getCell(1));
             String packTypeDescription = ExcelUtil.getStringCellValue(sheetTopic.getRow(1).getCell(1));
 
-            IPackTypeKeyProjection packTypeKey = packTypeRepository.findPackTypeIdByName(packTypeName);
-
-            UUID packTypeId = packTypeKey != null ? packTypeKey.getPackTypeId() : null;
+            UUID packTypeId = packTypeRepository.findPackTypeIdByName(packTypeName);
 
             // Nếu pack type không tồn tại thì thêm mới
             if(packTypeId == null){
@@ -153,9 +143,8 @@ public class ExcelImportService implements IExcelImportService {
             }
 
             String topicTypeName = ExcelUtil.getStringCellValue(sheetTopic.getRow(3).getCell(1));
-            ITopicTypeKeyProjection topicTypeKey = topicTypeRepository.findIdByTypeName(topicTypeName);
-            UUID topicTypeId = topicTypeKey != null ? topicTypeKey.getTopicTypeId() : null;
-            if(topicTypeKey == null){
+            UUID topicTypeId = topicTypeRepository.findIdByTypeName(topicTypeName);
+            if(topicTypeId == null){
                 topicTypeId = UUID.randomUUID();
                 topicTypeJdbcRepository.insertTopicType(
                         TopicTypeEntity.builder()

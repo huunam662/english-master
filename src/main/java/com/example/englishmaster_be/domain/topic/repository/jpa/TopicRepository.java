@@ -11,9 +11,25 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, JpaSpecificationExecutor<TopicEntity> {
+
+    @Query(value = """
+        SELECT EXISTS(SELECT id FROM topics WHERE id = :topicId)
+    """, nativeQuery = true)
+    boolean existsById(@Param("topicId") UUID topicId);
+
+    @Query("""
+        SELECT workTime from TopicEntity WHERE topicId = :topicId
+    """)
+    LocalTime findWorkTimeById(@Param("topicId") UUID topicId);
+
+    @Query(value = """
+        SELECT topic_image FROM topics WHERE id = :topicId
+    """, nativeQuery = true)
+    String findTopicImageById(@Param("topicId") UUID topicId);
 
     Page<TopicEntity> findAll(Pageable pageable);
 
@@ -30,7 +46,7 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, JpaSp
 
     @Query("""
         SELECT t FROM TopicEntity t
-        INNER JOIN FETCH t.topicType
+        LEFT JOIN FETCH t.topicType
         WHERE t.topicId = :topicId
     """)
     Optional<TopicEntity> findByTopicId(@Param("topicId") UUID topicId);

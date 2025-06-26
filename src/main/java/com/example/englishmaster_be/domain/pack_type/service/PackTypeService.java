@@ -18,6 +18,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.UUID;
@@ -99,5 +100,17 @@ public class PackTypeService implements IPackTypeService{
             throw new ErrorHolder(Error.BAD_REQUEST, "Pack type already exists");
 
         return isExistedByName;
+    }
+
+    @Override
+    public UUID getPackTypeIdByName(String packTypeName) {
+        return packTypeRepository.findPackTypeIdByName(packTypeName);
+    }
+
+    @Transactional
+    @Override
+    public PackTypeEntity savePackType(PackTypeEntity packTypeEntity) {
+        Assert.notNull(packTypeEntity, "Pack type to save is required.");
+        return packTypeRepository.save(packTypeEntity);
     }
 }
