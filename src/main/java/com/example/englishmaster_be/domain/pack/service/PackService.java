@@ -3,15 +3,22 @@ package com.example.englishmaster_be.domain.pack.service;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.pack.dto.IPackKeyProjection;
+import com.example.englishmaster_be.domain.pack.dto.request.PackOptionsFilterRequest;
+import com.example.englishmaster_be.domain.pack.dto.response.PackPackTypeResponse;
+import com.example.englishmaster_be.domain.pack.mapper.PackMapper;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.domain.pack.dto.request.PackRequest;
 import com.example.englishmaster_be.domain.pack.repository.jpa.PackRepository;
 import com.example.englishmaster_be.domain.pack.model.PackEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -98,5 +105,20 @@ public class PackService implements IPackService {
     public PackEntity savePack(PackEntity pack) {
         Assert.notNull(pack, "Pack is required.");
         return packRepository.save(pack);
+    }
+
+    @Override
+    public FilterResponse<?> filterPack(UUID packTypeId, PackOptionsFilterRequest request) {
+        Pageable pageable = PageRequest.of(request.getPageNumber(), request.getPageSize(), request.getDirection(), request.getSortBy());
+        Page<PackEntity> pagePacks = packRepository.getPagePackByPackId(packTypeId, pageable);
+        List<PackPackTypeResponse> pageContents = PackMapper.INSTANCE.toPackPackTypeResponseList(pagePacks.getContent());
+        return FilterResponse.<PackPackTypeResponse>builder()
+                .pageNumber(pageable.getPageNumber() + 1)
+                .pageSize(pageable.getPageSize())
+                .contentLength(pageContents.size())
+                .content(pageContents)
+                .offset(pageable.getOffset())
+                .totalPages((long) pagePacks.getTotalPages())
+                .build();
     }
 }

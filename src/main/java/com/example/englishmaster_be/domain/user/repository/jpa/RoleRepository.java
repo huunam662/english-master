@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.user.repository;
+package com.example.englishmaster_be.domain.user.repository.jpa;
 
 import com.example.englishmaster_be.common.constant.Role;
 import com.example.englishmaster_be.domain.user.model.RoleEntity;

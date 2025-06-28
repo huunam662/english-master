@@ -7,7 +7,7 @@ import com.example.englishmaster_be.domain.mock_test.repository.jpa.MockTestRepo
 import com.example.englishmaster_be.domain.mock_test_result.model.MockTestResultEntity;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
-import com.example.englishmaster_be.domain.user.repository.UserRepository;
+import com.example.englishmaster_be.domain.user.repository.jpa.UserRepository;
 import com.example.englishmaster_be.value.LinkValue;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;

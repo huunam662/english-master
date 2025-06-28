@@ -5,6 +5,7 @@ import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.user.dto.request.*;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -35,4 +36,6 @@ public interface IUserService {
     void updatePasswordForgot(UserEntity user, String newPassword);
 
     boolean isExistingEmail(String email);
+
+    void saveAllUsersToExcel(MultipartFile file);
 }

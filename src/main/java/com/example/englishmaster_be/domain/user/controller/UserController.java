@@ -9,8 +9,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Map;
 
@@ -49,5 +51,11 @@ public class UserController {
     public Map<String, Boolean> checkEmail(@PathVariable("email") String email){
 
         return Map.of("isExisting", userService.isExistingEmail(email));
+    }
+
+    @PostMapping(value = "/import/excel", consumes = {MediaType.MULTIPART_FORM_DATA_VALUE})
+    @PreAuthorize("hasRole('ADMIN')")
+    public void importAllUserFromExcel(@RequestPart("file") MultipartFile file) {
+        userService.saveAllUsersToExcel(file);
     }
 }
