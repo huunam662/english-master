@@ -35,7 +35,6 @@ public class RoleEntity implements GrantedAuthority {
     @OneToMany(mappedBy = "role", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Set<UserEntity> users;
 
-
     @Override
     @JsonIgnore
     public String getAuthority() {

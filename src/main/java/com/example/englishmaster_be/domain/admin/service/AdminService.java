@@ -16,7 +16,7 @@ import com.example.englishmaster_be.domain.mock_test.model.MockTestEntity;
 import com.example.englishmaster_be.domain.pack.model.PackEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
-import com.example.englishmaster_be.domain.user.repository.UserRepository;
+import com.example.englishmaster_be.domain.user.repository.jpa.UserRepository;
 import com.example.englishmaster_be.domain.admin.dto.response.CountMockTestTopicResponse;
 import com.example.englishmaster_be.shared.service.mailer.MailerService;
 import com.querydsl.core.types.OrderSpecifier;

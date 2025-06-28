@@ -7,7 +7,6 @@ import lombok.experimental.FieldDefaults;
 @Setter
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FileResponse {
 
@@ -15,4 +14,8 @@ public class FileResponse {
 
     String type;
 
+    public FileResponse(String url, String type) {
+        this.url = url;
+        this.type = type;
+    }
 }

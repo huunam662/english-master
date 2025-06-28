@@ -2,6 +2,8 @@ package com.example.englishmaster_be.domain.pack.repository.jpa;
 
 import com.example.englishmaster_be.domain.pack.dto.IPackKeyProjection;
 import com.example.englishmaster_be.domain.pack.model.PackEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -31,4 +33,10 @@ public interface PackRepository extends JpaRepository<PackEntity, UUID> {
     """)
     IPackKeyProjection findPackIdByName(@Param("packName") String packName);
 
+    @Query("""
+        SELECT p FROM PackEntity p
+        LEFT JOIN FETCH p.packType pt
+        WHERE pt.id = :packTypeId
+    """)
+    Page<PackEntity> getPagePackByPackId(@Param("packTypeId") UUID packTypeId, Pageable pageable);
 }

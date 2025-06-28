@@ -33,6 +33,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
@@ -81,8 +83,11 @@ public class GlobalExceptionHandler implements AccessDeniedHandler, Authenticati
         this.printError(error, response);
     }
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResultApiResponse.ErrorResponse handleEntityNotFoundException(EntityNotFoundException ex){
+    @ExceptionHandler({
+            EntityNotFoundException.class,
+            FileNotFoundException.class
+    })
+    public ResultApiResponse.ErrorResponse handleEntityNotFoundException(Exception ex){
         Error error = Error.RESOURCE_NOT_FOUND;
         logError(error, ex);
         return ResultApiResponse.ErrorResponse.build(new ErrorHolder(error, ex.getMessage()));

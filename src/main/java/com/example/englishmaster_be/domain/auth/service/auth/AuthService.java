@@ -6,7 +6,7 @@ import com.example.englishmaster_be.common.constant.SessionActiveType;
 import com.example.englishmaster_be.common.constant.OtpStatus;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.auth.dto.request.*;
-import com.example.englishmaster_be.domain.user.repository.RoleRepository;
+import com.example.englishmaster_be.domain.user.repository.jpa.RoleRepository;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.domain.auth.model.SessionActiveEntity;
 import com.example.englishmaster_be.domain.auth.service.invalid_token.IInvalidTokenService;

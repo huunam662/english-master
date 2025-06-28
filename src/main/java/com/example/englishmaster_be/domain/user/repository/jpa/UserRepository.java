@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.user.repository;
+package com.example.englishmaster_be.domain.user.repository.jpa;
 
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -49,5 +49,10 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
         UPDATE users SET password = :newPassword WHERE email = :email
     """, nativeQuery = true)
     void updatePassword(@Param("newPassword") String newPassword, @Param("email") String email);
+
+    @Query(value = """
+        SELECT id FROM users WHERE email IN :emails
+    """, nativeQuery = true)
+    List<UUID> findAllIdIn(@Param("emails") List<String> emails);
 }
 

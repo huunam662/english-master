@@ -10,7 +10,7 @@ import com.example.englishmaster_be.domain.user.model.QUserEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.domain.auth.repository.jpa.SessionActiveRepository;
 import com.example.englishmaster_be.domain.auth.repository.jpa.InvalidTokenRepository;
-import com.example.englishmaster_be.domain.user.repository.UserRepository;
+import com.example.englishmaster_be.domain.user.repository.jpa.UserRepository;
 import com.example.englishmaster_be.domain.auth.service.invalid_token.IInvalidTokenService;
 import com.example.englishmaster_be.value.JwtValue;
 import com.querydsl.core.types.dsl.Expressions;
