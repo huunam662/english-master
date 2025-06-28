@@ -44,7 +44,7 @@ public class CloudinaryService implements ICloudinaryService {
 
 		Map uploadResultResponse = cloudinary.uploader().upload(file.getBytes(), Map.of());
 
-		String imageUrl = String.valueOf(uploadResultResponse.get("url"));
+		String imageUrl = String.valueOf(uploadResultResponse.get("secure_url"));
 //			String fileType = String.valueOf(uploadResultResponse.get("type"));
 
 		return FileResponse.builder()
@@ -64,7 +64,7 @@ public class CloudinaryService implements ICloudinaryService {
 				)
 		);
 
-		String audioUrl = String.valueOf(uploadResult.get("url"));
+		String audioUrl = String.valueOf(uploadResult.get("secure_url"));
 
 		return FileResponse.builder()
 				.url(audioUrl)
