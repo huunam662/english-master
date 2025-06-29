@@ -70,7 +70,7 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, JpaSp
         INNER JOIN FETCH t.topicType tt
         INNER JOIN FETCH t.pack tp
         INNER JOIN FETCH tp.packType pt
-        WHERE LOWER(tt.topicTypeName) = LOWER(:topicTypeName) 
+        WHERE LOWER(tt.topicTypeName) = LOWER(:topicTypeName)
         ORDER BY t.updateAt
     """)
     List<TopicEntity> findAllTopicWithJoinParent(@Param("topicTypeName") String topicTypeName, Pageable pageable);

@@ -398,10 +398,8 @@ public class ExcelExportService implements IExcelExportService{
             questionChildHeaderRow.createCell(0).setCellValue("STT");
             questionChildHeaderRow.createCell(1).setCellValue("Result");
             questionChildHeaderRow.createCell(2).setCellValue("Score");
-            if(part.getPartName().equalsIgnoreCase("part 1")){
-                questionChildHeaderRow.createCell(3).setCellValue("Image");
-                questionChildHeaderRow.createCell(4).setCellValue("Audio");
-            }
+            questionChildHeaderRow.createCell(3).setCellValue("Image");
+            questionChildHeaderRow.createCell(4).setCellValue("Audio");
             List<QuestionEntity> questionChildsOfParent = questionParentChildsGroup.getOrDefault(questionParent, new ArrayList<>());
             int questionChildsSize = questionChildsOfParent.size();
             for(int i = 0; i < questionChildsSize; i++){
@@ -410,10 +408,8 @@ public class ExcelExportService implements IExcelExportService{
                 questionChildRow.createCell(0).setCellValue(i + 1);
                 questionChildRow.createCell(1).setCellValue(questionChild.getQuestionResult());
                 questionChildRow.createCell(2).setCellValue(questionChild.getQuestionScore());
-                if(part.getPartName().equalsIgnoreCase("part 1")){
-                    questionChildRow.createCell(3).setCellValue(questionChild.getContentImage());
-                    questionChildRow.createCell(4).setCellValue(questionChild.getContentAudio());
-                }
+                questionChildRow.createCell(3).setCellValue(questionChild.getContentImage());
+                questionChildRow.createCell(4).setCellValue(questionChild.getContentAudio());
             }
         }
     }
