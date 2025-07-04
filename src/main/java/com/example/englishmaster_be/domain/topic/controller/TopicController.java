@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.topic.controller;
 
 import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyResponse;
-import com.example.englishmaster_be.shared.dto.response.FilterResponse;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.topic.mapper.TopicMapper;

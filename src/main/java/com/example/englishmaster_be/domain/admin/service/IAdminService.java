@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.admin.service;
 
-import com.example.englishmaster_be.shared.dto.response.FilterResponse;
-import com.example.englishmaster_be.domain.user.dto.request.UserFilterRequest;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.domain.user.dto.request.UserFilterReq;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.domain.admin.dto.response.CountMockTestTopicResponse;
 
@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface IAdminService {
 
 
-    FilterResponse<?> getAllUser(UserFilterRequest filterRequest);
+    FilterResponse<?> getAllUser(UserFilterReq filterRequest);
 
     void enableUser(UUID userId, Boolean enable);
 

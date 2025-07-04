@@ -51,8 +51,8 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
     void updatePassword(@Param("newPassword") String newPassword, @Param("email") String email);
 
     @Query(value = """
-        SELECT id FROM users WHERE email IN :emails
+        SELECT email FROM users WHERE email IN :emails
     """, nativeQuery = true)
-    List<UUID> findAllIdIn(@Param("emails") List<String> emails);
+    List<String> findAllEmailIn(@Param("emails") List<String> emails);
 }
 

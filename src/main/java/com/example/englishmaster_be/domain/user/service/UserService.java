@@ -8,8 +8,8 @@ import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;
 import com.example.englishmaster_be.domain.auth.model.SessionActiveEntity;
 import com.example.englishmaster_be.domain.excel.util.ExcelUtil;
-import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
-import com.example.englishmaster_be.domain.upload.service.IUploadService;
+import com.example.englishmaster_be.domain.upload.meu.request.FileDeleteRequest;
+import com.example.englishmaster_be.domain.upload.meu.service.IUploadService;
 import com.example.englishmaster_be.domain.user.dto.request.*;
 import com.example.englishmaster_be.domain.user.mapper.UserMapper;
 import com.example.englishmaster_be.domain.user.model.RoleEntity;
@@ -18,7 +18,7 @@ import com.example.englishmaster_be.domain.user.repository.jdbc.UserJdbcReposito
 import com.example.englishmaster_be.domain.user.repository.jpa.RoleRepository;
 import com.example.englishmaster_be.domain.user.repository.jpa.UserRepository;
 import com.example.englishmaster_be.domain.auth.service.invalid_token.IInvalidTokenService;
-import com.example.englishmaster_be.shared.service.jwt.JwtService;
+import com.example.englishmaster_be.domain.auth.service.jwt.JwtService;
 import com.example.englishmaster_be.domain.auth.service.session_active.ISessionActiveService;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -73,7 +73,7 @@ public class UserService implements IUserService, UserDetailsService {
     @Transactional
     @Override
     @SneakyThrows
-    public UserEntity changeProfile(UserChangeProfileRequest changeProfileRequest) {
+    public UserEntity changeProfile(UserChangeProfileReq changeProfileRequest) {
 
         UserEntity user = currentUser();
 
@@ -245,7 +245,6 @@ public class UserService implements IUserService, UserDetailsService {
                 Cell cellPhoneNumber = rowNext.getCell(4);
                 String phoneNumber = ExcelUtil.getStringCellValue(cellPhoneNumber);
                 UserEntity user =  new UserEntity();
-                user.setUserId(UUID.randomUUID());
                 user.setEmail(contentEmail);
                 user.setPassword(passwordEncoder.encode(contentPassword));
                 user.setName(fullName);
@@ -256,8 +255,8 @@ public class UserService implements IUserService, UserDetailsService {
                 rowNext = sheet.getRow(++next);
             }
             List<String> emails = usersToSave.stream().map(UserEntity::getEmail).toList();
-            List<UUID> userIds = userRepository.findAllIdIn(emails);
-            usersToSave = usersToSave.stream().filter(user -> !userIds.contains(user.getUserId())).toList();
+            List<String> userEmails = userRepository.findAllEmailIn(emails);
+            usersToSave = usersToSave.stream().filter(user -> !userEmails.contains(user.getEmail())).toList();
             userJdbcRepository.batchInsertUsers(usersToSave);
         }
         catch (Exception e){

@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.user.controller;
 
 import com.example.englishmaster_be.domain.user.dto.request.*;
-import com.example.englishmaster_be.domain.user.dto.response.UserProfileResponse;
+import com.example.englishmaster_be.domain.user.dto.response.UserProfileRes;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.domain.user.mapper.UserMapper;
 import com.example.englishmaster_be.domain.user.service.IUserService;
@@ -29,7 +29,7 @@ public class UserController {
 
     @GetMapping("/information")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public UserProfileResponse informationUser() {
+    public UserProfileRes informationUser() {
 
         UserEntity currentUser = userService.currentUser();
 
@@ -38,8 +38,8 @@ public class UserController {
 
     @PatchMapping(value = "/changeProfile")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public UserProfileResponse changeProfile(
-            @RequestBody UserChangeProfileRequest changeProfileRequest
+    public UserProfileRes changeProfile(
+            @RequestBody UserChangeProfileReq changeProfileRequest
     ) {
 
         UserEntity user = userService.changeProfile(changeProfileRequest);

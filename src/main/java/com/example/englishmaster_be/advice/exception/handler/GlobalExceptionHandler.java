@@ -2,7 +2,7 @@ package com.example.englishmaster_be.advice.exception.handler;
 
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
-import com.example.englishmaster_be.shared.dto.response.ResultApiResponse;
+import com.example.englishmaster_be.common.dto.response.ResultApiResponse;
 import com.fasterxml.jackson.core.JsonLocation;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
@@ -13,7 +13,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
@@ -84,7 +86,20 @@ public class GlobalExceptionHandler implements AccessDeniedHandler, Authenticati
     }
 
     @ExceptionHandler({
-            EntityNotFoundException.class,
+            EntityNotFoundException.class
+    })
+    public ResultApiResponse.ErrorResponse handleEntityNotFoundException(EntityNotFoundException ex, HttpServletRequest request, HttpServletResponse response) {
+        return new ResultApiResponse.ErrorResponse(ex, request, response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({
+            BadRequestException.class
+    })
+    public ResultApiResponse.ErrorResponse handleBadRequestExceptionException(BadRequestException ex, HttpServletRequest request, HttpServletResponse response) {
+        return new ResultApiResponse.ErrorResponse(ex, request, response, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler({
             FileNotFoundException.class
     })
     public ResultApiResponse.ErrorResponse handleEntityNotFoundException(Exception ex){

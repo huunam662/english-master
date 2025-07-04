@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.feedback.controller;
 
-import com.example.englishmaster_be.shared.dto.response.FilterResponse;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
 import com.example.englishmaster_be.common.constant.sort.FeedbackSortBy;
 
 import com.example.englishmaster_be.domain.feedback.service.IFeedbackService;

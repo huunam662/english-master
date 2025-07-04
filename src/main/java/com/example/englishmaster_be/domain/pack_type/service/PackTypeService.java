@@ -11,7 +11,7 @@ import com.example.englishmaster_be.domain.pack_type.mapper.PackTypeMapper;
 import com.example.englishmaster_be.domain.pack_type.model.PackTypeEntity;
 import com.example.englishmaster_be.domain.pack_type.repository.factory.PackTypeQueryFactory;
 import com.example.englishmaster_be.domain.pack_type.repository.jpa.PackTypeRepository;
-import com.example.englishmaster_be.shared.dto.response.FilterResponse;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;

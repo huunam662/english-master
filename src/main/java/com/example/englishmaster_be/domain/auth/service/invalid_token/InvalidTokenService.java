@@ -3,7 +3,7 @@ package com.example.englishmaster_be.domain.auth.service.invalid_token;
 import com.example.englishmaster_be.common.constant.InvalidTokenType;
 import com.example.englishmaster_be.domain.auth.model.SessionActiveEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
-import com.example.englishmaster_be.shared.service.jwt.JwtService;
+import com.example.englishmaster_be.domain.auth.service.jwt.JwtService;
 import com.example.englishmaster_be.domain.auth.repository.jpa.InvalidTokenRepository;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

@@ -3,13 +3,13 @@ package com.example.englishmaster_be.domain.admin.service;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.Role;
 import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.domain.user.dto.response.UserRes;
 import com.example.englishmaster_be.domain.user.model.QUserEntity;
-import com.example.englishmaster_be.shared.dto.response.FilterResponse;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.mock_test.service.IMockTestService;
 import com.example.englishmaster_be.domain.pack.service.IPackService;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
-import com.example.englishmaster_be.domain.user.dto.request.UserFilterRequest;
-import com.example.englishmaster_be.domain.user.dto.response.UserResponse;
+import com.example.englishmaster_be.domain.user.dto.request.UserFilterReq;
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.domain.user.mapper.UserMapper;
 import com.example.englishmaster_be.domain.mock_test.model.MockTestEntity;
@@ -18,7 +18,7 @@ import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.domain.user.repository.jpa.UserRepository;
 import com.example.englishmaster_be.domain.admin.dto.response.CountMockTestTopicResponse;
-import com.example.englishmaster_be.shared.service.mailer.MailerService;
+import com.example.englishmaster_be.common.service.mailer.MailerService;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -69,9 +69,9 @@ public class AdminService implements IAdminService {
 
 
     @Override
-    public FilterResponse<?> getAllUser(UserFilterRequest filterRequest) {
+    public FilterResponse<?> getAllUser(UserFilterReq filterRequest) {
 
-        FilterResponse<UserResponse> filterResponse = FilterResponse.<UserResponse>builder()
+        FilterResponse<UserRes> filterResponse = FilterResponse.<UserRes>builder()
                 .pageNumber(filterRequest.getPage())
                 .pageSize(filterRequest.getSize())
                 .offset((long) (filterRequest.getPage() - 1) * filterRequest.getSize())
@@ -232,7 +232,7 @@ public class AdminService implements IAdminService {
                 .selectFrom(QUserEntity.userEntity)
                 .where(wherePattern);
 
-        // Chuyển đổi kết quả thành UserResponse
+        // Chuyển đổi kết quả thành UserRes
         return query.fetch();
     }
 }

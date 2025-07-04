@@ -1,9 +1,9 @@
 package com.example.englishmaster_be.domain.admin.controller;
 
-import com.example.englishmaster_be.shared.dto.response.FilterResponse;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.admin.service.IAdminService;
-import com.example.englishmaster_be.domain.user.dto.response.UserResponse;
-import com.example.englishmaster_be.domain.user.dto.request.UserFilterRequest;
+import com.example.englishmaster_be.domain.user.dto.response.UserRes;
+import com.example.englishmaster_be.domain.user.dto.request.UserFilterReq;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.domain.user.mapper.UserMapper;
 import com.example.englishmaster_be.domain.admin.dto.response.CountMockTestTopicResponse;
@@ -40,7 +40,7 @@ public class AdminController {
             @RequestParam(value = "enable", defaultValue = "true") Boolean enable
     ) {
 
-        UserFilterRequest userFilterRequest = UserFilterRequest.builder()
+        UserFilterReq userFilterRequest = UserFilterReq.builder()
                 .page(page)
                 .size(size)
                 .sortBy(sortBy)
@@ -79,7 +79,7 @@ public class AdminController {
     // API để tìm kiếm người dùng lâu ngày chưa đăng nhập
     @GetMapping("/users/inactive")
     @PreAuthorize("hasRole('ADMIN')")
-    public List<UserResponse> getInactiveUsers() {
+    public List<UserRes> getInactiveUsers() {
 
         List<UserEntity> inactiveUsers = adminService.getUsersNotLoggedInLast10Days();
 
@@ -88,7 +88,7 @@ public class AdminController {
 
     @GetMapping("/inactive-notify")
     @PreAuthorize("hasRole('ADMIN')")
-    public List<UserResponse> notifyInactiveUsers(@RequestParam int days){
+    public List<UserRes> notifyInactiveUsers(@RequestParam int days){
 
         List<UserEntity> notifyInactiveUsers = adminService.findUsersInactiveForDaysAndNotify(days);
 

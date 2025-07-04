@@ -9,8 +9,8 @@ import com.example.englishmaster_be.domain.evaluator_writing.prompt.WritingTaskP
 import com.example.englishmaster_be.domain.user.service.UserService;
 import com.example.englishmaster_be.domain.evaluator_writing.repository.jpa.EssaySubmissionRepository;
 import com.example.englishmaster_be.domain.mock_test.repository.jdbc.MockTestJdbcRepository;
-import com.example.englishmaster_be.shared.util.gemini.GeminiClient;
-import com.example.englishmaster_be.shared.util.gemini.GenerationConfig;
+import com.example.englishmaster_be.domain.evaluator_writing.util.GeminiClient;
+import com.example.englishmaster_be.domain.evaluator_writing.util.GenerationConfig;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

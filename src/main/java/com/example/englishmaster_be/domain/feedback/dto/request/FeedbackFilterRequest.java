@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.feedback.dto.request;
 
-import com.example.englishmaster_be.shared.dto.request.FilterRequest;
+import com.example.englishmaster_be.common.dto.request.FilterRequest;
 import com.example.englishmaster_be.common.constant.sort.FeedbackSortBy;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

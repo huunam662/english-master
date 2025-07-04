@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.part.dto.response;
 
-import com.example.englishmaster_be.domain.user.dto.response.UserBasicResponse;
+import com.example.englishmaster_be.domain.user.dto.response.UserBasicRes;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -35,8 +35,8 @@ public class PartResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd-yyyy hh:mm:ss")
     LocalDateTime updateAt;
 
-    UserBasicResponse userCreate;
+    UserBasicRes userCreate;
 
-    UserBasicResponse userUpdate;
+    UserBasicRes userUpdate;
 
 }

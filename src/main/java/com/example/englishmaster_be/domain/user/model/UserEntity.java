@@ -5,7 +5,7 @@ import com.example.englishmaster_be.domain.auth.model.InvalidTokenEntity;
 import com.example.englishmaster_be.domain.news.model.NewsEntity;
 import com.example.englishmaster_be.domain.auth.model.OtpEntity;
 import com.example.englishmaster_be.domain.auth.model.SessionActiveEntity;
-import com.example.englishmaster_be.domain.flash_card.model.FlashCardEntity;
+import com.example.englishmaster_be.domain.flash_card.flash_card.model.FlashCardEntity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -85,7 +85,7 @@ public class UserEntity implements UserDetails {
     @OneToMany(mappedBy = "userCreate", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Set<NewsEntity> news;
 
-    @OneToMany(mappedBy = "userCreate", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "createBy", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     Set<FlashCardEntity> flashCards;
 
     @OneToMany(mappedBy = "userComment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

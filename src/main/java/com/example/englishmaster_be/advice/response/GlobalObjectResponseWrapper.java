@@ -1,8 +1,8 @@
 
 package com.example.englishmaster_be.advice.response;
 
-import com.example.englishmaster_be.shared.dto.response.FilterResponse;
-import com.example.englishmaster_be.shared.dto.response.ResultApiResponse;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
+import com.example.englishmaster_be.common.dto.response.ResultApiResponse;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;

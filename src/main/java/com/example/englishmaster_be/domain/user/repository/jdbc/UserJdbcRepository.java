@@ -9,7 +9,9 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Repository
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
@@ -37,16 +39,21 @@ public class UserJdbcRepository {
             if(end > usersSize) end = usersSize;
             List<UserEntity> usersSub = users.subList(start, end);
             List<MapSqlParameterSource> params = usersSub.stream().map(
-                    elm -> new MapSqlParameterSource()
-                            .addValue("id", elm.getUserId())
-                            .addValue("email", elm.getEmail())
-                            .addValue("password", elm.getPassword())
-                            .addValue("name", elm.getName())
-                            .addValue("phone", elm.getPhone())
-                            .addValue("roleId", elm.getRole().getRoleId())
-                            .addValue("isEnabled", elm.getEnabled())
-                            .addValue("avatar", elm.getAvatar())
-                            .addValue("address", elm.getAddress())
+                    elm -> {
+                        elm.setUserId(UUID.randomUUID());
+                        elm.setCreateAt(LocalDateTime.now());
+                        elm.setUpdateAt(LocalDateTime.now());
+                        return new MapSqlParameterSource()
+                                .addValue("id", elm.getUserId())
+                                .addValue("email", elm.getEmail())
+                                .addValue("password", elm.getPassword())
+                                .addValue("name", elm.getName())
+                                .addValue("phone", elm.getPhone())
+                                .addValue("roleId", elm.getRole().getRoleId())
+                                .addValue("isEnabled", elm.getEnabled())
+                                .addValue("avatar", elm.getAvatar())
+                                .addValue("address", elm.getAddress());
+                    }
             ).toList();
             jdbcTemplate.batchUpdate(sql, params.toArray(MapSqlParameterSource[]::new));
             start = end;

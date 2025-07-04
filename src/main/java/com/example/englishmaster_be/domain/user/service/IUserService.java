@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.domain.user.service;
 
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;
-import com.example.englishmaster_be.shared.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.user.dto.request.*;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +14,7 @@ public interface IUserService {
 
     UserEntity saveUser(UserEntity user);
 
-    UserEntity changeProfile(UserChangeProfileRequest changeProfileRequest);
+    UserEntity changeProfile(UserChangeProfileReq changeProfileRequest);
 
     UserEntity currentUser();
 
