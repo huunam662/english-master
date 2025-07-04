@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.speaking_submission.util.bot;
 
-import com.example.englishmaster_be.shared.util.gemini.SpringApplicationContext;
+import com.example.englishmaster_be.domain.evaluator_writing.util.SpringApplicationContext;
 import com.example.englishmaster_be.value.ChatBotValue;
 
 import java.util.HashMap;

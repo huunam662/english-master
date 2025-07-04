@@ -5,7 +5,7 @@ import com.example.englishmaster_be.domain.pack_type.dto.response.PackTypeRespon
 import com.example.englishmaster_be.domain.pack_type.model.PackTypeEntity;
 import com.example.englishmaster_be.domain.pack_type.mapper.PackTypeMapper;
 import com.example.englishmaster_be.domain.pack_type.model.QPackTypeEntity;
-import com.example.englishmaster_be.shared.dto.response.FilterResponse;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.pack_type.util.PackTypeUtil;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQuery;

@@ -8,7 +8,7 @@ import com.example.englishmaster_be.domain.auth.repository.jpa.SessionActiveRepo
 import com.example.englishmaster_be.domain.user.service.IUserService;
 import com.example.englishmaster_be.domain.auth.model.SessionActiveEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
-import com.example.englishmaster_be.shared.service.jwt.JwtService;
+import com.example.englishmaster_be.domain.auth.service.jwt.JwtService;
 import com.example.englishmaster_be.value.JwtValue;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

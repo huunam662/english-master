@@ -17,8 +17,8 @@ import com.example.englishmaster_be.domain.speaking_submission.repository.jdbc.S
 import com.example.englishmaster_be.domain.speaking_submission.repository.jdbc.SpeakingSubmissionJdbcRepository;
 import com.example.englishmaster_be.domain.speaking_submission.util.bot.BotUtil;
 import com.example.englishmaster_be.domain.speaking_submission.util.speaking.SpeakingUtil;
-import com.example.englishmaster_be.shared.service.mailer.MailerService;
-import com.example.englishmaster_be.shared.util.gemini.SpringApplicationContext;
+import com.example.englishmaster_be.common.service.mailer.MailerService;
+import com.example.englishmaster_be.domain.evaluator_writing.util.SpringApplicationContext;
 import jakarta.mail.MessagingException;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;

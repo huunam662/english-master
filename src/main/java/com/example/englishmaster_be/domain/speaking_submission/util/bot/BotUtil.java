@@ -2,7 +2,7 @@ package com.example.englishmaster_be.domain.speaking_submission.util.bot;
 
 import com.example.englishmaster_be.domain.speaking_submission.dto.response.speaking_submission.BotFeedbackResponse;
 import com.example.englishmaster_be.domain.speaking_submission.util.speaking.SpeakingUtil;
-import com.example.englishmaster_be.shared.util.gemini.SpringApplicationContext;
+import com.example.englishmaster_be.domain.evaluator_writing.util.SpringApplicationContext;
 import com.example.englishmaster_be.value.AssemblyValue;
 import com.example.englishmaster_be.value.ChatBotValue;
 import com.fasterxml.jackson.databind.JsonNode;

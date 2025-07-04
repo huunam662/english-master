@@ -3,10 +3,10 @@ package com.example.englishmaster_be.domain.user.mapper;
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthProfileResponse;
 import com.example.englishmaster_be.domain.auth.dto.response.UserAuthResponse;
 import com.example.englishmaster_be.domain.news.dto.response.AuthorCommentResponse;
-import com.example.englishmaster_be.domain.user.dto.request.UserChangeProfileRequest;
+import com.example.englishmaster_be.domain.user.dto.request.UserChangeProfileReq;
 import com.example.englishmaster_be.domain.auth.dto.request.UserRegisterRequest;
-import com.example.englishmaster_be.domain.user.dto.response.UserProfileResponse;
-import com.example.englishmaster_be.domain.user.dto.response.UserResponse;
+import com.example.englishmaster_be.domain.user.dto.response.UserProfileRes;
+import com.example.englishmaster_be.domain.user.dto.response.UserRes;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
@@ -26,13 +26,13 @@ public interface UserMapper {
 
     UserEntity toUserEntity(UserRegisterRequest userRegisterDTO);
 
-    UserResponse toUserResponse(UserEntity user);
+    UserRes toUserResponse(UserEntity user);
 
-    List<UserResponse> toUserResponseList(Collection<UserEntity> userEntityList);
+    List<UserRes> toUserResponseList(Collection<UserEntity> userEntityList);
 
     @Mapping(target = "role", source = "role.roleName")
     @Mapping(target = "user", expression = "java(toUserResponse(userEntity))")
-    UserProfileResponse toInformationUserResponse(UserEntity userEntity);
+    UserProfileRes toInformationUserResponse(UserEntity userEntity);
 
     @Mapping(target = "refreshToken", source = "refreshToken")
     @Mapping(target = "accessToken", source = "jwtToken")
@@ -43,7 +43,7 @@ public interface UserMapper {
     UserAuthProfileResponse toUserAuthProfileResponse(UserEntity user);
 
     @Mapping(target = "avatar", ignore = true)
-    void flowToUserEntity(UserChangeProfileRequest changeProfileRequest, @MappingTarget UserEntity userEntity);
+    void flowToUserEntity(UserChangeProfileReq changeProfileRequest, @MappingTarget UserEntity userEntity);
 
     AuthorCommentResponse toAuthorCommentResponse(UserEntity user);
 }

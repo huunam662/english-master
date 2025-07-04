@@ -4,9 +4,7 @@ import com.example.englishmaster_be.domain.pack.dto.IPackKeyProjection;
 import com.example.englishmaster_be.domain.pack.dto.request.PackOptionsFilterRequest;
 import com.example.englishmaster_be.domain.pack.dto.request.PackRequest;
 import com.example.englishmaster_be.domain.pack.model.PackEntity;
-import com.example.englishmaster_be.domain.pack_type.dto.projection.IPackTypeKeyProjection;
-import com.example.englishmaster_be.domain.pack_type.service.IPackTypeService;
-import com.example.englishmaster_be.shared.dto.response.FilterResponse;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
 
 import java.util.List;
 import java.util.UUID;

@@ -3,7 +3,7 @@ package com.example.englishmaster_be.domain.auth.service.otp;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.OtpStatus;
 import com.example.englishmaster_be.common.constant.error.Error;
-import com.example.englishmaster_be.shared.util.OtpUtil;
+import com.example.englishmaster_be.domain.auth.util.OtpUtil;
 import com.example.englishmaster_be.domain.auth.model.OtpEntity;
 import com.example.englishmaster_be.domain.auth.repository.jpa.OtpRepository;
 import com.example.englishmaster_be.domain.user.model.UserEntity;

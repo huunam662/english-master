@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.domain.auth.dto.response;
 
 
-import com.example.englishmaster_be.domain.user.dto.response.UserProfileResponse;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 import lombok.experimental.FieldDefaults;

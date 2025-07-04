@@ -2,7 +2,7 @@ package com.example.englishmaster_be.config.middleware;
 
 import com.example.englishmaster_be.advice.exception.handler.GlobalExceptionHandler;
 import com.example.englishmaster_be.common.constant.error.Error;
-import com.example.englishmaster_be.shared.service.jwt.JwtService;
+import com.example.englishmaster_be.domain.auth.service.jwt.JwtService;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.domain.auth.service.invalid_token.IInvalidTokenService;
 import jakarta.servlet.FilterChain;

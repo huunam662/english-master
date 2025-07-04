@@ -1,13 +1,12 @@
 package com.example.englishmaster_be.domain.pack_type.service;
 
-import com.example.englishmaster_be.domain.pack_type.dto.projection.IPackTypeKeyProjection;
 import com.example.englishmaster_be.domain.pack_type.dto.request.CreatePackTypeRequest;
 import com.example.englishmaster_be.domain.pack_type.dto.request.PackTypeFilterRequest;
 import com.example.englishmaster_be.domain.pack_type.dto.request.UpdatePackTypeRequest;
 import com.example.englishmaster_be.domain.pack_type.dto.response.PackTypeKeyResponse;
 import com.example.englishmaster_be.domain.pack_type.dto.response.PackTypeResponse;
 import com.example.englishmaster_be.domain.pack_type.model.PackTypeEntity;
-import com.example.englishmaster_be.shared.dto.response.FilterResponse;
+import com.example.englishmaster_be.common.dto.response.FilterResponse;
 
 import java.util.List;
 import java.util.UUID;
