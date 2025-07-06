@@ -146,8 +146,7 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, UUID> 
         INNER JOIN FETCH q.part p
         INNER JOIN FETCH p.topic t
         WHERE t.topicId = :topicId
-        AND LOWER(q.questionType) != 'speaking'
-        AND LOWER(q.questionType) != 'writing'
+        AND LOWER(q.questionType) NOT IN ('speaking', 'writing')
         AND q.questionGroupParent IS NULL
     """)
     List<QuestionEntity> findAllReadingListeningByTopicId(@Param("topicId") UUID topicId);
