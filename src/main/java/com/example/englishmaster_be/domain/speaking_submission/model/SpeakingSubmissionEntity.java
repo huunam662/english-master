@@ -38,7 +38,7 @@ public class SpeakingSubmissionEntity {
     @Column(name = "level", columnDefinition = "level_speaker_type")
     LevelSpeakerType levelSpeaker;
 
-    @Column(name = "reached_percent")
+    @Column(name = "reached_percent", columnDefinition = "NUMERIC(?,?)")
     Float reachedPercent;
 
     @Column(name = "status", columnDefinition = "status_submission_type")
