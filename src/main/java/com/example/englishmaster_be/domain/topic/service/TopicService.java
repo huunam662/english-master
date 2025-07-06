@@ -8,7 +8,7 @@ import com.example.englishmaster_be.domain.pack_type.model.PackTypeEntity;
 import com.example.englishmaster_be.domain.pack_type.service.IPackTypeService;
 import com.example.englishmaster_be.domain.part.mapper.PartMapper;
 import com.example.englishmaster_be.domain.question.mapper.QuestionMapper;
-import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyResponse;
+import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyRes;
 import com.example.englishmaster_be.domain.topic.mapper.TopicMapper;
 import com.example.englishmaster_be.domain.topic.repository.jdbc.TopicJdbcRepository;
 import com.example.englishmaster_be.domain.topic.repository.spec.TopicSpecification;
@@ -20,10 +20,10 @@ import com.example.englishmaster_be.domain.part.service.IPartService;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.domain.upload.meu.service.IUploadService;
 import com.example.englishmaster_be.domain.user.service.IUserService;
-import com.example.englishmaster_be.domain.topic.dto.request.TopicRequest;
-import com.example.englishmaster_be.domain.topic.dto.request.TopicFilterRequest;
+import com.example.englishmaster_be.domain.topic.dto.request.TopicReq;
+import com.example.englishmaster_be.domain.topic.dto.request.TopicFilterReq;
 import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
-import com.example.englishmaster_be.domain.topic.dto.response.TopicResponse;
+import com.example.englishmaster_be.domain.topic.dto.response.TopicRes;
 import com.example.englishmaster_be.domain.answer.repository.jpa.AnswerRepository;
 import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
 import com.example.englishmaster_be.domain.pack.model.PackEntity;
@@ -92,7 +92,7 @@ public class TopicService implements ITopicService {
     @Transactional
     @Override
     @SneakyThrows
-    public TopicEntity createTopic(TopicRequest topicRequest) {
+    public TopicEntity createTopic(TopicReq topicRequest) {
 
         UserEntity user = userService.currentUser();
 
@@ -150,7 +150,7 @@ public class TopicService implements ITopicService {
 
     @Transactional
     @Override
-    public TopicEntity updateTopic(UUID topicId, TopicRequest topicRequest) {
+    public TopicEntity updateTopic(UUID topicId, TopicReq topicRequest) {
 
         UserEntity user = userService.currentUser();
 
@@ -272,9 +272,9 @@ public class TopicService implements ITopicService {
             for(QuestionEntity questionChild : questionChildsList){
                 if(questionChild == null) continue;
                 List<AnswerEntity> answersList = answerParentChildGroup.getOrDefault(questionChild.getQuestionId(), Collections.emptyList());
-                questionChild.setAnswers(new HashSet<>(answersList));
+                questionChild.setAnswers(new LinkedHashSet<>(answersList));
             }
-            questionParent.setQuestionGroupChildren(new HashSet<>(questionChildsList));
+            questionParent.setQuestionGroupChildren(new LinkedHashSet<>(questionChildsList));
         }
 
         Collections.shuffle(listQuestionParent);
@@ -291,7 +291,7 @@ public class TopicService implements ITopicService {
         PartEntity part = partService.getPartToId(partId);
 
         if (topic.getParts() == null)
-            topic.setParts(new HashSet<>());
+            topic.setParts(new LinkedHashSet<>());
 
         topic.getParts().add(part);
 
@@ -379,11 +379,11 @@ public class TopicService implements ITopicService {
 
         if (topic.getTopicType().getTopicTypeName().equalsIgnoreCase("speaking")){
             List<QuestionEntity> questionSpeakings = questionRepository.findAllQuestionSpeakingOfTopicAndPart(topicId, partName);
-            TopicUtil.fillQuestionSpeakingToTopic(topic, questionSpeakings);
+            TopicUtil.fillQuestionSpeakingOrWritingToTopic(topic, questionSpeakings);
         }
         else if (topic.getTopicType().getTopicTypeName().equalsIgnoreCase("writing")){
             List<QuestionEntity> questionWritings = questionRepository.findAllQuestionWritingOfTopicAndPart(topicId, partName);
-            TopicUtil.fillQuestionSpeakingToTopic(topic, questionWritings);
+            TopicUtil.fillQuestionSpeakingOrWritingToTopic(topic, questionWritings);
         }
         else{
             List<AnswerEntity> answersQuestionChild = answerRepository.findAnswersJoinQuestionPartTopic(topicId, partName);
@@ -395,7 +395,7 @@ public class TopicService implements ITopicService {
 
 
     @Override
-    public FilterResponse<?> filterTopics(TopicFilterRequest filterRequest) {
+    public FilterResponse<?> filterTopics(TopicFilterReq filterRequest) {
 
         if(filterRequest.getPage() < 1)
             throw new ErrorHolder(Error.BAD_REQUEST, "Page must be begin at 1.");
@@ -410,7 +410,7 @@ public class TopicService implements ITopicService {
 
         List<TopicEntity> topicResult = pageResult.getContent().stream().distinct().toList();
 
-        return FilterResponse.<TopicResponse>builder()
+        return FilterResponse.<TopicRes>builder()
                 .pageNumber(pageResult.getNumber() + 1)
                 .pageSize(pageResult.getSize())
                 .totalPages((long) pageResult.getTotalPages())
@@ -427,16 +427,25 @@ public class TopicService implements ITopicService {
 
         TopicEntity topic = getTopicById(topicId);
 
-        List<AnswerEntity> answersQuestionChild = answerRepository.findAnswersJoinQuestionPartTopic(topicId);
-
-        TopicUtil.fillAnswerToTopic(topic, answersQuestionChild);
+        if (topic.getTopicType().getTopicTypeName().equalsIgnoreCase("speaking")){
+            List<QuestionEntity> questionSpeakings = questionRepository.findAllQuestionSpeakingOfTopic(topicId);
+            TopicUtil.fillQuestionSpeakingOrWritingToTopic(topic, questionSpeakings);
+        }
+        else if (topic.getTopicType().getTopicTypeName().equalsIgnoreCase("writing")){
+            List<QuestionEntity> questionWritings = questionRepository.findAllQuestionWritingOfTopic(topicId);
+            TopicUtil.fillQuestionSpeakingOrWritingToTopic(topic, questionWritings);
+        }
+        else{
+            List<AnswerEntity> answersQuestionChild = answerRepository.findAnswersJoinQuestionPartTopic(topicId);
+            TopicUtil.fillAnswerToTopic(topic, answersQuestionChild);
+        }
 
         return QuestionMapper.INSTANCE.toQuestionPartResponseList(topic);
     }
 
     @Transactional
     @Override
-    public TopicKeyResponse updateTopicToExcel(MultipartFile file, UUID topicId, String imageUrl) throws BadRequestException {
+    public TopicKeyRes updateTopicToExcel(MultipartFile file, UUID topicId, String imageUrl, String audioUrl) throws BadRequestException {
         Assert.notNull(topicId, "Topic id is required.");
         Assert.notNull(file, "Excel file is required.");
         UserEntity userCurrent = userService.currentUser();
@@ -486,10 +495,14 @@ public class TopicService implements ITopicService {
             if(topicImage == null || topicImage.isEmpty()){
                 topicImage = topicRepository.findTopicImageById(topicId);
             }
-            String topicDescription = ExcelUtil.getStringCellValue(sheet.getRow(6).getCell(1));
+            String topicAudio = audioUrl != null ? audioUrl : ExcelUtil.getStringCellValue(sheet.getRow(6).getCell(1));
+            if(topicAudio == null || topicAudio.isEmpty()){
+                topicAudio = topicRepository.findTopicAudioById(topicId);
+            }
+            String topicDescription = ExcelUtil.getStringCellValue(sheet.getRow(7).getCell(1));
             LocalTime workTime;
             try{
-                Cell cellWorkTime = sheet.getRow(7).getCell(1);
+                Cell cellWorkTime = sheet.getRow(8).getCell(1);
                 if(cellWorkTime.getCellType().equals(CellType.STRING)){
                     workTime = LocalTime.parse(
                             ExcelUtil.getStringCellValue(cellWorkTime),
@@ -507,11 +520,12 @@ public class TopicService implements ITopicService {
                 log.error(e.getMessage());
                 workTime = topicRepository.findWorkTimeById(topicId);
             }
-            topicJdbcRepository.updateTopic(topicId, packIdToName, topicTypeIdToName, userCurrent.getUserId(), topicName, topicImage, topicDescription, workTime);
-            return new TopicKeyResponse(topicId);
+            topicJdbcRepository.updateTopic(topicId, packIdToName, topicTypeIdToName, userCurrent.getUserId(), topicName, topicImage, topicAudio, topicDescription, workTime);
+            return new TopicKeyRes(topicId);
         }
         catch (Exception e){
             throw new BadRequestException("Cannot update topic to excel.");
         }
     }
+
 }

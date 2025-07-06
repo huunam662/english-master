@@ -46,8 +46,10 @@ public class QuestionJdbcRepository {
                     id, number_choice, question_score, create_at, update_at,
                     create_by, update_by, question_title, question_content,
                     content_audio, content_image, question_type, is_question_parent,
-                    question_group, part_id, question_result
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    question_group, part_id, question_result, question_numberical
+                ) VALUES (
+                    ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                )
                 """;
 
         int questionsSize = questions.size();
@@ -83,6 +85,7 @@ public class QuestionJdbcRepository {
                     ps.setObject(14, question.getQuestionGroupParent() != null ? question.getQuestionGroupParent().getQuestionId() : null);
                     ps.setObject(15, question.getPart() != null ? question.getPart().getPartId() : question.getPartId());
                     ps.setString(16, question.getQuestionResult());
+                    ps.setInt(17, question.getQuestionNumber());
                 }
 
                 @Override
@@ -120,6 +123,22 @@ public class QuestionJdbcRepository {
                         .addValue("questionId", question.getQuestionId())
                 ).toArray(MapSqlParameterSource[]::new)
         );
+    }
+
+    @Transactional
+    public void batchUpdateQuestionNumber(List<QuestionEntity> questions){
+        if(questions == null || questions.isEmpty()) return;
+        String sql = """
+                    UPDATE question
+                    SET question_numberical = :questionNumber
+                    WHERE id = :questionId
+                """;
+        List<MapSqlParameterSource> params = questions.stream().map(
+                question -> new MapSqlParameterSource()
+                        .addValue("questionId", question.getQuestionId())
+                        .addValue("questionNumber", question.getQuestionNumber())
+        ).toList();
+        namedParameterJdbcTemplate.batchUpdate(sql, params.toArray(MapSqlParameterSource[]::new));
     }
 
 }

@@ -3,7 +3,7 @@ package com.example.englishmaster_be.domain.excel.controller.imp;
 
 import com.example.englishmaster_be.domain.excel.dto.response.*;
 import com.example.englishmaster_be.domain.excel.service.imp.IExcelImportService;
-import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyResponse;
+import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyRes;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "Excel Import")
@@ -32,12 +33,13 @@ public class ExcelImportController {
             summary = "Import topic information from excel file.",
             description = "Import topic information from excel file."
     )
-    public TopicKeyResponse importTopicInformationFromExcel(
+    public TopicKeyRes importTopicInformationFromExcel(
             @RequestPart("file") MultipartFile file,
-            @RequestParam(value = "imageUrl", required = false) String imageUrl
+            @RequestParam(value = "imageUrl", required = false) String imageUrl,
+            @RequestParam(value = "audioUrl", required = false) String audioUrl
     ) {
 
-        return excelService.importTopicFromExcel(file, imageUrl);
+        return excelService.importTopicFromExcel(file, imageUrl, audioUrl);
     }
 
 
@@ -86,4 +88,17 @@ public class ExcelImportController {
 
         return excelService.importQuestionAtAllPartForTopicFromExcel(topicId, file);
     }
+
+    @PostMapping(value = "/import/multiple-topic/all-questions-to-topic-part", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @SneakyThrows
+    @Operation(
+            summary = "Import all questions from parts for multiple topic from multiple excel file.",
+            description = "Import all questions from parts for multiple topic from multiple excel file."
+    )
+    public List<ExcelTopicPartIdsResponse> importAllQuestionsFromPartForMultipleTopic(
+            @RequestPart("files") List<MultipartFile> files
+    ){
+        return excelService.importAllQuestionsFromPartForMultipleTopic(files);
+    }
+
 }

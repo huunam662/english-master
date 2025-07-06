@@ -1,14 +1,15 @@
 package com.example.englishmaster_be.domain.topic.controller;
 
-import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyResponse;
+import com.example.englishmaster_be.domain.topic.dto.response.TopicAudioImageRes;
+import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyRes;
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.topic.mapper.TopicMapper;
-import com.example.englishmaster_be.domain.topic.dto.request.TopicRequest;
-import com.example.englishmaster_be.domain.topic.dto.request.TopicFilterRequest;
+import com.example.englishmaster_be.domain.topic.dto.request.TopicReq;
+import com.example.englishmaster_be.domain.topic.dto.request.TopicFilterReq;
 import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
-import com.example.englishmaster_be.domain.topic.dto.response.TopicResponse;
+import com.example.englishmaster_be.domain.topic.dto.response.TopicRes;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -33,10 +34,15 @@ public class TopicController {
 
     ITopicService topicService;
 
+    @GetMapping("/{id}/media")
+    public TopicAudioImageRes getTopicAudio(@PathVariable("id") UUID id){
+        TopicEntity topic = topicService.getTopicById(id);
+        return TopicMapper.INSTANCE.toTopicAudioImageRes(topic);
+    }
 
     @GetMapping(value = "/{topicId:.+}/inforTopic")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
-    public TopicResponse getInformationTopic(@PathVariable("topicId") UUID topicId) {
+    public TopicRes getInformationTopic(@PathVariable("topicId") UUID topicId) {
 
         TopicEntity topic = topicService.getTopicById(topicId);
 
@@ -45,8 +51,8 @@ public class TopicController {
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
-    public TopicResponse createTopic(
-            @RequestBody TopicRequest topicRequest
+    public TopicRes createTopic(
+            @RequestBody TopicReq topicRequest
     ) {
         
         TopicEntity topic = topicService.createTopic(topicRequest);
@@ -57,9 +63,9 @@ public class TopicController {
 
     @PutMapping(value = "/{topicId:.+}/updateTopic")
     @PreAuthorize("hasRole('ADMIN')")
-    public TopicResponse updateTopic(
+    public TopicRes updateTopic(
             @PathVariable("topicId") UUID topicId,
-            @RequestBody TopicRequest topicRequest
+            @RequestBody TopicReq topicRequest
     ) {
 
         TopicEntity topic = topicService.updateTopic(topicId, topicRequest);
@@ -76,13 +82,13 @@ public class TopicController {
     }
 
     @GetMapping(value = "/listTopic")
-    public FilterResponse<?> getAllTopic(@ModelAttribute TopicFilterRequest filterRequest) {
+    public FilterResponse<?> getAllTopic(@ModelAttribute TopicFilterReq filterRequest) {
 
         return topicService.filterTopics(filterRequest);
     }
 
     @GetMapping("/{topicId}")
-    public TopicResponse getTopic(@PathVariable("topicId") UUID id) {
+    public TopicRes getTopic(@PathVariable("topicId") UUID id) {
 
         TopicEntity topic = topicService.getTopicById(id);
 
@@ -153,13 +159,14 @@ public class TopicController {
             summary = "Update topic information from excel.",
             description = "Update topic information from excel."
     )
-    public TopicKeyResponse updateTopicInformationFromExcel(
+    public TopicKeyRes updateTopicInformationFromExcel(
             @PathVariable("topicId") UUID topicId,
             @RequestPart("file") MultipartFile file,
-            @RequestParam(value = "imageUrl", required = false) String imageUrl
+            @RequestParam(value = "imageUrl", required = false) String imageUrl,
+            @RequestParam(value = "audioUrl", required = false) String audioUrl
     ) throws BadRequestException {
 
-        return topicService.updateTopicToExcel(file, topicId, imageUrl);
+        return topicService.updateTopicToExcel(file, topicId, imageUrl, audioUrl);
     }
 
     @PatchMapping(value = "/{topicId:.+}/enableTopic")

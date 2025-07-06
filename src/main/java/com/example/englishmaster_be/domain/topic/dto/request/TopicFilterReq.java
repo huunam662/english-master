@@ -18,7 +18,7 @@ import java.util.UUID;
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @ParameterObject
-public class TopicFilterRequest extends FilterRequest {
+public class TopicFilterReq extends FilterRequest {
 
     @NotNull(message = "Pack id is required.")
     UUID packId;

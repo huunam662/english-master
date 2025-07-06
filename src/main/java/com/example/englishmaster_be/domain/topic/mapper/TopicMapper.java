@@ -2,10 +2,8 @@ package com.example.englishmaster_be.domain.topic.mapper;
 
 import com.example.englishmaster_be.domain.excel.dto.response.ExcelTopicContentResponse;
 import com.example.englishmaster_be.domain.part.mapper.PartMapper;
-import com.example.englishmaster_be.domain.topic.dto.request.TopicRequest;
-import com.example.englishmaster_be.domain.topic.dto.response.TopicAndTypeResponse;
-import com.example.englishmaster_be.domain.topic.dto.response.TopicBasicResponse;
-import com.example.englishmaster_be.domain.topic.dto.response.TopicResponse;
+import com.example.englishmaster_be.domain.topic.dto.request.TopicReq;
+import com.example.englishmaster_be.domain.topic.dto.response.*;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
@@ -22,23 +20,24 @@ public interface TopicMapper {
     @Mapping(target = "packName", source = "pack.packName")
     @Mapping(target = "partNames", expression = "java(PartMapper.INSTANCE.toPartNameResponseList(topicEntity.getParts()))")
     @Mapping(target = "topicType", source = "topicType.topicTypeName")
-    TopicResponse toTopicResponse(TopicEntity topicEntity);
+    TopicRes toTopicResponse(TopicEntity topicEntity);
 
-    List<TopicResponse> toTopicResponseList(Collection<TopicEntity> topicEntityList);
+    List<TopicRes> toTopicResponseList(Collection<TopicEntity> topicEntityList);
 
     @Mapping(target = "topicType", source = "topicType.topicTypeName")
-    TopicBasicResponse toTopicBasicResponse(TopicEntity topicEntity);
+    TopicBasicRes toTopicBasicResponse(TopicEntity topicEntity);
 
     @Mapping(target = "topicId", ignore = true)
     @Mapping(target = "topicImage", ignore = true)
     @Mapping(target = "workTime", ignore = true)
     @Mapping(target = "topicType", ignore = true)
-    void flowToTopicEntity(TopicRequest topicRequest, @MappingTarget TopicEntity topicEntity);
+    void flowToTopicEntity(TopicReq topicRequest, @MappingTarget TopicEntity topicEntity);
 
 
     @Mapping(target = "topicType", ignore = true)
     void flowToTopicEntity(ExcelTopicContentResponse excelTopicContentResponse, @MappingTarget TopicEntity topicEntity);
 
-    TopicAndTypeResponse toTopicAndTypeResponse(TopicEntity topicEntity);
+    TopicAndTypeRes toTopicAndTypeResponse(TopicEntity topicEntity);
 
+    TopicAudioImageRes toTopicAudioImageRes(TopicEntity topic);
 }

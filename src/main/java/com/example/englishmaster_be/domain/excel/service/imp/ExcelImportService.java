@@ -3,11 +3,13 @@ package com.example.englishmaster_be.domain.excel.service.imp;
 import com.example.englishmaster_be.common.constant.TopicType;
 import com.example.englishmaster_be.common.constant.QuestionType;
 import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.domain.evaluator_writing.util.SpringApplicationContext;
 import com.example.englishmaster_be.domain.excel.dto.response.*;
 import com.example.englishmaster_be.domain.pack.dto.IPackKeyProjection;
+import com.example.englishmaster_be.domain.question.repository.jpa.QuestionRepository;
 import com.example.englishmaster_be.domain.topic.dto.projection.ITopicField1Projection;
 import com.example.englishmaster_be.domain.topic.dto.projection.ITopicKeyProjection;
-import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyResponse;
+import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyRes;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.topic_type.model.TopicTypeEntity;
 import com.example.englishmaster_be.domain.topic_type.repository.jdbc.TopicTypeJdbcRepository;
@@ -32,24 +34,30 @@ import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.topic.repository.jpa.TopicRepository;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
+import com.example.englishmaster_be.util.DomUtil;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.coyote.BadRequestException;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j(topic = "EXCEL-IMPORT-SERVICE")
 @Service
@@ -58,17 +66,11 @@ import java.util.*;
 public class ExcelImportService implements IExcelImportService {
 
     PartRepository partRepository;
-
     TopicRepository topicRepository;
-
     PackRepository packRepository;
-
     ITopicService topicService;
-
     IUserService userService;
-
     PackTypeRepository packTypeRepository;
-
     PackTypeJdbcRepository packTypeJdbcRepository;
     PackJdbcRepository packJdbcRepository;
     TopicJdbcRepository topicJdbcRepository;
@@ -80,11 +82,12 @@ public class ExcelImportService implements IExcelImportService {
 
     @Transactional
     @Override
-    public TopicKeyResponse importTopicFromExcel(MultipartFile file, String imageUrl) {
+    public TopicKeyRes importTopicFromExcel(MultipartFile file, String imageUrl, String audioUrl) {
 
-        TopicKeyResponse topicKey = importTopicFromExcel(file);
+        TopicKeyRes topicKey = importTopicFromExcel(file);
 
-        topicJdbcRepository.updateTopic(topicKey.getTopicId(), imageUrl);
+        topicJdbcRepository.updateTopicImage(topicKey.getTopicId(), imageUrl);
+        topicJdbcRepository.updateTopicAudio(topicKey.getTopicId(), audioUrl);
 
         return topicKey;
     }
@@ -92,7 +95,7 @@ public class ExcelImportService implements IExcelImportService {
     @Transactional
     @Override
     @SneakyThrows
-    public TopicKeyResponse importTopicFromExcel(MultipartFile file) {
+    public TopicKeyRes importTopicFromExcel(MultipartFile file) {
 
         UserEntity userImport = userService.currentUser();
 
@@ -110,10 +113,8 @@ public class ExcelImportService implements IExcelImportService {
 
             // Nếu pack type không tồn tại thì thêm mới
             if(packTypeId == null){
-                packTypeId = UUID.randomUUID();
-                packTypeJdbcRepository.insertPackType(
+                packTypeId = packTypeJdbcRepository.insertPackType(
                         PackTypeEntity.builder()
-                                .id(packTypeId)
                                 .name(packTypeName)
                                 .description(packTypeDescription)
                                 .createdBy(userImport)
@@ -130,10 +131,8 @@ public class ExcelImportService implements IExcelImportService {
 
             // Nếu pack không thuộc pack type thì thêm mới
             if(packId == null || !packTypeId.equals(packKey.getPackTypeId())){
-                packId = UUID.randomUUID();
-                packJdbcRepository.insertPack(
+                packId = packJdbcRepository.insertPack(
                         PackEntity.builder()
-                                .packId(packId)
                                 .packName(packExamName)
                                 .userCreate(userImport)
                                 .userUpdate(userImport)
@@ -145,10 +144,8 @@ public class ExcelImportService implements IExcelImportService {
             String topicTypeName = ExcelUtil.getStringCellValue(sheetTopic.getRow(3).getCell(1));
             UUID topicTypeId = topicTypeRepository.findIdByTypeName(topicTypeName);
             if(topicTypeId == null){
-                topicTypeId = UUID.randomUUID();
-                topicTypeJdbcRepository.insertTopicType(
+                topicTypeId = topicTypeJdbcRepository.insertTopicType(
                         TopicTypeEntity.builder()
-                                .topicTypeId(topicTypeId)
                                 .topicTypeName(topicTypeName)
                                 .userCreate(userImport)
                                 .userUpdate(userImport)
@@ -158,8 +155,9 @@ public class ExcelImportService implements IExcelImportService {
 
             String topicName = ExcelUtil.getStringCellValue(sheetTopic.getRow(4).getCell(1));
             String topicImage = ExcelUtil.getStringCellValue(sheetTopic.getRow(5).getCell(1));
-            String topicDescription = ExcelUtil.getStringCellValue(sheetTopic.getRow(6).getCell(1));
-            Cell cellWorkTime = sheetTopic.getRow(7).getCell(1);
+            String topicAudio = ExcelUtil.getStringCellValue(sheetTopic.getRow(6).getCell(1));
+            String topicDescription = ExcelUtil.getStringCellValue(sheetTopic.getRow(7).getCell(1));
+            Cell cellWorkTime = sheetTopic.getRow(8).getCell(1);
             LocalTime workTime = LocalTime.of(1, 0, 0);
             try{
                 if(cellWorkTime.getCellType().equals(CellType.STRING)){
@@ -191,9 +189,10 @@ public class ExcelImportService implements IExcelImportService {
                                 .topicId(topicId)
                                 .topicName(topicName)
                                 .topicImage(topicImage)
+                                .topicAudio(topicAudio)
                                 .topicDescription(topicDescription)
                                 .numberQuestion(0)
-                                .enable(true)
+                                .enable(false)
                                 .workTime(workTime)
                                 .topicDescription(topicDescription)
                                 .packId(packId)
@@ -204,7 +203,7 @@ public class ExcelImportService implements IExcelImportService {
                 );
             }
 
-            return TopicKeyResponse.builder()
+            return TopicKeyRes.builder()
                     .topicId(topicId)
                     .build();
         }
@@ -245,12 +244,9 @@ public class ExcelImportService implements IExcelImportService {
 
             List<String> partNames = partNamesAndTypes.keySet().stream().toList();
 
-            List<String> partNamesOfTopic = partRepository.findPartNamesByTopicIdAndIn(topicId, partNames);
 
             List<PartEntity> partsTopic = partNames.stream()
-                    .filter(partName -> !partNamesOfTopic.contains(partName))
                     .map(partName -> {
-
                         String partType = partNamesAndTypes.get(partName);
                         return PartEntity.builder()
                                 .partId(UUID.randomUUID())
@@ -322,20 +318,17 @@ public class ExcelImportService implements IExcelImportService {
         List<QuestionEntity> questionsChildOfParent = new ArrayList<>();
         List<AnswerEntity> answersOfQuestionChild = new ArrayList<>();
 
-        UUID partId = partRepository.findPartIdByTopicIdAndPartName(topicId, partName);
-        if(partId == null){
-            partId = UUID.randomUUID();
-            partsOfTopic.add(
-                    PartEntity.builder()
-                            .partId(partId)
-                            .partName(partName)
-                            .partType(ExcelUtil.getStringCellValue(rowPart.getCell(1)))
-                            .userCreate(userImport)
-                            .userUpdate(userImport)
-                            .topicId(topicId)
-                            .build()
-            );
-        }
+        UUID partId = UUID.randomUUID();
+        partsOfTopic.add(
+                PartEntity.builder()
+                        .partId(partId)
+                        .partName(partName)
+                        .partType(ExcelUtil.getStringCellValue(rowPart.getCell(1)))
+                        .userCreate(userImport)
+                        .userUpdate(userImport)
+                        .topicId(topicId)
+                        .build()
+        );
 
         int countOfQuestionsTopic = topicRepository.countQuestionsByTopicId(topicId);
         int iRowAudio = iRowPart + 1;
@@ -349,6 +342,7 @@ public class ExcelImportService implements IExcelImportService {
                     .userUpdate(userImport)
                     .isQuestionParent(true)
                     .questionScore(0)
+                    .questionNumber(0)
                     .questionType(QuestionType.Question_Parent)
                     .contentAudio(ExcelUtil.getStringCellValue(rowAudio.getCell(1)))
                     .build();
@@ -375,6 +369,7 @@ public class ExcelImportService implements IExcelImportService {
                         .userCreate(userImport)
                         .userUpdate(userImport)
                         .isQuestionParent(false)
+                        .questionNumber(++countOfQuestionsTopic)
                         .questionType(QuestionType.Question_Child)
                         .numberChoice(1)
                         .questionGroupParent(questionParent)
@@ -385,7 +380,6 @@ public class ExcelImportService implements IExcelImportService {
                         .build();
                 questionsChildOfParent.add(questionChild);
                 questionParent.setQuestionScore(questionParent.getQuestionScore() + questionChild.getQuestionScore());
-                countOfQuestionsTopic++;
 
                 for(String answerContent : List.of("A", "B", "C", "D")){
                     answersOfQuestionChild.add(
@@ -410,7 +404,7 @@ public class ExcelImportService implements IExcelImportService {
         questionJdbcRepository.batchInsertQuestion(questionsParentOfPart);
         questionJdbcRepository.batchInsertQuestion(questionsChildOfParent);
         answerJdbcRepository.batchInsertAnswer(answersOfQuestionChild);
-        topicJdbcRepository.updateTopic(topicId, countOfQuestionsTopic);
+        topicJdbcRepository.updateTopicNumberQuestion(topicId, countOfQuestionsTopic);
     }
 
     @Transactional
@@ -463,20 +457,17 @@ public class ExcelImportService implements IExcelImportService {
         List<QuestionEntity> questionsChildOfParent = new ArrayList<>();
         List<AnswerEntity> answersOfQuestionChild = new ArrayList<>();
 
-        UUID partId = partRepository.findPartIdByTopicIdAndPartName(topicId, partName);
-        if(partId == null){
-            partId = UUID.randomUUID();
-            partsOfTopic.add(
-                    PartEntity.builder()
-                            .partId(partId)
-                            .partName(partName)
-                            .partType(ExcelUtil.getStringCellValue(rowPart.getCell(1)))
-                            .userCreate(userImport)
-                            .userUpdate(userImport)
-                            .topicId(topicId)
-                            .build()
-            );
-        }
+        UUID partId = UUID.randomUUID();
+        partsOfTopic.add(
+                PartEntity.builder()
+                        .partId(partId)
+                        .partName(partName)
+                        .partType(ExcelUtil.getStringCellValue(rowPart.getCell(1)))
+                        .userCreate(userImport)
+                        .userUpdate(userImport)
+                        .topicId(topicId)
+                        .build()
+        );
 
         int countOfQuestionsTopic = topicRepository.countQuestionsByTopicId(topicId);
         int iRowAudio = iRowPart + 1;
@@ -494,6 +485,7 @@ public class ExcelImportService implements IExcelImportService {
                     .userUpdate(userImport)
                     .isQuestionParent(true)
                     .questionScore(0)
+                    .questionNumber(0)
                     .questionType(QuestionType.Question_Parent)
                     .contentAudio(ExcelUtil.getStringCellValue(rowAudio.getCell(1)))
                     .contentImage(ExcelUtil.getStringCellValue(rowImage.getCell(1)))
@@ -521,6 +513,7 @@ public class ExcelImportService implements IExcelImportService {
                         .userCreate(userImport)
                         .userUpdate(userImport)
                         .isQuestionParent(false)
+                        .questionNumber(++countOfQuestionsTopic)
                         .questionType(QuestionType.Question_Child)
                         .numberChoice(1)
                         .questionContent(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(jQuestionContent)))
@@ -530,7 +523,6 @@ public class ExcelImportService implements IExcelImportService {
                         .build();
                 questionsChildOfParent.add(questionChild);
                 questionParent.setQuestionScore(questionParent.getQuestionScore() + questionChild.getQuestionScore());
-                countOfQuestionsTopic++;
 
                 for(int i = jStartAnswer; i < jQuestionResult; i++){
                     String answerContent = ExcelUtil.getStringCellValue(rowQuestionChild.getCell(i));
@@ -556,7 +548,7 @@ public class ExcelImportService implements IExcelImportService {
         questionJdbcRepository.batchInsertQuestion(questionsParentOfPart);
         questionJdbcRepository.batchInsertQuestion(questionsChildOfParent);
         answerJdbcRepository.batchInsertAnswer(answersOfQuestionChild);
-        topicJdbcRepository.updateTopic(topicId, countOfQuestionsTopic);
+        topicJdbcRepository.updateTopicNumberQuestion(topicId, countOfQuestionsTopic);
     }
 
 
@@ -608,20 +600,17 @@ public class ExcelImportService implements IExcelImportService {
         List<QuestionEntity> questionsChildOfParent = new ArrayList<>();
         List<AnswerEntity> answersOfQuestionChild = new ArrayList<>();
 
-        UUID partId = partRepository.findPartIdByTopicIdAndPartName(topicId, partName);
-        if(partId == null){
-            partId = UUID.randomUUID();
-            partsOfTopic.add(
-                    PartEntity.builder()
-                            .partId(partId)
-                            .partName(partName)
-                            .partType(ExcelUtil.getStringCellValue(rowPart.getCell(1)))
-                            .userCreate(userImport)
-                            .userUpdate(userImport)
-                            .topicId(topicId)
-                            .build()
-            );
-        }
+        UUID partId = UUID.randomUUID();
+        partsOfTopic.add(
+                PartEntity.builder()
+                        .partId(partId)
+                        .partName(partName)
+                        .partType(ExcelUtil.getStringCellValue(rowPart.getCell(1)))
+                        .userCreate(userImport)
+                        .userUpdate(userImport)
+                        .topicId(topicId)
+                        .build()
+        );
 
         QuestionEntity questionParent = QuestionEntity.builder()
                 .questionId(UUID.randomUUID())
@@ -630,6 +619,7 @@ public class ExcelImportService implements IExcelImportService {
                 .userUpdate(userImport)
                 .isQuestionParent(true)
                 .questionScore(0)
+                .questionNumber(0)
                 .questionType(QuestionType.Question_Parent)
                 .build();
         questionsParentOfPart.add(questionParent);
@@ -652,6 +642,7 @@ public class ExcelImportService implements IExcelImportService {
                     .userCreate(userImport)
                     .userUpdate(userImport)
                     .isQuestionParent(false)
+                    .questionNumber(++countOfQuestionsTopic)
                     .questionType(QuestionType.Question_Child)
                     .numberChoice(1)
                     .questionContent(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(jQuestionContent)))
@@ -661,7 +652,6 @@ public class ExcelImportService implements IExcelImportService {
                     .build();
             questionsChildOfParent.add(questionChild);
             questionParent.setQuestionScore(questionParent.getQuestionScore() + questionChild.getQuestionScore());
-            countOfQuestionsTopic++;
 
             for(int i = jStartAnswer; i < jQuestionResult; i++){
                 String answerContent = ExcelUtil.getStringCellValue(rowQuestionChild.getCell(i));
@@ -684,7 +674,7 @@ public class ExcelImportService implements IExcelImportService {
         questionJdbcRepository.batchInsertQuestion(questionsParentOfPart);
         questionJdbcRepository.batchInsertQuestion(questionsChildOfParent);
         answerJdbcRepository.batchInsertAnswer(answersOfQuestionChild);
-        topicJdbcRepository.updateTopic(topicId, countOfQuestionsTopic);
+        topicJdbcRepository.updateTopicNumberQuestion(topicId, countOfQuestionsTopic);
     }
 
 
@@ -738,20 +728,17 @@ public class ExcelImportService implements IExcelImportService {
         List<QuestionEntity> questionsChildOfParent = new ArrayList<>();
         List<AnswerEntity> answersOfQuestionChild = new ArrayList<>();
 
-        UUID partId = partRepository.findPartIdByTopicIdAndPartName(topicId, partName);
-        if(partId == null){
-            partId = UUID.randomUUID();
-            partsOfTopic.add(
-                    PartEntity.builder()
-                            .partId(partId)
-                            .partName(partName)
-                            .partType(ExcelUtil.getStringCellValue(rowPart.getCell(1)))
-                            .userCreate(userImport)
-                            .userUpdate(userImport)
-                            .topicId(topicId)
-                            .build()
-            );
-        }
+        UUID partId = UUID.randomUUID();
+        partsOfTopic.add(
+                PartEntity.builder()
+                        .partId(partId)
+                        .partName(partName)
+                        .partType(ExcelUtil.getStringCellValue(rowPart.getCell(1)))
+                        .userCreate(userImport)
+                        .userUpdate(userImport)
+                        .topicId(topicId)
+                        .build()
+        );
 
         int countOfQuestionsTopic = topicRepository.countQuestionsByTopicId(topicId);
         int iRowParentContent = iRowPart + 1;
@@ -766,6 +753,7 @@ public class ExcelImportService implements IExcelImportService {
                     .isQuestionParent(true)
                     .questionContent(ExcelUtil.getStringCellValue(rowParentContent.getCell(1)))
                     .questionScore(0)
+                    .questionNumber(0)
                     .questionType(QuestionType.Question_Parent)
                     .build();
             if(part == 7) {
@@ -794,6 +782,7 @@ public class ExcelImportService implements IExcelImportService {
                         .userCreate(userImport)
                         .userUpdate(userImport)
                         .isQuestionParent(false)
+                        .questionNumber(++countOfQuestionsTopic)
                         .questionType(QuestionType.Question_Child)
                         .numberChoice(1)
                         .questionContent(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(jQuestionContent)))
@@ -803,7 +792,6 @@ public class ExcelImportService implements IExcelImportService {
                         .build();
                 questionsChildOfParent.add(questionChild);
                 questionParent.setQuestionScore(questionParent.getQuestionScore() + questionChild.getQuestionScore());
-                countOfQuestionsTopic++;
 
                 for(int i = jStartAnswer; i < jQuestionResult; i++){
                     String answerContent = ExcelUtil.getStringCellValue(rowQuestionChild.getCell(i));
@@ -829,7 +817,7 @@ public class ExcelImportService implements IExcelImportService {
         questionJdbcRepository.batchInsertQuestion(questionsParentOfPart);
         questionJdbcRepository.batchInsertQuestion(questionsChildOfParent);
         answerJdbcRepository.batchInsertAnswer(answersOfQuestionChild);
-        topicJdbcRepository.updateTopic(topicId, countOfQuestionsTopic);
+        topicJdbcRepository.updateTopicNumberQuestion(topicId, countOfQuestionsTopic);
     }
 
 
@@ -920,7 +908,7 @@ public class ExcelImportService implements IExcelImportService {
         List<QuestionEntity> questionsChildOfParent = new ArrayList<>();
         List<AnswerEntity> answersOfQuestionChild = new ArrayList<>();
 
-        int countOfQuestionsTopic = 0;
+        int countOfQuestionsTopic = topicRepository.countQuestionsByTopicId(topicId);
 
         int sheetPartStep = 1;
         // Thêm part, question, answer cho topic
@@ -933,20 +921,17 @@ public class ExcelImportService implements IExcelImportService {
             if(rowPart == null) break;
 
             String partName = ExcelUtil.getStringCellValue(rowPart.getCell(0));
-            UUID partId = partRepository.findPartIdByTopicIdAndPartName(topicId, partName);
-            if(partId == null){
-                partId = UUID.randomUUID();
-                partsOfTopic.add(
-                        PartEntity.builder()
-                                .partId(partId)
-                                .partName(ExcelUtil.getStringCellValue(rowPart.getCell(0)))
-                                .partType(ExcelUtil.getStringCellValue(rowPart.getCell(1)))
-                                .userCreate(userImport)
-                                .userUpdate(userImport)
-                                .topicId(topicId)
-                                .build()
-                );
-            }
+            UUID partId = UUID.randomUUID();
+            partsOfTopic.add(
+                    PartEntity.builder()
+                            .partId(partId)
+                            .partName(partName)
+                            .partType(ExcelUtil.getStringCellValue(rowPart.getCell(1)))
+                            .userCreate(userImport)
+                            .userUpdate(userImport)
+                            .topicId(topicId)
+                            .build()
+            );
 
             int iRowAudioQuestionParent = iRowPart + 1;
 
@@ -961,6 +946,7 @@ public class ExcelImportService implements IExcelImportService {
                         .questionId(UUID.randomUUID())
                         .partId(partId)
                         .isQuestionParent(true)
+                        .questionNumber(0)
                         .questionType(QuestionType.Question_Parent)
                         .questionScore(0)
                         .contentAudio(ExcelUtil.getStringCellValue(rowAudio.getCell(1)))
@@ -990,6 +976,7 @@ public class ExcelImportService implements IExcelImportService {
                             .questionGroupParent(questionParent)
                             .questionType(QuestionType.Question_Child)
                             .isQuestionParent(false)
+                            .questionNumber(++countOfQuestionsTopic)
                             .numberChoice(1)
                             .questionContent(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(jQuestionContent)))
                             .questionResult(ExcelUtil.getStringCellValue(rowQuestionChild.getCell(jQuestionResult)))
@@ -1000,7 +987,6 @@ public class ExcelImportService implements IExcelImportService {
                             .build();
                     questionParent.setQuestionScore(questionParent.getQuestionScore() + questionChild.getQuestionScore());
                     questionsChildOfParent.add(questionChild);
-                    countOfQuestionsTopic++;
 
                     for(int i = jStartAnswer; i < jQuestionResult; i++){
                         String answerChildContent = ExcelUtil.getStringCellValue(rowQuestionChild.getCell(i));
@@ -1030,24 +1016,24 @@ public class ExcelImportService implements IExcelImportService {
         questionJdbcRepository.batchInsertQuestion(questionsParentOfPart);
         questionJdbcRepository.batchInsertQuestion(questionsChildOfParent);
         answerJdbcRepository.batchInsertAnswer(answersOfQuestionChild);
-        topicJdbcRepository.updateTopic(topicId, countOfQuestionsTopic);
+        topicJdbcRepository.updateTopicNumberQuestion(topicId, countOfQuestionsTopic);
     }
 
     @Transactional
     @Override
-    public TopicKeyResponse importTopicPartsQuestionsAnswersReading(MultipartFile file) {
+    public TopicKeyRes importTopicPartsQuestionsAnswersReading(MultipartFile file) {
 
         Assert.notNull(file, "File is required.");
 
         UserEntity userImport = userService.currentUser();
 
-        TopicKeyResponse topicKey = importTopicFromExcel(file);
+        TopicKeyRes topicKey = importTopicFromExcel(file);
 
         try(Workbook workbook = new XSSFWorkbook(file.getInputStream())){
 
             fillTopicPartsQuestionsAnswersReadingToDb(topicKey.getTopicId(), userImport, workbook, file);
 
-            return TopicKeyResponse.builder()
+            return TopicKeyRes.builder()
                     .topicId(topicKey.getTopicId())
                     .build();
         }
@@ -1064,11 +1050,11 @@ public class ExcelImportService implements IExcelImportService {
     protected void fillSpeakingPartsToDb(UUID topicId, UserEntity userImport, Workbook workbook){
 
         List<PartEntity> partsOfTopic = new ArrayList<>();
-        List<QuestionEntity> questionsParentOfPart = new ArrayList<>();
+        List<QuestionEntity> questionsSpeakingOfPart = new ArrayList<>();
 
         int numberOfSheets = workbook.getNumberOfSheets();
         int sheetPartStep = 1;
-        int numberOfQuestions = 0;
+        int countOfQuestionsTopic = topicRepository.countQuestionsByTopicId(topicId);
         while(sheetPartStep < numberOfSheets){
             Sheet sheet = workbook.getSheetAt(sheetPartStep);
             int iRowPart = 0;
@@ -1076,48 +1062,89 @@ public class ExcelImportService implements IExcelImportService {
             if(rowPart == null) break;
 
             String partName = ExcelUtil.getStringCellValue(sheet.getRow(0).getCell(0));
-            UUID partId = partRepository.findPartIdByTopicIdAndPartName(topicId, partName);
-            if(partId == null){
-                partId = UUID.randomUUID();
-                partsOfTopic.add(
-                        PartEntity.builder()
-                                .partId(partId)
-                                .partName(ExcelUtil.getStringCellValue(rowPart.getCell(0)))
-                                .partType(ExcelUtil.getStringCellValue(rowPart.getCell(1)))
-                                .userCreate(userImport)
-                                .userUpdate(userImport)
-                                .topicId(topicId)
-                                .build()
-                );
-            }
+            UUID partId = UUID.randomUUID();
+            partsOfTopic.add(
+                    PartEntity.builder()
+                            .partId(partId)
+                            .partName(partName)
+                            .partType(ExcelUtil.getStringCellValue(rowPart.getCell(1)))
+                            .userCreate(userImport)
+                            .userUpdate(userImport)
+                            .topicId(topicId)
+                            .build()
+            );
 
             int iRowImage = iRowPart + 1;
             Row rowImage = sheet.getRow(iRowImage);
             while (rowImage != null){
+                int iRowNext = iRowImage + 1;
+                Row rowNext = sheet.getRow(iRowNext);
+                String nameCell0 = ExcelUtil.getStringCellValue(rowNext.getCell(0));
+                if(nameCell0.equalsIgnoreCase("title")){
+                    String title = ExcelUtil.getStringCellValue(rowNext.getCell(1));
+                    List<String> questionContents = new ArrayList<>();
+                    int iRowQuestionContent = iRowNext + 2;
+                    Row rowQuestionContent = sheet.getRow(iRowQuestionContent);
+                    while (rowQuestionContent != null){
+                        if(ExcelUtil.getStringCellValue(rowQuestionContent.getCell(0)).equalsIgnoreCase("image")){
+                            break;
+                        }
+                        String questionContent = ExcelUtil.getStringCellValue(rowQuestionContent.getCell(1));
+                        questionContents.add(questionContent);
+                        rowQuestionContent = sheet.getRow(++iRowQuestionContent);
+                    }
 
-                int iRowQuestionSpeaking = iRowImage + 1;
+                    if(!questionContents.isEmpty()){
+                        String questionContentHtml = DomUtil.toHtmlQuestionContentSpeaking(title, questionContents);
+                        QuestionEntity questionSpeaking = QuestionEntity.builder()
+                                .questionId(UUID.randomUUID())
+                                .questionContent(questionContentHtml)
+                                .partId(partId)
+                                .contentImage(ExcelUtil.getStringCellValue(rowImage.getCell(1)))
+                                .questionType(QuestionType.Speaking)
+                                .questionNumber(++countOfQuestionsTopic)
+                                .isQuestionParent(true)
+                                .questionScore(0)
+                                .userCreate(userImport)
+                                .userUpdate(userImport)
+                                .build();
+                        questionsSpeakingOfPart.add(questionSpeaking);
+                    }
 
-                QuestionEntity questionParent = QuestionEntity.builder()
-                        .questionId(UUID.randomUUID())
-                        .questionContent(ExcelUtil.getStringCellValue(sheet.getRow(iRowQuestionSpeaking).getCell(1)))
-                        .partId(partId)
-                        .contentImage(ExcelUtil.getStringCellValue(rowImage.getCell(1)))
-                        .questionType(QuestionType.Speaking)
-                        .isQuestionParent(true)
-                        .questionScore(0)
-                        .userCreate(userImport)
-                        .userUpdate(userImport)
-                        .build();
-                questionsParentOfPart.add(questionParent);
-                numberOfQuestions++;
-                rowImage = sheet.getRow(iRowQuestionSpeaking + 1);
+                    iRowImage = iRowQuestionContent;
+                    rowImage = rowQuestionContent;
+                }
+                else{
+                    Row rowQuestionContent = sheet.getRow(iRowNext);
+                    while (rowQuestionContent != null){
+                        if(ExcelUtil.getStringCellValue(rowQuestionContent.getCell(0)).equalsIgnoreCase("image")){
+                            break;
+                        }
+                        QuestionEntity questionSpeaking = QuestionEntity.builder()
+                                .questionId(UUID.randomUUID())
+                                .questionContent(ExcelUtil.getStringCellValue(rowQuestionContent.getCell(1)))
+                                .partId(partId)
+                                .contentImage(ExcelUtil.getStringCellValue(rowImage.getCell(1)))
+                                .questionType(QuestionType.Speaking)
+                                .questionNumber(++countOfQuestionsTopic)
+                                .isQuestionParent(true)
+                                .questionScore(0)
+                                .userCreate(userImport)
+                                .userUpdate(userImport)
+                                .build();
+                        questionsSpeakingOfPart.add(questionSpeaking);
+                        rowQuestionContent = sheet.getRow(++iRowNext);
+                    }
+                    iRowImage = iRowNext;
+                    rowImage = rowQuestionContent;
+                }
             }
             sheetPartStep++;
         }
 
-        topicJdbcRepository.updateTopic(topicId, numberOfQuestions);
+        topicJdbcRepository.updateTopicNumberQuestion(topicId, countOfQuestionsTopic);
         partJdbcRepository.batchInsertPart(partsOfTopic);
-        questionJdbcRepository.batchInsertQuestion(questionsParentOfPart);
+        questionJdbcRepository.batchInsertQuestion(questionsSpeakingOfPart);
     }
 
     @Transactional
@@ -1128,7 +1155,7 @@ public class ExcelImportService implements IExcelImportService {
 
         int numberOfSheets = workbook.getNumberOfSheets();
         int sheetPartStep = 1;
-        int numberOfQuestions = 0;
+        int countOfQuestionsTopic = topicRepository.countQuestionsByTopicId(topicId);
         while(sheetPartStep < numberOfSheets){
             Sheet sheet = workbook.getSheetAt(sheetPartStep);
             int iRowPart = 0;
@@ -1136,20 +1163,17 @@ public class ExcelImportService implements IExcelImportService {
             if(rowPart == null) break;
 
             String partName = ExcelUtil.getStringCellValue(sheet.getRow(0).getCell(0));
-            UUID partId = partRepository.findPartIdByTopicIdAndPartName(topicId, partName);
-            if(partId == null){
-                partId = UUID.randomUUID();
-                partsOfTopic.add(
-                        PartEntity.builder()
-                                .partId(partId)
-                                .partName(ExcelUtil.getStringCellValue(rowPart.getCell(0)))
-                                .partType(ExcelUtil.getStringCellValue(rowPart.getCell(1)))
-                                .userCreate(userImport)
-                                .userUpdate(userImport)
-                                .topicId(topicId)
-                                .build()
-                );
-            }
+            UUID partId = UUID.randomUUID();
+            partsOfTopic.add(
+                    PartEntity.builder()
+                            .partId(partId)
+                            .partName(partName)
+                            .partType(ExcelUtil.getStringCellValue(rowPart.getCell(1)))
+                            .userCreate(userImport)
+                            .userUpdate(userImport)
+                            .topicId(topicId)
+                            .build()
+            );
 
             int iRowImage = iRowPart + 1;
             Row rowImage = sheet.getRow(iRowImage);
@@ -1164,18 +1188,18 @@ public class ExcelImportService implements IExcelImportService {
                         .contentImage(ExcelUtil.getStringCellValue(rowImage.getCell(1)))
                         .questionType(QuestionType.Writing)
                         .isQuestionParent(true)
+                        .questionNumber(++countOfQuestionsTopic)
                         .questionScore(0)
                         .userCreate(userImport)
                         .userUpdate(userImport)
                         .build();
                 questionsParentOfPart.add(questionParent);
-                numberOfQuestions++;
                 rowImage = sheet.getRow(iRowQuestionSpeaking + 1);
             }
             sheetPartStep++;
         }
 
-        topicJdbcRepository.updateTopic(topicId, numberOfQuestions);
+        topicJdbcRepository.updateTopicNumberQuestion(topicId, countOfQuestionsTopic);
         partJdbcRepository.batchInsertPart(partsOfTopic);
         questionJdbcRepository.batchInsertQuestion(questionsParentOfPart);
     }
@@ -1206,5 +1230,39 @@ public class ExcelImportService implements IExcelImportService {
         }
     }
 
-
+    @Override
+    public List<ExcelTopicPartIdsResponse> importAllQuestionsFromPartForMultipleTopic(List<MultipartFile> files) throws BadRequestException {
+        if(files == null || files.isEmpty())
+            throw new BadRequestException("Files is required.");
+        UserEntity userImport = userService.currentUser();
+        List<CompletableFuture<ExcelTopicPartIdsResponse>> futures = new ArrayList<>();
+        for(MultipartFile file : files){
+            if(file == null) continue;
+            CompletableFuture<ExcelTopicPartIdsResponse> future = CompletableFuture.supplyAsync(() -> {
+                SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+                Authentication authentication = new UsernamePasswordAuthenticationToken(
+                        userImport, null, userImport.getAuthorities()
+                );
+                securityContext.setAuthentication(authentication);
+                SecurityContextHolder.setContext(securityContext);
+                ExcelImportService excelImportService = SpringApplicationContext.getBean(ExcelImportService.class);
+                TopicKeyRes topicKeyRes = excelImportService.importTopicFromExcel(file);
+                ExcelTopicPartIdsResponse topicPartIdsRes = excelImportService.importQuestionAtAllPartForTopicFromExcel(topicKeyRes.getTopicId(), file);
+                SecurityContextHolder.clearContext();
+                return topicPartIdsRes;
+            }).exceptionally((e) -> {
+                log.error(e.getMessage());
+                return null;
+            });
+            futures.add(future);
+        }
+        CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).join();
+        List<ExcelTopicPartIdsResponse> results = futures.stream()
+                .map(CompletableFuture::join)
+                .filter(Objects::nonNull)
+                .toList();
+        if(results.isEmpty())
+            throw new ErrorHolder(Error.CONFLICT, "Cannot import files", true);
+        return results;
+    }
 }

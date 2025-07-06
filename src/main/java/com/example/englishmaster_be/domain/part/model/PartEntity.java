@@ -41,11 +41,11 @@ public class PartEntity {
     @Column(name = "part_type")
     String partType;
 
-    @Column(name = "content_type")
-    String contentType;
-
     @Column(name = "content_data")
     String contentData;
+
+    @Column(name = "content_type")
+    String contentType;
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp

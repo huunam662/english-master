@@ -6,6 +6,7 @@ import com.example.englishmaster_be.domain.question.dto.response.QuestionPartRes
 import com.example.englishmaster_be.domain.part.model.PartEntity;
 import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -29,4 +30,6 @@ public interface IQuestionService {
     void deleteAllQuestions(List<UUID> questionIds);
 
     INumberAndScoreQuestionTopic getNumberAndScoreQuestionTopic(UUID topicId);
+
+    void orderQuestionNumberToTopicId(UUID topicId);
 }

@@ -1,15 +1,16 @@
 package com.example.englishmaster_be.domain.topic.service;
 
-import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyResponse;
+import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyRes;
 import com.example.englishmaster_be.common.dto.response.FilterResponse;
 import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
-import com.example.englishmaster_be.domain.topic.dto.request.TopicRequest;
-import com.example.englishmaster_be.domain.topic.dto.request.TopicFilterRequest;
+import com.example.englishmaster_be.domain.topic.dto.request.TopicReq;
+import com.example.englishmaster_be.domain.topic.dto.request.TopicFilterReq;
 import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
 import com.example.englishmaster_be.domain.pack.model.PackEntity;
 import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import org.apache.coyote.BadRequestException;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -18,9 +19,9 @@ import java.util.UUID;
 
 public interface ITopicService {
 
-    TopicEntity createTopic(TopicRequest topicRequest);
+    TopicEntity createTopic(TopicReq topicRequest);
 
-    TopicEntity updateTopic(UUID topicId, TopicRequest topicRequest);
+    TopicEntity updateTopic(UUID topicId, TopicReq topicRequest);
 
     TopicEntity getTopicById(UUID topicId);
 
@@ -32,7 +33,7 @@ public interface ITopicService {
 
     List<QuestionEntity> getQuestionOfPartToTopic(UUID topicId, UUID partId);
 
-    FilterResponse<?> filterTopics(TopicFilterRequest filterRequest);
+    FilterResponse<?> filterTopics(TopicFilterReq filterRequest);
 
     void addPartToTopic(UUID topicId, UUID partId);
 
@@ -50,5 +51,6 @@ public interface ITopicService {
 
     List<QuestionPartResponse> getQuestionPartListOfTopic(UUID topicId);
 
-    TopicKeyResponse updateTopicToExcel(MultipartFile file, UUID topicId, String imageUrl) throws BadRequestException;
+    TopicKeyRes updateTopicToExcel(MultipartFile file, UUID topicId, String imageUrl, String audioUrl) throws BadRequestException;
+
 }
