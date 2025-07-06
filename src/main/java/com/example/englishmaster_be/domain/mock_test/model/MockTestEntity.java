@@ -45,7 +45,7 @@ public class MockTestEntity {
     @Column(name = "total_answers_wrong")
     Integer totalAnswersWrong;
 
-    @Column(name = "answers_correct_percent")
+    @Column(name = "answers_correct_percent", columnDefinition = "NUMERIC(?,?)")
     Float answersCorrectPercent;
 
     @Column(name = "work_time")
