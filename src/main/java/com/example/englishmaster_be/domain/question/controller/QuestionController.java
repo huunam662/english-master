@@ -7,6 +7,7 @@ import com.example.englishmaster_be.domain.question.service.IQuestionService;
 import com.example.englishmaster_be.domain.answer.mapper.AnswerMapper;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
 import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -53,6 +54,15 @@ public class QuestionController {
     ) {
 
         return questionService.getAllPartQuestions(partName, topicId);
+    }
+
+    @Operation(
+            summary = "Update order question number of topic to topic id.",
+            description = "Update order question number of topic to topic id."
+    )
+    @PatchMapping("/order-question-number")
+    public void orderQuestionNumberToTopicId(@RequestParam("topicId") UUID topicId){
+        questionService.orderQuestionNumberToTopicId(topicId);
     }
 
 }

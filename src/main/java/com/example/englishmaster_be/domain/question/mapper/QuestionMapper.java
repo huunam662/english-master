@@ -24,18 +24,6 @@ public interface QuestionMapper {
 
     QuestionMapper INSTANCE = Mappers.getMapper(QuestionMapper.class);
 
-    @Mapping(target = "questionGroupChildren", expression = "java(questionDtoToQuestionSet(questionDto.getListQuestionChild()))")
-    QuestionEntity toQuestionEntity(QuestionRequest questionDto);
-
-    default Set<QuestionEntity> questionDtoToQuestionSet(Collection<QuestionRequest> questionDto) {
-        if(questionDto == null){
-            return Collections.emptySet();
-        }
-        return questionDto.stream().map(this::toQuestionEntity).collect(Collectors.toSet());
-    }
-
-    QuestionEntity toQuestionEntity(QuestionGroupRequest createGroupQuestionDTO);
-
     @Mapping(target = "numberOfQuestionsChild", expression = "java(questionEntity.getQuestionGroupChildren() != null ? questionEntity.getQuestionGroupChildren().size() : 0)")
     @Mapping(target = "questionsChildren", expression = "java(toQuestionChildResponseList(questionEntity.getQuestionGroupChildren()))")
     @Mapping(target = "topicId", source = "part.topicId")
@@ -52,7 +40,6 @@ public interface QuestionMapper {
 
         return QuestionUtil.parseQuestionResponseList(questionEntityList, partEntity);
     }
-
 
     @Mapping(target = "answers", expression = "java(AnswerMapper.INSTANCE.toAnswerResponseList(questionEntity.getAnswers()))")
     @Mapping(target = "topicId", source = "part.topicId")
@@ -95,23 +82,24 @@ public interface QuestionMapper {
             return Collections.emptyList();
 
         return topic.getParts().stream()
-                .sorted(Comparator.comparing(PartEntity::getPartName))
+                .sorted(Comparator.comparing(PartEntity::getPartName, Comparator.nullsLast(Comparator.naturalOrder())))
                 .map(part -> {
-                    QuestionPartResponse questionPartResponse = toQuestionPartResponse(part.getQuestions(), topic, part);
-                    if(topic.getTopicType().getTopicTypeName().equalsIgnoreCase("speaking")){
-                        questionPartResponse.getPart().setTotalQuestion(
-                                part.getQuestions().size()
-                        );
+                    String topicType = topic.getTopicType().getTopicTypeName();
+                    boolean isSpeakingOrWriting = topicType.equalsIgnoreCase("speaking") || topicType.equalsIgnoreCase("writing");
+                    int totalQuestionOfPart;
+                    if(isSpeakingOrWriting) {
+                        part.getQuestions().forEach(questionParent -> questionParent.setQuestionGroupChildren(new LinkedHashSet<>()));
+                        totalQuestionOfPart = part.getQuestions().size();
                     }
-                    else questionPartResponse.getPart().setTotalQuestion(QuestionUtil.totalQuestionChildOf(part.getQuestions()));
-
+                    else {
+                        totalQuestionOfPart = QuestionUtil.totalQuestionChildOf(part.getQuestions());
+                    }
+                    QuestionPartResponse questionPartResponse = toQuestionPartResponse(part.getQuestions(), topic, part);
+                    questionPartResponse.getPart().setTotalQuestion(totalQuestionOfPart);
                     return questionPartResponse;
                 }
-                ).collect(Collectors.toList());
-    }
-
-    @Mapping(target = "questionId", ignore = true)
-    void flowToQuestionEntity(QuestionRequest questionRequest, @MappingTarget QuestionEntity questionEntity);
+                ).toList();
+    };
 
     @Mapping(target = "questionId", ignore = true)
     void flowToQuestionEntity(ExcelQuestionResponse questionByExcelFileResponse, @MappingTarget QuestionEntity questionEntity);

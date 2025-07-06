@@ -28,12 +28,12 @@ public class TopicJdbcRepository {
         String sql = """
                     INSERT INTO topics(
                         id, topic_name, topic_description, create_at, update_at, enable,
-                        create_by, update_by, topic_image, work_time, number_question,
+                        create_by, update_by, topic_image, topic_audio, work_time, number_question,
                         pack_id, topic_type_id
                     )
                     VALUES(
                         :id, :topicName, :topicDescription, now(), now(), :enable,
-                        :createBy, :updateBy, :topicImage, :workTime, :numberQuestion,
+                        :createBy, :updateBy, :topicImage, :topicAudio, :workTime, :numberQuestion,
                         :packId, :topicTypeId
                     )
                     """;
@@ -46,6 +46,7 @@ public class TopicJdbcRepository {
                 .addValue("createBy", topic.getUserCreate().getUserId())
                 .addValue("updateBy", topic.getUserCreate().getUserId())
                 .addValue("topicImage", topic.getTopicImage())
+                .addValue("topicAudio", topic.getTopicAudio())
                 .addValue("workTime", Time.valueOf(topic.getWorkTime()))
                 .addValue("numberQuestion", topic.getNumberQuestion())
                 .addValue("packId", topic.getPack() != null ? topic.getPack().getPackId() : topic.getPackId())
@@ -55,7 +56,7 @@ public class TopicJdbcRepository {
     }
 
     @Transactional
-    public void updateTopic(UUID topicId, int numberQuestion){
+    public void updateTopicNumberQuestion(UUID topicId, int numberQuestion){
 
         if(topicId == null) return;
         if(numberQuestion < 0) return;
@@ -74,7 +75,7 @@ public class TopicJdbcRepository {
     }
 
     @Transactional
-    public void updateTopic(UUID topicId, String imageUrl){
+    public void updateTopicImage(UUID topicId, String imageUrl){
         if(topicId == null) return;
         if(imageUrl == null || imageUrl.isEmpty()) return;
 
@@ -92,6 +93,24 @@ public class TopicJdbcRepository {
     }
 
     @Transactional
+    public void updateTopicAudio(UUID topicId, String audioUrl){
+        if(topicId == null) return;
+        if(audioUrl == null || audioUrl.isEmpty()) return;
+
+        String sql = """
+                UPDATE topics
+                SET topic_audio = :audioUrl
+                WHERE id = :id
+                """;
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("id", topicId)
+                .addValue("audioUrl", audioUrl);
+
+        namedParameterJdbcTemplate.update(sql, params);
+    }
+
+    @Transactional
     public void updateTopic(
             UUID topicId,
             UUID packId,
@@ -99,6 +118,7 @@ public class TopicJdbcRepository {
             UUID userUpdateId,
             String topicName,
             String topicImage,
+            String topicAudio,
             String topicDescription,
             LocalTime workTime
     ){
@@ -112,6 +132,7 @@ public class TopicJdbcRepository {
                     topic_name = :topicName,
                     topic_description = :topicDescription,
                     topic_image = :topicImage,
+                    topic_audio = :topicAudio,
                     work_time = :workTime
                 WHERE id = :topicId
                 """;
@@ -122,6 +143,7 @@ public class TopicJdbcRepository {
                 .addValue("userUpdateId", userUpdateId)
                 .addValue("topicName", topicName)
                 .addValue("topicImage", topicImage)
+                .addValue("topicAudio", topicAudio)
                 .addValue("topicDescription", topicDescription)
                 .addValue("workTime", Time.valueOf(workTime));
         namedParameterJdbcTemplate.update(sql, params);

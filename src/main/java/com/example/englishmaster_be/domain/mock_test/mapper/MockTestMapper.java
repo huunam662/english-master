@@ -1,21 +1,12 @@
 package com.example.englishmaster_be.domain.mock_test.mapper;
 
-import com.example.englishmaster_be.domain.answer.dto.response.AnswerBasicResponse;
 import com.example.englishmaster_be.domain.answer.mapper.AnswerMapper;
 import com.example.englishmaster_be.domain.mock_test.dto.request.MockTestRequest;
 import com.example.englishmaster_be.domain.mock_test.dto.response.*;
-import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
 import com.example.englishmaster_be.domain.mock_test.model.MockTestEntity;
 import com.example.englishmaster_be.domain.mock_test_result.mapper.MockTestResultMapper;
-import com.example.englishmaster_be.domain.question.dto.response.QuestionAnswersResponse;
-import com.example.englishmaster_be.domain.part.dto.response.PartBasicResponse;
-import com.example.englishmaster_be.domain.part.model.PartEntity;
-import com.example.englishmaster_be.domain.question.dto.response.QuestionReadingListeningResponse;
-import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.speaking_submission.util.speaking.SpeakingUtil;
-import com.example.englishmaster_be.domain.topic.dto.response.TopicAndTypeResponse;
 import com.example.englishmaster_be.domain.topic.mapper.TopicMapper;
-import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

@@ -64,7 +64,18 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, UUID> 
         INNER JOIN FETCH p.topic t
         WHERE t.topicId = :topicId
         AND LOWER(qSpeaking.questionType) = 'speaking'
+        ORDER BY qSpeaking.questionNumber
+    """)
+    List<QuestionEntity> findAllQuestionSpeakingOfTopic(@Param("topicId") UUID topicId);
+
+    @Query("""
+        SELECT qSpeaking FROM QuestionEntity qSpeaking
+        INNER JOIN FETCH qSpeaking.part p
+        INNER JOIN FETCH p.topic t
+        WHERE t.topicId = :topicId
+        AND LOWER(qSpeaking.questionType) = 'speaking'
         AND LOWER(p.partName) = LOWER(:partName)
+        ORDER BY qSpeaking.questionNumber
     """)
     List<QuestionEntity> findAllQuestionSpeakingOfTopicAndPart(@Param("topicId") UUID topicId, @Param("partName") String partName);
 
@@ -74,7 +85,18 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, UUID> 
         INNER JOIN FETCH p.topic t
         WHERE t.topicId = :topicId
         AND LOWER(qWriting.questionType) = 'writing'
+        ORDER BY qWriting.questionNumber
+    """)
+    List<QuestionEntity> findAllQuestionWritingOfTopic(@Param("topicId") UUID topicId);
+
+    @Query("""
+        SELECT qWriting FROM QuestionEntity qWriting
+        INNER JOIN FETCH qWriting.part p
+        INNER JOIN FETCH p.topic t
+        WHERE t.topicId = :topicId
+        AND LOWER(qWriting.questionType) = 'writing'
         AND LOWER(p.partName) = LOWER(:partName)
+        ORDER BY qWriting.questionNumber
     """)
     List<QuestionEntity> findAllQuestionWritingOfTopicAndPart(@Param("topicId") UUID topicId, @Param("partName") String partName);
 
@@ -83,9 +105,20 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, UUID> 
         INNER JOIN FETCH qSpeaking.part p
         INNER JOIN FETCH p.topic t
         WHERE t.topicId IN :topicIds
-         AND LOWER(qSpeaking.questionType) = 'speaking'
+        AND LOWER(qSpeaking.questionType) = 'speaking'
+        ORDER BY qSpeaking.questionNumber
     """)
     List<QuestionEntity> findAllQuestionSpeakingOfTopics(@Param("topicIds") List<UUID> topicIds);
+
+    @Query("""
+        SELECT qWriting FROM QuestionEntity qWriting
+        INNER JOIN FETCH qWriting.part p
+        INNER JOIN FETCH p.topic t
+        WHERE t.topicId IN :topicIds
+        AND LOWER(qWriting.questionType) = 'writing'
+        ORDER BY qWriting.questionNumber
+    """)
+    List<QuestionEntity> findAllQuestionWritingOfTopics(@Param("topicIds") List<UUID> topicIds);
 
     @Query(value = """
         SELECT id FROM question
@@ -106,5 +139,19 @@ public interface QuestionRepository extends JpaRepository<QuestionEntity, UUID> 
         WHERE mt.id = :mockTestId AND LOWER(q.question_type) = 'speaking'
     """, nativeQuery = true)
     Integer countOfQuestionSpeakingTopicByMockTestId(@Param("mockTestId") UUID mockTestId);
+
+    @Query("""
+        SELECT q FROM QuestionEntity q
+        LEFT JOIN FETCH q.questionGroupChildren
+        INNER JOIN FETCH q.part p
+        INNER JOIN FETCH p.topic t
+        WHERE t.topicId = :topicId
+        AND LOWER(q.questionType) != 'speaking'
+        AND LOWER(q.questionType) != 'writing'
+        AND q.questionGroupParent IS NULL
+    """)
+    List<QuestionEntity> findAllReadingListeningByTopicId(@Param("topicId") UUID topicId);
+
+
 }
 

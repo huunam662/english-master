@@ -37,11 +37,14 @@ public class QuestionEntity {
     @Column(name = "question_title")
     String questionTitle;
 
-    @Column(name = "question_content", columnDefinition = "text")
+    @Column(name = "question_content")
     String questionContent;
 
     @Column(name = "question_score")
     Integer questionScore;
+
+    @Column(name = "question_numberical")
+    Integer questionNumber;
 
     @Column(name = "content_audio")
     String contentAudio;
@@ -51,12 +54,6 @@ public class QuestionEntity {
 
     @Column(name = "question_result")
     String questionResult;
-
-    @Column(name = "question_explain_en")
-    String questionExplainEn;
-
-    @Column(name = "question_explain_vn")
-    String questionExplainVn;
 
     @Column(name="question_type")
     @Enumerated(EnumType.STRING)
@@ -74,9 +71,6 @@ public class QuestionEntity {
     @UpdateTimestamp
     @Column(name = "update_at")
     LocalDateTime updateAt;
-
-    @Column(name = "has_hints")
-    Boolean hasHints;
 
     @Column(name = "is_question_parent")
     Boolean isQuestionParent;

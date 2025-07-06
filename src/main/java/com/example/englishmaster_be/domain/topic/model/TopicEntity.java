@@ -42,6 +42,9 @@ public class TopicEntity {
     @Column(name = "topic_image")
     String topicImage;
 
+    @Column(name = "topic_audio")
+    String topicAudio;
+
     @Column(name = "topic_description")
     String topicDescription;
 

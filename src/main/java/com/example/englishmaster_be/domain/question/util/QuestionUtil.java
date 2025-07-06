@@ -1,6 +1,5 @@
 package com.example.englishmaster_be.domain.question.util;
 
-import com.example.englishmaster_be.common.constant.PartType;
 import com.example.englishmaster_be.common.constant.QuestionType;
 import com.example.englishmaster_be.domain.answer.dto.request.CreateAnswer1Request;
 import com.example.englishmaster_be.domain.answer.dto.request.EditAnswer1Request;
@@ -16,9 +15,7 @@ import com.example.englishmaster_be.domain.part.model.PartEntity;
 import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
-
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class QuestionUtil {
 
@@ -26,93 +23,21 @@ public class QuestionUtil {
 
         if(questionEntityList == null) return null;
 
-        if(!partEntity.getTopic().getTopicType().getTopicTypeName().equalsIgnoreCase("speaking"))
-            questionEntityList = shuffleQuestionsAndAnswers(questionEntityList, partEntity);
-
         return questionEntityList.stream().map(
                 questionEntity -> {
-
                     QuestionResponse questionResponse;
-
                     Boolean isQuestionParent = questionEntity.getIsQuestionParent();
-
                     if(isQuestionParent) {
-
                         questionResponse = QuestionMapper.INSTANCE.toQuestionResponse(questionEntity);
                         questionResponse.setNumberOfQuestionsChild(questionEntity.getQuestionGroupChildren() != null ? questionEntity.getQuestionGroupChildren().size() : 0);
                     }
                     else {
-
                         questionResponse = QuestionMapper.INSTANCE.toQuestionChildResponse(questionEntity);
                         questionResponse.setNumberOfQuestionsChild(0);
                     }
-
                     return questionResponse;
                 }
         ).toList();
-    }
-
-
-    public static List<QuestionEntity> shuffleQuestionsAndAnswers(Collection<QuestionEntity> questionParentsList, PartEntity partEntity) {
-
-        if(questionParentsList == null || partEntity == null) return null;
-
-        List<QuestionEntity> questionParentsShuffle = new ArrayList<>(questionParentsList);
-
-        Collections.shuffle(questionParentsShuffle);
-
-        List<PartType> partTypesNotShuffle = List.of(
-                PartType.PART_1_TOEIC,
-                PartType.PART_2_TOEIC,
-                PartType.PART_1_IELTS,
-                PartType.PART_2_IELTS
-        );
-
-        boolean notShuffleAnswer = partTypesNotShuffle.stream().anyMatch(
-                partType -> partType.getType().equalsIgnoreCase(partEntity.getPartType())
-        );
-
-        boolean partTypeIsTextCompletion = partEntity.getPartType().equalsIgnoreCase("Text Completion");
-
-        questionParentsShuffle.forEach(questionEntity -> {
-
-            if(questionEntity.getIsQuestionParent() && questionEntity.getQuestionGroupChildren() != null) {
-
-                List<QuestionEntity> questionsList4Shuffle = new ArrayList<>(questionEntity.getQuestionGroupChildren());
-
-                if(!partTypeIsTextCompletion)
-                    Collections.shuffle(questionsList4Shuffle);
-
-                questionsList4Shuffle.forEach(
-                        questionGroupChildEntity -> {
-
-                            if(notShuffleAnswer){
-                                questionGroupChildEntity.setAnswers(
-                                        questionGroupChildEntity.getAnswers().stream().sorted(
-                                                Comparator.comparing(AnswerEntity::getAnswerContent)
-                                        ).collect(Collectors.toCollection(LinkedHashSet::new))
-                                );
-                            }
-                            else{
-                                if(questionGroupChildEntity.getAnswers() != null){
-
-                                    List<AnswerEntity> answersList4Shuffle = new ArrayList<>(questionGroupChildEntity.getAnswers());
-
-                                    Collections.shuffle(answersList4Shuffle);
-
-                                    questionGroupChildEntity.setAnswers(new HashSet<>(answersList4Shuffle));
-                                }
-                            }
-
-                        }
-                );
-
-                questionEntity.setQuestionGroupChildren(new HashSet<>(questionsList4Shuffle));
-            }
-
-        });
-
-        return new ArrayList<>(questionParentsShuffle);
     }
 
     public static int totalQuestionChildOf(Collection<QuestionEntity> questionParents) {
@@ -172,7 +97,7 @@ public class QuestionUtil {
             questionParent.setUserUpdate(userCurrent);
             questionParent.setQuestionType(QuestionType.Question_Parent);
             questionParent.setQuestionScore(0);
-            questionParent.setQuestionGroupChildren(new HashSet<>());
+            questionParent.setQuestionGroupChildren(new LinkedHashSet<>());
 
             questionParentToSave.add(questionParent);
 
@@ -194,7 +119,7 @@ public class QuestionUtil {
                 questionChild.setIsQuestionParent(false);
                 questionChild.setQuestionType(QuestionType.Question_Child);
                 questionChild.setQuestionScore(childRequest.getQuestionScore());
-                questionChild.setAnswers(new HashSet<>());
+                questionChild.setAnswers(new LinkedHashSet<>());
 
                 questionParent.setQuestionScore(questionParent.getQuestionScore() + childRequest.getQuestionScore());
                 questionParent.getQuestionGroupChildren().add(questionChild);
@@ -244,7 +169,7 @@ public class QuestionUtil {
             questionParent.setQuestionType(QuestionType.Question_Parent);
             questionParent.setQuestionScore(0);
             questionParent.setPart(part);
-            questionParent.setQuestionGroupChildren(new HashSet<>());
+            questionParent.setQuestionGroupChildren(new LinkedHashSet<>());
 
             if(questionParentRequest.getQuestionParentId() == null){
                 questionParent.setQuestionId(UUID.randomUUID());
@@ -268,7 +193,7 @@ public class QuestionUtil {
                 questionChild.setQuestionType(QuestionType.Question_Child);
                 questionChild.setPart(part);
                 questionChild.setQuestionGroupParent(questionParent);
-                questionChild.setAnswers(new HashSet<>());
+                questionChild.setAnswers(new LinkedHashSet<>());
                 questionParent.setQuestionScore(questionParent.getQuestionScore() + questionChild.getQuestionScore());
 
                 if(questionChildRequest.getQuestionChildId() == null){

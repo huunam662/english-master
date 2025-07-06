@@ -134,7 +134,6 @@ public class SpeakingSubmissionService implements ISpeakingSubmissionService{
                 .build();
     }
 
-    @Transactional
     @Override
     public void evaluateSpeakingTest(List<SpeakingSubmissionEntity> speakingSubmissions) {
         if(speakingSubmissions == null || speakingSubmissions.isEmpty())

@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.topic.repository.spec;
 
 import com.example.englishmaster_be.common.constant.sort.TopicSortBy;
-import com.example.englishmaster_be.domain.topic.dto.request.TopicFilterRequest;
+import com.example.englishmaster_be.domain.topic.dto.request.TopicFilterReq;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.pack.model.PackEntity;
 import com.example.englishmaster_be.domain.topic_type.model.TopicTypeEntity;
@@ -112,7 +112,7 @@ public class TopicSpecification {
         };
     }
 
-    public static Specification<TopicEntity> filterTopics(TopicFilterRequest filter){
+    public static Specification<TopicEntity> filterTopics(TopicFilterReq filter){
 
         return innerJoinPackExam(filter.getPackId())
                 .and(leftJoinParts())

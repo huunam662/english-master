@@ -1,20 +1,12 @@
 package com.example.englishmaster_be.domain.topic.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.databind.ser.std.TimeZoneSerializer;
-import io.swagger.annotations.Example;
-import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
-import org.springframework.web.multipart.MultipartFile;
 import io.swagger.v3.oas.annotations.Parameter;
 
-import java.sql.Time;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -24,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @SuperBuilder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class TopicRequest {
+public class TopicReq {
 
 	UUID packId;
 
@@ -38,6 +30,8 @@ public class TopicRequest {
 	String workTime;
 
 	String topicImage;
+
+	String topicAudio;
 
 	List<UUID> listPart;
 

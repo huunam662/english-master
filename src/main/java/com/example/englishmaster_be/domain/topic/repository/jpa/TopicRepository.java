@@ -31,6 +31,11 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, JpaSp
     """, nativeQuery = true)
     String findTopicImageById(@Param("topicId") UUID topicId);
 
+    @Query(value = """
+        SELECT topic_audio FROM topics WHERE id = :topicId
+    """, nativeQuery = true)
+    String findTopicAudioById(@Param("topicId") UUID topicId);
+
     Page<TopicEntity> findAll(Pageable pageable);
 
     List<TopicEntity> findAllByPack(PackEntity pack);
@@ -60,7 +65,7 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, JpaSp
     ITopicKeyProjection findTopicIdByName(@Param("topicName") String topicName);
 
     @Query(value = """
-        SELECT number_question FROM topics
+        SELECT COALESCE(number_question, 0) FROM topics
         WHERE id = :topicId
     """, nativeQuery = true)
     Integer countQuestionsByTopicId(@Param("topicId") UUID topicId);
@@ -90,7 +95,7 @@ public interface TopicRepository extends JpaRepository<TopicEntity, UUID>, JpaSp
         INNER JOIN FETCH t.topicType tt
         INNER JOIN FETCH t.pack tp
         INNER JOIN FETCH tp.packType pt
-        ORDER BY t.updateAt
+        ORDER BY t.topicName
     """)
     List<TopicEntity> findAllTopicWithJoinParent(Pageable pageable);
 

@@ -14,16 +14,15 @@ public class TopicUtil {
             TopicEntity topic,
             List<AnswerEntity> answersQuestionChild
     ) {
-
         Map<QuestionEntity, List<AnswerEntity>> questionChildAnswersGroup = answersQuestionChild.stream()
                 .collect(Collectors.groupingBy(AnswerEntity::getQuestion));
-
-        Map<QuestionEntity, List<QuestionEntity>> questionParentChildsGroup = questionChildAnswersGroup.keySet().stream()
+        List<QuestionEntity> questionChildSort = questionChildAnswersGroup.keySet().stream()
+                .sorted(Comparator.comparing(QuestionEntity::getQuestionNumber, Comparator.nullsLast(Comparator.naturalOrder())))
+                .toList();
+        Map<QuestionEntity, List<QuestionEntity>> questionParentChildsGroup = questionChildSort.stream()
                 .collect(Collectors.groupingBy(QuestionEntity::getQuestionGroupParent));
-
         Map<PartEntity, List<QuestionEntity>> partQuestionParentsGroup = questionParentChildsGroup.keySet().stream()
                 .collect(Collectors.groupingBy(QuestionEntity::getPart));
-
         Set<PartEntity> partsOfTopic = partQuestionParentsGroup.keySet();
         for(PartEntity part: partsOfTopic){
             if(part == null) continue;
@@ -34,41 +33,32 @@ public class TopicUtil {
                 for(QuestionEntity questionChild: questionChilds){
                     if(questionChild == null) continue;
                     List<AnswerEntity> answersChild = questionChildAnswersGroup.getOrDefault(questionChild, Collections.emptyList());
-                    questionChild.setAnswers(new HashSet<>(answersChild));
+                    questionChild.setAnswers(new LinkedHashSet<>(answersChild));
                 }
-                questionParent.setQuestionGroupChildren(new HashSet<>(questionChilds));
+                questionParent.setQuestionGroupChildren(new LinkedHashSet<>(questionChilds));
             }
-            part.setQuestions(new HashSet<>(questionParents));
+            part.setQuestions(new LinkedHashSet<>(questionParents));
             part.setTopic(topic);
         }
-
-        partsOfTopic = partsOfTopic.stream()
-                .sorted(Comparator.comparing(PartEntity::getPartName))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-
         topic.setParts(partsOfTopic);
     }
 
-    public static void fillQuestionSpeakingToTopic(
+    public static void fillQuestionSpeakingOrWritingToTopic(
             TopicEntity topic,
             List<QuestionEntity> questionSpeakings
     ) {
-
-        Map<PartEntity, List<QuestionEntity>> partQuestionParentsGroup = questionSpeakings.stream()
+        List<QuestionEntity> questionSpeakingsSort = questionSpeakings.stream()
+                .sorted(Comparator.comparing(QuestionEntity::getQuestionNumber, Comparator.nullsLast(Comparator.naturalOrder())))
+                .toList();
+        Map<PartEntity, List<QuestionEntity>> partQuestionParentsGroup = questionSpeakingsSort.stream()
                 .collect(Collectors.groupingBy(QuestionEntity::getPart));
-
         Set<PartEntity> partsOfTopic = partQuestionParentsGroup.keySet();
         for(PartEntity part: partsOfTopic){
             if(part == null) continue;
             List<QuestionEntity> questions = partQuestionParentsGroup.getOrDefault(part, Collections.emptyList());
-            part.setQuestions(new HashSet<>(questions));
+            part.setQuestions(new LinkedHashSet<>(questions));
             part.setTopic(topic);
         }
-
-        partsOfTopic = partsOfTopic.stream()
-                .sorted(Comparator.comparing(PartEntity::getPartName))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-
         topic.setParts(partsOfTopic);
     }
 }

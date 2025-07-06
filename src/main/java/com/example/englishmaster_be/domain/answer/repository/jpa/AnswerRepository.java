@@ -44,7 +44,6 @@ public interface AnswerRepository extends JpaRepository<AnswerEntity, UUID> {
     @Query("""
         SELECT DISTINCT ac FROM AnswerEntity ac
         INNER JOIN FETCH ac.question qc
-        INNER JOIN FETCH qc.part qcp
         INNER JOIN FETCH qc.questionGroupParent qp
         INNER JOIN FETCH qp.part qpp
         INNER JOIN FETCH qpp.topic t
@@ -55,7 +54,6 @@ public interface AnswerRepository extends JpaRepository<AnswerEntity, UUID> {
     @Query("""
         SELECT DISTINCT ac FROM AnswerEntity ac
         INNER JOIN FETCH ac.question qc
-        INNER JOIN FETCH qc.part qcp
         INNER JOIN FETCH qc.questionGroupParent qp
         INNER JOIN FETCH qp.part qpp
         INNER JOIN FETCH qpp.topic t
@@ -67,11 +65,10 @@ public interface AnswerRepository extends JpaRepository<AnswerEntity, UUID> {
     @Query("""
         SELECT DISTINCT ac FROM AnswerEntity ac
         INNER JOIN FETCH ac.question qc
-        INNER JOIN FETCH qc.part qcp
         INNER JOIN FETCH qc.questionGroupParent qp
         INNER JOIN FETCH qp.part qpp
         INNER JOIN FETCH qpp.topic t
-        WHERE t.topicId = :topicId AND LOWER(qpp.partName) = LOWER(:partName) 
+        WHERE t.topicId = :topicId AND LOWER(qpp.partName) = LOWER(:partName)
     """)
     List<AnswerEntity> findAnswersJoinQuestionPartTopic(@Param("topicId") UUID topicId, @Param("partName") String partName);
 

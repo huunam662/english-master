@@ -5,6 +5,7 @@ import com.example.englishmaster_be.domain.question.dto.request.*;
 import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.question.repository.jdbc.QuestionJdbcRepository;
 import com.example.englishmaster_be.domain.question.repository.jpa.QuestionRepository;
+import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.topic.service.ITopicService;
 import com.example.englishmaster_be.domain.question.dto.response.*;
 import com.example.englishmaster_be.domain.user.service.IUserService;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j(topic = "QUESTION-SERVICE")
 @Service
@@ -170,5 +172,56 @@ public class QuestionService implements IQuestionService {
         Assert.notNull(topicId, "Id of topic is required.");
 
         return questionRepository.findNumberAndScoreQuestions(topicId);
+    }
+
+    @Transactional
+    @Override
+    public void orderQuestionNumberToTopicId(UUID topicId) {
+        TopicEntity topic = topicService.getTopicById(topicId);
+        String topicType = topic.getTopicType().getTopicTypeName();
+        List<QuestionEntity> questions;
+        if(topicType.equalsIgnoreCase("speaking")){
+            questions = questionRepository.findAllQuestionSpeakingOfTopic(topicId);
+        }
+        else if(topicType.equalsIgnoreCase("writing")){
+            questions = questionRepository.findAllQuestionWritingOfTopic(topicId);
+        }
+        else{
+            questions = questionRepository.findAllReadingListeningByTopicId(topicId);
+            questions = questions.stream().flatMap(questionParent -> {
+                    if(questionParent.getQuestionGroupChildren() == null)
+                        return null;
+                    questionParent.getQuestionGroupChildren().forEach(
+                            questionChild -> questionChild.setPart(questionParent.getPart())
+                    );
+                    return questionParent.getQuestionGroupChildren().stream();
+                }
+            ).toList();
+        }
+        Map<PartEntity, List<QuestionEntity>> partQuestions = questions.stream().collect(
+                Collectors.groupingBy(QuestionEntity::getPart)
+        );
+        List<PartEntity> parts = partQuestions.keySet().stream()
+                .sorted(Comparator.comparing(PartEntity::getPartName))
+                .toList();
+        int questionNumberIncrease = 0;
+        List<QuestionEntity> questionToUpdateNumber = new ArrayList<>();
+        for(PartEntity part : parts){
+            List<QuestionEntity> questionsSort = partQuestions.getOrDefault(part, new ArrayList<>())
+                    .stream()
+                    .sorted(Comparator.comparing(
+                            QuestionEntity::getQuestionNumber,
+                            Comparator.nullsLast(Comparator.naturalOrder())
+                    )).toList();
+            for(QuestionEntity question : questionsSort){
+                questionNumberIncrease++;
+                Integer questionNumber = question.getQuestionNumber();
+                if(questionNumber == null || questionNumber != questionNumberIncrease){
+                    question.setQuestionNumber(questionNumberIncrease);
+                    questionToUpdateNumber.add(question);
+                }
+            }
+        }
+        questionJdbcRepository.batchUpdateQuestionNumber(questionToUpdateNumber);
     }
 }

@@ -27,13 +27,11 @@ public class QuestionResponse {
 
     String questionResult;
 
-    String questionExplainEn;
-
-    String questionExplainVn;
-
     String contentAudio;
 
     String contentImage;
+
+    Integer questionNumber;
 
     Integer questionScore;
 
