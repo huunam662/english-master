@@ -38,7 +38,7 @@ public class TopicUtil {
                 for(QuestionEntity questionChild: questionChilds){
                     if(questionChild == null) continue;
                     String questionParentContent = questionParent.getQuestionContent();
-                    if(questionParentContent != null && questionParentContent.contains("____()")){
+                    if(questionParentContent != null && questionParentContent.contains("_()")){
                         questionParent.setQuestionContent(questionParentContent.replaceFirst("\\(\\)", String.format("<strong><i>(%d)</i></strong>", questionChild.getQuestionNumber())));
                     }
                     List<AnswerEntity> answersChild = questionChildAnswersGroup.getOrDefault(questionChild, Collections.emptyList());
