@@ -41,7 +41,9 @@ public class TopicUtil {
                     if(questionParentContent != null && questionParentContent.contains("_()")){
                         questionParent.setQuestionContent(questionParentContent.replaceFirst("\\(\\)", String.format("<strong><i>(%d)</i></strong>", questionChild.getQuestionNumber())));
                     }
-                    List<AnswerEntity> answersChild = questionChildAnswersGroup.getOrDefault(questionChild, Collections.emptyList());
+                    List<AnswerEntity> answersChild = questionChildAnswersGroup.getOrDefault(questionChild, Collections.emptyList())
+                                    .stream().sorted(Comparator.comparing(AnswerEntity::getAnswerContent, Comparator.nullsLast(Comparator.naturalOrder())))
+                                    .toList();
                     questionChild.setAnswers(new LinkedHashSet<>(answersChild));
                 }
                 questionParent.setQuestionGroupChildren(new LinkedHashSet<>(questionChilds));
