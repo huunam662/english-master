@@ -176,7 +176,7 @@ public class SpeakingSubmissionService implements ISpeakingSubmissionService{
                         log.error(e.getMessage());
                         throw new RuntimeException(e);
                     }
-                }, SpringApplicationContext.getBean("configTaskExecutor", ThreadPoolTaskExecutor.class)
+                }
             ).exceptionally((e) -> {
                 // Nếu có lỗi xảy ra trong quá trình chấm điểm và đánh giá thì log lại thông báo và trả về null
                 log.error(e.getMessage());

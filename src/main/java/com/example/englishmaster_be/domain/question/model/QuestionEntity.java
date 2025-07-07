@@ -15,6 +15,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -28,10 +29,12 @@ import java.util.UUID;
 @Builder
 @Schema(hidden = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class QuestionEntity {
 
     @Id
     @Column(name = "id")
+    @EqualsAndHashCode.Include
     UUID questionId;
 
     @Column(name = "question_title")
@@ -127,5 +130,4 @@ public class QuestionEntity {
 
         if(questionScore == null) questionScore = 0;
     }
-
 }

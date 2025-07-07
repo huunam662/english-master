@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.excel.dto.response;
+package com.example.englishmaster_be.domain.excel._import.dto.res;
 
 import com.example.englishmaster_be.common.constant.QuestionType;
 import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
@@ -14,7 +14,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class ExcelQuestionResponse {
+public class ExcelQuestionRes {
 
     UUID questionId;
 
@@ -42,5 +42,5 @@ public class ExcelQuestionResponse {
 
     List<AnswerResponse> answers;
 
-    List<ExcelQuestionResponse> questionsChildren;
+    List<ExcelQuestionRes> questionsChildren;
 }

@@ -29,7 +29,7 @@ public class TopicTypeJdbcRepository {
                         id, type_name, create_at, update_at, create_by, update_by
                     )
                     VALUES(:topicTypeId, :topicTypeName, now(), now(), :createBy, :updateBy)
-                    ON CONFLICT (LOWER(type_name))
+                    ON CONFLICT (type_name)
                     DO UPDATE SET type_name = :topicTypeName
                     RETURNING id
                     """;

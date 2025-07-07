@@ -188,15 +188,6 @@ public class QuestionService implements IQuestionService {
         }
         else{
             questions = questionRepository.findAllReadingListeningByTopicId(topicId);
-            questions = questions.stream().flatMap(questionParent -> {
-                    if(questionParent.getQuestionGroupChildren() == null)
-                        return null;
-                    questionParent.getQuestionGroupChildren().forEach(
-                            questionChild -> questionChild.setPart(questionParent.getPart())
-                    );
-                    return questionParent.getQuestionGroupChildren().stream();
-                }
-            ).toList();
         }
         Map<PartEntity, List<QuestionEntity>> partQuestions = questions.stream().collect(
                 Collectors.groupingBy(QuestionEntity::getPart)
@@ -204,21 +195,33 @@ public class QuestionService implements IQuestionService {
         List<PartEntity> parts = partQuestions.keySet().stream()
                 .sorted(Comparator.comparing(PartEntity::getPartName))
                 .toList();
-        int questionNumberIncrease = 0;
+        int questionNumberParentIncrease = 0;
+        int questionNumberChildIncrease = 0;
         List<QuestionEntity> questionToUpdateNumber = new ArrayList<>();
         for(PartEntity part : parts){
-            List<QuestionEntity> questionsSort = partQuestions.getOrDefault(part, new ArrayList<>())
+            List<QuestionEntity> questionsParentSort = partQuestions.getOrDefault(part, new ArrayList<>())
                     .stream()
                     .sorted(Comparator.comparing(
                             QuestionEntity::getQuestionNumber,
                             Comparator.nullsLast(Comparator.naturalOrder())
                     )).toList();
-            for(QuestionEntity question : questionsSort){
-                questionNumberIncrease++;
-                Integer questionNumber = question.getQuestionNumber();
-                if(questionNumber == null || questionNumber != questionNumberIncrease){
-                    question.setQuestionNumber(questionNumberIncrease);
-                    questionToUpdateNumber.add(question);
+            for(QuestionEntity questionParent : questionsParentSort){
+                questionNumberParentIncrease++;
+                Integer questionParentNumber = questionParent.getQuestionNumber();
+                if(questionParentNumber == null || questionParentNumber != questionNumberParentIncrease){
+                    questionParent.setQuestionNumber(questionNumberParentIncrease);
+                    questionToUpdateNumber.add(questionParent);
+                }
+                List<QuestionEntity> questionsChildSort = questionParent.getQuestionGroupChildren().stream()
+                        .sorted(Comparator.comparing(QuestionEntity::getQuestionNumber, Comparator.nullsLast(Comparator.naturalOrder())))
+                        .toList();
+                for(QuestionEntity questionChild : questionsChildSort){
+                    questionNumberChildIncrease++;
+                    Integer questionChildNumber = questionParent.getQuestionNumber();
+                    if(questionChildNumber == null || questionChildNumber != questionNumberChildIncrease){
+                        questionChild.setQuestionNumber(questionNumberChildIncrease);
+                        questionToUpdateNumber.add(questionChild);
+                    }
                 }
             }
         }
