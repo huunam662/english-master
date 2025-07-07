@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.domain.question.mapper;
 
 import com.example.englishmaster_be.domain.answer.mapper.AnswerMapper;
-import com.example.englishmaster_be.domain.excel.dto.response.ExcelQuestionResponse;
 import com.example.englishmaster_be.domain.part.mapper.PartMapper;
 import com.example.englishmaster_be.domain.question.dto.request.*;
 import com.example.englishmaster_be.domain.question.dto.response.*;
@@ -14,7 +13,6 @@ import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Mapper(
         imports = {AnswerMapper.class, TopicMapper.class, PartMapper.class},
@@ -99,10 +97,7 @@ public interface QuestionMapper {
                     return questionPartResponse;
                 }
                 ).toList();
-    };
-
-    @Mapping(target = "questionId", ignore = true)
-    void flowToQuestionEntity(ExcelQuestionResponse questionByExcelFileResponse, @MappingTarget QuestionEntity questionEntity);
+    }
 
     QuestionEntity toQuestionParent(CreateQuestionParentRequest request);
 

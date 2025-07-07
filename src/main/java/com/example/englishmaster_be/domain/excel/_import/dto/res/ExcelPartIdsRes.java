@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.excel.dto.response;
+package com.example.englishmaster_be.domain.excel._import.dto.res;
 
 import lombok.Data;
 import lombok.experimental.SuperBuilder;
@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Data
 @SuperBuilder
-public class ExcelPartIdsResponse {
+public class ExcelPartIdsRes {
 
     List<UUID> partIds;
 

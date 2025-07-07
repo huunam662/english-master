@@ -33,7 +33,7 @@ public class PackTypeJdbcRepository {
                         :id, :name, now(), now(),
                         :createdBy, :updatedBy, :description
                     ) 
-                    ON CONFLICT(LOWER(name))
+                    ON CONFLICT(name)
                     DO UPDATE SET name = :name
                     RETURNING id;
                     """;

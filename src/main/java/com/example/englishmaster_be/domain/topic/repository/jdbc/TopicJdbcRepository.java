@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.domain.topic.repository.jdbc;
 
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
+import io.swagger.models.auth.In;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -11,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Time;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Repository
@@ -56,10 +59,9 @@ public class TopicJdbcRepository {
     }
 
     @Transactional
-    public void updateTopicNumberQuestion(UUID topicId, int numberQuestion){
+    public void updateTopicNumberQuestion(Map<UUID, Integer> topicNumberQuestion){
 
-        if(topicId == null) return;
-        if(numberQuestion < 0) return;
+        if(topicNumberQuestion == null || topicNumberQuestion.isEmpty()) return;
 
         String sql = """
                 UPDATE topics
@@ -67,11 +69,13 @@ public class TopicJdbcRepository {
                 WHERE id = :id
                 """;
 
-        MapSqlParameterSource params = new MapSqlParameterSource()
-                .addValue("id", topicId)
-                .addValue("numberQuestion", numberQuestion);
+        List<MapSqlParameterSource> params = topicNumberQuestion.entrySet().stream().map(
+                elm -> new MapSqlParameterSource()
+                        .addValue("id", elm.getKey())
+                        .addValue("numberQuestion", elm.getValue())
+        ).toList();
 
-        namedParameterJdbcTemplate.update(sql, params);
+        namedParameterJdbcTemplate.batchUpdate(sql, params.toArray(MapSqlParameterSource[]::new));
     }
 
     @Transactional

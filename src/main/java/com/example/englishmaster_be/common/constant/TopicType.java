@@ -10,7 +10,7 @@ import java.util.Arrays;
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public enum TopicType {
 
-    LISTENING_READING("Reading & Listening"),
+    READING_LISTENING("Reading & Listening"),
     SPEAKING("Speaking"),
     READING("Reading"),
     LISTENING("Listening"),
@@ -22,7 +22,7 @@ public enum TopicType {
         this.type = type;
     }
 
-    public static final TopicType DEFAULT = LISTENING_READING;
+    public static final TopicType DEFAULT = READING_LISTENING;
 
     public static TopicType fromType(final String type) {
 

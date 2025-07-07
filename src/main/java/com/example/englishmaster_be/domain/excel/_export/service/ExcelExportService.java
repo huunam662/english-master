@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.excel.service.exp;
+package com.example.englishmaster_be.domain.excel._export.service;
 
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.constant.TopicType;
@@ -12,12 +12,10 @@ import com.example.englishmaster_be.domain.topic.model.TopicEntity;
 import com.example.englishmaster_be.domain.topic.repository.jpa.TopicRepository;
 import com.example.englishmaster_be.domain.topic.util.TopicUtil;
 import com.example.englishmaster_be.domain.topic_type.model.TopicTypeEntity;
-import jakarta.servlet.ServletOutputStream;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -54,7 +52,7 @@ public class ExcelExportService implements IExcelExportService{
         ByteArrayOutputStream zipOut = new ByteArrayOutputStream();
         try(ZipOutputStream zipOutputStream = new ZipOutputStream(zipOut)){
             TopicTypeEntity topicType = topic.getTopicType();
-            if(topicType.getTopicTypeName().equalsIgnoreCase(TopicType.LISTENING_READING.getType())){
+            if(topicType.getTopicTypeName().equalsIgnoreCase(TopicType.READING_LISTENING.getType())){
                 exportReadingAndListeningInformation(List.of(topic), zipOutputStream);
             }
             else if(topicType.getTopicTypeName().equalsIgnoreCase(TopicType.READING.getType())){
@@ -87,7 +85,7 @@ public class ExcelExportService implements IExcelExportService{
                 );
                 for(TopicType topicType : TopicType.values()){
                     List<TopicEntity> topicsOfType = typeTopicGroup.getOrDefault(topicType, new ArrayList<>());
-                    if(topicType.getType().equalsIgnoreCase(TopicType.LISTENING_READING.getType())){
+                    if(topicType.getType().equalsIgnoreCase(TopicType.READING_LISTENING.getType())){
                         exportReadingAndListeningInformation(topicsOfType, zipOutputStream);
                     }
                     else if(topicType.getType().equalsIgnoreCase(TopicType.READING.getType())){
@@ -118,7 +116,7 @@ public class ExcelExportService implements IExcelExportService{
         ByteArrayOutputStream zipOut = new ByteArrayOutputStream();
         try(ZipOutputStream zipOutputStream = new ZipOutputStream(zipOut)){
             while (!topicsResult.isEmpty()){
-                if(topicType.getType().equalsIgnoreCase(TopicType.LISTENING_READING.getType())){
+                if(topicType.getType().equalsIgnoreCase(TopicType.READING_LISTENING.getType())){
                     exportReadingAndListeningInformation(topicsResult, zipOutputStream);
                 }
                 else if(topicType.getType().equalsIgnoreCase(TopicType.READING.getType())){
@@ -259,9 +257,7 @@ public class ExcelExportService implements IExcelExportService{
             ){
                 List<AnswerEntity> answers = answersTopic.getOrDefault(topic, new ArrayList<>());
                 TopicUtil.fillAnswerToTopic(topic, answers);
-                List<PartEntity> partsTopic = topic.getParts().stream()
-                        .sorted(Comparator.comparing(PartEntity::getPartName, Comparator.nullsLast(Comparator.naturalOrder())))
-                        .toList();
+                List<PartEntity> partsTopic = topic.getParts().stream().toList();
                 writeTopicInformationToSheet(topic, partsTopic, workbook);
                 for(PartEntity part : partsTopic){
                     exportReadingOfTopic(part, workbook);
@@ -342,9 +338,7 @@ public class ExcelExportService implements IExcelExportService{
             ){
                 List<AnswerEntity> answers = answersTopic.getOrDefault(topic, new ArrayList<>());
                 TopicUtil.fillAnswerToTopic(topic, answers);
-                List<PartEntity> partsTopic = topic.getParts().stream()
-                        .sorted(Comparator.comparing(PartEntity::getPartName, Comparator.nullsLast(Comparator.naturalOrder())))
-                        .toList();
+                List<PartEntity> partsTopic = topic.getParts().stream().toList();
                 writeTopicInformationToSheet(topic, partsTopic, workbook);
                 for(PartEntity part : partsTopic){
                     String partNameLower = part.getPartName().toLowerCase();

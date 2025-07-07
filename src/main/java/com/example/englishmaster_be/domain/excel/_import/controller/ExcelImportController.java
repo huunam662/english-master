@@ -1,8 +1,8 @@
-package com.example.englishmaster_be.domain.excel.controller.imp;
+package com.example.englishmaster_be.domain.excel._import.controller;
 
-
-import com.example.englishmaster_be.domain.excel.dto.response.*;
-import com.example.englishmaster_be.domain.excel.service.imp.IExcelImportService;
+import com.example.englishmaster_be.domain.excel._import.dto.res.ExcelPartIdsRes;
+import com.example.englishmaster_be.domain.excel._import.dto.res.ExcelTopicPartIdsRes;
+import com.example.englishmaster_be.domain.excel._import.service.IExcelImportService;
 import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyRes;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,7 +14,6 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.util.List;
 import java.util.UUID;
 
@@ -49,7 +48,7 @@ public class ExcelImportController {
             summary = "Import questions for topic and part.",
             description = "Import questions for topic and part."
     )
-    public ExcelTopicPartIdsResponse importQuestionsForTopicAndPart(
+    public ExcelTopicPartIdsRes importQuestionsForTopicAndPart(
             @PathVariable("topicId") UUID topicId,
             @Parameter(description = "Part number must one value in scope [1, 2, 3, 4, 5, 6, 7]")
             @RequestParam("partNumber") int partNumber,
@@ -66,7 +65,7 @@ public class ExcelImportController {
             summary = "Import all parts for topic from excel file.",
             description = "Import all parts for topic from excel file."
     )
-    public ExcelPartIdsResponse importPartsForTopicFromExcel(
+    public ExcelPartIdsRes importPartsForTopicFromExcel(
             @PathVariable("topicId") UUID topicId,
             @RequestPart("file") MultipartFile file
     ){
@@ -81,7 +80,7 @@ public class ExcelImportController {
             summary = "Import all questions from parts for topic from excel file.",
             description = "Import all questions from parts for topic from excel file."
     )
-    public ExcelPartIdsResponse importAllQuestionsFromPartForTopicFromExcel(
+    public ExcelPartIdsRes importAllQuestionsFromPartForTopicFromExcel(
             @PathVariable("topicId") UUID topicId,
             @RequestPart("file") MultipartFile file
     ){
@@ -95,7 +94,7 @@ public class ExcelImportController {
             summary = "Import all questions from parts for multiple topic from multiple excel file.",
             description = "Import all questions from parts for multiple topic from multiple excel file."
     )
-    public List<ExcelTopicPartIdsResponse> importAllQuestionsFromPartForMultipleTopic(
+    public List<ExcelTopicPartIdsRes> importAllQuestionsFromPartForMultipleTopic(
             @RequestPart("files") List<MultipartFile> files
     ){
         return excelService.importAllQuestionsFromPartForMultipleTopic(files);

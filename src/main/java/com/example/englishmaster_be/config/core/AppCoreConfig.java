@@ -64,18 +64,6 @@ public class AppCoreConfig {
         return authConfig.getAuthenticationManager();
     }
 
-    @Bean("configTaskExecutor")
-    public ThreadPoolTaskExecutor configTaskExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10);
-        executor.setMaxPoolSize(20);
-        executor.setQueueCapacity(100);
-        executor.setThreadNamePrefix("Thread-");
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        executor.initialize();
-        return executor;
-    }
-
     @Bean("auditorWare")
     public AuditorAware<UserEntity> auditorWare() {
         return () -> {
