@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.evaluator_writing.service;
 
+import com.example.englishmaster_be.common.service.mailer.MailerService;
 import com.example.englishmaster_be.domain.evaluator_writing.dto.EvaluatorWritingRequest;
 import com.example.englishmaster_be.domain.evaluator_writing.dto.WritingFeedbackResponse;
 import com.example.englishmaster_be.domain.evaluator_writing.dto.WritingPart;
@@ -11,13 +12,16 @@ import com.example.englishmaster_be.domain.evaluator_writing.repository.jpa.Essa
 import com.example.englishmaster_be.domain.mock_test.repository.jdbc.MockTestJdbcRepository;
 import com.example.englishmaster_be.domain.evaluator_writing.util.GeminiClient;
 import com.example.englishmaster_be.domain.evaluator_writing.util.GenerationConfig;
+import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,17 +32,19 @@ public class EvaluatorWritingService implements IEvaluatorWritingService {
     private final UserService userService;
     private final Logger logger = LoggerFactory.getLogger(EvaluatorWritingService.class);
     private final MockTestJdbcRepository mockTestJdbcRepository;
+    private final MailerService mailerService;
 
-    public EvaluatorWritingService(WritingTaskPromptFactory promptFactory, EssaySubmissionRepository essaySubmissionRepository, UserService userService, MockTestJdbcRepository mockTestJdbcRepository) {
+    public EvaluatorWritingService(MailerService mailerService, WritingTaskPromptFactory promptFactory, EssaySubmissionRepository essaySubmissionRepository, UserService userService, MockTestJdbcRepository mockTestJdbcRepository) {
         this.promptFactory = promptFactory;
         this.essaySubmissionRepository = essaySubmissionRepository;
         this.userService = userService;
         this.mockTestJdbcRepository = mockTestJdbcRepository;
+        this.mailerService = mailerService;
     }
 
     @Override
     @Transactional
-    public WritingFeedbackResponse evaluateEssay(EvaluatorWritingRequest evaluatorWritingRequest) {
+    public WritingFeedbackResponse evaluateEssay(EvaluatorWritingRequest evaluatorWritingRequest) throws MessagingException, IOException {
         WritingTaskPrompt systemPrompt = this.promptFactory.createPrompt(
                 evaluatorWritingRequest.getQuestionType());
         String userPrompt = "Đây là đề bài" + evaluatorWritingRequest.getEssayQuestion()
@@ -70,6 +76,17 @@ public class EvaluatorWritingService implements IEvaluatorWritingService {
                 UUID.randomUUID(), evaluatorWritingRequest.getUserEssay(),
                 essayFeedback, mockTestId
         );
+
+        CompletableFuture.runAsync(() -> {
+            try {
+                mailerService.sendResultMockTestEmail(mockTestId);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }).exceptionally((e) -> {
+            logger.error(e.getMessage());
+            return null;
+        });
 
         return response;
     }

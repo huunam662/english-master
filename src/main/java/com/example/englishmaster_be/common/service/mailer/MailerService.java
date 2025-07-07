@@ -1,11 +1,17 @@
 package com.example.englishmaster_be.common.service.mailer;
 
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.common.constant.TopicType;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.domain.mock_test.model.MockTestEntity;
 import com.example.englishmaster_be.domain.mock_test.repository.jpa.MockTestRepository;
+import com.example.englishmaster_be.domain.mock_test.service.IMockTestService;
 import com.example.englishmaster_be.domain.mock_test_result.model.MockTestResultEntity;
 import com.example.englishmaster_be.domain.part.model.PartEntity;
+import com.example.englishmaster_be.domain.topic.model.TopicEntity;
+import com.example.englishmaster_be.domain.topic.service.ITopicService;
+import com.example.englishmaster_be.domain.topic_type.model.TopicTypeEntity;
+import com.example.englishmaster_be.domain.topic_type.service.ITopicTypeService;
 import com.example.englishmaster_be.domain.user.model.UserEntity;
 import com.example.englishmaster_be.domain.user.repository.jpa.UserRepository;
 import com.example.englishmaster_be.value.LinkValue;
@@ -44,8 +50,9 @@ public class MailerService {
     LinkValue linkValue;
 
     UserRepository userRepository;
-
     MockTestRepository mockTestRepository;
+    IMockTestService mockTestService;
+    ITopicTypeService topicTypeService;
 
     public void sendMail(String recipientEmail) throws MessagingException {
 
@@ -202,9 +209,16 @@ public class MailerService {
 
     public void sendResultMockTestEmail(UUID mockTestId) throws MessagingException, IOException {
         Assert.notNull(mockTestId, "mockTestId must not be null");
-        MockTestEntity mockTest = mockTestRepository.findMockTestById(mockTestId)
-                .orElseThrow(() -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Mock test not found."));
-        String feMockTestResultUrl = linkValue.getLinkFeMockTestResult().replace(":mockTestId", mockTestId.toString());
+        MockTestEntity mockTest = mockTestService.getMockTestById(mockTestId);
+        TopicTypeEntity topicType = topicTypeService.getTopicTypeToId(mockTest.getTopic().getTopicTypeId());
+        String feMockTestResultUrl;
+
+        if(topicType.getTopicTypeName().equalsIgnoreCase(TopicType.SPEAKING.getType()))
+            feMockTestResultUrl = linkValue.getLinkFeMockTestResultSpeaking();
+        else if(topicType.getTopicTypeName().equalsIgnoreCase(TopicType.WRITING.getType()))
+            feMockTestResultUrl = linkValue.getLinkFeMockTestResultWriting();
+        else feMockTestResultUrl = linkValue.getLinkFeMockTestResultReadingListening();
+        feMockTestResultUrl = feMockTestResultUrl.replace(":mockTestId", mockTestId.toString());
         String feShowMoreTopic = linkValue.getLinkFeShowMoreTopic();
         String htmlContent = readTemplateContent("speaking-result-email.html")
                 .replace("${topicName}", mockTest.getTopic().getTopicName())

@@ -6,11 +6,13 @@ import com.example.englishmaster_be.domain.evaluator_writing.dto.WritingPart;
 import com.example.englishmaster_be.domain.evaluator_writing.service.EvaluatorWritingService;
 import com.example.englishmaster_be.domain.evaluator_writing.service.IEvaluatorWritingService;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,7 +30,7 @@ public class EvaluatorWritingController {
 
     @PostMapping("")
     @PreAuthorize("hasRole('USER') OR hasRole('ADMIN')")
-    public WritingFeedbackResponse evaluateWritingTask(@RequestBody EvaluatorWritingRequest evaluatorWritingRequest) {
+    public WritingFeedbackResponse evaluateWritingTask(@RequestBody EvaluatorWritingRequest evaluatorWritingRequest) throws MessagingException, IOException {
         return evaluatorWritingService.evaluateEssay(evaluatorWritingRequest);
     }
 
