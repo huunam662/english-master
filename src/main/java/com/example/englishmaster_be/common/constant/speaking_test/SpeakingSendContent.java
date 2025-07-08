@@ -25,7 +25,7 @@ public enum SpeakingSendContent {
                         "word": "...",
                         "feedback": "...",
                         "wordRecommend": "...",
-                        "pronunciation": "...",
+                        "pronunciation": "..."
                     }
                 ],
                 "grammars": [
@@ -45,7 +45,7 @@ public enum SpeakingSendContent {
                 "vocabularies": [
                 {
                     "wordRecommend": "...",
-                    "pronunciation": "...",
+                    "pronunciation": "..."
                 }
             ]
             }
