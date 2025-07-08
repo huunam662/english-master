@@ -48,7 +48,6 @@ public class SpeakingUtil {
                                 .wordRecommend(pronunciationError.getWordRecommend())
                                 .pronunciation(pronunciationError.getPronunciation())
                                 .feedback(pronunciationError.getFeedback())
-                                .pronunciationUrl(pronunciationError.getPronunciationUrl())
                                 .build()
                 );
             }
@@ -93,7 +92,6 @@ public class SpeakingUtil {
                                 .speakingErrorType(SpeakingErrorType.Vocabulary)
                                 .wordRecommend(vocabularyError.getWordRecommend())
                                 .pronunciation(vocabularyError.getPronunciation())
-                                .pronunciationUrl(vocabularyError.getPronunciationUrl())
                                 .build()
                 );
             }

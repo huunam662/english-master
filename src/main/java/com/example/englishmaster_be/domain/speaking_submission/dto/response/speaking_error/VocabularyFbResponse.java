@@ -16,6 +16,4 @@ public class VocabularyFbResponse {
 
     String pronunciation;
 
-    String pronunciationUrl;
-
 }

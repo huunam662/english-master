@@ -20,6 +20,4 @@ public class PronunciationFbResponse {
 
     String pronunciation;
 
-    String pronunciationUrl;
-
 }

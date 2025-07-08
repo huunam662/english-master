@@ -28,12 +28,12 @@ public class SpeakingErrorJdbcRepository {
                     INSERT INTO speaking_errors(
                         id, speaking_submission_id, error_type, word,
                         word_recommend, pronunciation, feedback,
-                        create_at, update_at, pronunciation_url
+                        create_at, update_at
                     )
                     VALUES(
                         :id, :speakingSubmissionId, CAST(:errorType AS speaking_error_type), 
                         :word, :wordRecommend, :pronunciation, :feedback,
-                        now(), now(), :pronunciationUrl
+                        now(), now()
                     )
                 """;
 
@@ -56,7 +56,6 @@ public class SpeakingErrorJdbcRepository {
                             .addValue("wordRecommend", elm.getWordRecommend())
                             .addValue("pronunciation", elm.getPronunciation())
                             .addValue("feedback", elm.getFeedback())
-                            .addValue("pronunciationUrl", elm.getPronunciationUrl())
             ).toList();
 
             jdbcTemplate.batchUpdate(sql, mapSqlParameters.toArray(MapSqlParameterSource[]::new));
