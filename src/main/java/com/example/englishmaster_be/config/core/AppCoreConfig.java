@@ -15,11 +15,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -29,6 +31,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 import org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver;
 
@@ -38,7 +41,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 @Configuration
-@EnableJpaAuditing(auditorAwareRef = "auditorWare")
+@EnableJpaAuditing
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class AppCoreConfig {
@@ -64,12 +67,15 @@ public class AppCoreConfig {
         return authConfig.getAuthenticationManager();
     }
 
-    @Bean("auditorWare")
+    @Primary
+    @Bean
     public AuditorAware<UserEntity> auditorWare() {
         return () -> {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            if(authentication == null || !authentication.isAuthenticated())
-                throw new AuthenticationServiceException("You must be logged in first.");
+            if(
+                    authentication == null || authentication.getPrincipal() == null ||
+                    !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken
+            ) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "You must logged in first.");
             return Optional.of((UserEntity) authentication.getPrincipal());
         };
     }

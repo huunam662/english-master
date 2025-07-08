@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.advice.exception.handler;
 
+import com.example.englishmaster_be.advice.exception.template.ApplicationException;
 import com.example.englishmaster_be.common.constant.error.Error;
 import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
 import com.example.englishmaster_be.common.dto.response.ResultApiResponse;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.io.FileNotFoundException;
@@ -90,6 +92,11 @@ public class GlobalExceptionHandler implements AccessDeniedHandler, Authenticati
     })
     public ResultApiResponse.ErrorResponse handleEntityNotFoundException(EntityNotFoundException ex, HttpServletRequest request, HttpServletResponse response) {
         return new ResultApiResponse.ErrorResponse(ex, request, response, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler({ApplicationException.class})
+    public ResultApiResponse.ErrorResponse handleResponseStatusException(ApplicationException ex, HttpServletRequest request, HttpServletResponse response) {
+        return new ResultApiResponse.ErrorResponse(ex, request, response, (HttpStatus) ex.getStatusCode());
     }
 
     @ExceptionHandler({
