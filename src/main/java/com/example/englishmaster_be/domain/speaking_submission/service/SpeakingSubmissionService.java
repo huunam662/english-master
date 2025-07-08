@@ -30,12 +30,14 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -97,21 +99,21 @@ public class SpeakingSubmissionService implements ISpeakingSubmissionService{
         // Lưu danh sách Speaking submissions xuống database (batch insert)
         speakingSubmissionJdbcRepository.batchInsertSpeakingSubmission(speakingSubmissions);
         // Tiến hành chia luồng mới để chấm điểm và đánh giá và spring sẽ không chờ vì đã tích hợp cơ chế bất đồng bộ (Async)
-        CompletableFuture.runAsync(
+        CompletableFuture.supplyAsync(
                 // Tiến hành goi hàm chấm điểm và đánh giá
                 () -> evaluateSpeakingTest(speakingSubmissions)
         ).exceptionally((ex) -> {
             // Nếu có ngoại lệ xảy ra trong quá trình đánh giá thì log lại thông báo để dễ debug sau này
             log.error(ex.getMessage());
             return null;
-        }).thenRun(() -> {
+        }).whenComplete((speakingSubmissionsResults, throwable) -> {
             // Sau khi chấm điểm và đánh giá các phần thi của thí sinh thành công thì cập nhật lại thông tin cho mock test
             int countOfQuestionTopicMockTest = questionRepository.countOfQuestionSpeakingTopicByMockTestId(mockTestId);
-            int totalQuestionFinish = speakingSubmissions.size();
-            int totalQuestionSkip = countOfQuestionTopicMockTest - speakingSubmissions.size();
+            int totalQuestionFinish = speakingSubmissionsResults.size();
+            int totalQuestionSkip = countOfQuestionTopicMockTest - speakingSubmissionsResults.size();
             // Tính phần trăm trung bình theo từng phần thi (parts)
             float speakingReachedPercent = BigDecimal.valueOf(
-                        speakingSubmissions.stream().map(SpeakingSubmissionEntity::getReachedPercent)
+                        speakingSubmissionsResults.stream().map(SpeakingSubmissionEntity::getReachedPercent)
                         .reduce(0f, Float::sum) / totalQuestionFinish
                     ).setScale(2, RoundingMode.HALF_UP).floatValue();
             // Cập nhật mới cho mock test
@@ -119,7 +121,8 @@ public class SpeakingSubmissionService implements ISpeakingSubmissionService{
                     mockTestId, speakingReachedPercent, totalQuestionFinish, 0,
                     totalQuestionFinish, totalQuestionSkip, totalQuestionFinish
             );
-        }).thenRun(() -> {
+        }).whenComplete((result, throwable) -> {
+            log.error(throwable.getMessage());
             // Gửi mail cho thí sinh về kết quả bài thi
             log.info("Send Email to User.");
             try {
@@ -135,54 +138,57 @@ public class SpeakingSubmissionService implements ISpeakingSubmissionService{
     }
 
     @Override
-    public void evaluateSpeakingTest(List<SpeakingSubmissionEntity> speakingSubmissions) {
+    public List<SpeakingSubmissionEntity> evaluateSpeakingTest(List<SpeakingSubmissionEntity> speakingSubmissions) {
         if(speakingSubmissions == null || speakingSubmissions.isEmpty())
             throw new ErrorHolder(Error.BAD_REQUEST, "Speaking submissions are required.");
         // Khởi tạo danh sách lưu trữ các task tương ứng với mỗi luồng được chia
-        List<CompletableFuture<Void>> futures = new ArrayList<>();
+        List<CompletableFuture<SpeakingSubmissionEntity>> futures = new ArrayList<>();
         // Duyệt danh sách các instance Speaking submission
         for(SpeakingSubmissionEntity speakingSubmission : speakingSubmissions){
             // Chia luồng cho mỗi instance được duyệt
-            CompletableFuture<Void> future = CompletableFuture.supplyAsync(() -> {
-                    try {
-                        // Lấy ra kết quả speech to text từ hàm giao tiếp với API bên thứ 3 (AssemblyAI open API)
-                        String speakingText = BotUtil.speechToText(speakingSubmission.getAudioUrl());
-                        // Lấy ra question content (Đề bài) từ question id được request từ client
-                        String questionContent = questionRepository.findQuestionSpeakingContent(speakingSubmission.getQuestionId());
-                        // Tiến hành xóa các thẻ (tag) tồn tại ở trong question content nếu có
-                        String questionContentClearHtmlTag = Jsoup.clean(questionContent, Safelist.none());
-                        // Gán để bài và đoạn speech to text vào trong prompt content, sẽ gửi cho API bên thứ 3 (coHere chatbot open API)
-                        String sendContent = SpeakingSendContent.Content.getContent().replace(":question", questionContentClearHtmlTag)
-                                .replace(":speakingText", speakingText);
-                        // Gửi prompt cho chat bot
-                        BotFeedbackResponse feedbackTestResult = BotUtil.feedback4Speaking(sendContent);
-                        if(feedbackTestResult != null){
-                            // Cập nhật nội dung chấm điểm và đánh giá từ AI cho phần thi của thí sinh
-                            speakingSubmission.setFeedback(feedbackTestResult.getFeedback());
-                            float reachedPercent = BigDecimal.valueOf(feedbackTestResult.getReachedPercent() / 100)
-                                            .setScale(2, RoundingMode.HALF_UP).floatValue();
-                            speakingSubmission.setReachedPercent(reachedPercent);
-                            speakingSubmission.setLevelSpeaker(SpeakingUtil.toLevelSpeaker(feedbackTestResult.getReachedPercent()));
-                            speakingSubmission.setSpeakingText(speakingText);
-                            BotFeedbackErrorResponse feedbackError = feedbackTestResult.getErrors();
-                            // Lấy ra các lỗi speaking của thí sinh tương ứng với 4 tiêu chí (Fluency, Vocabulary, Grammar, Pronunciation)
-                            List<SpeakingErrorEntity> speakingErrors = SpeakingUtil.toSpeakingErrors(speakingSubmission.getId(), feedbackError);
-                            // Lưu các lỗi speaking của thí sinh xuống database
-                            speakingErrorJdbcRepository.batchInsertSpeakingError(speakingErrors);
+            CompletableFuture<SpeakingSubmissionEntity> future = CompletableFuture.supplyAsync(() -> {
+                    TransactionTemplate transactionTemplate = SpringApplicationContext.getBean(TransactionTemplate.class);
+                    return transactionTemplate.execute(status -> {
+                        try {
+                            // Lấy ra kết quả speech to text từ hàm giao tiếp với API bên thứ 3 (AssemblyAI open API)
+                            String speakingText = BotUtil.speechToText(speakingSubmission.getAudioUrl());
+                            // Lấy ra question content (Đề bài) từ question id được request từ client
+                            String questionContent = questionRepository.findQuestionSpeakingContent(speakingSubmission.getQuestionId());
+                            // Tiến hành xóa các thẻ (tag) tồn tại ở trong question content nếu có
+                            String questionContentClearHtmlTag = Jsoup.clean(questionContent, Safelist.none());
+                            // Gán để bài và đoạn speech to text vào trong prompt content, sẽ gửi cho API bên thứ 3 (coHere chatbot open API)
+                            String sendContent = SpeakingSendContent.Content.getContent().replace(":question", questionContentClearHtmlTag)
+                                    .replace(":speakingText", speakingText);
+                            // Gửi prompt cho chat bot
+                            BotFeedbackResponse feedbackTestResult = BotUtil.feedback4Speaking(sendContent);
+                            if(feedbackTestResult != null){
+                                // Cập nhật nội dung chấm điểm và đánh giá từ AI cho phần thi của thí sinh
+                                speakingSubmission.setFeedback(feedbackTestResult.getFeedback());
+                                float reachedPercent = BigDecimal.valueOf(feedbackTestResult.getReachedPercent() / 100)
+                                        .setScale(2, RoundingMode.HALF_UP).floatValue();
+                                speakingSubmission.setReachedPercent(reachedPercent);
+                                speakingSubmission.setLevelSpeaker(SpeakingUtil.toLevelSpeaker(feedbackTestResult.getReachedPercent()));
+                                speakingSubmission.setSpeakingText(speakingText);
+                                BotFeedbackErrorResponse feedbackError = feedbackTestResult.getErrors();
+                                // Lấy ra các lỗi speaking của thí sinh tương ứng với 4 tiêu chí (Fluency, Vocabulary, Grammar, Pronunciation)
+                                List<SpeakingErrorEntity> speakingErrors = SpeakingUtil.toSpeakingErrors(speakingSubmission.getId(), feedbackError);
+                                // Lưu các lỗi speaking của thí sinh xuống database
+                                speakingErrorJdbcRepository.batchInsertSpeakingError(speakingErrors);
+                            }
+                            // Trả về instance phần thi của thí sinh
+                            return speakingSubmission;
+                        } catch (InterruptedException e) {
+                            status.setRollbackOnly();
+                            log.error(e.getMessage());
+                            throw new RuntimeException(e);
                         }
-                        // Trả về instance phần thi của thí sinh
-                        return speakingSubmission;
-                    } catch (InterruptedException e) {
-                        log.error(e.getMessage());
-                        throw new RuntimeException(e);
-                    }
+                    });
                 }
             ).exceptionally((e) -> {
                 // Nếu có lỗi xảy ra trong quá trình chấm điểm và đánh giá thì log lại thông báo và trả về null
                 log.error(e.getMessage());
                 return null;
-            }).thenAccept((speakingSubmissionApply) -> {
-                // Nếu instance phần thi của thí sinh nhận được là null (trả ề từ exceptionally) thí return
+            }).whenComplete((speakingSubmissionApply, throwable) -> {
                 if(speakingSubmissionApply == null) return;
                 // Nếu thành công thì tiến hành cập nhật status
                 speakingSubmissionApply.setStatus(StatusSpeakingSubmission.Completed);
@@ -194,6 +200,10 @@ public class SpeakingSubmissionService implements ISpeakingSubmissionService{
         }
         // Đăng ký sự kiện chờ tất cả các task đều dược hoàn thành (đồng nhất)
         CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new)).join();
+        return futures.stream()
+                .map(CompletableFuture::join)
+                .filter(Objects::nonNull)
+                .toList();
     }
 
 }

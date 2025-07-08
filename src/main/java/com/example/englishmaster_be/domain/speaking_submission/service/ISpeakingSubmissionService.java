@@ -10,5 +10,5 @@ public interface ISpeakingSubmissionService {
 
     MockTestKeyResponse speakingSubmitTest(SpeakingSubmitRequest speakingSubmitRequest);
 
-    void evaluateSpeakingTest(List<SpeakingSubmissionEntity> speakingSubmissions);
+    List<SpeakingSubmissionEntity> evaluateSpeakingTest(List<SpeakingSubmissionEntity> speakingSubmissions);
 }
