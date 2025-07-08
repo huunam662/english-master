@@ -199,12 +199,9 @@ public class QuestionService implements IQuestionService {
         int questionNumberChildIncrease = 0;
         List<QuestionEntity> questionToUpdateNumber = new ArrayList<>();
         for(PartEntity part : parts){
-            List<QuestionEntity> questionsParentSort = partQuestions.getOrDefault(part, new ArrayList<>())
-                    .stream()
-                    .sorted(Comparator.comparing(
-                            QuestionEntity::getQuestionNumber,
-                            Comparator.nullsLast(Comparator.naturalOrder())
-                    )).toList();
+            List<QuestionEntity> questionsParentSort = partQuestions.getOrDefault(part, new ArrayList<>()).stream()
+                    .sorted(Comparator.comparing(QuestionEntity::getQuestionNumber, Comparator.nullsLast(Comparator.naturalOrder())))
+                    .toList();
             for(QuestionEntity questionParent : questionsParentSort){
                 questionNumberParentIncrease++;
                 Integer questionParentNumber = questionParent.getQuestionNumber();

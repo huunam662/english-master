@@ -35,9 +35,6 @@ public class SpeakingErrorEntity {
     @Column(name = "pronunciation")
     String pronunciation;
 
-    @Column(name = "pronunciation_url")
-    String pronunciationUrl;
-
     @Column(name = "feedback")
     String feedback;
 
