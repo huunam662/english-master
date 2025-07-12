@@ -9,7 +9,7 @@ import com.example.englishmaster_be.domain.part.model.PartEntity;
 import com.example.englishmaster_be.domain.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.question.repository.jpa.QuestionRepository;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
-import com.example.englishmaster_be.domain.topic.repository.jpa.TopicRepository;
+import com.example.englishmaster_be.domain.topic.repository.TopicRepository;
 import com.example.englishmaster_be.domain.topic.util.TopicUtil;
 import com.example.englishmaster_be.domain.topic_type.model.TopicTypeEntity;
 import lombok.AccessLevel;
