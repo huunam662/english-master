@@ -13,6 +13,11 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -29,6 +34,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Schema(hidden = true)
 @FieldDefaults(level = AccessLevel.PRIVATE)
+@EntityListeners(AuditingEntityListener.class)
 public class TopicEntity {
 
     @Id
@@ -60,11 +66,13 @@ public class TopicEntity {
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
     @Column(name = "create_at")
+    @CreatedDate
     LocalDateTime createAt;
 
     @Temporal(TemporalType.TIMESTAMP)
     @UpdateTimestamp
     @Column(name = "update_at")
+    @LastModifiedDate
     LocalDateTime updateAt;
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -87,10 +95,12 @@ public class TopicEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "create_by", referencedColumnName = "id")
+    @CreatedBy
     UserEntity userCreate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "update_by", referencedColumnName = "id")
+    @LastModifiedBy
     UserEntity userUpdate;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -110,17 +120,4 @@ public class TopicEntity {
     @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY)
     Set<PartEntity> parts;
 
-
-    @PrePersist
-    void onCreate() {
-        createAt = LocalDateTime.now();
-        updateAt = LocalDateTime.now();
-
-        enable = Boolean.TRUE;
-    }
-
-    @PreUpdate
-    void onUpdate() {
-        updateAt = LocalDateTime.now();
-    }
 }

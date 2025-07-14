@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.topic.repository.factory;
+package com.example.englishmaster_be.domain.topic.repository;
 
 import com.example.englishmaster_be.domain.topic.model.QTopicEntity;
 import com.example.englishmaster_be.domain.topic.model.TopicEntity;
