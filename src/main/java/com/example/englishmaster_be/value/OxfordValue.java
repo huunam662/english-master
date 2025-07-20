@@ -7,16 +7,15 @@ import org.springframework.stereotype.Component;
 
 @Getter
 @Component
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class OxfordValue {
 
     @Value("${oxford.api.appId}")
-    String appId;
+    private String appId;
 
     @Value("${oxford.api.appKey}")
-    String appKey;
+    private String appKey;
 
     @Value("${oxford.api.baseUrl}")
-    String baseUrl;
+    private String baseUrl;
 
 }

@@ -1,152 +1,60 @@
 package com.example.englishmaster_be.domain.feedback.service;
 
-import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
-import com.example.englishmaster_be.common.constant.error.Error;
-import com.example.englishmaster_be.domain.feedback.model.QFeedbackEntity;
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
-import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackRequest;
-import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackFilterRequest;
-import com.example.englishmaster_be.domain.upload.meu.request.FileDeleteRequest;
+import com.example.englishmaster_be.advice.exception.ApplicationException;
+import com.example.englishmaster_be.common.dto.req.PageOptionsReq;
+import com.example.englishmaster_be.domain.feedback.dto.view.IFeedbackPageView;
+import com.example.englishmaster_be.domain.feedback.dto.req.FeedbackReq;
+import com.example.englishmaster_be.domain.feedback.repository.FeedbackDslRepository;
+import com.example.englishmaster_be.domain.upload.meu.dto.req.FileDeleteReq;
 import com.example.englishmaster_be.domain.upload.meu.service.IUploadService;
-import com.example.englishmaster_be.domain.user.service.IUserService;
+import com.example.englishmaster_be.domain.user.user.service.IUserService;
 import com.example.englishmaster_be.domain.feedback.mapper.FeedbackMapper;
 import com.example.englishmaster_be.domain.feedback.repository.FeedbackRepository;
-import com.example.englishmaster_be.domain.feedback.util.FeedbackUtil;
 import com.example.englishmaster_be.domain.feedback.model.FeedbackEntity;
-import com.example.englishmaster_be.domain.feedback.dto.response.FeedbackResponse;
-import com.example.englishmaster_be.domain.user.model.UserEntity;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
+import com.example.englishmaster_be.domain.user.user.model.UserEntity;
 import lombok.SneakyThrows;
-import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.Optional;
+
+import java.io.FileNotFoundException;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Lazy})
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FeedbackService implements IFeedbackService {
 
-    JPAQueryFactory queryFactory;
+    private final FeedbackDslRepository feedbackDslRepository;
+    private final FeedbackRepository feedbackRepository;
+    private final IUserService userService;
+    private final IUploadService uploadService;
 
-    FeedbackRepository feedbackRepository;
-
-    IUserService userService;
-
-    IUploadService uploadService;
-
-
+    @Lazy
+    public FeedbackService(FeedbackDslRepository feedbackDslRepository, FeedbackRepository feedbackRepository, IUserService userService, IUploadService uploadService) {
+        this.feedbackDslRepository = feedbackDslRepository;
+        this.feedbackRepository = feedbackRepository;
+        this.userService = userService;
+        this.uploadService = uploadService;
+    }
 
     @Override
     public FeedbackEntity getFeedbackById(UUID feedbackId) {
         return feedbackRepository.findByFeedbackId(feedbackId)
                 .orElseThrow(
-                        () -> new ErrorHolder(Error.RESOURCE_NOT_FOUND, "Feedback not found")
+                        () -> new ApplicationException(HttpStatus.NOT_FOUND, "Feedback not found")
                 );
     }
 
-
     @Override
-    public FilterResponse<?> getListFeedbackOfAdmin(FeedbackFilterRequest filterRequest) {
-
-        FilterResponse<FeedbackResponse> filterResponse = FilterResponse.<FeedbackResponse>
-                        builder()
-                            .pageNumber(filterRequest.getPage())
-                            .pageSize(filterRequest.getPageSize())
-                            .offset((long) (filterRequest.getPage() - 1) * filterRequest.getPageSize())
-                        .build();
-
-        BooleanExpression wherePattern = QFeedbackEntity.feedbackEntity.isNotNull();
-
-        if (filterRequest.getIsEnable() != null){
-
-            wherePattern = wherePattern.and(QFeedbackEntity.feedbackEntity.enable.eq(filterRequest.getIsEnable()));
-        }
-
-        if (filterRequest.getSearch() != null && !filterRequest.getSearch().isEmpty()) {
-
-            String likeExpression = "%" + filterRequest.getSearch().trim().toLowerCase().replaceAll("\\s+", "%") + "%";
-
-            wherePattern = wherePattern.and(QFeedbackEntity.feedbackEntity.content.likeIgnoreCase(likeExpression));
-        }
-
-        long totalElements = Optional.ofNullable(
-                                                queryFactory
-                                                .select(QFeedbackEntity.feedbackEntity.count())
-                                                .where(wherePattern)
-                                                .fetchOne()
-                                            ).orElse(0L);
-        long totalPages = (long) Math.ceil((float) totalElements / filterResponse.getPageSize());
-        filterResponse.setTotalPages(totalPages);
-
-        JPAQuery<FeedbackEntity> query = queryFactory
-                                    .selectFrom(QFeedbackEntity.feedbackEntity)
-                                    .where(wherePattern);
-
-        OrderSpecifier<?> orderSpecifier = FeedbackUtil.buildFeedbackOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
-
-        query.orderBy(orderSpecifier)
-                .offset(filterResponse.getOffset())
-                .limit(filterResponse.getPageSize());
-
-        filterResponse.setContent(
-                FeedbackMapper.INSTANCE.toFeedbackResponseList(query.fetch())
-        );
-
-        return filterResponse;
+    public Page<IFeedbackPageView> getPageFeedback(PageOptionsReq optionsReq) {
+        return feedbackDslRepository.findPageFeedback(optionsReq);
     }
-
-
-    @Override
-    public FilterResponse<?> getListFeedbackOfUser(FeedbackFilterRequest filterRequest) {
-
-        FilterResponse<FeedbackResponse> filterResponse = FilterResponse.<FeedbackResponse>
-                        builder()
-                .pageNumber(filterRequest.getPage())
-                .pageSize(filterRequest.getPageSize())
-                .offset((long) (filterRequest.getPage() - 1) * filterRequest.getPageSize())
-                .build();
-
-        BooleanExpression wherePattern = QFeedbackEntity.feedbackEntity.enable.eq(Boolean.TRUE);
-
-        long totalElements = Optional.ofNullable(
-                queryFactory
-                        .select(QFeedbackEntity.feedbackEntity.count())
-                        .from(QFeedbackEntity.feedbackEntity)
-                        .where(wherePattern)
-                        .fetchOne()
-        ).orElse(0L);
-
-        long totalPages = (long) Math.ceil((float) totalElements / filterResponse.getPageSize());
-        filterResponse.setTotalPages(totalPages);
-
-        OrderSpecifier<?> orderSpecifier = FeedbackUtil.buildFeedbackOrderSpecifier(filterRequest.getSortBy(), filterRequest.getDirection());
-
-        JPAQuery<FeedbackEntity> query = queryFactory
-                .selectFrom(QFeedbackEntity.feedbackEntity)
-                .where(wherePattern)
-                .orderBy(orderSpecifier)
-                .offset(filterResponse.getOffset())
-                .limit(filterResponse.getPageSize());
-
-        filterResponse.setContent(
-                FeedbackMapper.INSTANCE.toFeedbackResponseList(query.fetch())
-        );
-
-        return filterResponse;
-    }
-
 
     @Transactional
     @Override
-    public FeedbackEntity saveFeedback(FeedbackRequest feedbackRequest) {
+    public FeedbackEntity saveFeedback(FeedbackReq feedbackRequest) {
 
         UserEntity user = userService.currentUser();
 
@@ -155,7 +63,7 @@ public class FeedbackService implements IFeedbackService {
         if(feedbackRequest.getFeedbackId() != null)
             feedback = getFeedbackById(feedbackRequest.getFeedbackId());
 
-        else feedback = FeedbackEntity.builder().build();
+        else feedback = new FeedbackEntity();
 
         FeedbackMapper.INSTANCE.flowToFeedbackEntity(feedbackRequest, feedback);
         feedback.setAvatar(user.getAvatar());
@@ -183,11 +91,13 @@ public class FeedbackService implements IFeedbackService {
         FeedbackEntity feedback = getFeedbackById(feedbackId);
 
         if(feedback.getAvatar() != null)
-            uploadService.delete(
-                    FileDeleteRequest.builder()
-                            .filepath(feedback.getAvatar())
-                            .build()
-            );
+            CompletableFuture.runAsync(() -> {
+                try {
+                    uploadService.delete(new FileDeleteReq(feedback.getAvatar()));
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                }
+            });
 
         feedbackRepository.delete(feedback);
     }

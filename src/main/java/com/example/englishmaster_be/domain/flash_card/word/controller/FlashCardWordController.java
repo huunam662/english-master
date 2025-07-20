@@ -1,10 +1,12 @@
 package com.example.englishmaster_be.domain.flash_card.word.controller;
 
-import com.example.englishmaster_be.common.dto.request.PageOptionsReq;
-import com.example.englishmaster_be.common.dto.response.PageInfoRes;
-import com.example.englishmaster_be.domain.flash_card.word.dto.request.FlashCardWordReq;
-import com.example.englishmaster_be.domain.flash_card.word.dto.request.UpdateFlashCardWordReq;
-import com.example.englishmaster_be.domain.flash_card.word.dto.response.FlashCardWordRes;
+import com.example.englishmaster_be.common.dto.req.PageOptionsReq;
+import com.example.englishmaster_be.common.dto.res.PageInfoRes;
+import com.example.englishmaster_be.domain.flash_card.word.dto.req.FlashCardWordReq;
+import com.example.englishmaster_be.domain.flash_card.word.dto.req.UpdateFlashCardWordReq;
+import com.example.englishmaster_be.domain.flash_card.word.dto.res.FlashCardWordPageRes;
+import com.example.englishmaster_be.domain.flash_card.word.dto.res.FlashCardWordRes;
+import com.example.englishmaster_be.domain.flash_card.word.dto.view.IFlashCardWordPageView;
 import com.example.englishmaster_be.domain.flash_card.word.mapper.FlashCardWordMapper;
 import com.example.englishmaster_be.domain.flash_card.word.model.FlashCardWordEntity;
 import com.example.englishmaster_be.domain.flash_card.word.service.IFlashCardWordService;
@@ -34,12 +36,12 @@ public class FlashCardWordController {
             description = "Get page flash card word."
     )
     @GetMapping("/page")
-    public PageInfoRes<FlashCardWordRes> getPageFlashCardWord(
+    public PageInfoRes<FlashCardWordPageRes> getPageFlashCardWord(
             @ModelAttribute @Valid PageOptionsReq optionsReq
     ){
-        Page<FlashCardWordEntity> pageFlashCardWord = flashCardWordService.getPageFlashCardWord(optionsReq);
-        List<FlashCardWordRes> flashCardWordResList = FlashCardWordMapper.INSTANCE.toFlashCardWordResList(pageFlashCardWord.getContent());
-        Page<FlashCardWordRes> pageFlashCardWordUserRes = new PageImpl<>(flashCardWordResList, pageFlashCardWord.getPageable(), pageFlashCardWord.getTotalElements());
+        Page<IFlashCardWordPageView> pageFlashCardWord = flashCardWordService.getPageFlashCardWord(optionsReq);
+        List<FlashCardWordPageRes> flashCardWordResList = FlashCardWordMapper.INSTANCE.toFlashCardWordPageResList(pageFlashCardWord.getContent());
+        Page<FlashCardWordPageRes> pageFlashCardWordUserRes = new PageImpl<>(flashCardWordResList, pageFlashCardWord.getPageable(), pageFlashCardWord.getTotalElements());
         return new PageInfoRes<>(pageFlashCardWordUserRes);
     }
 
@@ -48,13 +50,13 @@ public class FlashCardWordController {
             description = "Get page flash card word to flash card id."
     )
     @GetMapping("/flash-card/{flashCardId}/page")
-    public PageInfoRes<FlashCardWordRes> getPageFlashCardWordToFlashCardId(
+    public PageInfoRes<FlashCardWordPageRes> getPageFlashCardWordToFlashCardId(
             @PathVariable("flashCardId") UUID flashCardId,
             @ModelAttribute @Valid PageOptionsReq optionsReq
     ){
-        Page<FlashCardWordEntity> pageFlashCardWord = flashCardWordService.getPageFlashCardWordToFlashCardId(flashCardId, optionsReq);
-        List<FlashCardWordRes> flashCardWordResList = FlashCardWordMapper.INSTANCE.toFlashCardWordResList(pageFlashCardWord.getContent());
-        Page<FlashCardWordRes> pageFlashCardWordUserRes = new PageImpl<>(flashCardWordResList, pageFlashCardWord.getPageable(), pageFlashCardWord.getTotalElements());
+        Page<IFlashCardWordPageView> pageFlashCardWord = flashCardWordService.getPageFlashCardWordToFlashCardId(flashCardId, optionsReq);
+        List<FlashCardWordPageRes> flashCardWordResList = FlashCardWordMapper.INSTANCE.toFlashCardWordPageResList(pageFlashCardWord.getContent());
+        Page<FlashCardWordPageRes> pageFlashCardWordUserRes = new PageImpl<>(flashCardWordResList, pageFlashCardWord.getPageable(), pageFlashCardWord.getTotalElements());
         return new PageInfoRes<>(pageFlashCardWordUserRes);
     }
 

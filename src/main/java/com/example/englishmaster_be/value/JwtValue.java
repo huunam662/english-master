@@ -10,20 +10,19 @@ import org.springframework.stereotype.Component;
 
 @Getter
 @Component
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class JwtValue {
 
 
     @Value("${englishmaster.jwtSecret}")
-    String jwtSecret;
+    private String jwtSecret;
 
     @Value("${englishmaster.salt.hash.jwtToken}")
-    String saltHashToken;
+    private String saltHashToken;
 
     @Value("${englishmaster.jwtExpiration}")
-    long jwtExpiration;
+    private long jwtExpiration;
 
     @Value("${englishmaster.jwtRefreshExpirationMs}")
-    long jwtRefreshExpirationMs;
+    private long jwtRefreshExpirationMs;
 
 }

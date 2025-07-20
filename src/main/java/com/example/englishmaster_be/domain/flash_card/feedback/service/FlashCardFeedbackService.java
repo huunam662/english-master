@@ -1,23 +1,23 @@
 package com.example.englishmaster_be.domain.flash_card.feedback.service;
 
-import com.example.englishmaster_be.advice.exception.template.ApplicationException;
+import com.example.englishmaster_be.advice.exception.ApplicationException;
 import com.example.englishmaster_be.common.constant.Role;
-import com.example.englishmaster_be.common.dto.request.PageOptionsReq;
+import com.example.englishmaster_be.common.dto.req.PageOptionsReq;
 import com.example.englishmaster_be.domain.flash_card.feedback.dto.req.FlashCardFeedbackReq;
+import com.example.englishmaster_be.domain.flash_card.feedback.dto.view.IFlashCardFeedbackPageView;
 import com.example.englishmaster_be.domain.flash_card.feedback.model.FlashCardFeedbackEntity;
 import com.example.englishmaster_be.domain.flash_card.feedback.repository.FlashCardFeedbackRepository;
-import com.example.englishmaster_be.domain.flash_card.feedback.repository.FlashCardFeedbackSpecRepository;
+import com.example.englishmaster_be.domain.flash_card.feedback.repository.FlashCardFeedbackDslRepository;
 import com.example.englishmaster_be.domain.flash_card.flash_card.model.FlashCardEntity;
 import com.example.englishmaster_be.domain.flash_card.flash_card.service.IFlashCardService;
-import com.example.englishmaster_be.domain.user.model.UserEntity;
-import com.example.englishmaster_be.domain.user.service.IUserService;
-import org.apache.http.client.HttpResponseException;
+import com.example.englishmaster_be.domain.user.user.model.UserEntity;
+import com.example.englishmaster_be.domain.user.user.service.IUserService;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -25,13 +25,13 @@ import java.util.UUID;
 public class FlashCardFeedbackService implements IFlashCardFeedbackService{
 
     private final FlashCardFeedbackRepository flashCardFeedbackRepository;
-    private final FlashCardFeedbackSpecRepository flashCardFeedbackSpecRepository;
+    private final FlashCardFeedbackDslRepository flashCardFeedbackDslRepository;
     private final IFlashCardService flashCardService;
     private final IUserService userService;
 
     @Lazy
-    public FlashCardFeedbackService(FlashCardFeedbackSpecRepository flashCardFeedbackSpecRepository, FlashCardFeedbackRepository flashCardFeedbackRepository, IFlashCardService flashCardService, IUserService userService) {
-        this.flashCardFeedbackSpecRepository = flashCardFeedbackSpecRepository;
+    public FlashCardFeedbackService(FlashCardFeedbackDslRepository flashCardFeedbackDslRepository, FlashCardFeedbackRepository flashCardFeedbackRepository, IFlashCardService flashCardService, IUserService userService) {
+        this.flashCardFeedbackDslRepository = flashCardFeedbackDslRepository;
         this.flashCardFeedbackRepository = flashCardFeedbackRepository;
         this.flashCardService = flashCardService;
         this.userService = userService;
@@ -83,12 +83,13 @@ public class FlashCardFeedbackService implements IFlashCardFeedbackService{
     }
 
     @Override
-    public Page<FlashCardFeedbackEntity> getPageFlashCardFeedback(PageOptionsReq optionsReq) {
-        return flashCardFeedbackSpecRepository.findPageFlashCardFeedback(optionsReq);
+    public Page<IFlashCardFeedbackPageView> getPageFlashCardFeedback(PageOptionsReq optionsReq) {
+        return flashCardFeedbackDslRepository.findPageFlashCardFeedback(optionsReq);
     }
 
     @Override
-    public Page<FlashCardFeedbackEntity> getPageFlashCardFeedbackToFlashCardId(UUID flashCardId, PageOptionsReq optionsReq) {
-        return flashCardFeedbackSpecRepository.findPageFlashCardFeedbackByFlashCardId(flashCardId, optionsReq);
+    public Page<IFlashCardFeedbackPageView> getPageFlashCardFeedbackToFlashCardId(UUID flashCardId, PageOptionsReq optionsReq) {
+        FlashCardEntity flashCard = flashCardService.getSingleFlashCardToId(flashCardId);
+        return flashCardFeedbackDslRepository.findPageFlashCardFeedbackByFlashCard(flashCard, optionsReq);
     }
 }

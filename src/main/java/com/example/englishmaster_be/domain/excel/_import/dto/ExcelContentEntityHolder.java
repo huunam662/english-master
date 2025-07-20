@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.domain.excel._import.dto;
 
-import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
-import com.example.englishmaster_be.domain.part.model.PartEntity;
-import com.example.englishmaster_be.domain.question.model.QuestionEntity;
+import com.example.englishmaster_be.domain.exam.answer.model.AnswerEntity;
+import com.example.englishmaster_be.domain.exam.part.model.PartEntity;
+import com.example.englishmaster_be.domain.exam.question.model.QuestionEntity;
 import lombok.Data;
 import java.util.*;
 

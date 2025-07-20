@@ -24,12 +24,13 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@AllArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class WebSecurityConfig {
 
-    MiddlewareConfig authTokenFilter;
+    private final MiddlewareConfig authTokenFilter;
 
+    public WebSecurityConfig(MiddlewareConfig authTokenFilter) {
+        this.authTokenFilter = authTokenFilter;
+    }
 
     @Bean
     @SneakyThrows

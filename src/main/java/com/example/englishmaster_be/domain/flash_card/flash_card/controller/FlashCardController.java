@@ -1,11 +1,12 @@
 package com.example.englishmaster_be.domain.flash_card.flash_card.controller;
 
 
-import com.example.englishmaster_be.common.dto.request.PageOptionsReq;
-import com.example.englishmaster_be.common.dto.response.PageInfoRes;
-import com.example.englishmaster_be.domain.flash_card.flash_card.dto.request.FlashCardReq;
-import com.example.englishmaster_be.domain.flash_card.flash_card.dto.response.FlashCardRes;
-import com.example.englishmaster_be.domain.flash_card.flash_card.dto.response.FlashCardUserRes;
+import com.example.englishmaster_be.common.dto.req.PageOptionsReq;
+import com.example.englishmaster_be.common.dto.res.PageInfoRes;
+import com.example.englishmaster_be.domain.flash_card.flash_card.dto.req.FlashCardReq;
+import com.example.englishmaster_be.domain.flash_card.flash_card.dto.res.FlashCardFullRes;
+import com.example.englishmaster_be.domain.flash_card.flash_card.dto.res.FlashCardPageRes;
+import com.example.englishmaster_be.domain.flash_card.flash_card.dto.view.IFlashCardPageView;
 import com.example.englishmaster_be.domain.flash_card.flash_card.mapper.FlashCardMapper;
 import com.example.englishmaster_be.domain.flash_card.flash_card.model.FlashCardEntity;
 import com.example.englishmaster_be.domain.flash_card.flash_card.service.IFlashCardService;
@@ -35,7 +36,7 @@ public class FlashCardController {
             description = "Get single flash card to flash card id."
     )
     @GetMapping("/{id}")
-    public FlashCardRes getSingleFlashCardToId(@PathVariable("id") UUID id) {
+    public FlashCardFullRes getSingleFlashCardToId(@PathVariable("id") UUID id) {
         FlashCardEntity flashCard = flashCardService.getSingleFlashCardToId(id);
         return FlashCardMapper.INSTANCE.toFlashCardRes(flashCard);
     }
@@ -45,7 +46,7 @@ public class FlashCardController {
             description = "Get all flash cards."
     )
     @GetMapping
-    public List<FlashCardRes> getAllFlashCards() {
+    public List<FlashCardFullRes> getAllFlashCards() {
         List<FlashCardEntity> list = flashCardService.getAllFlashCards();
         return FlashCardMapper.INSTANCE.toFlashCardResList(list);
     }
@@ -55,12 +56,12 @@ public class FlashCardController {
             description = "Get page flash card."
     )
     @GetMapping("/page")
-    public PageInfoRes<FlashCardUserRes> getPageFlashCard(
+    public PageInfoRes<FlashCardPageRes> getPageFlashCard(
         @ModelAttribute PageOptionsReq pageOptions
     ) {
-        Page<FlashCardEntity> pageFlashCard = flashCardService.getPageFlashCard(pageOptions);
-        List<FlashCardUserRes> flashCardUserResList = FlashCardMapper.INSTANCE.toFlashCardUserResList(pageFlashCard.getContent());
-        Page<FlashCardUserRes> pageFlashCardRes = new PageImpl<>(flashCardUserResList, pageFlashCard.getPageable(), pageFlashCard.getTotalElements());
+        Page<IFlashCardPageView> pageFlashCard = flashCardService.getPageFlashCard(pageOptions);
+        List<FlashCardPageRes> flashCardUserResList = FlashCardMapper.INSTANCE.toFlashCardPageResList(pageFlashCard.getContent());
+        Page<FlashCardPageRes> pageFlashCardRes = new PageImpl<>(flashCardUserResList, pageFlashCard.getPageable(), pageFlashCard.getTotalElements());
         return new PageInfoRes<>(pageFlashCardRes);
     }
 

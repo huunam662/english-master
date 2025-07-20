@@ -10,14 +10,12 @@ import org.springframework.stereotype.Component;
 
 @Getter
 @Component
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class FileValue {
 
-
     @Value("${englishmaster.fileSave}")
-    String fileSave;
+    private String fileSave;
 
     @Value("${englishmaster.linkFileShowImageBE}")
-    String prefixLinkFileShow;
+    private String prefixLinkFileShow;
 
 }

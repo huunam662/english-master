@@ -10,18 +10,17 @@ import org.springframework.stereotype.Component;
 
 @Getter
 @Component
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class CloudinaryValue {
 
 
     @Value("${cloudinary.cloud-name}")
-    String cloudName;
+    private String cloudName;
 
     @Value("${cloudinary.api-key}")
-    String apiKey;
+    private String apiKey;
 
     @Value("${cloudinary.api-secret}")
-    String apiSecret;
+    private String apiSecret;
 
 
 

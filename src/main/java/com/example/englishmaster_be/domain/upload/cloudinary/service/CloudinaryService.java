@@ -2,15 +2,12 @@ package com.example.englishmaster_be.domain.upload.cloudinary.service;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
-import com.example.englishmaster_be.domain.upload.cloudinary.dto.request.CloudinaryOptionsRequest;
-import com.example.englishmaster_be.domain.upload.cloudinary.dto.response.CloudinaryFileResponse;
-import com.example.englishmaster_be.domain.upload.cloudinary.dto.response.CloudinaryPageFileResponse;
-import com.example.englishmaster_be.common.dto.response.FileResponse;
+import com.example.englishmaster_be.domain.upload.cloudinary.dto.req.CloudinaryOptionsReq;
+import com.example.englishmaster_be.domain.upload.cloudinary.dto.res.CloudinaryFileRes;
+import com.example.englishmaster_be.domain.upload.cloudinary.dto.res.CloudinaryPageFileRes;
+import com.example.englishmaster_be.common.dto.res.FileRes;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.context.annotation.Lazy;
@@ -29,33 +26,35 @@ import java.util.stream.Stream;
 
 @Slf4j(topic = "CLOUDINARY-SERVICE")
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Lazy})
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @SuppressWarnings("unchecked")
 public class CloudinaryService implements ICloudinaryService {
 
-	RestTemplate restTemplate;
+	private final RestTemplate restTemplate;
+	private final Cloudinary cloudinary;
 
-	Cloudinary cloudinary;
+	@Lazy
+	public CloudinaryService(RestTemplate restTemplate, Cloudinary cloudinary) {
+		this.restTemplate = restTemplate;
+		this.cloudinary = cloudinary;
+	}
 
 	@SneakyThrows
 	@Override
-	public FileResponse uploadFile(MultipartFile file){
+	public FileRes uploadFile(MultipartFile file){
 
 		Map uploadResultResponse = cloudinary.uploader().upload(file.getBytes(), Map.of());
 
 		String imageUrl = String.valueOf(uploadResultResponse.get("secure_url"));
 //			String fileType = String.valueOf(uploadResultResponse.get("type"));
-
-		return FileResponse.builder()
-				.url(imageUrl)
-				.type(file.getContentType())
-				.build();
+		FileRes fileRes = new FileRes();
+		fileRes.setUrl(imageUrl);
+		fileRes.setType(file.getContentType());
+		return fileRes;
 	}
 
 	@SneakyThrows
 	@Override
-	public FileResponse uploadAudio(MultipartFile file) {
+	public FileRes uploadAudio(MultipartFile file) {
 
 		Map uploadResult = cloudinary.uploader().upload(
 				file.getBytes(),
@@ -65,20 +64,19 @@ public class CloudinaryService implements ICloudinaryService {
 		);
 
 		String audioUrl = String.valueOf(uploadResult.get("secure_url"));
-
-		return FileResponse.builder()
-				.url(audioUrl)
-				.type(file.getContentType())
-				.build();
+		FileRes fileRes = new FileRes();
+		fileRes.setUrl(audioUrl);
+		fileRes.setType(file.getContentType());
+		return fileRes;
 	}
 
 	@Override
-	public List<CloudinaryFileResponse> getFileList() throws Exception {
+	public List<CloudinaryFileRes> getFileList() throws Exception {
 		List<Map<String, Object>> imagesResult = getFileListToType("image", null);
 		List<Map<String, Object>> videosResult = getFileListToType("video", null);
 		List<Map<String, Object>> rawsResult = getFileListToType("raw", null);
 		List<Map<String, Object>> results = Stream.of(imagesResult, videosResult, rawsResult).flatMap(Collection::stream).toList();
-		return results.stream().map(CloudinaryFileResponse::new).toList();
+		return results.stream().map(CloudinaryFileRes::new).toList();
 	}
 
 	private List<Map<String, Object>> getFileListToType(String resourceType, String nextCursor) throws Exception {
@@ -96,7 +94,7 @@ public class CloudinaryService implements ICloudinaryService {
 	}
 
 	@Override
-	public CloudinaryPageFileResponse getPageFile(CloudinaryOptionsRequest params) throws Exception {
+	public CloudinaryPageFileRes getPageFile(CloudinaryOptionsReq params) throws Exception {
 		Map options = ObjectUtils.asMap(
 				"type", "upload",
 				"max_results", params.getSize()
@@ -109,12 +107,12 @@ public class CloudinaryService implements ICloudinaryService {
 		}
 		Map results = cloudinary.api().resources(options);
 
-		return new CloudinaryPageFileResponse(results, params);
+		return new CloudinaryPageFileRes(results, params);
 	}
 
 	@Override
 	public void deleteFileByPublicId(String publicId) throws FileNotFoundException, BadRequestException {
-		CloudinaryFileResponse file = getFileToPublicId(publicId);
+		CloudinaryFileRes file = getFileToPublicId(publicId);
 		try{
 			cloudinary.uploader().destroy(
 					file.getPublicId(),
@@ -129,7 +127,7 @@ public class CloudinaryService implements ICloudinaryService {
 	}
 
 	@Override
-	public CloudinaryFileResponse getFileToPublicId(String publicId) throws FileNotFoundException {
+	public CloudinaryFileRes getFileToPublicId(String publicId) throws FileNotFoundException {
 		Assert.notNull(publicId, "Public id to get file information is required.");
 		List<String> types = List.of("image", "video", "raw");
 		for(String type : types){
@@ -141,7 +139,7 @@ public class CloudinaryService implements ICloudinaryService {
 								"resource_type", type
 						)
 				);
-				return new CloudinaryFileResponse(fileResult);
+				return new CloudinaryFileRes(fileResult);
 			}
 			catch (Exception e){
 				log.error(e.getMessage(), e);
@@ -153,7 +151,7 @@ public class CloudinaryService implements ICloudinaryService {
 	@Override
 	public byte[] getFileByteToPublicId(String publicId, String type, HttpServletResponse response) {
 		try{
-			CloudinaryFileResponse file = getFileToPublicId(publicId);
+			CloudinaryFileRes file = getFileToPublicId(publicId);
 			ResponseEntity<byte[]> responseEntity = restTemplate.exchange(
 					file.getUrl(),
 					HttpMethod.GET,

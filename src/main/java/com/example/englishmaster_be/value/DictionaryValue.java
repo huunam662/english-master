@@ -8,16 +8,15 @@ import org.springframework.stereotype.Component;
 
 @Getter
 @Component
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class DictionaryValue {
 
     @Value("${dictionary.api}")
-    String dictionaryApi;
+    private String dictionaryApi;
 
     @Value("${unsplash.api.key}")
-    String unsplashApiKey;
+    private String unsplashApiKey;
 
     @Value("${dictionary.file.path}")
-    String fileName;
+    private String fileName;
 
 }

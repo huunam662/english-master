@@ -3,14 +3,11 @@ package com.example.englishmaster_be.domain.excel._import.controller;
 import com.example.englishmaster_be.domain.excel._import.dto.res.ExcelPartIdsRes;
 import com.example.englishmaster_be.domain.excel._import.dto.res.ExcelTopicPartIdsRes;
 import com.example.englishmaster_be.domain.excel._import.service.IExcelImportService;
-import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyRes;
+import com.example.englishmaster_be.domain.exam.topic.topic.dto.res.TopicKeyRes;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.experimental.FieldDefaults;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,11 +17,13 @@ import java.util.UUID;
 @Tag(name = "Excel Import")
 @RestController
 @RequestMapping("/excel")
-@RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ExcelImportController {
 
-    IExcelImportService excelService;
+    private final IExcelImportService excelService;
+
+    public ExcelImportController(IExcelImportService excelService) {
+        this.excelService = excelService;
+    }
 
     @PostMapping(value = "/import/topic-information", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @SneakyThrows

@@ -11,28 +11,26 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Getter
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class LinkValue {
 
-
     @Value("${englishmaster.linkFileShowImageBE}")
-    String linkFileShowImageBE;
+    private String linkFileShowImageBE;
 
     @Value("${englishmaster.linkBE}")
-    String linkBE;
+    private String linkBE;
 
     @Value("${englishmaster.linkFE}")
-    String linkFE;
+    private String linkFE;
 
     @Value("${link.fe.mock-test.result.reading-listening}")
-    String linkFeMockTestResultReadingListening;
+    private String linkFeMockTestResultReadingListening;
 
     @Value("${link.fe.mock-test.result.speaking}")
-    String linkFeMockTestResultSpeaking;
+    private String linkFeMockTestResultSpeaking;
 
     @Value("${link.fe.mock-test.result.writing}")
-    String linkFeMockTestResultWriting;
+    private String linkFeMockTestResultWriting;
 
     @Value("${link.fe.show-more-topic}")
-    String linkFeShowMoreTopic;
+    private String linkFeShowMoreTopic;
 }

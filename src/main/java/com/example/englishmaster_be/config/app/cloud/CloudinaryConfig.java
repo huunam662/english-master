@@ -10,11 +10,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor
 public class CloudinaryConfig {
 
-	CloudinaryValue cloudinaryValue;
+	private final CloudinaryValue cloudinaryValue;
+
+	public CloudinaryConfig(CloudinaryValue cloudinaryValue) {
+		this.cloudinaryValue = cloudinaryValue;
+	}
 
 	@Bean
 	public Cloudinary cloudinary() {

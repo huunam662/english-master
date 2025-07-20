@@ -1,24 +1,17 @@
 package com.example.englishmaster_be.domain.dictionary.service;
 
-import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
-import com.example.englishmaster_be.common.constant.error.Error;
-import com.example.englishmaster_be.domain.dictionary.helper.EnglishWordDictionaryHelper;
-import com.example.englishmaster_be.domain.dictionary.dto.response.DictionarySuggestionResponse;
+import com.example.englishmaster_be.advice.exception.ApplicationException;
+import com.example.englishmaster_be.domain.dictionary.dto.res.DictionarySuggestionResponse;
+import com.example.englishmaster_be.domain.dictionary.util.DictionaryUtil;
 import com.example.englishmaster_be.value.DictionaryValue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Set;
@@ -26,19 +19,18 @@ import java.util.stream.Collectors;
 
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Lazy})
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DictionaryService implements IDictionaryService {
 
-    ObjectMapper objectMapper;
+    private final ObjectMapper objectMapper;
+    private final DictionaryValue dictionaryValue;
+    private final RestTemplate restTemplate;
 
-    DictionaryValue dictionaryValue;
-
-    EnglishWordDictionaryHelper englishWordDictionaryHelper;
-
-    RestTemplate restTemplate;
-
-
+    @Lazy
+    public DictionaryService(ObjectMapper objectMapper, DictionaryValue dictionaryValue, RestTemplate restTemplate) {
+        this.objectMapper = objectMapper;
+        this.dictionaryValue = dictionaryValue;
+        this.restTemplate = restTemplate;
+    }
 
     @SneakyThrows
     @Override
@@ -55,18 +47,16 @@ public class DictionaryService implements IDictionaryService {
     }
 
     @Override
-    public DictionarySuggestionResponse getSuggestions(String word) {
+    public DictionarySuggestionResponse getSuggestions(String word) throws IOException {
 
-        Set<String> wordSet = englishWordDictionaryHelper.getWordSet();
+        Set<String> wordSet = DictionaryUtil.loadWordList();
 
         Set<String> newSet = wordSet.stream()
                 .filter(wordSince -> wordSince.startsWith(word))
                 .limit(7)
                 .collect(Collectors.toSet());
 
-        return DictionarySuggestionResponse.builder()
-                .newSet(newSet)
-                .build();
+        return new DictionarySuggestionResponse(newSet);
     }
 
     @SneakyThrows
@@ -90,7 +80,7 @@ public class DictionaryService implements IDictionaryService {
         JsonNode results = jsonResponse.get("results");
 
         if (results == null || results.isEmpty())
-            throw new ErrorHolder(Error.RESOURCE_NOT_FOUND, "The urls is empty or not found");
+            throw new ApplicationException(HttpStatus.NOT_FOUND, "The urls is empty or not found");
 
         JsonNode firstResult = results.get(0);
 

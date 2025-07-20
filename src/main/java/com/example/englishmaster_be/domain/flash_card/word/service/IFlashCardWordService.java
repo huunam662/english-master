@@ -1,8 +1,9 @@
 package com.example.englishmaster_be.domain.flash_card.word.service;
 
-import com.example.englishmaster_be.common.dto.request.PageOptionsReq;
-import com.example.englishmaster_be.domain.flash_card.word.dto.request.FlashCardWordReq;
-import com.example.englishmaster_be.domain.flash_card.word.dto.request.UpdateFlashCardWordReq;
+import com.example.englishmaster_be.common.dto.req.PageOptionsReq;
+import com.example.englishmaster_be.domain.flash_card.word.dto.req.FlashCardWordReq;
+import com.example.englishmaster_be.domain.flash_card.word.dto.req.UpdateFlashCardWordReq;
+import com.example.englishmaster_be.domain.flash_card.word.dto.view.IFlashCardWordPageView;
 import com.example.englishmaster_be.domain.flash_card.word.model.FlashCardWordEntity;
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
@@ -23,7 +24,7 @@ public interface IFlashCardWordService {
 
     List<FlashCardWordEntity> updateAllFlashCardWords(List<UpdateFlashCardWordReq> body);
 
-    FlashCardWordEntity updateImageFlashCardWordToId(UUID id, String imageUrl) throws BadRequestException;
+    FlashCardWordEntity updateImageFlashCardWordToId(UUID id, String imageUrl);
 
     void deleteSingleFlashCardWordToId(UUID id);
 
@@ -31,8 +32,8 @@ public interface IFlashCardWordService {
 
     void deleteAllFlashCardWordsToIds(List<UUID> flashCardWordIds);
 
-    Page<FlashCardWordEntity> getPageFlashCardWord(PageOptionsReq optionsReq);
+    Page<IFlashCardWordPageView> getPageFlashCardWord(PageOptionsReq optionsReq);
 
-    Page<FlashCardWordEntity> getPageFlashCardWordToFlashCardId(UUID flashCardId, PageOptionsReq optionsReq);
+    Page<IFlashCardWordPageView> getPageFlashCardWordToFlashCardId(UUID flashCardId, PageOptionsReq optionsReq);
 
 }

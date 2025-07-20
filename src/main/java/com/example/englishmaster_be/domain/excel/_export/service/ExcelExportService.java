@@ -1,28 +1,24 @@
 package com.example.englishmaster_be.domain.excel._export.service;
 
-import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
+import com.example.englishmaster_be.advice.exception.ApplicationException;
 import com.example.englishmaster_be.common.constant.TopicType;
-import com.example.englishmaster_be.common.constant.error.Error;
-import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
-import com.example.englishmaster_be.domain.answer.repository.jpa.AnswerRepository;
-import com.example.englishmaster_be.domain.part.model.PartEntity;
-import com.example.englishmaster_be.domain.question.model.QuestionEntity;
-import com.example.englishmaster_be.domain.question.repository.jpa.QuestionRepository;
-import com.example.englishmaster_be.domain.topic.model.TopicEntity;
-import com.example.englishmaster_be.domain.topic.repository.TopicRepository;
-import com.example.englishmaster_be.domain.topic.util.TopicUtil;
-import com.example.englishmaster_be.domain.topic_type.model.TopicTypeEntity;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
+import com.example.englishmaster_be.domain.exam.answer.model.AnswerEntity;
+import com.example.englishmaster_be.domain.exam.answer.repository.AnswerRepository;
+import com.example.englishmaster_be.domain.exam.part.model.PartEntity;
+import com.example.englishmaster_be.domain.exam.question.model.QuestionEntity;
+import com.example.englishmaster_be.domain.exam.question.repository.QuestionRepository;
+import com.example.englishmaster_be.domain.exam.topic.topic.model.TopicEntity;
+import com.example.englishmaster_be.domain.exam.topic.topic.repository.TopicRepository;
+import com.example.englishmaster_be.domain.exam.topic.topic.util.TopicUtil;
+import com.example.englishmaster_be.domain.exam.topic.type.model.TopicTypeEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -35,19 +31,23 @@ import java.util.zip.ZipOutputStream;
 
 @Slf4j(topic = "EXCEL-EXPORT-SERVICE")
 @Service
-@RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ExcelExportService implements IExcelExportService{
 
-    AnswerRepository answerRepository;
-    QuestionRepository questionRepository;
-    TopicRepository topicRepository;
+    private final AnswerRepository answerRepository;
+    private final QuestionRepository questionRepository;
+    private final TopicRepository topicRepository;
+
+    public ExcelExportService(AnswerRepository answerRepository, QuestionRepository questionRepository, TopicRepository topicRepository) {
+        this.answerRepository = answerRepository;
+        this.questionRepository = questionRepository;
+        this.topicRepository = topicRepository;
+    }
 
     @Override
     public ByteArrayInputStream exportTopicById(UUID topicId) {
 
         TopicEntity topic = topicRepository.findAllTopicWithJoinParent(topicId)
-                .orElseThrow(() -> new ErrorHolder(Error.RESOURCE_NOT_FOUND));
+                .orElseThrow(() -> new ApplicationException(HttpStatus.NOT_FOUND, "Topic not found."));
 
         ByteArrayOutputStream zipOut = new ByteArrayOutputStream();
         try(ZipOutputStream zipOutputStream = new ZipOutputStream(zipOut)){
@@ -66,7 +66,7 @@ public class ExcelExportService implements IExcelExportService{
             }
         }
         catch (IOException e){
-            throw new ErrorHolder(Error.BAD_REQUEST, e.getMessage(), false);
+            throw new ApplicationException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
         return new ByteArrayInputStream(zipOut.toByteArray());
     }
@@ -102,7 +102,7 @@ public class ExcelExportService implements IExcelExportService{
             }
         }
         catch (IOException e){
-            throw new ErrorHolder(Error.BAD_REQUEST, e.getMessage(), false);
+            throw new ApplicationException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
         return new ByteArrayInputStream(zipOut.toByteArray());
     }
@@ -132,7 +132,7 @@ public class ExcelExportService implements IExcelExportService{
             }
         }
         catch (IOException e){
-            throw new ErrorHolder(Error.BAD_REQUEST, e.getMessage(), false);
+            throw new ApplicationException(HttpStatus.BAD_REQUEST, e.getMessage());
         }
         return new ByteArrayInputStream(zipOut.toByteArray());
     }

@@ -2,24 +2,24 @@ package com.example.englishmaster_be.domain.dictionary.controller;
 
 
 
-import com.example.englishmaster_be.domain.dictionary.dto.response.DictionarySuggestionResponse;
+import com.example.englishmaster_be.domain.dictionary.dto.res.DictionarySuggestionResponse;
 import com.example.englishmaster_be.domain.dictionary.service.IDictionaryService;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
 
 @Tag(name = "Dictionary")
 @RestController
 @RequestMapping("/dictionary")
-@RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class DictionaryController {
 
-    IDictionaryService dictionaryService;
+    private final IDictionaryService dictionaryService;
 
+    public DictionaryController(IDictionaryService dictionaryService) {
+        this.dictionaryService = dictionaryService;
+    }
 
     @GetMapping("/search/{word}")
     public JsonNode searchWords(@PathVariable("word") String word) {
@@ -29,7 +29,7 @@ public class DictionaryController {
 
 
     @GetMapping("/suggest/{word}")
-    public DictionarySuggestionResponse getSuggestions(@PathVariable("word") String word) {
+    public DictionarySuggestionResponse getSuggestions(@PathVariable("word") String word) throws IOException {
 
         return dictionaryService.getSuggestions(word);
     }

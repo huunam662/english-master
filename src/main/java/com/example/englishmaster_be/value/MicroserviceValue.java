@@ -8,40 +8,39 @@ import org.springframework.stereotype.Component;
 
 @Getter
 @Component
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class MicroserviceValue {
 
     @Value("${microservice.news.api-key}")
-    String API_KEY;
+    private String API_KEY;
 
     @Value("${microservice.news.url}")
-    String URL;
+    private String URL;
 
     @Value("${microservice.news.prefix}")
-    String prefix;
+    private String prefix;
 
     @Value("${microservice.news.endpoint.post.create}")
-    String createEndpoint;
+    private String createEndpoint;
 
     @Value("${microservice.news.endpoint.post.get-all}")
-    String getAllEndpoint;
+    private String getAllEndpoint;
 
     @Value("${microservice.news.endpoint.post.get-by-id}")
-    String getByIdEndpoint;
+    private String getByIdEndpoint;
 
     @Value("${microservice.news.endpoint.post.update}")
-    String updateEndpoint;
+    private String updateEndpoint;
 
     @Value("${microservice.news.endpoint.post.get-by-slug}")
-    String getBySlugEndpoint;
+    private String getBySlugEndpoint;
 
     @Value("${microservice.news.endpoint.post.get-by-post-category}")
-    String getByPostCategorySlugEndpoint;
+    private String getByPostCategorySlugEndpoint;
 
     @Value("${microservice.news.endpoint.post.search-post}")
-    String searchEndpoint;
+    private String searchEndpoint;
 
     @Value("${microservice.news.endpoint.post.delete}")
-    String deleteEndpoint;
+    private String deleteEndpoint;
 
 }

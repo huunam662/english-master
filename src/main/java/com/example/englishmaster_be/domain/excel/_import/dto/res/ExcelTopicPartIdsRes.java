@@ -2,14 +2,15 @@ package com.example.englishmaster_be.domain.excel._import.dto.res;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import java.util.UUID;
 
-@Data
 @EqualsAndHashCode(callSuper = true)
-@SuperBuilder
+@Data
+@NoArgsConstructor
 public class ExcelTopicPartIdsRes extends ExcelPartIdsRes {
 
-    UUID topicId;
+    private UUID topicId;
 
 }

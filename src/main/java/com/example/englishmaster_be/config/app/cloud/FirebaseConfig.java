@@ -14,11 +14,13 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.IOException;
 
 @Configuration
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor
 public class FirebaseConfig {
 
-    BucketValue bucketValue;
+    private final BucketValue bucketValue;
+
+    public FirebaseConfig(BucketValue bucketValue) {
+        this.bucketValue = bucketValue;
+    }
 
     @Bean
     public FirebaseApp firebaseInit() throws IOException{

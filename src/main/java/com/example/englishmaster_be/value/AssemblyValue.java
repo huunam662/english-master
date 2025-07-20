@@ -8,15 +8,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Getter
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class AssemblyValue {
 
     @Value("${assembly.api-key}")
-    String apiKey;
+    private String apiKey;
 
     @Value("${assembly.transcribe-audio.endpoint}")
-    String transcribeAudioEndpoint;
+    private String transcribeAudioEndpoint;
 
     @Value("${assembly.transcript.endpoint}")
-    String transcriptEndpoint;
+    private String transcriptEndpoint;
 }

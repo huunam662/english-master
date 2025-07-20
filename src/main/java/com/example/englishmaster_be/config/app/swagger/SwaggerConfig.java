@@ -15,13 +15,13 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor
 public class SwaggerConfig implements WebMvcConfigurer {
 
+    private final AppValue appValue;
 
-    AppValue appValue;
-
+    public SwaggerConfig(AppValue appValue) {
+        this.appValue = appValue;
+    }
 
     @Bean
     public OpenAPI openAPI() {

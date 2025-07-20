@@ -9,13 +9,11 @@ import org.springframework.stereotype.Component;
 
 @Getter
 @Component
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class BucketValue {
 
-
     @Value("${englishmaster.connect.student-nodejs}")
-    String bucketNameStudentNodejs;
+    private String bucketNameStudentNodejs;
 
     @Value("${firebase.adminsdk.path}")
-    String adminSdkPath;
+    private String adminSdkPath;
 }

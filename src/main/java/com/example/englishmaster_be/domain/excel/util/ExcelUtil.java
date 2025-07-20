@@ -1,9 +1,9 @@
 package com.example.englishmaster_be.domain.excel.util;
 
-import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
-import com.example.englishmaster_be.common.constant.error.Error;
-import com.example.englishmaster_be.domain.answer.dto.request.AnswerBasicRequest;
+import com.example.englishmaster_be.advice.exception.ApplicationException;
+import com.example.englishmaster_be.domain.exam.answer.dto.req.AnswerBasicReq;
 import org.apache.poi.ss.usermodel.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ public class ExcelUtil {
         List<Integer> partsScope = List.of(1, 2, 3, 4, 5, 6, 7, 8, 9);
 
         if (!partsScope.contains(partNumber))
-            throw new ErrorHolder(Error.BAD_REQUEST, String.format("Part number must one value in scope [%s]", String.join(", ", partsScope.stream().map(String::valueOf).toList())));
+            throw new ApplicationException(HttpStatus.BAD_REQUEST, String.format("Part number must one value in scope [%s]", String.join(", ", partsScope.stream().map(String::valueOf).toList())));
     }
 
     public static String getStringCellValue(Row row, int cellIndex) {
@@ -60,8 +60,8 @@ public class ExcelUtil {
         return (cell != null) ? (int) cell.getNumericCellValue() : 0;
     }
 
-    public static List<AnswerBasicRequest> processAnswers(String optionA, String optionB, String optionC, String optionD, String result) {
-        List<AnswerBasicRequest> listAnswerDTO = new ArrayList<>();
+    public static List<AnswerBasicReq> processAnswers(String optionA, String optionB, String optionC, String optionD, String result) {
+        List<AnswerBasicReq> listAnswerDTO = new ArrayList<>();
         listAnswerDTO.add(createAnswerDTO(optionA, result));
         listAnswerDTO.add(createAnswerDTO(optionB, result));
         listAnswerDTO.add(createAnswerDTO(optionC, result));
@@ -69,8 +69,8 @@ public class ExcelUtil {
         return listAnswerDTO;
     }
 
-    public static AnswerBasicRequest createAnswerDTO(String option, String result) {
-        AnswerBasicRequest answerDTO = new AnswerBasicRequest();
+    public static AnswerBasicReq createAnswerDTO(String option, String result) {
+        AnswerBasicReq answerDTO = new AnswerBasicReq();
         answerDTO.setAnswerContent(option);
         answerDTO.setCorrectAnswer(option != null && option.equalsIgnoreCase(result));
         return answerDTO;

@@ -17,6 +17,7 @@ public interface FlashCardWordRepository extends JpaRepository<FlashCardWordEnti
         SELECT fw FROM FlashCardWordEntity fw
         INNER JOIN FETCH fw.flashCard
         INNER JOIN FETCH fw.createBy
+        LEFT JOIN FETCH fw.updateBy
         WHERE fw.id = :id
     """)
     Optional<FlashCardWordEntity> findEntityById(@Param("id") UUID id);
@@ -25,6 +26,7 @@ public interface FlashCardWordRepository extends JpaRepository<FlashCardWordEnti
         SELECT fw FROM FlashCardWordEntity fw
         INNER JOIN FETCH fw.flashCard
         INNER JOIN FETCH fw.createBy
+        LEFT JOIN FETCH fw.updateBy
     """)
     List<FlashCardWordEntity> findAllEntity();
 
@@ -32,6 +34,7 @@ public interface FlashCardWordRepository extends JpaRepository<FlashCardWordEnti
         SELECT fw FROM FlashCardWordEntity fw
         INNER JOIN FETCH fw.flashCard fc
         INNER JOIN FETCH fw.createBy cb
+        LEFT JOIN FETCH fw.updateBy
         WHERE fc.id = :flashCardId
     """)
     List<FlashCardWordEntity> findAllEntityByFlashCardId(@Param("flashCardId") UUID flashCardId);

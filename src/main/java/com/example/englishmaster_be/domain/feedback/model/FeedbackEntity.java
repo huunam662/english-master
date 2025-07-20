@@ -6,63 +6,54 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 
 @Entity
-@Table(name = "Feedback")
+@Table(name = "feedback")
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Schema(hidden = true)
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@EntityListeners(AuditingEntityListener.class)
 public class FeedbackEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "id")
-    UUID id;
+    private UUID id;
 
     @Column(name = "name")
-    String name;
+    private String name;
 
     @Column(name = "Content")
-    String content;
+    private String content;
 
     @Column(name = "description")
-    String description;
+    private String description;
 
     @Column(name = "avatar")
-    String avatar;
+    private String avatar;
 
-    Integer star;
+    private Integer star;
 
-    Boolean enable;
+    private Boolean enable;
 
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
     @Column(name = "create_at")
-    LocalDateTime createAt;
+    @CreatedDate
+    private LocalDateTime createAt;
 
     @Temporal(TemporalType.TIMESTAMP)
     @UpdateTimestamp
     @Column(name = "update_at")
-    LocalDateTime updateAt;
+    @LastModifiedDate
+    private LocalDateTime updateAt;
 
-
-
-    @PrePersist
-    void onCreate() {
-        createAt = LocalDateTime.now();
-        updateAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    void onUpdate() {
-        updateAt = LocalDateTime.now();
-    }
 }

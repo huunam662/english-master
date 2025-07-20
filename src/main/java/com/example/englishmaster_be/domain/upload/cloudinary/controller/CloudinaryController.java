@@ -1,11 +1,11 @@
 package com.example.englishmaster_be.domain.upload.cloudinary.controller;
 
 
-import com.example.englishmaster_be.domain.upload.cloudinary.dto.request.CloudinaryOptionsRequest;
-import com.example.englishmaster_be.domain.upload.cloudinary.dto.response.CloudinaryFileResponse;
-import com.example.englishmaster_be.domain.upload.cloudinary.dto.response.CloudinaryPageFileResponse;
+import com.example.englishmaster_be.domain.upload.cloudinary.dto.req.CloudinaryOptionsReq;
+import com.example.englishmaster_be.domain.upload.cloudinary.dto.res.CloudinaryFileRes;
+import com.example.englishmaster_be.domain.upload.cloudinary.dto.res.CloudinaryPageFileRes;
 import com.example.englishmaster_be.domain.upload.cloudinary.service.ICloudinaryService;
-import com.example.englishmaster_be.common.dto.response.FileResponse;
+import com.example.englishmaster_be.common.dto.res.FileRes;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -30,12 +30,12 @@ public class CloudinaryController {
 	ICloudinaryService cloudinaryService;
 
 	@PostMapping(value = "/upload/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public FileResponse uploadImage(@RequestPart("image") MultipartFile file) {
+    public FileRes uploadImage(@RequestPart("image") MultipartFile file) {
 		return cloudinaryService.uploadFile(file);
 	}
 
 	@PostMapping(value = "/upload/audio", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public FileResponse uploadAudio(@RequestPart("audio") MultipartFile file) {
+    public FileRes uploadAudio(@RequestPart("audio") MultipartFile file) {
 		return cloudinaryService.uploadAudio(file);
 	}
 
@@ -50,17 +50,17 @@ public class CloudinaryController {
 	}
 
 	@GetMapping
-	public List<CloudinaryFileResponse> getFileList() throws Exception {
+	public List<CloudinaryFileRes> getFileList() throws Exception {
 		return cloudinaryService.getFileList();
 	}
 
 	@GetMapping("/{publicId}")
-	public CloudinaryFileResponse getSingleFile(@PathVariable String publicId) throws Exception {
+	public CloudinaryFileRes getSingleFile(@PathVariable String publicId) throws Exception {
 		return cloudinaryService.getFileToPublicId(publicId);
 	}
 
 	@GetMapping("/page")
-	public CloudinaryPageFileResponse getPageFile(@ModelAttribute @Valid CloudinaryOptionsRequest params) throws Exception {
+	public CloudinaryPageFileRes getPageFile(@ModelAttribute @Valid CloudinaryOptionsReq params) throws Exception {
 		return cloudinaryService.getPageFile(params);
 	}
 

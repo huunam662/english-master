@@ -17,11 +17,13 @@ import java.util.UUID;
 @Tag(name = "Excel Export")
 @RestController
 @RequestMapping("/excel/export")
-@RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class ExcelExportController {
 
-    IExcelExportService excelExportService;
+    private final IExcelExportService excelExportService;
+
+    public ExcelExportController(IExcelExportService excelExportService) {
+        this.excelExportService = excelExportService;
+    }
 
     @GetMapping("/topic/type")
     @PreAuthorize("hasRole('ADMIN')")

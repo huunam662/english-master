@@ -1,11 +1,13 @@
 package com.example.englishmaster_be.domain.flash_card.feedback.mapper;
 
-import com.example.englishmaster_be.domain.flash_card.feedback.dto.res.FlashCardFeedbackFbRes;
-import com.example.englishmaster_be.domain.flash_card.feedback.dto.res.FlashCardFeedbackRes;
+import com.example.englishmaster_be.domain.flash_card.feedback.dto.res.FlashCardFeedbackFullRes;
+import com.example.englishmaster_be.domain.flash_card.feedback.dto.res.FlashCardFeedbackPageRes;
+import com.example.englishmaster_be.domain.flash_card.feedback.dto.view.IFlashCardFeedbackPageView;
 import com.example.englishmaster_be.domain.flash_card.feedback.model.FlashCardFeedbackEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
 
+import java.util.Collection;
 import java.util.List;
 
 @Mapper
@@ -13,12 +15,12 @@ public interface FlashCardFeedbackMapper {
 
     FlashCardFeedbackMapper INSTANCE = Mappers.getMapper(FlashCardFeedbackMapper.class);
 
-    FlashCardFeedbackRes toFlashCardFeedbackRes(FlashCardFeedbackEntity flashCardFeedback);
+    FlashCardFeedbackFullRes toFlashCardFeedbackFullRes(FlashCardFeedbackEntity flashCardFeedback);
 
-    List<FlashCardFeedbackRes> toFlashCardFeedbackResList(List<FlashCardFeedbackEntity> flashCardFeedbacks);
+    List<FlashCardFeedbackFullRes> toFlashCardFeedbackFullResList(Collection<FlashCardFeedbackEntity> flashCardFeedbacks);
 
-    FlashCardFeedbackFbRes toFlashCardFeedbackFbRes(FlashCardFeedbackEntity flashCardFeedback);
+    FlashCardFeedbackPageRes toFlashCardFeedbackPageRes(IFlashCardFeedbackPageView flashCardFeedbackPageView);
 
-    List<FlashCardFeedbackFbRes> toFlashCardFeedbackFbResList(List<FlashCardFeedbackEntity> flashCardFeedbacks);
+    List<FlashCardFeedbackPageRes> toFlashCardFeedbackPageResList(Collection<IFlashCardFeedbackPageView> flashCardFeedbackPageViews);
 
 }

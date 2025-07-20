@@ -1,7 +1,8 @@
 package com.example.englishmaster_be.domain.flash_card.flash_card.service;
 
-import com.example.englishmaster_be.common.dto.request.PageOptionsReq;
-import com.example.englishmaster_be.domain.flash_card.flash_card.dto.request.FlashCardReq;
+import com.example.englishmaster_be.common.dto.req.PageOptionsReq;
+import com.example.englishmaster_be.domain.flash_card.flash_card.dto.req.FlashCardReq;
+import com.example.englishmaster_be.domain.flash_card.flash_card.dto.view.IFlashCardPageView;
 import com.example.englishmaster_be.domain.flash_card.flash_card.model.FlashCardEntity;
 import org.springframework.data.domain.Page;
 import java.util.List;
@@ -13,7 +14,7 @@ public interface IFlashCardService {
 
     List<FlashCardEntity> getAllFlashCards();
 
-    Page<FlashCardEntity> getPageFlashCard(PageOptionsReq pageOptions);
+    Page<IFlashCardPageView> getPageFlashCard(PageOptionsReq pageOptions);
 
     FlashCardEntity createFlashCard(FlashCardReq flashCardReq);
 

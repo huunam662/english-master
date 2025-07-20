@@ -8,14 +8,13 @@ import lombok.SneakyThrows;
 import lombok.experimental.FieldDefaults;
 import java.lang.reflect.Field;
 
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class PasswordValidator implements ConstraintValidator<PasswordMatch, Object> {
 
-    String passwordFieldName;
+    private String passwordFieldName;
 
-    String confirmPasswordFieldName;
+    private String confirmPasswordFieldName;
 
-    String message;
+    private String message;
 
 
     @Override

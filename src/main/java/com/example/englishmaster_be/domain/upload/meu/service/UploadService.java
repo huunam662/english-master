@@ -1,16 +1,12 @@
 package com.example.englishmaster_be.domain.upload.meu.service;
 
-import com.example.englishmaster_be.domain.upload.meu.request.FileDeleteRequest;
-import com.example.englishmaster_be.common.dto.response.FileResponse;
-import com.example.englishmaster_be.advice.exception.template.ErrorHolder;
-import com.example.englishmaster_be.common.constant.error.Error;
+import com.example.englishmaster_be.advice.exception.ApplicationException;
+import com.example.englishmaster_be.domain.upload.meu.dto.req.FileDeleteReq;
+import com.example.englishmaster_be.common.dto.res.FileRes;
 import com.example.englishmaster_be.value.UploadValue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.*;
@@ -26,14 +22,16 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Lazy})
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class UploadService implements IUploadService {
 
-    RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
+    private final UploadValue uploadValue;
 
-    UploadValue uploadValue;
-
+    @Lazy
+    public UploadService(RestTemplate restTemplate, UploadValue uploadValue) {
+        this.restTemplate = restTemplate;
+        this.uploadValue = uploadValue;
+    }
 
     private ResponseEntity<String> sendHttpRequest(String url, HttpMethod method, HttpHeaders headers, Object body) {
         HttpEntity<?> entity = new HttpEntity<>(body, headers);
@@ -49,22 +47,22 @@ public class UploadService implements IUploadService {
 
     @Transactional
     @Override
-    public FileResponse upload(MultipartFile file, String dir, boolean isPrivateFile, UUID topicId, String code) {
+    public FileRes upload(MultipartFile file, String dir, boolean isPrivateFile, UUID topicId, String code) {
 
-        FileResponse fileResponse = upload(file, dir, isPrivateFile);
+        FileRes fileResponse = upload(file, dir, isPrivateFile);
 
         return fileResponse;
     }
 
     @SneakyThrows
     @Override
-    public FileResponse upload(MultipartFile file, String dir, boolean isPrivateFile) {
+    public FileRes upload(MultipartFile file, String dir, boolean isPrivateFile) {
 
         if (file == null || file.isEmpty())
-            throw new ErrorHolder(Error.BAD_REQUEST, "File is null or empty");
+            throw new ApplicationException(HttpStatus.BAD_REQUEST, "File is null or empty");
 
         if (file.getContentType() == null)
-            throw new ErrorHolder(Error.BAD_REQUEST , "Invalid file storage type");
+            throw new ApplicationException(HttpStatus.BAD_REQUEST , "Invalid file storage type");
 
         MultipartBodyBuilder builder = new MultipartBodyBuilder();
         HttpHeaders headers = createHttpHeaders(MediaType.MULTIPART_FORM_DATA);
@@ -100,15 +98,14 @@ public class UploadService implements IUploadService {
             throw new RuntimeException("Upload failed");
 
         String typeFile = responseData.path("mimetype").asText(null);
-
-        return FileResponse.builder()
-                .url(url)
-                .type(typeFile)
-                .build();
+        FileRes fileRes = new FileRes();
+        fileRes.setUrl(url);
+        fileRes.setType(typeFile);
+        return fileRes;
     }
 
     @Override
-    public FileResponse upload(MultipartFile file) {
+    public FileRes upload(MultipartFile file) {
 
         String dir = "/";
 
@@ -120,7 +117,7 @@ public class UploadService implements IUploadService {
 
     @Transactional
     @Override
-    public void delete(FileDeleteRequest dto) {
+    public void delete(FileDeleteReq dto) {
 
         String path = extractPathFromFilepath(dto.getFilepath());
 

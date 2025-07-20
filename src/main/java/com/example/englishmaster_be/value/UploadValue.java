@@ -8,16 +8,15 @@ import org.springframework.stereotype.Component;
 
 @Getter
 @Component
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class UploadValue {
 
     @Value("${upload.server.api.upload}")
-    String uploadApiUrl;
+    private String uploadApiUrl;
 
     @Value("${upload.server.token}")
-    String token;
+    private String token;
 
     @Value("${upload.server.api.delete}")
-    String deleteApiUrl;
+    private String deleteApiUrl;
 
 }

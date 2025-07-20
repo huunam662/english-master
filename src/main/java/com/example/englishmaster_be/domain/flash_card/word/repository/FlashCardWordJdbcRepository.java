@@ -1,8 +1,8 @@
 package com.example.englishmaster_be.domain.flash_card.word.repository;
 
 import com.example.englishmaster_be.domain.flash_card.word.model.FlashCardWordEntity;
-import com.example.englishmaster_be.domain.user.model.UserEntity;
-import com.example.englishmaster_be.domain.user.service.IUserService;
+import com.example.englishmaster_be.domain.user.user.model.UserEntity;
+import com.example.englishmaster_be.domain.user.user.service.IUserService;
 import com.example.englishmaster_be.value.AppValue;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;

@@ -1,10 +1,13 @@
 package com.example.englishmaster_be.domain.flash_card.feedback.model;
 
 import com.example.englishmaster_be.domain.flash_card.flash_card.model.FlashCardEntity;
-import com.example.englishmaster_be.domain.user.model.UserEntity;
+import com.example.englishmaster_be.domain.user.user.model.UserEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -15,7 +18,9 @@ import java.util.UUID;
 
 @Table(name = "flash_card_feedback")
 @Entity
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
 @Schema(hidden = true)
 @EntityListeners(AuditingEntityListener.class)
 public class FlashCardFeedbackEntity {

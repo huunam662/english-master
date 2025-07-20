@@ -1,8 +1,10 @@
 package com.example.englishmaster_be.domain.feedback.mapper;
 
-import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackRequest;
+import com.example.englishmaster_be.domain.feedback.dto.req.FeedbackReq;
+import com.example.englishmaster_be.domain.feedback.dto.res.FeedbackPageRes;
+import com.example.englishmaster_be.domain.feedback.dto.view.IFeedbackPageView;
 import com.example.englishmaster_be.domain.feedback.model.FeedbackEntity;
-import com.example.englishmaster_be.domain.feedback.dto.response.FeedbackResponse;
+import com.example.englishmaster_be.domain.feedback.dto.res.FeedbackRes;
 import org.mapstruct.Builder;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -18,14 +20,17 @@ public interface FeedbackMapper {
     FeedbackMapper INSTANCE = Mappers.getMapper(FeedbackMapper.class);
 
     @Mapping(target = "feedbackId", source = "id")
-    FeedbackResponse toFeedbackResponse(FeedbackEntity feedback);
+    FeedbackRes toFeedbackResponse(FeedbackEntity feedback);
 
-    List<FeedbackResponse> toFeedbackResponseList(Collection<FeedbackEntity> feedbackList);
-
-    @Mapping(target = "id", ignore = true)
-    FeedbackEntity toFeedbackEntity(FeedbackRequest feedbackRequest);
+    List<FeedbackRes> toFeedbackResponseList(Collection<FeedbackEntity> feedbackList);
 
     @Mapping(target = "id", ignore = true)
-    void flowToFeedbackEntity(FeedbackRequest feedbackRequest, @MappingTarget FeedbackEntity feedback);
+    FeedbackEntity toFeedbackEntity(FeedbackReq feedbackRequest);
 
+    @Mapping(target = "id", ignore = true)
+    void flowToFeedbackEntity(FeedbackReq feedbackRequest, @MappingTarget FeedbackEntity feedback);
+
+    FeedbackPageRes toFeedbackPageRes(IFeedbackPageView feedbackPageView);
+
+    List<FeedbackPageRes> toFeedbackPageResList(Collection<IFeedbackPageView> feedbackPageViewList);
 }

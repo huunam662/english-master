@@ -1,36 +1,26 @@
 package com.example.englishmaster_be.config.web;
 
-import com.example.englishmaster_be.common.constant.speaking_test.LevelSpeakerType;
-import com.example.englishmaster_be.common.constant.TopicType;
-import com.example.englishmaster_be.common.constant.sort.FlashCardSortBy;
-import com.example.englishmaster_be.common.constant.sort.PackTypeSortBy;
-import com.example.englishmaster_be.common.constant.sort.TopicSortBy;
 import com.example.englishmaster_be.config.interceptor.InterceptorConfig;
 import com.example.englishmaster_be.value.AppValue;
-import lombok.AccessLevel;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.convert.converter.Converter;
-import org.springframework.format.FormatterRegistry;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.PathMatchConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
 import java.util.List;
 import java.util.stream.Stream;
 
 @Configuration
-@RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    AppValue appValue;
+    private final AppValue appValue;
 
-    InterceptorConfig globalInterceptorHandler;
+    private final InterceptorConfig globalInterceptorHandler;
 
+    public WebMvcConfig(AppValue appValue, InterceptorConfig globalInterceptorHandler) {
+        this.appValue = appValue;
+        this.globalInterceptorHandler = globalInterceptorHandler;
+    }
 
     @Override
     public void configurePathMatch(PathMatchConfigurer configurer) {
@@ -65,52 +55,5 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .excludePathPatterns(
                         pathMerge
                 );
-    }
-
-    @Override
-    public void addFormatters(FormatterRegistry registry) {
-
-        registry.addConverter(new Converter<String, PackTypeSortBy>() {
-            @Override
-            @NonNull
-            public PackTypeSortBy convert(@NonNull String source) {
-
-                return PackTypeSortBy.fromValue(source);
-            }
-
-        });
-
-        registry.addConverter(new Converter<String, TopicSortBy>() {
-            @Override
-            @NonNull
-            public TopicSortBy convert(@NonNull String source) {
-
-                return TopicSortBy.fromCode(source);
-            }
-        });
-
-        registry.addConverter(new Converter<String, TopicType>() {
-            @Override
-            @NonNull
-            public TopicType convert(@NonNull String source) {
-                return TopicType.fromType(source);
-            }
-        });
-
-        registry.addConverter(new Converter<String, FlashCardSortBy>() {
-            @Override
-            @NonNull
-            public FlashCardSortBy convert(@NonNull String source) {
-                return FlashCardSortBy.fromValue(source);
-            }
-        });
-
-        registry.addConverter(new Converter<String, LevelSpeakerType>() {
-            @Override
-            @NonNull
-            public LevelSpeakerType convert(@NonNull String source) {
-                return LevelSpeakerType.fromLevel(source);
-            }
-        });
     }
 }

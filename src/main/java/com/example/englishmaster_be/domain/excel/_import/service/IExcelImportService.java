@@ -2,7 +2,7 @@ package com.example.englishmaster_be.domain.excel._import.service;
 
 import com.example.englishmaster_be.domain.excel._import.dto.res.ExcelPartIdsRes;
 import com.example.englishmaster_be.domain.excel._import.dto.res.ExcelTopicPartIdsRes;
-import com.example.englishmaster_be.domain.topic.dto.response.TopicKeyRes;
+import com.example.englishmaster_be.domain.exam.topic.topic.dto.res.TopicKeyRes;
 import org.apache.coyote.BadRequestException;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;

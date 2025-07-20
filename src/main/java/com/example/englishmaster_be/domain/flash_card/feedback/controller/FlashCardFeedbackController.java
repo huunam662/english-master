@@ -1,19 +1,17 @@
 package com.example.englishmaster_be.domain.flash_card.feedback.controller;
 
-import com.example.englishmaster_be.common.dto.request.PageOptionsReq;
-import com.example.englishmaster_be.common.dto.response.PageInfoRes;
+import com.example.englishmaster_be.common.dto.req.PageOptionsReq;
+import com.example.englishmaster_be.common.dto.res.PageInfoRes;
 import com.example.englishmaster_be.domain.flash_card.feedback.dto.req.FlashCardFeedbackReq;
-import com.example.englishmaster_be.domain.flash_card.feedback.dto.res.FlashCardFeedbackFbRes;
-import com.example.englishmaster_be.domain.flash_card.feedback.dto.res.FlashCardFeedbackRes;
+import com.example.englishmaster_be.domain.flash_card.feedback.dto.res.FlashCardFeedbackFullRes;
+import com.example.englishmaster_be.domain.flash_card.feedback.dto.res.FlashCardFeedbackPageRes;
+import com.example.englishmaster_be.domain.flash_card.feedback.dto.view.IFlashCardFeedbackPageView;
 import com.example.englishmaster_be.domain.flash_card.feedback.mapper.FlashCardFeedbackMapper;
 import com.example.englishmaster_be.domain.flash_card.feedback.model.FlashCardFeedbackEntity;
 import com.example.englishmaster_be.domain.flash_card.feedback.service.IFlashCardFeedbackService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.web.bind.annotation.*;
@@ -36,9 +34,9 @@ public class FlashCardFeedbackController {
             summary = "Get single flash card feedback to id.",
             description = "Get single flash card feedback to id."
     )
-    public FlashCardFeedbackFbRes getSingleFlashCardFeedback(@PathVariable("flashCardFeedbackId") UUID id) {
+    public FlashCardFeedbackFullRes getSingleFlashCardFeedback(@PathVariable("flashCardFeedbackId") UUID id) {
         FlashCardFeedbackEntity flashCardFeedback = flashCardFeedbackService.getSingleFlashCardFeedback(id);
-        return FlashCardFeedbackMapper.INSTANCE.toFlashCardFeedbackFbRes(flashCardFeedback);
+        return FlashCardFeedbackMapper.INSTANCE.toFlashCardFeedbackFullRes(flashCardFeedback);
     }
 
     @GetMapping
@@ -46,9 +44,9 @@ public class FlashCardFeedbackController {
             summary = "Get All flash card feedback.",
             description = "Get All flash card feedback."
     )
-    public List<FlashCardFeedbackFbRes> getListFlashCardFeedback() {
+    public List<FlashCardFeedbackFullRes> getListFlashCardFeedback() {
         List<FlashCardFeedbackEntity> flashCardFeedbacks = flashCardFeedbackService.getListFlashCardFeedback();
-        return FlashCardFeedbackMapper.INSTANCE.toFlashCardFeedbackFbResList(flashCardFeedbacks);
+        return FlashCardFeedbackMapper.INSTANCE.toFlashCardFeedbackFullResList(flashCardFeedbacks);
     }
 
     @PostMapping("/flash-card/{flashCardId}")
@@ -91,25 +89,25 @@ public class FlashCardFeedbackController {
             summary = "Get page flash card feedback.",
             description = "Get page flash card feedback."
     )
-    public PageInfoRes<FlashCardFeedbackFbRes> getPageFlashCardFeedback(@ModelAttribute @Valid PageOptionsReq optionsReq){
-        Page<FlashCardFeedbackEntity> pageFlashCard = flashCardFeedbackService.getPageFlashCardFeedback(optionsReq);
-        List<FlashCardFeedbackFbRes> flashCardFeedbackResDtos = FlashCardFeedbackMapper.INSTANCE.toFlashCardFeedbackFbResList(pageFlashCard.getContent());
-        Page<FlashCardFeedbackFbRes> pageFlashCardFeedbackRes = new PageImpl<>(flashCardFeedbackResDtos, pageFlashCard.getPageable(), pageFlashCard.getTotalElements());
+    public PageInfoRes<FlashCardFeedbackPageRes> getPageFlashCardFeedback(@ModelAttribute @Valid PageOptionsReq optionsReq){
+        Page<IFlashCardFeedbackPageView> pageFlashCard = flashCardFeedbackService.getPageFlashCardFeedback(optionsReq);
+        List<FlashCardFeedbackPageRes> flashCardFeedbackResDtos = FlashCardFeedbackMapper.INSTANCE.toFlashCardFeedbackPageResList(pageFlashCard.getContent());
+        Page<FlashCardFeedbackPageRes> pageFlashCardFeedbackRes = new PageImpl<>(flashCardFeedbackResDtos, pageFlashCard.getPageable(), pageFlashCard.getTotalElements());
         return new PageInfoRes<>(pageFlashCardFeedbackRes);
     }
 
-    @GetMapping("/page/{flashCardId}")
+    @GetMapping("/flash-card/{flashCardId}/page")
     @Operation(
             summary = "Get page flash card feedback to flash card id.",
             description = "Get page flash card feedback to flash card id."
     )
-    public PageInfoRes<FlashCardFeedbackRes> getPageFlashCardFeedbackToFlashCardId(
+    public PageInfoRes<FlashCardFeedbackPageRes> getPageFlashCardFeedbackToFlashCardId(
             @PathVariable("flashCardId") UUID flashCardId,
             @ModelAttribute @Valid PageOptionsReq optionsReq
     ){
-        Page<FlashCardFeedbackEntity> pageFlashCard = flashCardFeedbackService.getPageFlashCardFeedbackToFlashCardId(flashCardId, optionsReq);
-        List<FlashCardFeedbackRes> flashCardFeedbackResDtos = FlashCardFeedbackMapper.INSTANCE.toFlashCardFeedbackResList(pageFlashCard.getContent());
-        Page<FlashCardFeedbackRes> pageFlashCardFeedbackFbRes = new PageImpl<>(flashCardFeedbackResDtos, pageFlashCard.getPageable(), pageFlashCard.getTotalElements());
+        Page<IFlashCardFeedbackPageView> pageFlashCard = flashCardFeedbackService.getPageFlashCardFeedbackToFlashCardId(flashCardId, optionsReq);
+        List<FlashCardFeedbackPageRes> flashCardFeedbackResDtos = FlashCardFeedbackMapper.INSTANCE.toFlashCardFeedbackPageResList(pageFlashCard.getContent());
+        Page<FlashCardFeedbackPageRes> pageFlashCardFeedbackFbRes = new PageImpl<>(flashCardFeedbackResDtos, pageFlashCard.getPageable(), pageFlashCard.getTotalElements());
         return new PageInfoRes<>(pageFlashCardFeedbackFbRes);
     }
 }

@@ -1,0 +1,156 @@
+package com.example.englishmaster_be.domain.exam.topic.topic.repository;
+
+import com.example.englishmaster_be.domain.exam.topic.topic.model.TopicEntity;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.sql.Time;
+import java.time.LocalTime;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+@Repository
+public class TopicJdbcRepository {
+
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+    @Lazy
+    public TopicJdbcRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+    }
+
+    @Transactional
+    public void insertTopic(TopicEntity topic) {
+
+        if(topic == null) return;
+
+        String sql = """
+                    INSERT INTO topics(
+                        id, topic_name, topic_description, create_at, update_at, enable,
+                        create_by, update_by, topic_image, topic_audio, work_time, number_question,
+                        pack_id, topic_type_id
+                    )
+                    VALUES(
+                        :id, :topicName, :topicDescription, now(), now(), :enable,
+                        :createBy, :updateBy, :topicImage, :topicAudio, :workTime, :numberQuestion,
+                        :packId, :topicTypeId
+                    )
+                    """;
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("id", topic.getTopicId())
+                .addValue("topicName", topic.getTopicName())
+                .addValue("topicDescription", topic.getTopicDescription())
+                .addValue("enable", topic.getEnable())
+                .addValue("createBy", topic.getUserCreate().getUserId())
+                .addValue("updateBy", topic.getUserCreate().getUserId())
+                .addValue("topicImage", topic.getTopicImage())
+                .addValue("topicAudio", topic.getTopicAudio())
+                .addValue("workTime", Time.valueOf(topic.getWorkTime()))
+                .addValue("numberQuestion", topic.getNumberQuestion())
+                .addValue("packId", topic.getPack() != null ? topic.getPack().getPackId() : topic.getPackId())
+                .addValue("topicTypeId", topic.getTopicType() != null ? topic.getTopicType().getTopicTypeId() : topic.getTopicTypeId());
+
+        namedParameterJdbcTemplate.update(sql, params);
+    }
+
+    @Transactional
+    public void updateTopicNumberQuestion(Map<UUID, Integer> topicNumberQuestion){
+
+        if(topicNumberQuestion == null || topicNumberQuestion.isEmpty()) return;
+
+        String sql = """
+                UPDATE topics
+                SET number_question = :numberQuestion
+                WHERE id = :id
+                """;
+
+        List<MapSqlParameterSource> params = topicNumberQuestion.entrySet().stream().map(
+                elm -> new MapSqlParameterSource()
+                        .addValue("id", elm.getKey())
+                        .addValue("numberQuestion", elm.getValue())
+        ).toList();
+
+        namedParameterJdbcTemplate.batchUpdate(sql, params.toArray(MapSqlParameterSource[]::new));
+    }
+
+    @Transactional
+    public void updateTopicImage(UUID topicId, String imageUrl){
+        if(topicId == null) return;
+        if(imageUrl == null || imageUrl.isEmpty()) return;
+
+        String sql = """
+                UPDATE topics
+                SET topic_image = :imageUrl
+                WHERE id = :id
+                """;
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("id", topicId)
+                .addValue("imageUrl", imageUrl);
+
+        namedParameterJdbcTemplate.update(sql, params);
+    }
+
+    @Transactional
+    public void updateTopicAudio(UUID topicId, String audioUrl){
+        if(topicId == null) return;
+        if(audioUrl == null || audioUrl.isEmpty()) return;
+
+        String sql = """
+                UPDATE topics
+                SET topic_audio = :audioUrl
+                WHERE id = :id
+                """;
+
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("id", topicId)
+                .addValue("audioUrl", audioUrl);
+
+        namedParameterJdbcTemplate.update(sql, params);
+    }
+
+    @Transactional
+    public void updateTopic(
+            UUID topicId,
+            UUID packId,
+            UUID topicTypeId,
+            UUID userUpdateId,
+            String topicName,
+            String topicImage,
+            String topicAudio,
+            String topicDescription,
+            LocalTime workTime
+    ){
+        if(topicId == null || packId == null || topicTypeId == null || userUpdateId == null) return;
+        String sql = """
+                UPDATE topics
+                SET pack_id = :packId,
+                    topic_type_id = :topicTypeId,
+                    update_by = :userUpdateId,
+                    update_at = now(),
+                    topic_name = :topicName,
+                    topic_description = :topicDescription,
+                    topic_image = :topicImage,
+                    topic_audio = :topicAudio,
+                    work_time = :workTime
+                WHERE id = :topicId
+                """;
+        MapSqlParameterSource params = new MapSqlParameterSource()
+                .addValue("topicId", topicId)
+                .addValue("packId", packId)
+                .addValue("topicTypeId", topicTypeId)
+                .addValue("userUpdateId", userUpdateId)
+                .addValue("topicName", topicName)
+                .addValue("topicImage", topicImage)
+                .addValue("topicAudio", topicAudio)
+                .addValue("topicDescription", topicDescription)
+                .addValue("workTime", Time.valueOf(workTime));
+        namedParameterJdbcTemplate.update(sql, params);
+    }
+
+}

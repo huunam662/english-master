@@ -1,46 +1,41 @@
 package com.example.englishmaster_be.domain.excel._import.dto.res;
 
 import com.example.englishmaster_be.common.constant.QuestionType;
-import com.example.englishmaster_be.domain.answer.dto.response.AnswerResponse;
+import com.example.englishmaster_be.domain.exam.answer.dto.res.AnswerRes;
 import lombok.*;
-import lombok.experimental.FieldDefaults;
 
 import java.util.List;
 import java.util.UUID;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@FieldDefaults(level = AccessLevel.PRIVATE)
 public class ExcelQuestionRes {
 
-    UUID questionId;
+    private UUID questionId;
 
-    UUID partId;
+    private UUID partId;
 
-    UUID topicId;
+    private UUID topicId;
 
-    String questionContent;
+    private String questionContent;
 
-    String questionResult;
+    private String questionResult;
 
-    String questionExplainEn;
+    private String questionExplainEn;
 
-    String questionExplainVn;
+    private String questionExplainVn;
 
-    String contentAudio;
+    private String contentAudio;
 
-    String contentImage;
+    private String contentImage;
 
-    Integer questionScore;
+    private Integer questionScore;
 
-    Boolean isQuestionParent;
+    private Boolean isQuestionParent;
 
-    QuestionType questionType;
+    private QuestionType questionType;
 
-    List<AnswerResponse> answers;
+    private List<AnswerRes> answers;
 
-    List<ExcelQuestionRes> questionsChildren;
+    private List<ExcelQuestionRes> questionsChildren;
 }

@@ -2,24 +2,21 @@ package com.example.englishmaster_be.scheduled;
 
 import com.example.englishmaster_be.common.constant.InvalidTokenType;
 import com.example.englishmaster_be.common.constant.SessionActiveType;
-import com.example.englishmaster_be.domain.auth.model.InvalidTokenEntity;
-import com.example.englishmaster_be.domain.auth.model.QInvalidTokenEntity;
-import com.example.englishmaster_be.domain.auth.model.QSessionActiveEntity;
-import com.example.englishmaster_be.domain.auth.model.SessionActiveEntity;
-import com.example.englishmaster_be.domain.user.model.QUserEntity;
-import com.example.englishmaster_be.domain.user.model.UserEntity;
-import com.example.englishmaster_be.domain.auth.repository.jpa.SessionActiveRepository;
-import com.example.englishmaster_be.domain.auth.repository.jpa.InvalidTokenRepository;
-import com.example.englishmaster_be.domain.user.repository.jpa.UserRepository;
-import com.example.englishmaster_be.domain.auth.service.invalid_token.IInvalidTokenService;
+import com.example.englishmaster_be.domain.user.auth.model.InvalidTokenEntity;
+import com.example.englishmaster_be.domain.user.auth.model.QInvalidTokenEntity;
+import com.example.englishmaster_be.domain.user.auth.model.QSessionActiveEntity;
+import com.example.englishmaster_be.domain.user.auth.model.SessionActiveEntity;
+import com.example.englishmaster_be.domain.user.user.model.QUserEntity;
+import com.example.englishmaster_be.domain.user.user.model.UserEntity;
+import com.example.englishmaster_be.domain.user.auth.repository.SessionActiveRepository;
+import com.example.englishmaster_be.domain.user.auth.repository.InvalidTokenRepository;
+import com.example.englishmaster_be.domain.user.user.repository.UserRepository;
+import com.example.englishmaster_be.domain.user.auth.service.invalid_token.IInvalidTokenService;
 import com.example.englishmaster_be.value.JwtValue;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.transaction.Transactional;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -33,22 +30,28 @@ import java.util.List;
 @Slf4j
 @EnableScheduling
 @Component
-@RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class TaskScheduled {
 
-    JwtValue jwtValue;
+    private final JwtValue jwtValue;
 
-    JPAQueryFactory queryFactory;
+    private final JPAQueryFactory queryFactory;
 
-    IInvalidTokenService invalidTokenService;
+    private final IInvalidTokenService invalidTokenService;
 
-    UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    InvalidTokenRepository invalidTokenRepository;
+    private final InvalidTokenRepository invalidTokenRepository;
 
-    SessionActiveRepository sessionActiveRepository;
+    private final SessionActiveRepository sessionActiveRepository;
 
+    public TaskScheduled(JwtValue jwtValue, JPAQueryFactory queryFactory, IInvalidTokenService invalidTokenService, UserRepository userRepository, InvalidTokenRepository invalidTokenRepository, SessionActiveRepository sessionActiveRepository) {
+        this.jwtValue = jwtValue;
+        this.queryFactory = queryFactory;
+        this.invalidTokenService = invalidTokenService;
+        this.userRepository = userRepository;
+        this.invalidTokenRepository = invalidTokenRepository;
+        this.sessionActiveRepository = sessionActiveRepository;
+    }
 
     @Transactional
     @Scheduled(cron = "0 0 3 * * ?") // Run at 3 AM every day

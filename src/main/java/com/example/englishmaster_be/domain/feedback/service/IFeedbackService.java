@@ -1,9 +1,10 @@
 package com.example.englishmaster_be.domain.feedback.service;
 
-import com.example.englishmaster_be.common.dto.response.FilterResponse;
-import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackRequest;
-import com.example.englishmaster_be.domain.feedback.dto.request.FeedbackFilterRequest;
+import com.example.englishmaster_be.common.dto.req.PageOptionsReq;
+import com.example.englishmaster_be.domain.feedback.dto.req.FeedbackReq;
+import com.example.englishmaster_be.domain.feedback.dto.view.IFeedbackPageView;
 import com.example.englishmaster_be.domain.feedback.model.FeedbackEntity;
+import org.springframework.data.domain.Page;
 
 import java.util.UUID;
 
@@ -11,11 +12,10 @@ public interface IFeedbackService {
 
     FeedbackEntity getFeedbackById(UUID feedbackId);
 
-    FilterResponse<?> getListFeedbackOfAdmin(FeedbackFilterRequest filterRequest);
+    Page<IFeedbackPageView> getPageFeedback(PageOptionsReq optionsReq);
 
-    FilterResponse<?> getListFeedbackOfUser(FeedbackFilterRequest filterRequest);
 
-    FeedbackEntity saveFeedback(FeedbackRequest feedbackRequest);
+    FeedbackEntity saveFeedback(FeedbackReq feedbackRequest);
 
     void enableFeedback(UUID feedbackId, Boolean enable);
 

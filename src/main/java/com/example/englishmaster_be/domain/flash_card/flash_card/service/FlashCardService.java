@@ -1,17 +1,17 @@
 package com.example.englishmaster_be.domain.flash_card.flash_card.service;
 
-import com.example.englishmaster_be.common.dto.request.PageOptionsReq;
-import com.example.englishmaster_be.domain.flash_card.flash_card.dto.request.FlashCardReq;
+import com.example.englishmaster_be.advice.exception.ApplicationException;
+import com.example.englishmaster_be.common.dto.req.PageOptionsReq;
+import com.example.englishmaster_be.domain.flash_card.flash_card.dto.req.FlashCardReq;
+import com.example.englishmaster_be.domain.flash_card.flash_card.dto.view.IFlashCardPageView;
 import com.example.englishmaster_be.domain.flash_card.flash_card.model.FlashCardEntity;
 import com.example.englishmaster_be.domain.flash_card.flash_card.repository.FlashCardRepository;
-import com.example.englishmaster_be.domain.flash_card.flash_card.repository.FlashCardSpecRepository;
+import com.example.englishmaster_be.domain.flash_card.flash_card.repository.FlashCardDslRepository;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.AccessLevel;
-import lombok.RequiredArgsConstructor;
-import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,17 +20,21 @@ import java.util.UUID;
 
 @Slf4j(topic = "FLASH-CARD-SERVICE")
 @Service
-@RequiredArgsConstructor(onConstructor_ = {@Lazy})
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FlashCardService implements IFlashCardService {
 
-    FlashCardRepository flashCardRepository;
-    FlashCardSpecRepository flashCardSpecRepository;
+    private final FlashCardRepository flashCardRepository;
+    private final FlashCardDslRepository flashCardDslRepository;
+
+    @Lazy
+    public FlashCardService(FlashCardRepository flashCardRepository, FlashCardDslRepository flashCardDslRepository) {
+        this.flashCardRepository = flashCardRepository;
+        this.flashCardDslRepository = flashCardDslRepository;
+    }
 
     @Override
     public FlashCardEntity getSingleFlashCardToId(UUID id) {
         return flashCardRepository.findById(id).orElseThrow(
-                () -> new EntityNotFoundException("Flashcard not found.", new Exception("id"))
+                () -> new ApplicationException(HttpStatus.NOT_FOUND, "Flashcard not found.", new Exception("id"))
         );
     }
 
@@ -40,8 +44,8 @@ public class FlashCardService implements IFlashCardService {
     }
 
     @Override
-    public Page<FlashCardEntity> getPageFlashCard(PageOptionsReq pageOptions) {
-        return flashCardSpecRepository.findPageFlashCardSpec(pageOptions);
+    public Page<IFlashCardPageView> getPageFlashCard(PageOptionsReq pageOptions) {
+        return flashCardDslRepository.findPageFlashCard(pageOptions);
     }
 
     @Transactional
