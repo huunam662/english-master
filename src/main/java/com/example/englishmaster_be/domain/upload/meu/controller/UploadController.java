@@ -3,7 +3,7 @@ package com.example.englishmaster_be.domain.upload.meu.controller;
 
 import com.example.englishmaster_be.domain.upload.meu.dto.req.FileDeleteReq;
 import com.example.englishmaster_be.domain.upload.meu.service.IUploadService;
-import com.example.englishmaster_be.common.dto.res.FileRes;
+import com.example.englishmaster_be.domain.upload.meu.dto.res.FileRes;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;

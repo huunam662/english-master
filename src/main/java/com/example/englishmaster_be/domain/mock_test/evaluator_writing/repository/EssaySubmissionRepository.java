@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.mock_test.evaluator_writing.repository.jpa;
+package com.example.englishmaster_be.domain.mock_test.evaluator_writing.repository;
 
 import com.example.englishmaster_be.domain.mock_test.evaluator_writing.dto.WritingPartProjection;
 import com.example.englishmaster_be.domain.mock_test.evaluator_writing.model.EssaySubmissionEntity;

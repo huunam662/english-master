@@ -6,6 +6,7 @@ import com.example.englishmaster_be.domain.exam.answer.dto.req.EditAnswerReq;
 import com.example.englishmaster_be.domain.exam.question.dto.req.CreateQuestionChildReq;
 import com.example.englishmaster_be.domain.exam.question.dto.req.CreateQuestionParentReq;
 import com.example.englishmaster_be.domain.exam.question.dto.req.EditQuestionChildReq;
+import com.example.englishmaster_be.domain.exam.question.dto.res.QuestionPartRes;
 import com.example.englishmaster_be.domain.exam.question.mapper.QuestionMapper;
 import com.example.englishmaster_be.domain.exam.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.exam.question.dto.req.EditQuestionParentReq;
@@ -19,26 +20,7 @@ import java.util.*;
 
 public class QuestionUtil {
 
-    public static List<QuestionRes> parseQuestionResponseList(Collection<QuestionEntity> questionEntityList){
 
-        if(questionEntityList == null) return null;
-
-        return questionEntityList.stream().map(
-                questionEntity -> {
-                    QuestionRes questionResponse;
-                    Boolean isQuestionParent = questionEntity.getIsQuestionParent();
-                    if(isQuestionParent) {
-                        questionResponse = QuestionMapper.INSTANCE.toQuestionResponse(questionEntity);
-                        questionResponse.setNumberOfQuestionsChild(questionEntity.getQuestionGroupChildren() != null ? questionEntity.getQuestionGroupChildren().size() : 0);
-                    }
-                    else {
-                        questionResponse = QuestionMapper.INSTANCE.toQuestionChildResponse(questionEntity);
-                        questionResponse.setNumberOfQuestionsChild(0);
-                    }
-                    return questionResponse;
-                }
-        ).toList();
-    }
 
     public static int totalQuestionChildOf(Collection<QuestionEntity> questionParents) {
 
@@ -223,5 +205,7 @@ public class QuestionUtil {
             }
         }
     }
+
+
 
 }

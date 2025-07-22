@@ -8,11 +8,6 @@ import java.util.function.Function;
 
 public class PageUtil {
 
-    public static Pageable unSortPageable(Pageable pageable){
-        if(pageable == null) return null;
-        return PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
-    }
-
     public static Pageable reBuildSortPageable(Pageable pageable, Function<String, String> propertyMapper) {
         if(pageable.getSort().isEmpty()) return pageable;
         Sort newSort = Sort.by(pageable.getSort().stream()

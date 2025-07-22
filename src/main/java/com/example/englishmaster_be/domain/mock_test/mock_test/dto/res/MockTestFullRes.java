@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.domain.mock_test.mock_test.dto.res;
 
 import com.example.englishmaster_be.domain.exam.topic.topic.dto.res.TopicAndTypeRes;
+import com.example.englishmaster_be.domain.exam.topic.topic.dto.res.TopicPackTypeRes;
 import com.example.englishmaster_be.domain.user.user.dto.res.UserRes;
 import lombok.*;
 
@@ -23,7 +24,7 @@ public class MockTestFullRes {
     private LocalTime finishTime;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
-    private TopicAndTypeRes topic;
+    private TopicPackTypeRes topic;
     private UserRes user;
 
 }

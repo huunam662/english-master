@@ -33,7 +33,6 @@ public interface PartMapper {
     List<PartAndTotalQuestionRes> toPartAndTotalQuestionResponseList(Collection<PartEntity> partList);
 
     default List<String> toPartNameResponseList(Collection<PartEntity> partEntities) {
-
         return partEntities.stream().map(
                 PartEntity::getPartName
         ).distinct().sorted().toList();

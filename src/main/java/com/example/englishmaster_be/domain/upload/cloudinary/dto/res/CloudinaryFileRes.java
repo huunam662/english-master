@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.domain.upload.cloudinary.dto.res;
 
-import com.example.englishmaster_be.common.dto.res.FileRes;
+import com.example.englishmaster_be.domain.upload.meu.dto.res.FileRes;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

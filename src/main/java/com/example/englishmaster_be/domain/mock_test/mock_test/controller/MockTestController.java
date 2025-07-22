@@ -1,8 +1,12 @@
 package com.example.englishmaster_be.domain.mock_test.mock_test.controller;
 
+import com.example.englishmaster_be.common.dto.req.PageOptionsReq;
+import com.example.englishmaster_be.common.dto.res.PageInfoRes;
 import com.example.englishmaster_be.domain.mock_test.mock_test.dto.res.MockTestInforRes;
 import com.example.englishmaster_be.domain.mock_test.mock_test.dto.res.MockTestKeyRes;
+import com.example.englishmaster_be.domain.mock_test.mock_test.dto.res.MockTestPageRes;
 import com.example.englishmaster_be.domain.mock_test.mock_test.dto.res.MockTestRes;
+import com.example.englishmaster_be.domain.mock_test.mock_test.dto.view.IMockTestPageView;
 import com.example.englishmaster_be.domain.mock_test.mock_test.dto.view.IMockTestToUserView;
 import com.example.englishmaster_be.domain.mock_test.mock_test.dto.req.MockTestReq;
 import com.example.englishmaster_be.domain.mock_test.mock_test.mapper.MockTestMapper;
@@ -10,6 +14,9 @@ import com.example.englishmaster_be.domain.mock_test.mock_test.model.MockTestEnt
 import com.example.englishmaster_be.domain.mock_test.mock_test.service.IMockTestService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
@@ -32,16 +39,13 @@ public class MockTestController {
             description = "Create mock test from topic exam."
     )
     public MockTestKeyRes createMockTest(@RequestBody MockTestReq saveMockTestRequest) {
-
         return mockTestService.saveMockTest(saveMockTestRequest);
     }
 
     @GetMapping(value = "/getMockTestById")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public MockTestRes getMockTest(@RequestParam("id") UUID id) {
-
         MockTestEntity mockTest = mockTestService.getMockTestById(id);
-
         return MockTestMapper.INSTANCE.toMockTestResponse(mockTest);
     }
 
@@ -49,8 +53,7 @@ public class MockTestController {
     @GetMapping(value = "/listTestToUser")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public List<IMockTestToUserView> listMockTestToUser() {
-        List<IMockTestToUserView> result = mockTestService.getListMockTestToUser();
-        return result;
+        return mockTestService.getListMockTestToUser();
     }
 
     @PostMapping(value = "/{mockTestId:.+}/submitResult")
@@ -60,7 +63,6 @@ public class MockTestController {
             description = "Submit mock test answers for type reading or listening or reading & listening."
     )
     public MockTestKeyRes addAnswerToMockTest(@PathVariable("mockTestId") UUID mockTestId, @RequestBody List<UUID> listAnswerId) {
-
         return mockTestService.addAnswerToMockTest(mockTestId, listAnswerId);
     }
 
@@ -68,7 +70,6 @@ public class MockTestController {
     @GetMapping(value = "/{mockTestId:.+}/sendEmail")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     public void sendEmailToMock(@PathVariable("mockTestId") UUID mockTestId) {
-
         mockTestService.sendEmailToMock(mockTestId);
     }
 
@@ -79,7 +80,18 @@ public class MockTestController {
             description = "Get mock test information."
     )
     public MockTestInforRes getMockTestInfor(@PathVariable("mockTestId") UUID mockTestId) {
-
         return mockTestService.getInformationMockTest(mockTestId);
+    }
+
+    @GetMapping("/page")
+    @Operation(
+            summary = "Get mock test page.",
+            description = "Get mock test page."
+    )
+    public PageInfoRes<MockTestPageRes> getMockTestPage(@ModelAttribute @Valid PageOptionsReq optionsReq) {
+        Page<IMockTestPageView> mockTestPageViews = mockTestService.getMockTestPage(optionsReq);
+        List<MockTestPageRes> mockTestPageResList = MockTestMapper.INSTANCE.toMockTestPageResList(mockTestPageViews.getContent());
+        Page<MockTestPageRes> pageRes = new PageImpl<>(mockTestPageResList, mockTestPageViews.getPageable(), mockTestPageViews.getTotalElements());
+        return new PageInfoRes<>(pageRes);
     }
 }

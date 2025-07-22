@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.mock_test.evaluator_writing.repository.jdbc;
+package com.example.englishmaster_be.domain.mock_test.evaluator_writing.repository;
 
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;

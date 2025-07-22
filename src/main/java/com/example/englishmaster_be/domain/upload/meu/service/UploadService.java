@@ -2,7 +2,7 @@ package com.example.englishmaster_be.domain.upload.meu.service;
 
 import com.example.englishmaster_be.advice.exception.ApplicationException;
 import com.example.englishmaster_be.domain.upload.meu.dto.req.FileDeleteReq;
-import com.example.englishmaster_be.common.dto.res.FileRes;
+import com.example.englishmaster_be.domain.upload.meu.dto.res.FileRes;
 import com.example.englishmaster_be.value.UploadValue;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

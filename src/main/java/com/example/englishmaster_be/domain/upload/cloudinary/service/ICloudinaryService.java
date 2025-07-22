@@ -3,7 +3,7 @@ package com.example.englishmaster_be.domain.upload.cloudinary.service;
 import com.example.englishmaster_be.domain.upload.cloudinary.dto.req.CloudinaryOptionsReq;
 import com.example.englishmaster_be.domain.upload.cloudinary.dto.res.CloudinaryFileRes;
 import com.example.englishmaster_be.domain.upload.cloudinary.dto.res.CloudinaryPageFileRes;
-import com.example.englishmaster_be.common.dto.res.FileRes;
+import com.example.englishmaster_be.domain.upload.meu.dto.res.FileRes;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.coyote.BadRequestException;
 import org.springframework.web.multipart.MultipartFile;

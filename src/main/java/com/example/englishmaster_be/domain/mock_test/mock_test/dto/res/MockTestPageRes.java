@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 public class MockTestPageRes {
 
     private MockTestFullRes mockTest;
-    private Long countPartsResult;
+    private Long countQuestionReadingOrListening;
+    private Long countQuestionSpeaking;
+    private Long countQuestionEssay;
 
 }

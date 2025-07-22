@@ -28,8 +28,9 @@ public class DslUtil {
     ){
         List<ConstantImpl<?>> results = new ArrayList<>();
         for (Expression<?> e : expressions) {
-            if (e instanceof PredicateOperation predicateOperation) {
-                results.addAll(collectValuesCondition(predicateOperation.getArgs()));
+            if (e instanceof PredicateOperation || e instanceof BooleanOperation) {
+                Operation<?> o = (Operation<?>) e;
+                results.addAll(collectValuesCondition(o.getArgs()));
             }
             else if (e instanceof ConstantImpl<?> constant) {
                 results.add(constant);
@@ -52,6 +53,7 @@ public class DslUtil {
             Predicate filterPredicate = DslUtil.toPredicateWhere(filter, root, propertyPathMap);
             Predicate whereCurrent = query.getMetadata().getWhere();
             if(whereCurrent != null){
+                query.getMetadata().clearWhere();
                 query.where(ExpressionUtils.and(whereCurrent, filterPredicate));
             }
             else query.where(filterPredicate);

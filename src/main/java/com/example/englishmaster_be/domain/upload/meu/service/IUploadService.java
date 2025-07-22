@@ -1,7 +1,7 @@
 package com.example.englishmaster_be.domain.upload.meu.service;
 
 import com.example.englishmaster_be.domain.upload.meu.dto.req.FileDeleteReq;
-import com.example.englishmaster_be.common.dto.res.FileRes;
+import com.example.englishmaster_be.domain.upload.meu.dto.res.FileRes;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;

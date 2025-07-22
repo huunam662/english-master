@@ -23,8 +23,6 @@ public class TopicRes {
     private String topicType;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     private LocalTime workTime;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
     private LocalDateTime createAt;
     private LocalDateTime updateAt;
     private List<String> partNames;

@@ -15,7 +15,8 @@ import com.example.englishmaster_be.domain.user.auth.service.invalid_token.IInva
 import com.example.englishmaster_be.value.JwtValue;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQuery;
-import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -27,30 +28,27 @@ import java.util.Date;
 import java.util.List;
 
 
-@Slf4j
+@Slf4j(topic = "SCHEDULED")
 @EnableScheduling
 @Component
 public class TaskScheduled {
 
+    @PersistenceContext
+    private final EntityManager em;
+
     private final JwtValue jwtValue;
-
-    private final JPAQueryFactory queryFactory;
-
     private final IInvalidTokenService invalidTokenService;
-
     private final UserRepository userRepository;
-
     private final InvalidTokenRepository invalidTokenRepository;
-
     private final SessionActiveRepository sessionActiveRepository;
 
-    public TaskScheduled(JwtValue jwtValue, JPAQueryFactory queryFactory, IInvalidTokenService invalidTokenService, UserRepository userRepository, InvalidTokenRepository invalidTokenRepository, SessionActiveRepository sessionActiveRepository) {
+    public TaskScheduled(EntityManager em, JwtValue jwtValue, IInvalidTokenService invalidTokenService, UserRepository userRepository, InvalidTokenRepository invalidTokenRepository, SessionActiveRepository sessionActiveRepository) {
         this.jwtValue = jwtValue;
-        this.queryFactory = queryFactory;
         this.invalidTokenService = invalidTokenService;
         this.userRepository = userRepository;
         this.invalidTokenRepository = invalidTokenRepository;
         this.sessionActiveRepository = sessionActiveRepository;
+        this.em = em;
     }
 
     @Transactional
@@ -68,18 +66,14 @@ public class TaskScheduled {
         log.info("Starting deleteExpiredUsers task");
         try {
             QUserEntity qUser = QUserEntity.userEntity;
-            LocalDateTime expirationTime = LocalDateTime.now().minusMinutes(5);
-
-            List<UserEntity> usersToDelete = queryFactory.selectFrom(qUser)
-                    .where(qUser.enabled.eq(false)
-                            .and(qUser.createAt.before(expirationTime)))
+            List<UserEntity> usersToDelete = new JPAQuery<UserEntity>(em)
+                    .from(qUser)
+                    .where(qUser.enabled.eq(false))
                     .fetch();
-
             for (UserEntity user : usersToDelete) {
                 sessionActiveRepository.deleteAll(sessionActiveRepository.findByUserId(user.getUserId()));
                 userRepository.delete(user);
             }
-
             log.info("Deleted {} expired users", usersToDelete.size());
         } catch (Exception e) {
             log.error("Error in deleteExpiredUsers task", e);
@@ -88,25 +82,19 @@ public class TaskScheduled {
 
     @Transactional
     public void deleteInvalidToken(){
-
         log.info("Starting deleteInvalidToken task");
-
+        QInvalidTokenEntity qInvalidTokenEntity = QInvalidTokenEntity.invalidTokenEntity;
         try{
-
-            JPAQuery<InvalidTokenEntity> query = queryFactory
-                    .selectFrom(QInvalidTokenEntity.invalidTokenEntity)
+            List<InvalidTokenEntity> tokensToDelete = new JPAQuery<InvalidTokenEntity>(em)
+                    .from(qInvalidTokenEntity)
                     .where(
                             Expressions.booleanTemplate(
                                     "{0} <= {1}",
-                                    QInvalidTokenEntity.invalidTokenEntity.createAt,
+                                    qInvalidTokenEntity.createAt,
                                     LocalDateTime.now().minusDays(3)
                             )
-                    );
-
-            List<InvalidTokenEntity> tokensToDelete = query.fetch();
-
+                    ).fetch();
             invalidTokenRepository.deleteAll(tokensToDelete);
-
         }
         catch (Exception e){
             log.error("ErrorEnum in deleteInvalidToken task", e);
@@ -115,23 +103,18 @@ public class TaskScheduled {
 
     @Transactional
     public void deleteAllSessionConfirm(){
-
         log.info("Starting deleteAllSessionActiveConfirm task");
-
         try {
-
-            JPAQuery<SessionActiveEntity> query = queryFactory
-                    .selectFrom(QSessionActiveEntity.sessionActiveEntity)
+            QSessionActiveEntity qsessionActiveEntity = QSessionActiveEntity.sessionActiveEntity;
+            List<SessionActiveEntity> sessionActiveEntityList = new JPAQuery<SessionActiveEntity>(em)
+                    .from(qsessionActiveEntity)
                     .where(
-                            QSessionActiveEntity.sessionActiveEntity.type.eq(SessionActiveType.CONFIRM).or(
-                                    QSessionActiveEntity.sessionActiveEntity.token.isNull()
+                            qsessionActiveEntity.type.eq(SessionActiveType.CONFIRM).or(
+                                    qsessionActiveEntity.token.isNull()
                             )
-                    );
-
-            List<SessionActiveEntity> sessionActiveEntityList = query.fetch();
-
+                    )
+                    .fetch();
             sessionActiveRepository.deleteAll(sessionActiveEntityList);
-
         }
         catch (Exception e){
             log.error("Error in deleteAllSessionActiveConfirm task", e);
@@ -141,34 +124,24 @@ public class TaskScheduled {
 
     @Transactional
     public void invalidTokenExpired(){
-
         log.info("Starting invalidTokenExpired task");
-
         try {
-
-            JPAQuery<SessionActiveEntity> query = queryFactory
-                    .selectFrom(QSessionActiveEntity.sessionActiveEntity)
+            QSessionActiveEntity qSessionActiveEntity = QSessionActiveEntity.sessionActiveEntity;
+            List<SessionActiveEntity> sessionActiveEntityList = new JPAQuery<SessionActiveEntity>(em)
+                    .from(qSessionActiveEntity)
                     .where(
                         Expressions.booleanTemplate(
                                 "{0} <= {1}",
-                                QSessionActiveEntity.sessionActiveEntity.createAt,
+                                qSessionActiveEntity.createAt,
                                 new Date(System.currentTimeMillis() - jwtValue.getJwtExpiration())
                                         .toInstant()
                                         .atZone(ZoneId.systemDefault())
                                         .toLocalDateTime()
-                        ).and(
-                                QSessionActiveEntity.sessionActiveEntity.type.eq(SessionActiveType.CONFIRM).not()
-                        ).and(
-                                QSessionActiveEntity.sessionActiveEntity.token.isNotNull()
-                        )
-                    );
-
-            List<SessionActiveEntity> sessionActiveEntityList = query.fetch();
-
-            sessionActiveEntityList.forEach(
-                    sessionActiveEntity -> invalidTokenService.sessionActiveToInvalidToken(sessionActiveEntity.getToken(), sessionActiveEntity.getUser().getUserId(), InvalidTokenType.EXPIRED)
-            );
-
+                    )
+                    .and(qSessionActiveEntity.type.eq(SessionActiveType.CONFIRM).not())
+                    .and(qSessionActiveEntity.token.isNotNull()))
+                    .fetch();
+            sessionActiveEntityList.forEach(sessionActiveEntity -> invalidTokenService.sessionActiveToInvalidToken(sessionActiveEntity.getToken(), sessionActiveEntity.getUser().getUserId(), InvalidTokenType.EXPIRED));
             sessionActiveRepository.deleteAll(sessionActiveEntityList);
         }
         catch (Exception e){

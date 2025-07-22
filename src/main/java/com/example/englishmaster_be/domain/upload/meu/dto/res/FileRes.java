@@ -1,7 +1,6 @@
-package com.example.englishmaster_be.common.dto.res;
+package com.example.englishmaster_be.domain.upload.meu.dto.res;
 
 import lombok.*;
-import lombok.experimental.FieldDefaults;
 
 @Data
 @NoArgsConstructor

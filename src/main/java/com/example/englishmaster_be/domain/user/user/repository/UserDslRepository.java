@@ -48,7 +48,7 @@ public class UserDslRepository {
         );
         JPAQuery<IUserPageView> query = new JPAQuery<>(em);
         query.select(Projections.bean(
-                IUserPageView.PageUserView.class,
+                IUserPageView.UserPageView.class,
                 user.as(user),
                 numberExpressionMap.get(countFlashCards).as(countFlashCards),
                 numberExpressionMap.get(countMockTests).as(countMockTests),

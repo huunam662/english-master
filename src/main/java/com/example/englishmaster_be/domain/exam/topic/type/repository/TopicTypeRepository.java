@@ -1,10 +1,10 @@
 package com.example.englishmaster_be.domain.exam.topic.type.repository;
 
 import com.example.englishmaster_be.domain.exam.topic.type.model.TopicTypeEntity;
-import feign.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

@@ -7,17 +7,17 @@ import lombok.NoArgsConstructor;
 public interface IMockTestPageView {
 
     MockTestEntity getMockTest();
-    Long getCountResultReadingOrListening();
-    Long getCountResultSpeaking();
-    Long getCountResultWriting();
+    Long getCountQuestionReadingOrListening();
+    Long getCountQuestionSpeaking();
+    Long getCountQuestionEssay();
 
     @Data
     @NoArgsConstructor
     class MockTestPageView implements IMockTestPageView{
         private MockTestEntity mockTest;
-        private Long countResultReadingOrListening;
-        private Long countResultSpeaking;
-        private Long countResultWriting;
+        private Long countQuestionReadingOrListening;
+        private Long countQuestionSpeaking;
+        private Long countQuestionEssay;
     }
 
 }

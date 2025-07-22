@@ -71,18 +71,6 @@ public class TopicEntity {
     @LastModifiedDate
     private LocalDateTime updateAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "start_time")
-    private LocalDateTime startTime;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "end_time")
-    private LocalDateTime endTime;
-
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "update_time")
-    private LocalDateTime updateTime;
-
     @Column(name = "pack_id", insertable = false, updatable = false)
     private UUID packId;
 

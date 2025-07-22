@@ -137,16 +137,32 @@ public class GlobalExceptionHandler implements AccessDeniedHandler, Authenticati
     }
 
     @ExceptionHandler({
-            UsernameNotFoundException.class,
-            BadCredentialsException.class,
-            DisabledException.class,
             InternalAuthenticationServiceException.class,
             AuthenticationException.class
+    })
+    public ResultApiRes handleBadAuthException(Exception ex, HttpServletRequest request, HttpServletResponse response) {
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        logError(status, ex);
+        return new ResultApiRes(ex, status, request, response);
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResultApiRes handleDisabledException(Exception ex, HttpServletRequest request, HttpServletResponse response) {
+        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        logError(status, ex);
+        Exception exr = new Exception("Account is locked");
+        return new ResultApiRes(exr, status, request, response);
+    }
+
+    @ExceptionHandler({
+            UsernameNotFoundException.class,
+            BadCredentialsException.class
     })
     public ResultApiRes handleBadCredentialsException(Exception ex, HttpServletRequest request, HttpServletResponse response) {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
         logError(status, ex);
-        return new ResultApiRes(ex, status, request, response);
+        Exception exr = new Exception("Wrong username or password");
+        return new ResultApiRes(exr, status, request, response);
     }
 
     @ExceptionHandler({

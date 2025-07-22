@@ -1,7 +1,6 @@
 package com.example.englishmaster_be.util;
 
 import org.jsoup.nodes.Element;
-
 import java.util.List;
 
 public class DomUtil {

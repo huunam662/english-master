@@ -11,7 +11,7 @@ public interface IUserPageView {
     Long getCountNews();
 
     @Data
-    class PageUserView implements IUserPageView {
+    class UserPageView implements IUserPageView {
         private UserEntity user;
         private Long countMockTests;
         private Long countFlashCards;

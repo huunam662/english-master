@@ -1,11 +1,14 @@
 package com.example.englishmaster_be.domain.mock_test.mock_test.service;
 
 import com.example.englishmaster_be.advice.exception.ApplicationException;
+import com.example.englishmaster_be.common.dto.req.PageOptionsReq;
 import com.example.englishmaster_be.domain.exam.answer.repository.AnswerRepository;
 import com.example.englishmaster_be.domain.mock_test.mock_test.dto.res.MockTestInforRes;
+import com.example.englishmaster_be.domain.mock_test.mock_test.dto.view.IMockTestPageView;
 import com.example.englishmaster_be.domain.mock_test.mock_test.mapper.MockTestMapper;
 import com.example.englishmaster_be.domain.mock_test.mock_test.dto.req.MockTestReq;
 import com.example.englishmaster_be.domain.mock_test.mock_test.model.MockTestEntity;
+import com.example.englishmaster_be.domain.mock_test.mock_test.repository.MockTestDslRepository;
 import com.example.englishmaster_be.domain.mock_test.mock_test.repository.MockTestJdbcRepository;
 import com.example.englishmaster_be.domain.mock_test.mock_test.repository.MockTestRepository;
 import com.example.englishmaster_be.domain.mock_test.reading_listening_submission.model.ReadingListeningSubmissionEntity;
@@ -30,6 +33,7 @@ import com.example.englishmaster_be.domain.user.auth.service.mailer.MailerServic
 import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,9 +64,10 @@ public class MockTestService implements IMockTestService {
     private final SpeakingSubmissionRepository speakingSubmissionRepository;
     private final SpeakingErrorRepository speakingErrorRepository;
     private final MailerService mailerService;
+    private final MockTestDslRepository mockTestDslRepository;
 
     @Lazy
-    public MockTestService(MockTestRepository mockTestRepository, IUserService userService, ITopicService topicService, AnswerRepository answerRepository, IQuestionService questionService, ReadingListeningSubmissionRepository mockTestDetailRepository, ReadingListeningSubmissionJdbcRepository mockTestDetailJdbcRepository, MockTestJdbcRepository mockTestJdbcRepository, SpeakingSubmissionRepository speakingSubmissionRepository, SpeakingErrorRepository speakingErrorRepository, MailerService mailerService) {
+    public MockTestService(MockTestDslRepository mockTestDslRepository, MockTestRepository mockTestRepository, IUserService userService, ITopicService topicService, AnswerRepository answerRepository, IQuestionService questionService, ReadingListeningSubmissionRepository mockTestDetailRepository, ReadingListeningSubmissionJdbcRepository mockTestDetailJdbcRepository, MockTestJdbcRepository mockTestJdbcRepository, SpeakingSubmissionRepository speakingSubmissionRepository, SpeakingErrorRepository speakingErrorRepository, MailerService mailerService) {
         this.mockTestRepository = mockTestRepository;
         this.userService = userService;
         this.topicService = topicService;
@@ -74,6 +79,7 @@ public class MockTestService implements IMockTestService {
         this.speakingSubmissionRepository = speakingSubmissionRepository;
         this.speakingErrorRepository = speakingErrorRepository;
         this.mailerService = mailerService;
+        this.mockTestDslRepository = mockTestDslRepository;
     }
 
     @Override
@@ -147,8 +153,7 @@ public class MockTestService implements IMockTestService {
     @Override
     public List<IMockTestToUserView> getListMockTestToUser() {
         UserEntity user = userService.currentUser();
-        List<IMockTestToUserView> projections = mockTestRepository.findExamResultForUser(user.getUserId());
-        return projections;
+        return mockTestRepository.findExamResultForUser(user.getUserId());
     }
 
     @Transactional
@@ -275,4 +280,8 @@ public class MockTestService implements IMockTestService {
         }
     }
 
+    @Override
+    public Page<IMockTestPageView> getMockTestPage(PageOptionsReq optionsReq) {
+        return mockTestDslRepository.findPageMockTestUser(optionsReq);
+    }
 }

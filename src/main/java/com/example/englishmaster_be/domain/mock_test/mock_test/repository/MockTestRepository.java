@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -67,6 +66,7 @@ public interface MockTestRepository extends JpaRepository<MockTestEntity, UUID> 
         SELECT mockTest FROM MockTestEntity mockTest
         INNER JOIN FETCH mockTest.user userCreate
         INNER JOIN FETCH mockTest.topic topicTest
+        LEFT JOIN FETCH topicTest.topicType
         WHERE mockTest.mockTestId = :mockTestId
     """)
     Optional<MockTestEntity> findMockTestById(@Param("mockTestId") UUID mockTestId);
@@ -75,7 +75,7 @@ public interface MockTestRepository extends JpaRepository<MockTestEntity, UUID> 
         SELECT mockTest FROM MockTestEntity mockTest
         INNER JOIN FETCH mockTest.user userCreate
         INNER JOIN FETCH mockTest.topic topicTest
-        INNER JOIN FETCH topicTest.topicType
+        LEFT JOIN FETCH topicTest.topicType
         WHERE mockTest.mockTestId = :mockTestId
     """)
     Optional<MockTestEntity> findMockTestJoinUserTopicTopicType(@Param("mockTestId") UUID mockTestId);

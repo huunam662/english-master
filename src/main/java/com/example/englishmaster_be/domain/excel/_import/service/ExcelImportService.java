@@ -924,7 +924,7 @@ public class ExcelImportService implements IExcelImportService {
             partTopic.setPartId(UUID.randomUUID());
             partTopic.setPartName(partName);
             partTopic.setPartType(ExcelUtil.getStringCellValue(rowPart.getCell(1)));
-            partTopic.setUserUpdate(userImport);
+            partTopic.setUserCreate(userImport);
             partTopic.setUserUpdate(userImport);
             partTopic.setTopicId(topicId);
 

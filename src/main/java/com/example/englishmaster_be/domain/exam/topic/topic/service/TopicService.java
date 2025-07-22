@@ -360,9 +360,6 @@ public class TopicService implements ITopicService {
     @Override
     public List<QuestionPartRes> getQuestionOfToTopicPart(UUID topicId, UUID partId) {
 
-        Assert.notNull(topicId, "Topic id is required.");
-        Assert.notNull(partId, "Part id is required.");
-
         TopicEntity topic = getTopicById(topicId);
 
         List<AnswerEntity> answersQuestionChild = answerRepository.findAnswersJoinQuestionPartTopic(topicId, partId);
@@ -374,9 +371,6 @@ public class TopicService implements ITopicService {
 
     @Override
     public List<QuestionPartRes> getQuestionOfToTopicPart(UUID topicId, String partName) {
-
-        Assert.notNull(topicId, "Topic id is required.");
-        Assert.notNull(partName, "Part name is required.");
 
         TopicEntity topic = getTopicById(topicId);
 
@@ -430,8 +424,6 @@ public class TopicService implements ITopicService {
     @Override
     public List<QuestionPartRes> getQuestionPartListOfTopic(UUID topicId) {
 
-        Assert.notNull(topicId, "Topic id is required.");
-
         TopicEntity topic = getTopicById(topicId);
 
         if (topic.getTopicType().getTopicTypeName().equalsIgnoreCase("speaking")){
@@ -453,8 +445,7 @@ public class TopicService implements ITopicService {
     @Transactional
     @Override
     public TopicKeyRes updateTopicToExcel(MultipartFile file, UUID topicId, String imageUrl, String audioUrl) throws BadRequestException {
-        Assert.notNull(topicId, "Topic id is required.");
-        Assert.notNull(file, "Excel file is required.");
+
         UserEntity userCurrent = userService.currentUser();
         if(!topicRepository.existsById(topicId))
             throw new EntityNotFoundException("Topic not found with id.");

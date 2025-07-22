@@ -9,7 +9,6 @@ import com.example.englishmaster_be.domain.exam.question.dto.req.EditQuestionPar
 import com.example.englishmaster_be.domain.exam.question.dto.res.*;
 import com.example.englishmaster_be.domain.exam.question.model.QuestionEntity;
 import com.example.englishmaster_be.domain.exam.topic.topic.mapper.TopicMapper;
-import com.example.englishmaster_be.domain.exam.question.util.QuestionUtil;
 import com.example.englishmaster_be.domain.exam.part.model.PartEntity;
 import com.example.englishmaster_be.domain.exam.topic.topic.model.TopicEntity;
 import org.mapstruct.*;
@@ -30,8 +29,7 @@ public interface QuestionMapper {
     QuestionRes toQuestionResponse(QuestionEntity questionEntity);
 
     default List<QuestionRes> toQuestionResponseList(Collection<QuestionEntity> questionEntityList){
-
-        return QuestionUtil.parseQuestionResponseList(questionEntityList);
+        return QuestionMapperUtil.mapToQuestionResponseList(questionEntityList);
     }
 
     @Mapping(target = "answers", expression = "java(AnswerMapper.INSTANCE.toAnswerResponseList(questionEntity.getAnswers()))")
@@ -39,14 +37,7 @@ public interface QuestionMapper {
     @Mapping(target = "questionsChildren", ignore = true)
     QuestionChildRes toQuestionChildResponse(QuestionEntity questionEntity);
 
-    default List<QuestionChildRes> toQuestionChildResponseList(Collection<QuestionEntity> questionEntityList){
-
-        if(questionEntityList == null) return Collections.emptyList();
-
-        return questionEntityList.stream().map(
-                this::toQuestionChildResponse
-        ).toList();
-    }
+    List<QuestionChildRes> toQuestionChildResponseList(Collection<QuestionEntity> questionEntityList);
 
     @Mapping(target = "topic", expression = "java(TopicMapper.INSTANCE.toTopicBasicResponse(topicEntity))")
     @Mapping(target = "part", expression = "java(PartMapper.INSTANCE.toPartAndTotalQuestionResponse(partEntity))")
@@ -54,30 +45,7 @@ public interface QuestionMapper {
     QuestionPartRes toQuestionPartResponse(Collection<QuestionEntity> questionParents, TopicEntity topicEntity, PartEntity partEntity);
 
     default List<QuestionPartRes> toQuestionPartResponseList(TopicEntity topic){
-
-        if (topic == null) return Collections.emptyList();
-
-        if(topic.getParts() == null || topic.getParts().isEmpty())
-            return Collections.emptyList();
-
-        return topic.getParts().stream()
-                .sorted(Comparator.comparing(PartEntity::getPartName, Comparator.nullsLast(Comparator.naturalOrder())))
-                .map(part -> {
-                    String topicType = topic.getTopicType().getTopicTypeName();
-                    boolean isSpeakingOrWriting = topicType.equalsIgnoreCase("speaking") || topicType.equalsIgnoreCase("writing");
-                    int totalQuestionOfPart;
-                    if(isSpeakingOrWriting) {
-                        part.getQuestions().forEach(questionParent -> questionParent.setQuestionGroupChildren(new LinkedHashSet<>()));
-                        totalQuestionOfPart = part.getQuestions().size();
-                    }
-                    else {
-                        totalQuestionOfPart = QuestionUtil.totalQuestionChildOf(part.getQuestions());
-                    }
-                    QuestionPartRes questionPartResponse = toQuestionPartResponse(part.getQuestions(), topic, part);
-                    questionPartResponse.getPart().setTotalQuestion(totalQuestionOfPart);
-                    return questionPartResponse;
-                }
-                ).toList();
+        return QuestionMapperUtil.mapToQuestionPartResList(topic);
     }
 
     QuestionEntity toQuestionParent(CreateQuestionParentReq request);

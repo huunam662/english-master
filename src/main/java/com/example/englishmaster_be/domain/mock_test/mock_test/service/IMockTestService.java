@@ -1,11 +1,14 @@
 package com.example.englishmaster_be.domain.mock_test.mock_test.service;
 
+import com.example.englishmaster_be.common.dto.req.PageOptionsReq;
 import com.example.englishmaster_be.domain.mock_test.mock_test.dto.res.MockTestInforRes;
 import com.example.englishmaster_be.domain.mock_test.mock_test.dto.res.MockTestKeyRes;
 import com.example.englishmaster_be.domain.mock_test.mock_test.dto.req.MockTestReq;
+import com.example.englishmaster_be.domain.mock_test.mock_test.dto.view.IMockTestPageView;
 import com.example.englishmaster_be.domain.mock_test.mock_test.dto.view.IMockTestToUserView;
 import com.example.englishmaster_be.domain.mock_test.mock_test.model.MockTestEntity;
 import com.example.englishmaster_be.domain.exam.topic.topic.model.TopicEntity;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,4 +31,5 @@ public interface IMockTestService {
 
     MockTestInforRes getInformationMockTest(UUID mockTestId);
 
+    Page<IMockTestPageView> getMockTestPage(PageOptionsReq optionsReq);
 }
