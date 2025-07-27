@@ -72,7 +72,7 @@ public class DslUtil {
             return property;
         });
         if(!pageable.getSort().isEmpty()){
-            query.orderBy(DslUtil.buildOrder(root, expressionsHavingMap, pageable).toArray(OrderSpecifier[]::new));
+            query.orderBy(DslUtil.buildOrder(root, pageable, propertyPathMap, expressionsHavingMap).toArray(OrderSpecifier[]::new));
         }
         List<T> pageViews = query.offset(pageable.getOffset()).limit(pageable.getPageSize()).fetch();
         long totalElements = DslUtil.fetchCount(em, query);
@@ -161,8 +161,9 @@ public class DslUtil {
 
     public static List<OrderSpecifier<?>> buildOrder(
             @NonNull EntityPathBase<?> root,
-            @NonNull Map<String, NumberExpression<?>> numberExpressions,
-            @NonNull Pageable pageable
+            @NonNull Pageable pageable,
+            @NonNull Map<String, String> propertyPathMap,
+            @NonNull Map<String, NumberExpression<?>> numberExpressions
     ){
         if(pageable.getSort().isEmpty()) return new ArrayList<>();
         return pageable.getSort().stream().map(o -> {
@@ -177,6 +178,9 @@ public class DslUtil {
             else{
                 try{
                     PathBuilder<?> path = new PathBuilder<>(root.getType(), root.getMetadata());
+                    if(propertyPathMap.containsKey(sortBy)){
+                        sortBy = propertyPathMap.get(sortBy);
+                    }
                     String[] sortBys = sortBy.split("\\.");
                     for(String by : sortBys){
                         path = path.get(by);

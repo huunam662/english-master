@@ -25,11 +25,13 @@ import java.util.UUID;
 @Tag(name = "Flash card")
 @RestController
 @RequestMapping("/flash-card")
-@RequiredArgsConstructor
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 public class FlashCardController {
 
-    IFlashCardService flashCardService;
+    private final IFlashCardService flashCardService;
+
+    public FlashCardController(IFlashCardService flashCardService) {
+        this.flashCardService = flashCardService;
+    }
 
     @Operation(
             summary = "Get single flash card to flash card id.",

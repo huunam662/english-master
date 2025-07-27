@@ -77,7 +77,7 @@ public class MockTestDslRepository {
         .leftJoin(mockTest.essaySubmissions, essaySubmission)
         .leftJoin(mockTest.readingListeningSubmissions, readingListeningSubmission)
         .leftJoin(mockTest.speakingSubmissions, speakingSubmission)
-        .groupBy(mockTest, user, topic);
+        .groupBy(mockTest, user, topic, topicType, pack, packType);
         if(currentUser.getRole().getRoleName().equals(Role.USER)){
             query.where(mockTest.user.eq(currentUser));
         }

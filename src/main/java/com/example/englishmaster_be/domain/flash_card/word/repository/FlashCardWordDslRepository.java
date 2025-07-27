@@ -59,6 +59,6 @@ public class FlashCardWordDslRepository {
         .leftJoin(flashCardWord.createBy, createBy).fetchJoin()
         .leftJoin(flashCardWord.updateBy, updateBy).fetchJoin()
         .where(flashCard.eq(flashCardEntity));
-        return DslUtil.fetchPage(em, query, Map.of(), optionsReq);
+        return DslUtil.fetchPage(em, query, optionsReq);
     }
 }

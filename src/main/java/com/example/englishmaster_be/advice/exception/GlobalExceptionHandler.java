@@ -25,6 +25,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
@@ -170,7 +171,8 @@ public class GlobalExceptionHandler implements AccessDeniedHandler, Authenticati
             MessagingException.class,
             IllegalArgumentException.class,
             FileAlreadyExistsException.class,
-            UnsupportedOperationException.class
+            UnsupportedOperationException.class,
+            MissingServletRequestParameterException.class
     })
     public ResultApiRes handleHttpClientErrorException(Exception ex, HttpServletRequest request, HttpServletResponse response) {
         HttpStatus status = HttpStatus.BAD_REQUEST;

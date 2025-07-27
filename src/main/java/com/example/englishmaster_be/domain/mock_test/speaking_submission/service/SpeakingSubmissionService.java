@@ -99,7 +99,7 @@ public class SpeakingSubmissionService implements ISpeakingSubmissionService{
         ).exceptionally((ex) -> {
             // Nếu có ngoại lệ xảy ra trong quá trình đánh giá thì log lại thông báo để dễ debug sau này
             log.error(ex.getMessage());
-            return null;
+            return speakingSubmissions;
         }).whenComplete((speakingSubmissionsResults, throwable) -> {
             // Sau khi chấm điểm và đánh giá các phần thi của thí sinh thành công thì cập nhật lại thông tin cho mock test
             int countOfQuestionTopicMockTest = questionRepository.countOfQuestionSpeakingTopicByMockTestId(mockTestId);
@@ -115,8 +115,7 @@ public class SpeakingSubmissionService implements ISpeakingSubmissionService{
                     mockTestId, speakingReachedPercent, totalQuestionFinish, 0,
                     totalQuestionFinish, totalQuestionSkip, totalQuestionFinish
             );
-        }).whenComplete((result, throwable) -> {
-            log.error(throwable.getMessage());
+        }).thenRun(() -> {
             // Gửi mail cho thí sinh về kết quả bài thi
             log.info("Send Email to User.");
             try {

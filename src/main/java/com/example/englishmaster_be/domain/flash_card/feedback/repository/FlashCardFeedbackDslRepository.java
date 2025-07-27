@@ -14,7 +14,6 @@ import jakarta.persistence.PersistenceContext;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Repository;
 
-import java.util.Map;
 
 @Repository
 public class FlashCardFeedbackDslRepository {
@@ -38,7 +37,7 @@ public class FlashCardFeedbackDslRepository {
         .from(flashCardFeedback)
         .leftJoin(flashCardFeedback.flashCard, flashCard).fetchJoin()
         .leftJoin(flashCardFeedback.userFeedback, userFeedback).fetchJoin();
-        return DslUtil.fetchPage(em, query, Map.of(), optionsReq);
+        return DslUtil.fetchPage(em, query, optionsReq);
     }
     
     public Page<IFlashCardFeedbackPageView> findPageFlashCardFeedbackByFlashCard(FlashCardEntity flashCardEntity, PageOptionsReq optionsReq){
@@ -54,6 +53,6 @@ public class FlashCardFeedbackDslRepository {
         .leftJoin(flashCardFeedback.flashCard, flashCard).fetchJoin()
         .leftJoin(flashCardFeedback.userFeedback, userFeedback).fetchJoin()
         .where(flashCard.eq(flashCardEntity));
-        return DslUtil.fetchPage(em, query, Map.of(), optionsReq);
+        return DslUtil.fetchPage(em, query, optionsReq);
     }
 }
