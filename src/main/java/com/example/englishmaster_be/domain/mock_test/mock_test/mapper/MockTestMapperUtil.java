@@ -82,6 +82,7 @@ public class MockTestMapperUtil {
             for(ReadingListeningSubmissionEntity submission : submissions){
                 ReadingListeningDetailRes rldRes = new ReadingListeningDetailRes();
                 AnswerEntity answerChoice = submission.getAnswerChoice();
+                rldRes.setMockTestDetailId(submission.getId());
                 rldRes.setQuestion(QuestionMapper.INSTANCE.toQuestionAnswersResponse(answerChoice.getQuestion()));
                 rldRes.setAnswerChoice(AnswerMapper.INSTANCE.toAnswerResponse(answerChoice));
                 rldRes.setIsCorrectAnswer(submission.getIsCorrectAnswer());

@@ -8,7 +8,6 @@ import com.example.englishmaster_be.domain.exam.topic.topic.model.QTopicEntity;
 import com.example.englishmaster_be.domain.exam.topic.type.model.QTopicTypeEntity;
 import com.example.englishmaster_be.domain.mock_test.evaluator_writing.model.QEssaySubmissionEntity;
 import com.example.englishmaster_be.domain.mock_test.mock_test.dto.view.IMockTestPageView;
-import com.example.englishmaster_be.domain.mock_test.mock_test.model.MockTestEntity;
 import com.example.englishmaster_be.domain.mock_test.mock_test.model.QMockTestEntity;
 import com.example.englishmaster_be.domain.mock_test.reading_listening_submission.model.QReadingListeningSubmissionEntity;
 import com.example.englishmaster_be.domain.mock_test.speaking_submission.model.QSpeakingSubmissionEntity;

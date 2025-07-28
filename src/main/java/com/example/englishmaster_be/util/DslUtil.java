@@ -221,12 +221,12 @@ public class DslUtil {
         @Override
         public Predicate visit(ComparisonNode node, Void param) {
             String selector = node.getSelector();
-            String operator = node.getOperator().getSymbol();
-            List<String> args = node.getArguments();
             NumberExpression<?> expr = resolver.apply(selector);
             if (expr == null) {
                 throw new ApplicationException(HttpStatus.BAD_REQUEST, "Unknown property: " + selector);
             }
+            String operator = node.getOperator().getSymbol();
+            List<String> args = node.getArguments();
             return buildPredicate(expr, operator, args);
         }
 
