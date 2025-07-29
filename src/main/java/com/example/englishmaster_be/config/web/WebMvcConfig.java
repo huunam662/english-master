@@ -1,6 +1,6 @@
 package com.example.englishmaster_be.config.web;
 
-import com.example.englishmaster_be.config.interceptor.InterceptorConfig;
+import com.example.englishmaster_be.advice.interceptor.GlobalAppInterceptor;
 import com.example.englishmaster_be.value.AppValue;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RestController;
@@ -15,9 +15,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     private final AppValue appValue;
 
-    private final InterceptorConfig globalInterceptorHandler;
+    private final GlobalAppInterceptor globalInterceptorHandler;
 
-    public WebMvcConfig(AppValue appValue, InterceptorConfig globalInterceptorHandler) {
+    public WebMvcConfig(AppValue appValue, GlobalAppInterceptor globalInterceptorHandler) {
         this.appValue = appValue;
         this.globalInterceptorHandler = globalInterceptorHandler;
     }

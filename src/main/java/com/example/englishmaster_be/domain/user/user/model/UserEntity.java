@@ -51,6 +51,9 @@ public class UserEntity implements UserDetails {
 
     private String avatar;
 
+    @Column(name = "user_type")
+    private String userType;
+
     @Temporal(TemporalType.TIMESTAMP)
     @CreationTimestamp
     @Column(name = "last_login")

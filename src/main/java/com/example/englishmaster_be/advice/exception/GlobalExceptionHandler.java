@@ -61,7 +61,7 @@ public class GlobalExceptionHandler implements AccessDeniedHandler, Authenticati
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        HttpStatus status = HttpStatus.UNAUTHORIZED;
+        HttpStatus status = HttpStatus.FORBIDDEN;
         logError(status, accessDeniedException);
         this.printError(accessDeniedException, status, request, response);
     }
@@ -128,11 +128,9 @@ public class GlobalExceptionHandler implements AccessDeniedHandler, Authenticati
         List<FieldError> fieldErrors = bindingResult.getFieldErrors();
         ResultApiRes.Violation violation = new ResultApiRes.Violation();
         if(!fieldErrors.isEmpty()) {
-            Object target = bindingResult.getTarget();
-            String fieldName = fieldErrors.get(0).getField();
-            Field field = target.getClass().getDeclaredField(fieldName);
-            violation.setField(fieldName);
-            violation.setMessage("Expected type [" + field.getType().getSimpleName() + "]");
+            FieldError fieldError = fieldErrors.get(0);
+            violation.setField(fieldError.getField());
+            violation.setMessage(fieldError.getDefaultMessage());
         }
         return new ResultApiRes(ex, violation, status, request, response);
     }

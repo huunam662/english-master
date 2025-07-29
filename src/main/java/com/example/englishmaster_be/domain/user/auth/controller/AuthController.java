@@ -20,8 +20,9 @@ public class AuthController {
         this.authService = authService;
     }
 
+
     @PostMapping("/login")
-    public UserAuthRes login(@RequestBody UserLoginReq loginDTO) {
+    public UserAuthRes login(@RequestBody @Valid UserLoginReq loginDTO) {
 
         return authService.login(loginDTO);
     }

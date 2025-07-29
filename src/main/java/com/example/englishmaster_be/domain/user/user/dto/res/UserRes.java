@@ -15,5 +15,6 @@ public class UserRes {
     private String phone;
     private String address;
     private String avatar;
+    private String userType;
 
 }

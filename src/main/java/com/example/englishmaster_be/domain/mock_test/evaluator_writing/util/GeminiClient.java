@@ -26,9 +26,9 @@ public class GeminiClient {
     public GeminiClient(String apiKey,
                         String geminiApiEndpoint,
                         String modelName) {
-        Assert.hasText(apiKey, "Gemini API key must be provided in application.properties as 'gemini.api.key'");
-        Assert.hasText(geminiApiEndpoint, "Gemini API endpoint must be provided in application.properties as 'gemini.api.endpoint'");
-        Assert.hasText(modelName, "Gemini model name must be provided in application.properties as 'gemini.api.model'");
+        Assert.hasText(apiKey, "Gemini API key must be provided in application.yml as 'gemini.api.key'");
+        Assert.hasText(geminiApiEndpoint, "Gemini API endpoint must be provided in application.yml as 'gemini.api.endpoint'");
+        Assert.hasText(modelName, "Gemini model name must be provided in application.yml as 'gemini.api.model'");
         this.apiKey = apiKey;
         this.geminiApiEndpoint = geminiApiEndpoint;
         this.modelName = modelName;

@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.scheduled;
+package com.example.englishmaster_be.config.app.scheduled;
 
 import com.example.englishmaster_be.common.constant.InvalidTokenType;
 import com.example.englishmaster_be.common.constant.SessionActiveType;
@@ -19,19 +19,19 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.List;
 
 
-@Slf4j(topic = "SCHEDULED")
+@Slf4j(topic = "TASK-SCHEDULED-CONFIG")
 @EnableScheduling
-@Component
-public class TaskScheduled {
+@Configuration
+public class TaskScheduledConfig {
 
     @PersistenceContext
     private final EntityManager em;
@@ -42,7 +42,7 @@ public class TaskScheduled {
     private final InvalidTokenRepository invalidTokenRepository;
     private final SessionActiveRepository sessionActiveRepository;
 
-    public TaskScheduled(EntityManager em, JwtValue jwtValue, IInvalidTokenService invalidTokenService, UserRepository userRepository, InvalidTokenRepository invalidTokenRepository, SessionActiveRepository sessionActiveRepository) {
+    public TaskScheduledConfig(EntityManager em, JwtValue jwtValue, IInvalidTokenService invalidTokenService, UserRepository userRepository, InvalidTokenRepository invalidTokenRepository, SessionActiveRepository sessionActiveRepository) {
         this.jwtValue = jwtValue;
         this.invalidTokenService = invalidTokenService;
         this.userRepository = userRepository;

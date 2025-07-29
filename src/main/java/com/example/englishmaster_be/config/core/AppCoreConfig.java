@@ -1,23 +1,25 @@
 package com.example.englishmaster_be.config.core;
 
 
+import com.example.englishmaster_be.advice.exception.ApplicationException;
 import com.example.englishmaster_be.domain.user.user.model.UserEntity;
+import com.example.englishmaster_be.domain.user.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.hibernate.resource.jdbc.spi.StatementInspector;
-import org.slf4j.Logger;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
@@ -57,7 +59,10 @@ public class AppCoreConfig {
             if(authentication == null || !authentication.isAuthenticated() || authentication instanceof AnonymousAuthenticationToken){
                 return Optional.empty();
             }
-            return Optional.of((UserEntity) authentication.getPrincipal());
+            if(!(authentication.getPrincipal() instanceof UserEntity user)){
+                return Optional.empty();
+            }
+            return Optional.of(user);
         };
     }
 

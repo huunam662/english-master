@@ -12,10 +12,25 @@ import org.springframework.http.*;
 import org.springframework.util.Assert;
 import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j(topic = "BOT-UTIL")
 public class BotUtil {
+
+
+    public static Map<String, Object> contentToSend(String content){
+        ChatBotValue chatBotValue = SpringApplicationContext.getBean(ChatBotValue.class);
+        Map<String, Object> contentBox = new HashMap<>();
+        contentBox.put("model", chatBotValue.getChatModel());
+        contentBox.put("messages", List.of(
+                Map.of(
+                        "role", "user",
+                        "content", content
+                ))
+        );
+        return contentBox;
+    }
 
     public static String speechToText(String audioUrl) throws InterruptedException {
         // Ràng buộc dữ liệu đầu vào phải có giá trị (audioUrl)
@@ -101,7 +116,7 @@ public class BotUtil {
         headers.setBearerAuth(chatBotValue.getApiKey());
         headers.set("accept", MediaType.APPLICATION_JSON_VALUE);
         // Khởi tạo body sẽ được gửi yêu cầu đánh giá đến cho dịch vụ bên thứ 3 (coHere chatbot open API)
-        Map<String, Object> body = BotSendContentUtil.contentToSend(sendContent);
+        Map<String, Object> body = BotUtil.contentToSend(sendContent);
         String urlRequest = chatBotValue.getChatEndpoint();
         // Tiến hành request bao gồm headers và body đến endpoint được cung cấp từ dịch vụ bên thứ 3 (coHere chatbot open API)
         ResponseEntity<JsonNode> response = restTemplate.exchange(
@@ -150,5 +165,6 @@ public class BotUtil {
             throw new RuntimeException(e);
         }
     }
+
 
 }

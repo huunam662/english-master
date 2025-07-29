@@ -106,6 +106,7 @@ public class AuthService implements IAuthService {
             sessionActiveService.deleteByUserIdAndType(user.getUserId(), SessionActiveType.CONFIRM);
 
         userRegister.setRole(roleRepository.findByRoleName(Role.USER));
+        userRegister.setUserType("MeU English");
         userRegister = userService.saveUser(userRegister);
         SessionActiveEntity sessionConfirm = sessionActiveService.saveForUserRegister(userRegister, SessionActiveType.CONFIRM);
 

@@ -48,7 +48,7 @@ import java.util.concurrent.CompletableFuture;
 
 @Slf4j(topic = "USER-SERVICE")
 @Service
-public class UserService implements IUserService, UserDetailsService {
+public class UserService implements IUserService {
 
     private final UserRepository userRepository;
     private final IUploadService uploadService;
@@ -149,13 +149,6 @@ public class UserService implements IUserService, UserDetailsService {
         if(throwable) return getUserByEmail(email);
 
         return userRepository.findByEmail(email).orElse(null);
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findUserJoinRoleByEmail(username).orElseThrow(
-                () -> new ApplicationException(HttpStatus.NOT_FOUND, "User not existed.", new Exception("username"))
-        );
     }
 
     @Transactional

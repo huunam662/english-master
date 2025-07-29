@@ -62,7 +62,9 @@ public class MiddlewareConfig extends OncePerRequestFilter {
         }
         catch (Exception ex){
             logger.error("Cannot set user authentication: {}", ex);
-            globalExceptionHandler.printError(ex, HttpStatus.UNAUTHORIZED, request, response);
+            if(ex instanceof ApplicationException aex){
+                globalExceptionHandler.printError(aex, HttpStatus.UNAUTHORIZED, request, response);
+            }
         }
     }
 }

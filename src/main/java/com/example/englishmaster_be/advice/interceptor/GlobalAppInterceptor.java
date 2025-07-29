@@ -1,18 +1,17 @@
-package com.example.englishmaster_be.config.interceptor;
+package com.example.englishmaster_be.advice.interceptor;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 import javax.annotation.Nonnull;
 
 @Slf4j(topic = "MIDDLEWARE-INTERCEPTOR")
 @Configuration
-public class InterceptorConfig implements HandlerInterceptor {
+public class GlobalAppInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(

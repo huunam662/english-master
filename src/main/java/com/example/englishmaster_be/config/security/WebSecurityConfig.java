@@ -1,6 +1,8 @@
 package com.example.englishmaster_be.config.security;
 
+import com.example.englishmaster_be.advice.exception.GlobalExceptionHandler;
 import com.example.englishmaster_be.config.middleware.MiddlewareConfig;
+import com.example.englishmaster_be.domain.user.auth.service.user.AuthUserService;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.SneakyThrows;
@@ -27,9 +29,13 @@ import java.util.List;
 public class WebSecurityConfig {
 
     private final MiddlewareConfig authTokenFilter;
+    private final GlobalExceptionHandler globalExceptionHandler;
+    private final AuthUserService authUserService;
 
-    public WebSecurityConfig(MiddlewareConfig authTokenFilter) {
+    public WebSecurityConfig(MiddlewareConfig authTokenFilter, GlobalExceptionHandler globalExceptionHandler, AuthUserService authUserService) {
         this.authTokenFilter = authTokenFilter;
+        this.globalExceptionHandler = globalExceptionHandler;
+        this.authUserService = authUserService;
     }
 
     @Bean
@@ -47,7 +53,13 @@ public class WebSecurityConfig {
                                 .anyRequest().authenticated()
                 );
 
+        http.oauth2Login(oauth2 -> oauth2
+                .userInfoEndpoint(uInf -> uInf.oidcUserService(authUserService))
+                .successHandler(authUserService)
+        );
+
         http.addFilterBefore(authTokenFilter, UsernamePasswordAuthenticationFilter.class);
+        http.exceptionHandling(ex -> ex.authenticationEntryPoint(globalExceptionHandler).accessDeniedHandler(globalExceptionHandler));
 
         return http.build();
     }

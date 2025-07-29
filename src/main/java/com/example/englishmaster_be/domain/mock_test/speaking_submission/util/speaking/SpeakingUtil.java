@@ -3,16 +3,8 @@ package com.example.englishmaster_be.domain.mock_test.speaking_submission.util.s
 import com.example.englishmaster_be.common.constant.speaking_test.LevelSpeakerType;
 import com.example.englishmaster_be.common.constant.speaking_test.SpeakingErrorType;
 import com.example.englishmaster_be.domain.mock_test.speaking_submission.dto.res.speaking_error.*;
-import com.example.englishmaster_be.domain.mock_test.speaking_submission.mapper.SpeakingSubmissionMapper;
-import com.example.englishmaster_be.domain.exam.part.mapper.PartMapper;
-import com.example.englishmaster_be.domain.exam.part.model.PartEntity;
-import com.example.englishmaster_be.domain.mock_test.speaking_submission.dto.res.speaking_submission.SpeakingSubmissionRes;
-import com.example.englishmaster_be.domain.mock_test.speaking_submission.dto.res.speaking_submission.SpeakingSubmissionResultRes;
-import com.example.englishmaster_be.domain.mock_test.speaking_submission.mapper.SpeakingErrorMapper;
 import com.example.englishmaster_be.domain.mock_test.speaking_submission.model.SpeakingErrorEntity;
-import com.example.englishmaster_be.domain.mock_test.speaking_submission.model.SpeakingSubmissionEntity;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class SpeakingUtil {
 
