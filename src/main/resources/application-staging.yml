@@ -31,6 +31,19 @@ spring:
     multipart:
       max-file-size: 50MB
       max-request-size: 50MB
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 169090196207-7l6cthqomj7912mq9nm5cvqt7mf0avao.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - openid
+              - profile
+              - email
+            client-name: Google
+
 
 englishmaster:
   salt:

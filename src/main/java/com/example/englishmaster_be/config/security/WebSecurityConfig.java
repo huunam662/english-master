@@ -2,11 +2,8 @@ package com.example.englishmaster_be.config.security;
 
 import com.example.englishmaster_be.advice.exception.GlobalExceptionHandler;
 import com.example.englishmaster_be.config.middleware.MiddlewareConfig;
-import com.example.englishmaster_be.domain.user.auth.service.user.AuthUserService;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
+import com.example.englishmaster_be.domain.user.auth.service.oauth.OauthUserService;
 import lombok.SneakyThrows;
-import lombok.experimental.FieldDefaults;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -20,7 +17,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-
 import java.util.List;
 
 @Configuration
@@ -30,9 +26,9 @@ public class WebSecurityConfig {
 
     private final MiddlewareConfig authTokenFilter;
     private final GlobalExceptionHandler globalExceptionHandler;
-    private final AuthUserService authUserService;
+    private final OauthUserService authUserService;
 
-    public WebSecurityConfig(MiddlewareConfig authTokenFilter, GlobalExceptionHandler globalExceptionHandler, AuthUserService authUserService) {
+    public WebSecurityConfig(MiddlewareConfig authTokenFilter, GlobalExceptionHandler globalExceptionHandler, OauthUserService authUserService) {
         this.authTokenFilter = authTokenFilter;
         this.globalExceptionHandler = globalExceptionHandler;
         this.authUserService = authUserService;
@@ -54,7 +50,7 @@ public class WebSecurityConfig {
                 );
 
         http.oauth2Login(oauth2 -> oauth2
-                .userInfoEndpoint(uInf -> uInf.oidcUserService(authUserService))
+                .userInfoEndpoint(uInf -> uInf.userService(authUserService))
                 .successHandler(authUserService)
         );
 

@@ -50,6 +50,7 @@ spring:
               - openid
               - profile
               - email
+            client-name: Google
 
 englishmaster:
   salt:

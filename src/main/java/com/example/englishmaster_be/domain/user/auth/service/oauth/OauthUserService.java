@@ -1,4 +1,4 @@
-package com.example.englishmaster_be.domain.user.auth.service.user;
+package com.example.englishmaster_be.domain.user.auth.service.oauth;
 
 import com.example.englishmaster_be.advice.exception.ApplicationException;
 import com.example.englishmaster_be.advice.exception.GlobalExceptionHandler;
@@ -25,12 +25,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
-import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
-import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser;
-import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,22 +36,20 @@ import java.nio.charset.StandardCharsets;
 
 @Slf4j(topic = "AUTH-USER-SERVICE")
 @Service
-public class AuthUserService implements UserDetailsService, AuthenticationSuccessHandler, OAuth2UserService<OidcUserRequest, OidcUser> {
+public class OauthUserService extends DefaultOAuth2UserService implements UserDetailsService, AuthenticationSuccessHandler {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final OidcUserService oidcUserService;
     private final JwtService jwtService;
     private final ISessionActiveService sessionActiveService;
     private final GlobalExceptionHandler globalExceptionHandler;
 
-    public AuthUserService(GlobalExceptionHandler globalExceptionHandler, UserRepository userRepository, RoleRepository roleRepository, JwtService jwtService, ISessionActiveService sessionActiveService) {
+    public OauthUserService(GlobalExceptionHandler globalExceptionHandler, UserRepository userRepository, RoleRepository roleRepository, JwtService jwtService, ISessionActiveService sessionActiveService) {
         this.globalExceptionHandler = globalExceptionHandler;
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.jwtService = jwtService;
         this.sessionActiveService = sessionActiveService;
-        this.oidcUserService = new OidcUserService();
     }
 
     @Override
@@ -63,11 +57,6 @@ public class AuthUserService implements UserDetailsService, AuthenticationSucces
         return userRepository.findUserJoinRoleByEmail(username).orElseThrow(
                 () -> new ApplicationException(HttpStatus.NOT_FOUND, "User not existed.", new Exception("username"))
         );
-    }
-
-    @Override
-    public OidcUser loadUser(OidcUserRequest userRequest) throws OAuth2AuthenticationException {
-        return oidcUserService.loadUser(userRequest);
     }
 
     @Transactional
