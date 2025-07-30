@@ -74,6 +74,7 @@ public class MockTestMapperUtil {
         for(PartEntity part : parts){
             List<ReadingListeningSubmissionEntity> submissions = partSubmissionsMap.getOrDefault(part, null);
             if(submissions == null) continue;
+            submissions = submissions.stream().sorted(Comparator.comparing(elm -> elm.getAnswerChoice().getQuestion().getQuestionNumber(), Comparator.nullsLast(Comparator.naturalOrder()))).toList();
             ReadingListeningSubmissionRes rlsRes = new ReadingListeningSubmissionRes();
             rlsRes.setPart(PartMapper.INSTANCE.toPartBasicResponse(part));
             int totalScoreResultOfPart = 0;
@@ -83,6 +84,8 @@ public class MockTestMapperUtil {
                 ReadingListeningDetailRes rldRes = new ReadingListeningDetailRes();
                 AnswerEntity answerChoice = submission.getAnswerChoice();
                 rldRes.setMockTestDetailId(submission.getId());
+                Set<AnswerEntity> answers = answerChoice.getQuestion().getAnswers().stream().sorted(Comparator.comparing(AnswerEntity::getAnswerContent, Comparator.nullsLast(Comparator.naturalOrder()))).collect(Collectors.toCollection(LinkedHashSet::new));
+                answerChoice.getQuestion().setAnswers(answers);
                 rldRes.setQuestion(QuestionMapper.INSTANCE.toQuestionAnswersResponse(answerChoice.getQuestion()));
                 rldRes.setAnswerChoice(AnswerMapper.INSTANCE.toAnswerResponse(answerChoice));
                 rldRes.setIsCorrectAnswer(submission.getIsCorrectAnswer());

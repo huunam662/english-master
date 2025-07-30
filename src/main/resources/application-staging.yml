@@ -43,7 +43,7 @@ spring:
               - profile
               - email
             client-name: Google
-
+            redirect-uri: "{baseUrl}/englishmaster/login/oauth2/code/google"
 
 englishmaster:
   salt:
