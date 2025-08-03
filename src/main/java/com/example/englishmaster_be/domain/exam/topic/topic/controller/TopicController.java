@@ -1,5 +1,6 @@
 package com.example.englishmaster_be.domain.exam.topic.topic.controller;
 
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/exam/topic/topic/controller/TopicController.java
 import com.example.englishmaster_be.common.dto.req.PageOptionsReq;
 import com.example.englishmaster_be.common.dto.res.PageInfoRes;
 import com.example.englishmaster_be.domain.exam.topic.topic.dto.res.*;
@@ -10,6 +11,17 @@ import com.example.englishmaster_be.domain.exam.topic.topic.service.ITopicServic
 import com.example.englishmaster_be.domain.exam.question.dto.res.QuestionPartRes;
 import com.example.englishmaster_be.domain.exam.topic.topic.dto.req.TopicReq;
 import com.example.englishmaster_be.domain.exam.part.dto.res.PartRes;
+=======
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
+import com.example.englishmaster_be.domain.question.dto.response.QuestionPartResponse;
+import com.example.englishmaster_be.domain.topic.service.ITopicService;
+import com.example.englishmaster_be.domain.topic.mapper.TopicMapper;
+import com.example.englishmaster_be.domain.topic.dto.request.TopicRequest;
+import com.example.englishmaster_be.domain.topic.dto.request.TopicFilterRequest;
+import com.example.englishmaster_be.domain.part.dto.response.PartResponse;
+import com.example.englishmaster_be.domain.topic.dto.response.TopicResponse;
+import com.example.englishmaster_be.domain.topic.model.TopicEntity;
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/topic/controller/TopicController.java
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.coyote.BadRequestException;
@@ -41,7 +53,11 @@ public class TopicController {
 
     @GetMapping(value = "/{topicId:.+}/inforTopic")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/exam/topic/topic/controller/TopicController.java
     public TopicRes getInformationTopic(@PathVariable("topicId") UUID topicId) {
+=======
+    public TopicResponse getInformationTopic(@PathVariable("topicId") UUID topicId) {
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/topic/controller/TopicController.java
 
         TopicEntity topic = topicService.getTopicById(topicId);
 
@@ -50,8 +66,13 @@ public class TopicController {
 
     @PostMapping(value = "/create")
     @PreAuthorize("hasRole('ADMIN')")
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/exam/topic/topic/controller/TopicController.java
     public TopicRes createTopic(
             @RequestBody TopicReq topicRequest
+=======
+    public TopicResponse createTopic(
+            @RequestBody TopicRequest topicRequest
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/topic/controller/TopicController.java
     ) {
         
         TopicEntity topic = topicService.createTopic(topicRequest);
@@ -62,7 +83,11 @@ public class TopicController {
 
     @PutMapping(value = "/{topicId:.+}/updateTopic")
     @PreAuthorize("hasRole('ADMIN')")
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/exam/topic/topic/controller/TopicController.java
     public TopicRes updateTopic(
+=======
+    public TopicResponse updateTopic(
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/topic/controller/TopicController.java
             @PathVariable("topicId") UUID topicId,
             @RequestBody TopicReq topicRequest
     ) {
@@ -80,6 +105,7 @@ public class TopicController {
         topicService.deleteTopic(topicId);
     }
 
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/exam/topic/topic/controller/TopicController.java
     @GetMapping(value = "/page")
     public PageInfoRes<TopicPageRes> getAllTopic(@ModelAttribute PageOptionsReq optionsReq) {
         Page<ITopicPageView> pageTopic = topicService.getPageTopics(optionsReq);
@@ -87,6 +113,10 @@ public class TopicController {
         Page<TopicPageRes> pageTopicRes = new PageImpl<>(topicResList, pageTopic.getPageable(), pageTopic.getTotalElements());
         return new PageInfoRes<>(pageTopicRes);
     }
+=======
+    @GetMapping(value = "/listTopic")
+    public FilterResponse<?> getAllTopic(@ModelAttribute TopicFilterRequest filterRequest) {
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/topic/controller/TopicController.java
 
     @GetMapping(value = "/listTopic")
     public PageInfoRes<TopicPageToPackRes> getAllTopicToPack(@RequestParam("packId") UUID packId, @ModelAttribute PageOptionsReq optionsReq) {
@@ -97,7 +127,11 @@ public class TopicController {
     }
 
     @GetMapping("/{topicId}")
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/exam/topic/topic/controller/TopicController.java
     public TopicRes getTopic(@PathVariable("topicId") UUID id) {
+=======
+    public TopicResponse getTopic(@PathVariable("topicId") UUID id) {
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/topic/controller/TopicController.java
 
         TopicEntity topic = topicService.getTopicById(id);
 
@@ -129,7 +163,11 @@ public class TopicController {
 
     @GetMapping(value = "/{topicId:.+}/listPart")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/exam/topic/topic/controller/TopicController.java
     public List<PartRes> getPartToTopic(@PathVariable("topicId") UUID topicId) {
+=======
+    public List<PartResponse> getPartToTopic(@PathVariable("topicId") UUID topicId) {
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/topic/controller/TopicController.java
 
         return topicService.getPartToTopic(topicId);
     }
@@ -187,7 +225,11 @@ public class TopicController {
 
     @GetMapping("/{topicId}/list-question-from-all-part")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/exam/topic/topic/controller/TopicController.java
     public List<QuestionPartRes> getQuestionFromAllPart(
+=======
+    public List<QuestionPartResponse> getQuestionFromAllPart(
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/topic/controller/TopicController.java
             @PathVariable("topicId") UUID topicId
     ) {
 

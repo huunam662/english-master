@@ -1,0 +1,21 @@
+package com.example.englishmaster_be.domain.topic_type.controller;
+
+import com.example.englishmaster_be.domain.topic_type.dto.response.TopicTypeResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+import java.util.UUID;
+
+public interface ITopicTypeController {
+
+    @GetMapping("/{topicTypeId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(
+            summary = "Get single topic type.",
+            description = "Get single topic type."
+    )
+    TopicTypeResponse getSingleTopicType(@PathVariable UUID topicTypeId);
+
+}

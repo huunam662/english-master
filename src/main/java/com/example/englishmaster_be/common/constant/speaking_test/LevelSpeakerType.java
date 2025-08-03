@@ -1,8 +1,11 @@
 package com.example.englishmaster_be.common.constant.speaking_test;
 
+<<<<<<< HEAD
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import jakarta.persistence.AttributeConverter;
+=======
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.experimental.FieldDefaults;
@@ -33,11 +36,15 @@ public enum LevelSpeakerType {
                 .findFirst().orElse(DEFAULT);
     }
 
+<<<<<<< HEAD
     @JsonValue
+=======
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c
     @Override
     public String toString() {
         return this.level;
     }
+<<<<<<< HEAD
 
     public static class Converter implements AttributeConverter<LevelSpeakerType, String>{
 
@@ -51,4 +58,6 @@ public enum LevelSpeakerType {
             return LevelSpeakerType.fromLevel(dbData);
         }
     }
+=======
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c
 }

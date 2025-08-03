@@ -1,9 +1,15 @@
 package com.example.englishmaster_be.domain.upload.meu.controller;
 
 
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/upload/meu/controller/UploadController.java
 import com.example.englishmaster_be.domain.upload.meu.dto.req.FileDeleteReq;
 import com.example.englishmaster_be.domain.upload.meu.service.IUploadService;
 import com.example.englishmaster_be.domain.upload.meu.dto.res.FileRes;
+=======
+import com.example.englishmaster_be.shared.dto.response.FileResponse;
+import com.example.englishmaster_be.domain.upload.dto.request.FileDeleteRequest;
+import com.example.englishmaster_be.domain.upload.service.IUploadService;
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/upload/controller/UploadController.java
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.SneakyThrows;
@@ -25,7 +31,11 @@ public class UploadController {
     }
 
     @PostMapping(value = "/file", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/upload/meu/controller/UploadController.java
     public FileRes uploadFile(
+=======
+    public FileResponse uploadFile(
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/upload/controller/UploadController.java
             @RequestPart("file") MultipartFile file,
             @RequestParam(value = "dir", defaultValue = "/") String dir,
             @RequestParam(value = "isPrivateFile", defaultValue = "false") boolean isPrivateFile,

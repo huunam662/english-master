@@ -140,8 +140,17 @@ public class ExcelExportService implements IExcelExportService{
     protected void exportSpeakingInformation(List<TopicEntity> topicsResult, ZipOutputStream zipOutputStream) throws IOException {
         List<UUID> topicIds = topicsResult.stream().map(TopicEntity::getTopicId).toList();
         List<QuestionEntity> questionSpeakings = questionRepository.findAllQuestionSpeakingOfTopics(topicIds);
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/excel/_export/service/ExcelExportService.java
         Map<TopicEntity, List<QuestionEntity>> questionsTopic = questionSpeakings.stream()
                 .collect(Collectors.groupingBy(elm -> elm.getPart().getTopic()));
+=======
+        Map<PartEntity, List<QuestionEntity>> partQuestionsParentGroup = questionSpeakings.stream().collect(
+                Collectors.groupingBy(QuestionEntity::getPart)
+        );
+        Map<TopicEntity, List<PartEntity>> topicPartsGroup = partQuestionsParentGroup.keySet().stream().collect(
+                Collectors.groupingBy(PartEntity::getTopic)
+        );
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/excel/service/exp/ExcelExportService.java
         for(TopicEntity topic : topicsResult){
             try(
                     Workbook workbook = new XSSFWorkbook();
@@ -154,7 +163,11 @@ public class ExcelExportService implements IExcelExportService{
                         .toList();
                 writeTopicInformationToSheet(topic, partsTopic, workbook);
                 for(PartEntity part : partsTopic){
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/excel/_export/service/ExcelExportService.java
                     exportSpeakingOfTopic(part, workbook);
+=======
+                    exportSpeakingOfTopic(part, partQuestionsParentGroup, workbook);
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/excel/service/exp/ExcelExportService.java
                 }
 
                 workbook.write(workbookOut);
@@ -174,6 +187,10 @@ public class ExcelExportService implements IExcelExportService{
 
     protected void exportSpeakingOfTopic(
             PartEntity part,
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/excel/_export/service/ExcelExportService.java
+=======
+            Map<PartEntity, List<QuestionEntity>> partQuestionsParentGroup,
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/excel/service/exp/ExcelExportService.java
             Workbook workbook
     ){
         int nextRowNew = 0;
@@ -181,6 +198,7 @@ public class ExcelExportService implements IExcelExportService{
         Row partRow = sheetPartOfSpeaking.createRow(nextRowNew);
         partRow.createCell(0).setCellValue(part.getPartName());
         partRow.createCell(1).setCellValue(part.getPartType());
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/excel/_export/service/ExcelExportService.java
         for(QuestionEntity questionSpeaking : part.getQuestions()){
             Row imageQuestionRow = sheetPartOfSpeaking.createRow(++nextRowNew);
             imageQuestionRow.createCell(0).setCellValue("Image");
@@ -236,6 +254,11 @@ public class ExcelExportService implements IExcelExportService{
         partRow.createCell(0).setCellValue(part.getPartName());
         partRow.createCell(1).setCellValue(part.getPartType());
         for(QuestionEntity questionSpeaking : part.getQuestions()){
+=======
+        List<QuestionEntity> questionParentsOfPart = partQuestionsParentGroup.getOrDefault(part, new ArrayList<>())
+                .stream().sorted(Comparator.comparing(QuestionEntity::getQuestionScore)).toList();
+        for(QuestionEntity questionSpeaking : questionParentsOfPart){
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/excel/service/exp/ExcelExportService.java
             Row imageQuestionRow = sheetPartOfSpeaking.createRow(++nextRowNew);
             imageQuestionRow.createCell(0).setCellValue("Image");
             imageQuestionRow.createCell(1).setCellValue(questionSpeaking.getContentImage());

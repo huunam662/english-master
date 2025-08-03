@@ -21,6 +21,99 @@ import java.util.*;
 public class QuestionUtil {
 
 
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/exam/question/util/QuestionUtil.java
+=======
+        if(questionEntityList == null) return null;
+
+        if(!partEntity.getTopic().getTopicType().getTopicTypeName().equalsIgnoreCase("speaking"))
+            questionEntityList = shuffleQuestionsAndAnswers(questionEntityList, partEntity);
+
+        return questionEntityList.stream().map(
+                questionEntity -> {
+
+                    QuestionResponse questionResponse;
+
+                    Boolean isQuestionParent = questionEntity.getIsQuestionParent();
+
+                    if(isQuestionParent) {
+
+                        questionResponse = QuestionMapper.INSTANCE.toQuestionResponse(questionEntity);
+                        questionResponse.setNumberOfQuestionsChild(questionEntity.getQuestionGroupChildren() != null ? questionEntity.getQuestionGroupChildren().size() : 0);
+                    }
+                    else {
+
+                        questionResponse = QuestionMapper.INSTANCE.toQuestionChildResponse(questionEntity);
+                        questionResponse.setNumberOfQuestionsChild(0);
+                    }
+
+                    return questionResponse;
+                }
+        ).toList();
+    }
+
+
+    public static List<QuestionEntity> shuffleQuestionsAndAnswers(Collection<QuestionEntity> questionParentsList, PartEntity partEntity) {
+
+        if(questionParentsList == null || partEntity == null) return null;
+
+        List<QuestionEntity> questionParentsShuffle = new ArrayList<>(questionParentsList);
+
+        Collections.shuffle(questionParentsShuffle);
+
+        List<PartType> partTypesNotShuffle = List.of(
+                PartType.PART_1_TOEIC,
+                PartType.PART_2_TOEIC,
+                PartType.PART_1_IELTS,
+                PartType.PART_2_IELTS
+        );
+
+        boolean notShuffleAnswer = partTypesNotShuffle.stream().anyMatch(
+                partType -> partType.getType().equalsIgnoreCase(partEntity.getPartType())
+        );
+
+        boolean partTypeIsTextCompletion = partEntity.getPartType().equalsIgnoreCase("Text Completion");
+
+        questionParentsShuffle.forEach(questionEntity -> {
+
+            if(questionEntity.getIsQuestionParent() && questionEntity.getQuestionGroupChildren() != null) {
+
+                List<QuestionEntity> questionsList4Shuffle = new ArrayList<>(questionEntity.getQuestionGroupChildren());
+
+                if(!partTypeIsTextCompletion)
+                    Collections.shuffle(questionsList4Shuffle);
+
+                questionsList4Shuffle.forEach(
+                        questionGroupChildEntity -> {
+
+                            if(notShuffleAnswer){
+                                questionGroupChildEntity.setAnswers(
+                                        questionGroupChildEntity.getAnswers().stream().sorted(
+                                                Comparator.comparing(AnswerEntity::getAnswerContent)
+                                        ).collect(Collectors.toCollection(LinkedHashSet::new))
+                                );
+                            }
+                            else{
+                                if(questionGroupChildEntity.getAnswers() != null){
+
+                                    List<AnswerEntity> answersList4Shuffle = new ArrayList<>(questionGroupChildEntity.getAnswers());
+
+                                    Collections.shuffle(answersList4Shuffle);
+
+                                    questionGroupChildEntity.setAnswers(new HashSet<>(answersList4Shuffle));
+                                }
+                            }
+
+                        }
+                );
+
+                questionEntity.setQuestionGroupChildren(new HashSet<>(questionsList4Shuffle));
+            }
+
+        });
+
+        return new ArrayList<>(questionParentsShuffle);
+    }
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/question/util/QuestionUtil.java
 
     public static int totalQuestionChildOf(Collection<QuestionEntity> questionParents) {
 

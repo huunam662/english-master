@@ -43,10 +43,15 @@ public class QuestionJdbcRepository {
                     id, number_choice, question_score, create_at, update_at,
                     create_by, update_by, question_title, question_content,
                     content_audio, content_image, question_type, is_question_parent,
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/exam/question/repository/QuestionJdbcRepository.java
                     question_group, part_id, question_result, question_numberical
                 ) VALUES (
                     ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
                 )
+=======
+                    question_group, part_id, question_result
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/question/repository/jdbc/QuestionJdbcRepository.java
                 """;
 
         int questionsSize = questions.size();
@@ -82,7 +87,10 @@ public class QuestionJdbcRepository {
                     ps.setObject(14, question.getQuestionGroupParent() != null ? question.getQuestionGroupParent().getQuestionId() : null);
                     ps.setObject(15, question.getPart() != null ? question.getPart().getPartId() : question.getPartId());
                     ps.setString(16, question.getQuestionResult());
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/exam/question/repository/QuestionJdbcRepository.java
                     ps.setInt(17, question.getQuestionNumber());
+=======
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/question/repository/jdbc/QuestionJdbcRepository.java
                 }
 
                 @Override

@@ -1,6 +1,7 @@
 package com.example.englishmaster_be.domain.news.comment.controller;
 
 
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/news/comment/controller/CommentController.java
 import com.example.englishmaster_be.domain.news.comment.dto.req.CreateCmToCommentReq;
 import com.example.englishmaster_be.domain.news.comment.dto.req.UpdateCommentReq;
 import com.example.englishmaster_be.domain.news.comment.dto.res.*;
@@ -8,6 +9,15 @@ import com.example.englishmaster_be.domain.news.comment.service.ICommentService;
 import com.example.englishmaster_be.domain.news.comment.dto.req.CreateNewsCommentReq;
 import com.example.englishmaster_be.domain.news.comment.mapper.CommentMapper;
 import com.example.englishmaster_be.domain.news.comment.model.CommentEntity;
+=======
+import com.example.englishmaster_be.domain.comment.dto.request.CreateCmToCommentRequest;
+import com.example.englishmaster_be.domain.comment.dto.request.UpdateCommentRequest;
+import com.example.englishmaster_be.domain.comment.dto.response.*;
+import com.example.englishmaster_be.domain.comment.service.ICommentService;
+import com.example.englishmaster_be.domain.comment.dto.request.CreateNewsCommentRequest;
+import com.example.englishmaster_be.domain.comment.mapper.CommentMapper;
+import com.example.englishmaster_be.domain.comment.model.CommentEntity;
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/comment/controller/CommentController.java
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

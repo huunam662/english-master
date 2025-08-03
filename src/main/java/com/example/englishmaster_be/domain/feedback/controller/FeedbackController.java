@@ -1,6 +1,11 @@
 package com.example.englishmaster_be.domain.feedback.controller;
 
+<<<<<<< HEAD
 import com.example.englishmaster_be.common.dto.req.PageOptionsReq;
+=======
+import com.example.englishmaster_be.shared.dto.response.FilterResponse;
+import com.example.englishmaster_be.common.constant.sort.FeedbackSortBy;
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c
 
 import com.example.englishmaster_be.common.dto.res.PageInfoRes;
 import com.example.englishmaster_be.domain.feedback.dto.res.FeedbackPageRes;
@@ -27,6 +32,7 @@ public class FeedbackController {
 
     private final IFeedbackService feedbackService;
 
+<<<<<<< HEAD
     public FeedbackController(IFeedbackService feedbackService) {
         this.feedbackService = feedbackService;
     }
@@ -38,12 +44,63 @@ public class FeedbackController {
         List<FeedbackPageRes> feedbackPageResList = FeedbackMapper.INSTANCE.toFeedbackPageResList(feedbackPageViews.getContent());
         Page<FeedbackPageRes> feedbackPageRes = new PageImpl<>(feedbackPageResList, feedbackPageViews.getPageable(), feedbackPageViews.getTotalElements());
         return new PageInfoRes<>(feedbackPageRes);
+=======
+
+    @GetMapping(value = "/listFeedbackAdmin")
+    @PreAuthorize("hasRole('ADMIN')")
+    public FilterResponse<?> listFeedbackOfAdmin(
+            @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
+            @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
+            @RequestParam(value = "sortBy", defaultValue = "None") FeedbackSortBy sortBy,
+            @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction sortDirection,
+            @RequestParam(value = "search", defaultValue = "") String search,
+            @RequestParam(value = "enable", defaultValue = "false") Boolean isEnable
+    ){
+
+        FeedbackFilterRequest filterRequest = FeedbackFilterRequest
+                .builder()
+                    .page(page)
+                    .pageSize(size)
+                    .sortBy(sortBy)
+                    .direction(sortDirection)
+                    .search(search)
+                    .isEnable(isEnable)
+                .build();
+
+        return feedbackService.getListFeedbackOfAdmin(filterRequest);
+    }
+
+    @GetMapping(value = "/listFeedbackUser")
+    public FilterResponse<?> listFeedbackOfUser(
+            @RequestParam(value = "page", defaultValue = "1") @Min(1) Integer page,
+            @RequestParam(value = "size", defaultValue = "10") @Min(1) @Max(100) Integer size,
+            @RequestParam(value = "search", defaultValue = "") String search,
+            @RequestParam(value = "sortBy", defaultValue = "None") FeedbackSortBy sortBy,
+              @RequestParam(value = "direction", defaultValue = "DESC") Sort.Direction sortDirection
+    ){
+
+        FeedbackFilterRequest filterRequest = FeedbackFilterRequest
+                .builder()
+                    .page(page)
+                    .pageSize(size)
+                    .sortBy(sortBy)
+                    .direction(sortDirection)
+                    .search(search)
+                .build();
+
+        return feedbackService.getListFeedbackOfUser(filterRequest);
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c
     }
 
     @PostMapping(value = "/createFeedback" )
     @PreAuthorize("hasRole('ADMIN')")
+<<<<<<< HEAD
     public FeedbackRes createFeedback(
             @RequestBody @Valid FeedbackReq feedbackRequest
+=======
+    public FeedbackResponse createFeedback(
+            @RequestBody @Valid FeedbackRequest feedbackRequest
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c
     ){
 
         FeedbackEntity feedback = feedbackService.saveFeedback(feedbackRequest);
@@ -63,7 +120,11 @@ public class FeedbackController {
 
     @PatchMapping(value = "/{feedbackId:.+}/updateFeedback")
     @PreAuthorize("hasRole('ADMIN')")
+<<<<<<< HEAD
     public FeedbackRes updateFeedback(
+=======
+    public FeedbackResponse updateFeedback(
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c
             @PathVariable("feedbackId") UUID feedbackId,
             @RequestBody @Valid FeedbackReq feedbackRequest
     ){

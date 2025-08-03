@@ -2,7 +2,11 @@ package com.example.englishmaster_be.domain.dictionary.controller;
 
 
 
+<<<<<<< HEAD
 import com.example.englishmaster_be.domain.dictionary.dto.res.DictionarySuggestionResponse;
+=======
+import com.example.englishmaster_be.domain.dictionary.dto.response.DictionarySuggestionResponse;
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c
 import com.example.englishmaster_be.domain.dictionary.service.IDictionaryService;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,7 +33,11 @@ public class DictionaryController {
 
 
     @GetMapping("/suggest/{word}")
+<<<<<<< HEAD
     public DictionarySuggestionResponse getSuggestions(@PathVariable("word") String word) throws IOException {
+=======
+    public DictionarySuggestionResponse getSuggestions(@PathVariable("word") String word) {
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c
 
         return dictionaryService.getSuggestions(word);
     }

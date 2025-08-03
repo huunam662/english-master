@@ -113,7 +113,11 @@ public interface MockTestRepository extends JpaRepository<MockTestEntity, UUID> 
         LEFT JOIN FETCH qc.part
         WHERE mt.mockTestId = :mockTestId
     """)
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/mock_test/mock_test/repository/MockTestRepository.java
     MockTestEntity findMockTestJoinTopicUserResultPart(@Param("mockTestId") UUID mockTestId);
+=======
+    MockTestEntity findMockTestJoinTopicAndUserAndResultAndPart(@Param("mockTestId") UUID mockTestId);
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/mock_test/repository/jpa/MockTestRepository.java
 
     @Query(value = """
         SELECT EXISTS(SELECT id FROM mock_test WHERE id = :mockTestId) 

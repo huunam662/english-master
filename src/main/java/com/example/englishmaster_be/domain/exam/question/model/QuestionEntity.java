@@ -1,10 +1,19 @@
 package com.example.englishmaster_be.domain.exam.question.model;
 
 import com.example.englishmaster_be.common.constant.QuestionType;
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/exam/question/model/QuestionEntity.java
 import com.example.englishmaster_be.domain.exam.answer.model.AnswerEntity;
 import com.example.englishmaster_be.domain.exam.part.model.PartEntity;
 import com.example.englishmaster_be.domain.mock_test.speaking_submission.model.SpeakingSubmissionEntity;
 import com.example.englishmaster_be.domain.user.user.model.UserEntity;
+=======
+import com.example.englishmaster_be.domain.answer.model.AnswerEntity;
+import com.example.englishmaster_be.domain.mock_test_result.model.MockTestDetailEntity;
+import com.example.englishmaster_be.domain.part.model.PartEntity;
+import com.example.englishmaster_be.domain.speaking_submission.model.SpeakingSubmissionEntity;
+import com.example.englishmaster_be.domain.topic.model.TopicEntity;
+import com.example.englishmaster_be.domain.user.model.UserEntity;
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/question/model/QuestionEntity.java
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
@@ -70,8 +79,16 @@ public class QuestionEntity {
     @Column(name = "update_at")
     private LocalDateTime updateAt;
 
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/exam/question/model/QuestionEntity.java
     @Column(name = "is_question_parent")
     private Boolean isQuestionParent;
+=======
+    @Column(name = "has_hints")
+    Boolean hasHints;
+
+    @Column(name = "is_question_parent")
+    Boolean isQuestionParent;
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/question/model/QuestionEntity.java
 
     @Column(name = "part_id", insertable = false, updatable = false)
     private UUID partId;
@@ -98,11 +115,22 @@ public class QuestionEntity {
     @OneToMany(mappedBy = "questionGroupParent", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<QuestionEntity> questionGroupChildren;
 
+<<<<<<< HEAD:src/main/java/com/example/englishmaster_be/domain/exam/question/model/QuestionEntity.java
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<AnswerEntity> answers;
 
     @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<SpeakingSubmissionEntity> speakingSubmissions;
+=======
+    @OneToMany(mappedBy = "question", orphanRemoval = true, fetch = FetchType.LAZY)
+    Set<AnswerEntity> answers;
+
+    @OneToMany(mappedBy = "questionChild", fetch = FetchType.LAZY)
+    Set<MockTestDetailEntity> detailMockTests;
+
+    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
+    Set<SpeakingSubmissionEntity> speakingSubmissions;
+>>>>>>> 197ed81940903ab14a285d25c6aed6f94b8e649c:src/main/java/com/example/englishmaster_be/domain/question/model/QuestionEntity.java
 
     @PrePersist
     @PreUpdate
