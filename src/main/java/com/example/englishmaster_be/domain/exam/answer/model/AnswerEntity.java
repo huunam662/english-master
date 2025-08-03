@@ -72,8 +72,7 @@ public class AnswerEntity {
     @JoinColumn(name = "question_id", referencedColumnName = "id")
     private QuestionEntity question;
 
-    @OneToMany(mappedBy = "answerChoice", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToMany(mappedBy = "answerChoice", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<ReadingListeningSubmissionEntity> readingListeningSubmissions;
 
 }

@@ -20,8 +20,8 @@ public class PageOptionsReq {
     @Parameter(example = "1", description = "Number of page.")
     private int page = 1;
     @Min(value = 1, message = "Page size required min is 1.")
-    @Parameter(example = "1", description = "Size of page.")
-    private int size = 1;
+    @Parameter(example = "10", description = "Size of page.")
+    private int size = 10;
     private List<String> sortBy;
     Sort.Direction direction;
     private String filter;

@@ -95,12 +95,10 @@ public class TopicEntity {
     @JoinColumn(name = "topic_type_id", referencedColumnName = "id")
     private TopicTypeEntity topicType;
 
-    @OneToMany(mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<MockTestEntity> mockTests;
 
-    @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToMany(mappedBy = "topic", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<PartEntity> parts;
 
 }

@@ -32,4 +32,5 @@ public interface IMockTestService {
     MockTestInforRes getInformationMockTest(UUID mockTestId);
 
     Page<IMockTestPageView> getMockTestPage(PageOptionsReq optionsReq);
+
 }

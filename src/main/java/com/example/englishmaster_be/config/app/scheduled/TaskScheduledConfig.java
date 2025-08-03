@@ -29,8 +29,8 @@ import java.util.List;
 
 
 @Slf4j(topic = "TASK-SCHEDULED-CONFIG")
-@EnableScheduling
 @Configuration
+@EnableScheduling
 public class TaskScheduledConfig {
 
     @PersistenceContext

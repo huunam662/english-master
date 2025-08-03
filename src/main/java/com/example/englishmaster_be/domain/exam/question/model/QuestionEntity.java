@@ -95,16 +95,13 @@ public class QuestionEntity {
     @JoinColumn(name = "question_group", referencedColumnName = "id")
     private QuestionEntity questionGroupParent;
 
-    @OneToMany(mappedBy = "questionGroupParent", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToMany(mappedBy = "questionGroupParent", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<QuestionEntity> questionGroupChildren;
 
-    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<AnswerEntity> answers;
 
-    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToMany(mappedBy = "question", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<SpeakingSubmissionEntity> speakingSubmissions;
 
     @PrePersist

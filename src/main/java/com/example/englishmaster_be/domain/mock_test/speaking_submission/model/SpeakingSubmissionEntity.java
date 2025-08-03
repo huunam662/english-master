@@ -69,8 +69,7 @@ public class SpeakingSubmissionEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     private MockTestEntity mockTest;
 
-    @OneToMany(mappedBy = "speakingSubmission", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToMany(mappedBy = "speakingSubmission", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<SpeakingErrorEntity> speakingErrors;
 
 }

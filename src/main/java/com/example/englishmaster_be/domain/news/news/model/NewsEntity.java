@@ -68,7 +68,6 @@ public class NewsEntity {
     private UserEntity userUpdate;
 
     @OneToMany(mappedBy = "news", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<CommentEntity> comments;
 
 }

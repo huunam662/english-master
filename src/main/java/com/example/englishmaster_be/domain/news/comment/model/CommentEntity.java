@@ -78,7 +78,6 @@ public class CommentEntity {
     private CommentEntity commentParent;
 
     @OneToMany(mappedBy = "commentParent", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<CommentEntity> commentChildren;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -87,7 +86,6 @@ public class CommentEntity {
             joinColumns = @JoinColumn(name = "comment_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<UserEntity> usersVotes;
 
 }

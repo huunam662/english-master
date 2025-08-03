@@ -75,6 +75,5 @@ public class FlashCardEntity {
     private Set<FlashCardFeedbackEntity> flashCardFeedbacks;
 
     @OneToMany(mappedBy = "flashCard", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<FlashCardWordEntity> flashCardWords;
 }

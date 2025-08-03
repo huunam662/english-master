@@ -81,8 +81,7 @@ public class PartEntity {
     @LastModifiedBy
     private UserEntity userUpdate;
 
-    @OneToMany(mappedBy = "part", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToMany(mappedBy = "part", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<QuestionEntity> questions;
 
 }

@@ -79,15 +79,12 @@ public class UserEntity implements UserDetails {
     private RoleEntity role;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<OtpEntity> OTPs;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<SessionActiveEntity> sessionActives;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<InvalidTokenEntity> invalidTokens;
 
     @OneToMany(mappedBy = "userCreate", fetch = FetchType.LAZY)
@@ -95,19 +92,15 @@ public class UserEntity implements UserDetails {
     private Set<NewsEntity> news;
 
     @OneToMany(mappedBy = "createBy", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<FlashCardEntity> flashCards;
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<MockTestEntity> mockTests;
 
     @OneToMany(mappedBy = "userComment", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<CommentEntity> comments;
 
     @OneToMany(mappedBy = "toOwnerComment", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<CommentEntity> commentsToOwner;
 
     @ManyToMany(fetch = FetchType.LAZY)
@@ -116,7 +109,6 @@ public class UserEntity implements UserDetails {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "comment_id")
     )
-    @OnDelete(action = OnDeleteAction.CASCADE)
     private Set<CommentEntity> commentsVotes;
 
     @Override

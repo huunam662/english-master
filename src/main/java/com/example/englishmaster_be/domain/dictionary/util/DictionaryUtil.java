@@ -15,10 +15,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Component
-@Getter
-@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
-@RequiredArgsConstructor
+
 public class DictionaryUtil {
 
     public static Set<String> loadWordList() throws IOException {

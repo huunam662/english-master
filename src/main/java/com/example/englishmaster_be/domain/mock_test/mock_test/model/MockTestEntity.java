@@ -78,16 +78,13 @@ public class MockTestEntity {
     @JoinColumn(name = "topic_id", referencedColumnName = "id")
     private TopicEntity topic;
 
-    @OneToMany(mappedBy = "mockTest", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToMany(mappedBy = "mockTest", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<ReadingListeningSubmissionEntity> readingListeningSubmissions;
 
-    @OneToMany(mappedBy = "mockTest", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToMany(mappedBy = "mockTest", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<EssaySubmissionEntity> essaySubmissions;
 
-    @OneToMany(mappedBy = "mockTest", fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToMany(mappedBy = "mockTest", fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<SpeakingSubmissionEntity> speakingSubmissions;
 
 }
